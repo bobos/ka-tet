@@ -1,0 +1,129 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+
+namespace TextNS
+{
+  public abstract class TextLib
+  {
+    private Dictionary<string, string> defaultTxtDict = new Dictionary<string, string>() {
+    {"w_cloudy", "Cloudy"},
+    {"w_cloudy_d", "Clear sky good for military activities"},
+  {"w_rain", "Rain"},
+    {"w_rain_d", "Rain can provide drinkable water if army is low on water, \n" +
+               "rain will also stop wild fire from spreading"},
+    {"w_heavyRain", "Heavy Rain"},
+    {"w_heavyRain_d", "Heavy rain can provide drinkable water if army is low on water, \n" +
+                   "rain will also stop wild fire from spreading and most likely cause flood, \n" +
+                 "armies better stay away from rivers during heavy rain"},
+    {"w_heat", "Heat"},
+    {"w_heat_d", "Due to the unbearable heat, chance of illness is high"},
+    {"w_dry", "Dry Air"},
+    {"w_dry_d", "Forest tends to catch fire due to the dry air, good time to set a wild fire on forest, \n" +
+             "also armies better stay away from forest to avoid the wild fire in this dry weather caused by nature or " +
+             "enemies"},
+    {"w_snow", "Snow"},
+    {"w_snow_d", "Snow will slow down a marching army and cause some losses on an army due to frozen death, \n" +
+              "but snow can also provide drinkable water if army is low on water"},
+    {"w_blizard", "Blizard"},
+    {"w_blizard_d", "Blizard will slow down a marching army tremendously and cause heavy losses on an army due to frozen death, " +
+              "and punish the morale of an army\n" +
+              "but blizard can also provide drinkable water if army is low on water"},
+
+    // Season
+    {"s_spring", "Spring"},
+    {"s_spring_d", "Spring is a good choice of starting a warfare as weather throughout this season is rather comfortable \n" +
+               "and also the field is replenished with fruits and wild livies which can be added into army's supply inventory"},
+    {"s_summer", "Summer"},
+    {"s_summer_d", "Summer is a hard season for lauching a warfare, as the flood caused by heavy rain is devastating to an army, " +
+               "also the heat in summer will cause dehydration and cause the spreading sickness within the army which camp in forest"},
+    {"s_autumn", "Autumn"},
+    {"s_autumn_d", "Autumn is the perfect season for lauching a warfare, because the farms are now filled with grains which are " +
+               "the countless supply deposits for armies which are low on food to fetch, the only thing a general needs to pay attention" +
+               " to in Autumn is the wild fire caused by either enemy armies or by nature"},
+    {"s_winter", "Winter"},
+    {"s_winter_d", "Winter is as hard as Summer for lauching a warfare or even harder, " +
+               "because all the lands are barren there is nothing can be sacavaged from field for supply, " +
+               "and armies are significantly slowed down when march in snow " +
+               "also the horrible blizard in Winter will cause unbearable soldier losses and break even the " +
+               "toughest soldiers' wills for which dare to stay on field not in the Winter camp"},
+
+    // Current
+    {"c_nowind", "No Wind"},
+    {"c_nowind_d", "No Wind"},
+    {"c_wind", "Wind"},
+    {"c_wind_d", "Wind helps wild fire to spread through the direction it blows"},
+    {"c_gale", "Gale"},
+    {"c_gale_d", "Gale helps wild fire to spread through the direction it blows, also Gale gives " +
+              "combat disadvantage to the army face the direction of the blowing"},
+          
+    // direction
+    {"d_dueNorth", "Due North"},
+    {"d_dueSouth", "Due South"},
+    {"d_dueWest", "Due West"},
+    {"d_dueEast", "Due East"},
+    {"d_northEast", "North East"},
+    {"d_northWest", "North West"},
+    {"d_southEast", "South East"},
+    {"d_southWest", "South West"},
+
+  // unit
+  	{"u_exhausted", "Exhausted"},
+  	{"u_tired", "Tired"},
+  	{"u_fresh", "Fresh"},
+  	{"u_vigorous", "Vigorous"},
+    {"u_concealing", "Concealling"},
+    {"u_camping", "Camping"},
+    {"u_routing", "Routing"},
+    {"u_disbanded", "Disbanded"},
+    {"u_standing", "Standing"},
+
+    // region
+    {"r_riverRun", "RiverRun"},
+
+		// legion names
+		{"l_longwei", "LongWei"},
+    {"l_longshen", "LongShen"},
+    {"l_huben", "HuBen"},
+    {"l_qingshen", "QingShen"},
+		{"l_longwei6", "LongWei6"},
+    {"l_longshen6", "LongShen6"},
+    {"l_huben6", "HuBen6"},
+    {"l_qingshen6", "QingShen6"},
+
+    // faction
+    {"f_liang", "Liang"},
+
+    // party report
+    {"pr_sloppyOnDrill", "General Sloppy On Drill"},
+    {"pr_sloppyOnDrill_d", "General is sloppy on drill, which leads the shameful defeat"}
+  };
+
+    protected Dictionary<string, string> txtDict = null;
+
+    public string get(string key)
+    {
+      string ret;
+      if (!(txtDict != null && txtDict.TryGetValue(key, out ret)))
+      {
+        // use default txt lib
+        if (!defaultTxtDict.TryGetValue(key, out ret))
+        {
+          return "TXT NOT FOUND";
+        }
+      }
+      return ret;
+    }
+  }
+
+  public class TextLibEng : TextLib { }
+  public class TextLibChn : TextLib
+  {
+    public TextLibChn()
+    {
+      txtDict = new Dictionary<string, string>() {
+      {"w_Cloudy", "多云"}
+  };
+    }
+  }
+
+}

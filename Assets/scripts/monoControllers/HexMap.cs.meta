@@ -1,0 +1,53 @@
+fileFormatVersion: 2
+guid: b8161b1cc982b4560b97ce12916d08b5
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - turnController: {instanceID: 0}
+  - weatherGenerator: {instanceID: 0}
+  - windGenerator: {instanceID: 0}
+  - settlementMgr: {instanceID: 0}
+  - msgBox: {instanceID: 0}
+  - actionController: {instanceID: 0}
+  - mouseController: {instanceID: 0}
+  - combatController: {instanceID: 0}
+  - cameraKeyboardController: {instanceID: 0}
+  - unitSelectionPanel: {instanceID: 0}
+  - settlementViewPanel: {instanceID: 0}
+  - weatherIndicator: {instanceID: 0}
+  - hoverInfo: {instanceID: 0}
+  - turnIndicator: {instanceID: 0}
+  - turnPhaseTitle: {instanceID: 0}
+  - MeshWater: {instanceID: 0}
+  - MeshFlat: {instanceID: 0}
+  - MeshHill: {instanceID: 0}
+  - MeshMountain: {instanceID: 0}
+  - MatOcean: {fileID: 2100000, guid: 75df011dacb6d464a9e0ee5173c7135b, type: 2}
+  - MatPlain: {fileID: 2100000, guid: 69259e7d8008543b39c4aafcbcc7b64b, type: 2}
+  - MatLessPlain: {fileID: 2100000, guid: bd3ea563e20fc49c7b5e4c4fa273045d, type: 2}
+  - MatGrassland: {fileID: 2100000, guid: 93150a07aab114939953d75ae6cc969c, type: 2}
+  - MatMountain: {fileID: 2100000, guid: 65c40ff28c2e84c469e874169db375ec, type: 2}
+  - MatBurning: {fileID: 2100000, guid: 3e1bcfbec40a64c9c983997b434b8048, type: 2}
+  - MatSchorched: {fileID: 2100000, guid: 805e7ddfe55d04f19a1332be5a771098, type: 2}
+  - MatFlooded: {fileID: 2100000, guid: fe18b45eefeea444889e98bc87524e15, type: 2}
+  - MovementRange: {fileID: 2100000, guid: cae7b8c5fa15c4bd5bac476224db6c47, type: 2}
+  - AttackRange: {fileID: 2100000, guid: 88b5b49f551384254aa9c6f9bd0ad9fe, type: 2}
+  - CampRange: {fileID: 2100000, guid: 70147730546794840a1e892187e7db49, type: 2}
+  - PlayerSkin: {fileID: 2100000, guid: c0c666eb76cd646dd862dc9e5e1c7d15, type: 2}
+  - GreySkin: {fileID: 2100000, guid: 6fcad8559932545e7ae95cd7029cdf1b, type: 2}
+  - AISkin: {fileID: 2100000, guid: f477c07df6a61496db2ed8db72df4d78, type: 2}
+  - UnitHightlight: {fileID: 2100000, guid: 9ec0fae0192974dcfba07b95564c7a33, type: 2}
+  - InfantryPrefab: {fileID: 1193126689161024, guid: 0386ac77b565f4917b9b36912b098329,
+      type: 2}
+  - CavalryPrefab: {fileID: 1301546875962452, guid: 74cf0d259d0e844b49427f25db11f118,
+      type: 2}
+  - HexPrefab: {fileID: 1123697764883644, guid: 69a97392171eb429b9ad2211f772f443,
+      type: 2}
+  - TentPrefab: {fileID: 1765841391525092, guid: 26c53a1f39c9a48179f77b3e61d7072f,
+      type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
