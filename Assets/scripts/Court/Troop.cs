@@ -36,6 +36,7 @@ namespace CourtNS
     }
 
     public Troop(int soldiers, Faction faction, Region region, Type type) {
+      this.type = type;
       this.soldiers = soldiers;
       this.faction = faction;
       name = region.AssignLegionName(type);
@@ -44,7 +45,6 @@ namespace CourtNS
       movCore = Util.Rand(AbilityMin + 60, AbilityMax + 60);
       morale = 60;
       this.region = region;
-      this.type = type;
       state = TroopState.Idle;
     }
 

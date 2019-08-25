@@ -115,7 +115,7 @@ public class Cons {
   public static TextLib GetTextLib () {
     // TODO: use strategy pattern
     if (textLib == null) {
-      textLib = new TextLibEng();
+      textLib = new TextLibChn();
     }
     return textLib;
   }

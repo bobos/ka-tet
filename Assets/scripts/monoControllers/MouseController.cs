@@ -694,7 +694,7 @@ namespace MonoNS
       {
         // TODO: fot test
         //if (settlementMgr.BuildSettlement(tileUnderMouse, Settlement.Type.camp, hexMap.warParties[0]))
-        if (settlementMgr.BuildSettlement(tileUnderMouse, Settlement.Type.camp,
+        if (settlementMgr.BuildSettlement("", tileUnderMouse, Settlement.Type.camp,
             selectedUnit.IsAI() ? hexMap.warParties[1] : hexMap.warParties[0], 0, 0, 0, selectedUnit))
         {
           msgBox.Show("Building Camp"); //TODO: build camp next the unit and consume 1 food

@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine.UI;
 
 namespace MonoNS
 {
@@ -20,7 +17,7 @@ namespace MonoNS
     {
       if (this != null && this.title != null)
       {
-        this.title.text = faction + " Turn";
+        this.title.text = faction + "回合";
       }
     }
 

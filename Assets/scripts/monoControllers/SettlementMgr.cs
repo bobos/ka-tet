@@ -91,13 +91,13 @@ namespace MonoNS
       List<DistJob> jobs = warParty.attackside ? attackerDistJobs : defenderDistJobs;
       foreach(DistJob job in jobs) {
         if (!job.from.IsFunctional() || !job.to.IsFunctional()) {
-          msgBox.Show("dist supply failed due to blocked settlement");
+          msgBox.Show("城寨被包围，无法运送粮草或兵役");
           continue;
         }
         // ambush supply caravans
         Tile[] route = PickASupplyRoute(job.from, job.to);
         if (route.Length == 0) {
-          msgBox.Show("dist supply failed due to blocked route");
+          msgBox.Show("后勤线路被敌军阻隔，无法运送粮草或兵役");
           continue;
         }
         Unit ambusher = IsSupplyRouteAmbushed(route, units.First().IsAI());
@@ -171,14 +171,14 @@ namespace MonoNS
     List<Settlement> attackerRoots;
     List<Settlement> defenderRoots;
     List<Settlement> buildingQueue;
-    public bool BuildSettlement(Tile location, Settlement.Type type, WarParty warParty,
+    public bool BuildSettlement(string name, Tile location, Settlement.Type type, WarParty warParty,
       int civillian, int labor, int supply = 0, Unit unit = null)
     {
       if(location.Work2BuildSettlement() == -1) return false; // unbuildable tile
       Settlement settlement = null;
       if (type == Settlement.Type.camp)
       {
-        settlement = new Camp(location, warParty, supply, labor);
+        settlement = new Camp(unit.rf.general.Name() + Cons.textLib.get("b_ownedCamp"), location, warParty, supply, labor);
         settlement.onSettlementReady += this.SettlementReady;
         buildingQueue.Add(settlement);
       }
@@ -186,11 +186,11 @@ namespace MonoNS
       {
         if (type == Settlement.Type.city)
         {
-          settlement = new City(location, warParty, supply, civillian, labor);
+          settlement = new City(name, location, warParty, supply, civillian, labor);
         }
         if (type == Settlement.Type.strategyBase)
         {
-          settlement = new StrategyBase(location, warParty, supply, labor);
+          settlement = new StrategyBase(name, location, warParty, supply, labor);
         }
       }
 
@@ -216,7 +216,7 @@ namespace MonoNS
       GameObject tileGO = hexMap.GetTileGO(settlement.baseTile);
       if (tileGO == null) Util.Throw("CreateSettlement: Tile doesn't exist!");
       // TODO: use different prefab for different type
-      GameObject GO = (GameObject)Instantiate(hexMap.TentPrefab,
+      GameObject GO = (GameObject)Instantiate(settlement.type == Settlement.Type.camp ? hexMap.CampPrefab : hexMap.TentPrefab,
               settlement.baseTile.Position(),
               Quaternion.identity,
               tileGO.transform);
@@ -239,14 +239,15 @@ namespace MonoNS
       {
         return;
       }
-      MeshRenderer mr = settlement2GO[settlement].GetComponentInChildren<MeshRenderer>();
-      if (settlement.state == Settlement.State.constructing)
-      {
-        mr.material = hexMap.GreySkin;
-      }
-      else
-      {
-        mr.material = settlement.owner.isAI ? hexMap.AISkin : hexMap.PlayerSkin;
+      foreach(MeshRenderer mr in settlement2GO[settlement].GetComponentsInChildren<MeshRenderer>()) {
+        if (settlement.state == Settlement.State.constructing)
+        {
+          mr.material = hexMap.GreySkin;
+        }
+        else
+        {
+          mr.material = settlement.owner.isAI ? hexMap.AISkin : hexMap.PlayerSkin;
+        }
       }
     }
 

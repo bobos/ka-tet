@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using UnitNS;
 
@@ -62,42 +60,40 @@ namespace MonoNS
     public void OnSettlementSelect(Settlement s)
     {
       self.SetActive(true);
-      string type = "camp";
+      string type = "营寨";
       if (s.type == Settlement.Type.city)
       {
-        type = "city";
+        type = "城市";
       }
       if (s.type == Settlement.Type.strategyBase)
       {
-        type = "Citedal";
+        type = "大本营";
       }
       title.text = s.name + " (" + type + ")";
-      population.text = "civillians:" + s.civillian + " labor:" + s.labor;
-      supply.text = "supply deposit: " + s.supplyDeposit + " Dan" + " Consume " + s.MinSupplyNeeded() + " per turn";
+      population.text = "人口: 平民" + s.civillian + " 兵役" + s.labor;
+      supply.text = "粮草: " + s.supplyDeposit + "石" + " 每回合消耗" + s.MinSupplyNeeded() + "石";
       Unit[] garrison = s.garrison.ToArray();
       garrison1.text = "";
       garrison2.text = "";
       if (garrison.Length > 0)
       {
         Unit u1 = garrison[0];
-        garrison1.text = "unit1: " + u1.GeneralName() + " slots: " + u1.slots + "/" + u1.GetMaxSupplySlots() + " mv: " + u1.movementRemaining + "/" + u1.GetFullMovement()
-        + " labor: " + u1.labor;
+        garrison1.text = "部队: " + u1.GeneralName() + " 补给: " + u1.slots + "/" + u1.GetMaxSupplySlots() + " 战兵:" + u1.rf.soldiers + " 兵役:" + u1.labor;
       }
       if (garrison.Length > 1)
       {
         Unit u2 = garrison[1];
-        garrison2.text = "unit2: " + u2.GeneralName() + " slots: " + u2.slots + "/" + u2.GetMaxSupplySlots() + " mv: " + u2.movementRemaining + "/" + u2.GetFullMovement()
-        + " labor: " + u2.labor;
+        garrison2.text = "部队: " + u2.GeneralName() + " 补给: " + u2.slots + "/" + u2.GetMaxSupplySlots() + " 战兵:" + u2.rf.soldiers + " 兵役:" + u2.labor;
       }
-      defense.text = "wall: " + s.wall;
-      defenseWill.text = "defense preparation: " + s.defensePrep;
-      string state = "normal";
+      defense.text = "城防: " + s.wall;
+      defenseWill.text = "守备: " + s.defensePrep;
+      string state = "正常";
       if (s.state == Settlement.State.constructing)
       {
-        state = "under construction";
+        state = "筑城中 预计" + s.buildTurns + "回合完成";
       }
-      this.state.text = "state: " + state;
-      this.inNetwork.text = "Building turns: " + s.buildTurns;
+      this.state.text = state;
+      this.inNetwork.text = "";
 
       EnableButtons(s.IsFunctional());
       // TODO: for test

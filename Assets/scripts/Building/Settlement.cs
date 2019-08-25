@@ -98,7 +98,7 @@ public abstract class Settlement
     strategyBase
   }
 
-  public Settlement(Tile location, WarParty warParty, int supply, int room)
+  public Settlement(string name, Tile location, WarParty warParty, int supply, int room)
   {
     hexMap = GameObject.FindObjectOfType<HexMap>();
     settlementMgr = hexMap.settlementMgr;
@@ -108,6 +108,7 @@ public abstract class Settlement
     owner = warParty;
     supplyDeposit = supply > SupplyCanTakeIn() ? SupplyCanTakeIn() : supply;
     parkSlots = room;
+    this.name = name;
   }
 
   public void Destroy()
@@ -234,29 +235,29 @@ public abstract class Settlement
 
   public string DistSupply(int amount, Settlement to) {
     if (amount > supplyDeposit) {
-      return "Failed to dist supply, insufficient supply";
+      return "粮草不足，无法完成后勤补给任务";
     }
 
     int neededLabor = CalcNeededLabor(amount);
     if (neededLabor > availableLabor) {
-      return "Failed to dist supply, insufficient labor";
+      return "兵役不足，无法完成后勤补给任务";
     }
 
     availableLabor -= neededLabor;
     supplyDeposit -= amount;
     to.TakeInSupply(amount);
-    return "Dist supply done";
+    return "后勤补给完成";
   }
 
   public string DistLabor(int amount, Settlement to) {
     if (amount > availableLabor) {
-      return "Failed to dist supply, insufficient labor";
+      return "兵役不足，无法向友军提供请求的兵役人口";
     }
 
     availableLabor -= amount;
     labor -= amount;
     to.TakeInLabor(amount);
-    return "Dist labor done";
+    return "兵役补充完成";
   }
 
   public void SupplyIntercepted(Unit enemy, int amount, int labors = 0) {
@@ -279,8 +280,10 @@ public abstract class Settlement
     int needed = enemy.GetNeededSupply();
     int supplyTaken = needed > adjustedAmount ? adjustedAmount : needed;
     enemy.TakeInSupply(supplyTaken);
-    MsgBox.ShowMsg(enemy.GeneralName() + " ambushed supply caravans, killed " + killedLaborEscort +
-                   " labor and took " + supplyTaken + " supply then burnt " + (adjustedAmount - supplyTaken) + " supply");
+    MsgBox.ShowMsg("粮草补给队遭遇" + enemy.GeneralName() + "所部伏击, " + killedLaborEscort + "押运民夫被杀余者逃回" + name + "," + 
+                   supplyTaken + "石粮草为敌军所夺，余下" + 
+                   (adjustedAmount - supplyTaken)
+                   + "石粮草遭悉数焚毁");
   }
 
   public void LaborIntercepted(Unit enemy, int amount) {
@@ -288,8 +291,7 @@ public abstract class Settlement
     availableLabor -= adjustedLabor;
     int killedLabor = (int)(Util.Rand(0.008f, 0.04f) * adjustedLabor);
     labor -= killedLabor;
-    MsgBox.ShowMsg(enemy.GeneralName() + " ambushed labor reinforcement, killed " + killedLabor +
-                   " labors, survivors have returned to " + name);
+    MsgBox.ShowMsg("民夫驰援队遭遇" + enemy.GeneralName() + "所部伏击, " + killedLabor + "民夫被杀余者逃回" + name);
   }
 
   public void TakeInSupply(int supply) {
@@ -366,7 +368,6 @@ public abstract class Settlement
       if (ambusher != null) {
         // supply caravans ambushed
         SupplyIntercepted(ambusher, neededPerTurn, neededLabor);
-        MsgBox.ShowMsg(unit.GeneralName() + " failed to retrieve supply from camp due to ambusher");
         continue;
       }
 
@@ -482,8 +483,8 @@ public class City : Settlement
     Huge
   }
 
-  public City(Tile tile, WarParty warParty, int supply, int civillian, int labor, Scale scale = Scale.Large) :
-    base(tile, warParty, supply, GetSlots(scale))
+  public City(string name, Tile tile, WarParty warParty, int supply, int civillian, int labor, Scale scale = Scale.Large) :
+    base(name, tile, warParty, supply, GetSlots(scale))
   {
     this.labor = labor;
     this.civillian = civillian;
@@ -501,7 +502,8 @@ public class City : Settlement
 public class StrategyBase : Settlement
 {
 
-  public StrategyBase(Tile tile, WarParty warParty, int supply, int labor) : base(tile, warParty, supply, MaxGarrisonPerBase)
+  public StrategyBase(string name, Tile tile, WarParty warParty, int supply, int labor) :
+  base(name, tile, warParty, supply, MaxGarrisonPerBase)
   {
     this.civillian = 0;
     this.labor = labor;
@@ -515,7 +517,8 @@ public class Camp : Settlement
 {
 
   const int SupportTurns = 3;
-  public Camp(Tile tile, WarParty warParty, int supply, int labor) : base(tile, warParty, supply, MaxGarrisonPerCamp)
+  public Camp(string name, Tile tile, WarParty warParty, int supply, int labor) :
+  base(name, tile, warParty, supply, MaxGarrisonPerCamp)
   {
     this.civillian = 0;
     this.labor = labor;

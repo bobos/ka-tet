@@ -100,15 +100,16 @@ namespace MonoNS
     {
       self.SetActive(true);
       title.text = unit.GeneralName();
-      movement.text = "movement:" + unit.movementRemaining + "/" + unit.GetFullMovement();
-      slots.text = "slots: " + unit.slots + "/" + unit.GetMaxSupplySlots() + " supply: " + unit.supply + " consume " + unit.SupplyNeededPerTurn() + " per turn";
-      num.text = "force:" + unit.GeneralName() + " wnd:" + unit.rf.wounded + " kia:" + unit.kia + " mia:" + unit.mia + " labor:" + unit.labor;
-      morale.text = "morale: " + unit.rf.morale;
-      offense.text = "offense: " + unit.atk;
-      defense.text = "defense: " + unit.def;
-      stamina.text = "stamina: " + unit.GetStaminaLvlName();
-      state.text = "state: " + unit.GetStateName() + (unit.starving ? " Starving" : "");
-      illness.text = "illness last:" + unit.GetIllTurns() + " illdeath:" + unit.GetIllDeathTurns();
+      movement.text = "移动力:" + unit.movementRemaining + "/" + unit.GetFullMovement();
+      slots.text = "粮草: " + unit.supply + "石" + " 可维持" + unit.slots + "/" + unit.GetMaxSupplySlots() + "回合" + " 每回合消耗:" + unit.SupplyNeededPerTurn() + "石";
+      num.text = unit.Name() + "[兵:" + unit.rf.soldiers + "/伤:" + unit.rf.wounded + "/亡:" + unit.kia + "/逃:" + unit.mia + "/役:" + unit.labor + "]";
+      morale.text = "士气: " + unit.rf.morale;
+      offense.text = "攻击: " + unit.atk;
+      defense.text = "防御: " + unit.def;
+      stamina.text = "体力: " + unit.GetStaminaLvlName();
+      state.text = "部队状态: " + unit.GetStateName() + (unit.starving ? " 饥饿[本轮" + unit.GetStarvingDessertNum() +"人逃"
+        + unit.GetStarvingKillNum() + "人亡]" : "" + (unit.IsWarWeary() ? " 毫无战意[本轮" + unit.GetWarWearyDissertNum() + "人逃亡]" : ""));
+      illness.text = unit.GetIllTurns() > 0 ? "疫情: 预计本轮致伤"+ unit.GetIllDisableNum() + "人,致死" + unit.GetIllKillNum() +"人,疫情还将持续" + unit.GetIllTurns() + "回合" : "";
 
       ToggleButtons(false);
       if (unit.IsAI() == !turnController.player) {

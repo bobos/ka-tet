@@ -16,7 +16,7 @@ namespace MonoNS
     public Text indicator;
     public void Set(int turnNum, string party)
     {
-      indicator.text = "Turn: " + turnNum + " " + party + "'s turn";
+      indicator.text = "当前回合: " + turnNum + " " + party + "回合";
     }
 
     public override void UpdateChild() {}

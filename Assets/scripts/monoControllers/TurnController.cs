@@ -28,7 +28,7 @@ namespace MonoNS
     void TurnChange()
     {
       playerTurn = !playerTurn;
-      string faction = playerTurn ? "Player" : "Enemy";
+      string faction = playerTurn ? "玩家" : "AI";
       turnIndicator.Set(turnNum, faction);
       showingTitle = true;
       title.Set(faction);

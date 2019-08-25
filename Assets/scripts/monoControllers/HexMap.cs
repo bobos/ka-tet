@@ -72,6 +72,7 @@ namespace MonoNS
     public GameObject CavalryPrefab;
     public GameObject HexPrefab;
     public GameObject TentPrefab;
+    public GameObject CampPrefab;
     public WarParty[] warParties = new WarParty[2];
     public List<GameObject> lineCache = new List<GameObject>();
 
@@ -231,6 +232,13 @@ namespace MonoNS
       }
     }
 
+    private void SetTroopSkin(GameObject view, Material skin) {
+      MeshRenderer[] mrs = view.GetComponentsInChildren<MeshRenderer>();
+      foreach (MeshRenderer mr in mrs) {
+        mr.material = skin;
+      }
+    }
+
     public void SetUnitSkin(Unit unit)
     {
       if (unit == null) return;
@@ -239,14 +247,15 @@ namespace MonoNS
         // unit has encamped
         return;
       }
-      MeshRenderer mr = unit2GO[unit].GetComponentInChildren<MeshRenderer>();
+      GameObject view = unit2GO[unit];
       if (unit.TurnDone())
       {
-        mr.material = GreySkin;
+        SetTroopSkin(view, GreySkin);
       }
       else
       {
-        mr.material = unit.IsAI() ? AISkin : PlayerSkin;
+        SetTroopSkin(view, 
+        unit.IsAI() ? AISkin : PlayerSkin);
       }
     }
 
@@ -269,8 +278,7 @@ namespace MonoNS
     public void HighlightUnit(Unit unit)
     {
       if (unit == null && unit2GO.ContainsKey(unit)) return;
-      MeshRenderer mr = unit2GO[unit].GetComponentInChildren<MeshRenderer>();
-      mr.material = UnitHightlight;
+      SetTroopSkin(unit2GO[unit], UnitHightlight);
     }
 
     void SetTileVisual(Tile tile)
@@ -477,7 +485,9 @@ namespace MonoNS
       if (unit2GO.ContainsKey(unit))
       {
         GameObject view = unit2GO[unit];
-        view.GetComponentInChildren<MeshRenderer>().enabled = false;
+        foreach(MeshRenderer mr in view.GetComponentsInChildren<MeshRenderer>()) {
+          mr.enabled = false;
+        }
         view.GetComponent<UnitView>().Deactivate();
       } else {
         CreateUnitViewAt(unit, unit.tile);
@@ -490,7 +500,9 @@ namespace MonoNS
       if (unit2GO.ContainsKey(unit))
       {
         GameObject view = unit2GO[unit];
-        view.GetComponentInChildren<MeshRenderer>().enabled = true;
+        foreach(MeshRenderer mr in view.GetComponentsInChildren<MeshRenderer>()) {
+          mr.enabled = true;
+        }
         view.GetComponent<UnitView>().Activate();
         return true;
       }

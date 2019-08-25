@@ -8,7 +8,7 @@ namespace TextNS
     private Dictionary<string, string> defaultTxtDict = new Dictionary<string, string>() {
     {"w_cloudy", "Cloudy"},
     {"w_cloudy_d", "Clear sky good for military activities"},
-  {"w_rain", "Rain"},
+    {"w_rain", "Rain"},
     {"w_rain_d", "Rain can provide drinkable water if army is low on water, \n" +
                "rain will also stop wild fire from spreading"},
     {"w_heavyRain", "Heavy Rain"},
@@ -78,27 +78,45 @@ namespace TextNS
     {"u_standing", "Standing"},
 
     // region
-    {"r_riverRun", "RiverRun"},
+    {"r_riverRun", "河间地"},
+    {"r_middleEarth", "河南"},
+    {"r_mountainBeyond", "河外"},
 
 		// legion names
-		{"l_longwei", "LongWei"},
-    {"l_longshen", "LongShen"},
-    {"l_huben", "HuBen"},
-    {"l_qingshen", "QingShen"},
-		{"l_longwei6", "LongWei6"},
-    {"l_longshen6", "LongShen6"},
-    {"l_huben6", "HuBen6"},
-    {"l_qingshen6", "QingShen6"},
+    {"l_1", "第一"},
+    {"l_2", "第二"},
+    {"l_3", "第三"},
+    {"l_4", "第四"},
+
+		{"l_legion", "军"},
+
+		{"l_longwei", "龙威"},
+    {"l_longshen", "龙武"},
+    {"l_huben", "虎贲"},
+    {"l_longshen5", "龙神"},
+    {"l_qingshen", "擒生"},
+		{"l_longwei6", "虎威"},
+    {"l_longshen6", "虎武"},
+    {"l_huben6", "期门"},
+    {"l_qingshen6", "捉生"},
 
     // faction
-    {"f_liang", "Liang"},
+    {"f_liang", "梁"},
+    {"f_hejian", "河间"},
+
+    // generals
+    {"g_liubei", "刘备"},
+    {"g_guanyu", "关羽"},
+    {"g_zhaoyun", "赵云"},
+    {"g_caocao", "曹操"},
+    {"g_xuchu", "许褚"},
 
     // party report
     {"pr_sloppyOnDrill", "General Sloppy On Drill"},
     {"pr_sloppyOnDrill_d", "General is sloppy on drill, which leads the shameful defeat"}
   };
 
-    protected Dictionary<string, string> txtDict = null;
+  protected Dictionary<string, string> txtDict = null;
 
     public string get(string key)
     {
@@ -116,14 +134,4 @@ namespace TextNS
   }
 
   public class TextLibEng : TextLib { }
-  public class TextLibChn : TextLib
-  {
-    public TextLibChn()
-    {
-      txtDict = new Dictionary<string, string>() {
-      {"w_Cloudy", "多云"}
-  };
-    }
-  }
-
 }

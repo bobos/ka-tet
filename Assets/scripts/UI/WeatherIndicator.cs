@@ -21,14 +21,14 @@ namespace MonoNS
 
     public void OnNewTurn()
     {
-      indicator.text = "Today Weather: " + weatherGenerator.currentWeather.Name() + "\n";
-      indicator.text += "Lasts: " + weatherGenerator.weatherLastingTurns + " days\n";
-      indicator.text += "Tomorrow Weather: " + weatherGenerator.Forecast().Name() + "\n";
+      indicator.text = "今日: " + weatherGenerator.currentWeather.Name() + "\n";
+      indicator.text += "预计持续: " + weatherGenerator.weatherLastingTurns + " 日\n";
+      indicator.text += "明日: " + weatherGenerator.Forecast().Name() + "\n";
       indicator.text += weatherGenerator.season.Name() + "\n";
-      indicator.text += "Current Wind: " + windGenerator.current.Name() + "\n";
-      indicator.text += "Wind direction: " + Cons.DirectionDisplay(windGenerator.direction) + "\n";
-      indicator.text += "Tomorrow Wind: " + windGenerator.ForecastWind().Name() + "\n";
-      indicator.text += "Tomorrow Wind direction: " + Cons.DirectionDisplay(windGenerator.ForecastDirection()) + "\n";
+      indicator.text += windGenerator.current.Name() + "\n";
+      indicator.text += "风向: " + Cons.DirectionDisplay(windGenerator.direction) + "\n";
+      indicator.text += "明日: " + windGenerator.ForecastWind().Name() + "\n";
+      indicator.text += "明日风向: " + Cons.DirectionDisplay(windGenerator.ForecastDirection()) + "\n";
     }
 
     public override void UpdateChild() {}

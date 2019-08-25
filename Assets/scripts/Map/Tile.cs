@@ -297,7 +297,7 @@ namespace MapTileNS
         return false;
       }
 
-      if (!CanSetFire() || burnable)
+      if (!CanSetFire() || !burnable)
       {
         return false;
       }

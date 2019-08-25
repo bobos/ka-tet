@@ -36,7 +36,7 @@ namespace CourtNS
         }
       }
       seq[pickedName] = seq[pickedName] + 1;
-      return Name() + " " + textLib.get(pickedName) + " " + seq[pickedName] + textLib.get("misc_legion");
+      return Name() + textLib.get(pickedName) + textLib.get("l_" + seq[pickedName]) + textLib.get("l_legion");
     }
   }
 
@@ -52,8 +52,7 @@ namespace CourtNS
         {"l_longshen", 0}
       };
       InfNameSeq = new Dictionary<string, int>() {
-        {"l_huben", 0},
-        {"l_qingshen", 0}
+        {"l_huben", 0}
       };
       name = textLib.get("r_riverRun");
       description = textLib.get("r_riverRun_d");

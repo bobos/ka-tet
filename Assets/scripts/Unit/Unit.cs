@@ -250,6 +250,31 @@ namespace UnitNS
       return (int)(illDeathRate * 100);
     }
 
+    public int GetIllDisableNum()
+    {
+      return (int)(rf.soldiers * illDisableRate);
+    }
+
+    public int GetIllKillNum()
+    {
+      return (int)(rf.soldiers * illDeathRate);
+    }
+
+    public int GetStarvingDessertNum()
+    {
+      return (int)(rf.soldiers * Starving2EscapeRate);
+    }
+
+    public int GetStarvingKillNum()
+    {
+      return (int)(rf.soldiers * Starving2DeathRate);
+    }
+
+    public int GetWarWearyDissertNum()
+    {
+      return (int)(rf.soldiers * DesertRate);
+    }
+
     public bool IsAI()
     {
       return rf.faction.IsAI();
@@ -332,7 +357,14 @@ namespace UnitNS
       if (state == State.Routing) {
         SetState(State.Stand);
       }
-      return remaining;
+      int needed = SupplyNeededPerTurn();
+      int neededHalf = MinSupplyNeeded();
+      int consumed = remaining >= needed ? needed : (remaining >= neededHalf ? neededHalf : remaining);
+      if (consumed >= neededHalf) {
+        remaining -= consumed;
+        this.consumed = true;
+      }
+      return remaining < 0 ? 0 : remaining;
     }
 
     // Before new turn starts
@@ -403,7 +435,7 @@ namespace UnitNS
       else if (IsWarWeary())
       {
         rf.morale -= 1;
-        int miaNum = (int)(rf.soldiers * DesertRate);
+        int miaNum = GetWarWearyDissertNum();
         mia += miaNum;
         rf.soldiers -= miaNum;
         labor -= miaNum;
@@ -411,7 +443,7 @@ namespace UnitNS
 
       if (illDisableRate > 0)
       {
-        int woundedNum = (int)(rf.soldiers * illDisableRate);
+        int woundedNum = GetIllDisableNum();
         rf.wounded += woundedNum;
         rf.soldiers -= woundedNum;
         labor -= (int)(woundedNum / 4);
@@ -421,7 +453,7 @@ namespace UnitNS
       if (illDeathRate > 0)
       {
         rf.morale -= 2;
-        int kiaNum = (int)(rf.soldiers * illDeathRate);
+        int kiaNum = GetIllKillNum();
         kia += kiaNum;
         rf.soldiers -= kiaNum;
         labor -= kiaNum;
@@ -593,19 +625,15 @@ namespace UnitNS
         return inSupply;
       }
 
-      if (inSupply >= needed) {
-        inSupply -= needed;
-        supply += needed;
+      int minNeeded = MinSupplyNeeded();
+      if (inSupply >= minNeeded) {
+        minNeeded = inSupply >= needed ? needed : minNeeded;
+        inSupply -= minNeeded;
+        supply += minNeeded;
         starving = false;
         return inSupply;
-      } else {
-        supply += inSupply;
-        int neededHalfTurn = MinSupplyNeeded();
-        if (inSupply >= neededHalfTurn) {
-          starving = false;
-        }
-        return 0;
       }
+      return inSupply;
     }
 
     public int GetMaxSupplySlots()
@@ -628,10 +656,10 @@ namespace UnitNS
         starving = true;
         supply = 0;
         rf.morale -= 10;
-        int miaNum = (int)(rf.soldiers * Starving2EscapeRate);
+        int miaNum = GetStarvingDessertNum();
         mia += miaNum;
         rf.soldiers -= miaNum;
-        int deathNum = (int)(rf.soldiers * Starving2DeathRate);
+        int deathNum = GetStarvingKillNum();
         kia += deathNum;
         rf.soldiers -= deathNum;
         labor -= deathNum;
@@ -803,7 +831,7 @@ namespace UnitNS
     }
 
     public void DiscoveredByEnemy() {
-      MsgBox.ShowMsg("Unit " + GeneralName() + " is spotted by enemy ");
+      MsgBox.ShowMsg(GeneralName() + "所部被敌军发现");
       concealCoolDownTurn = ConcealCoolDownIn;
       SetState(State.Stand);
     }

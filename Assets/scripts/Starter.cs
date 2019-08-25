@@ -126,7 +126,7 @@ public class Starter : MonoBehaviour {
     liubei.Assign(troop);
     troop = new Troop(500, Cons.HeJian, Cons.riverRun, Type.Cavalry);
     zhaoyun.Assign(troop);
-    troop = new Troop(800, Cons.HeJian, Cons.moutainBeyond, Type.Infantry);
+    troop = new Troop(800, Cons.HeJian, Cons.riverRun, Type.Infantry);
     guanyu.Assign(troop);
 
     troop = new Troop(7000, Cons.Liang, Cons.moutainBeyond, Type.Infantry);
@@ -142,11 +142,11 @@ public class Starter : MonoBehaviour {
 
     // create settlements
     const int supply = 4 * Infantry.MaxTroopNum / 10 * Infantry.FoodPerTenMenPerTurn * Infantry.BaseSlots;
-    if (!settlementMgr.BuildSettlement(hexMap.GetTile(1,1),
+    if (!settlementMgr.BuildSettlement("梁军大本营", hexMap.GetTile(1,1),
                     Settlement.Type.strategyBase,
                     hexMap.GetAIParty(), 0, 10000, supply * 5 * 5)) {
       Util.Throw("Failed to build base at 1,1");}
-    if (!settlementMgr.BuildSettlement(hexMap.GetTile(29, 15),
+    if (!settlementMgr.BuildSettlement("河间府", hexMap.GetTile(29, 15),
                     Settlement.Type.city,
                     hexMap.GetPlayerParty(), 250000, 5000, supply * 5 * 5)) {
       Util.Throw("Failed to build city at 29,12");}
