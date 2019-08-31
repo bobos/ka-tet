@@ -8,7 +8,7 @@ namespace MapTileNS
 {
   public abstract class Hex
   {
-    public abstract int GetCost(Unit unit, bool ignoreUnit);
+    public abstract int GetCost(Unit unit, PathFind.Mode mode);
     // Q + R + S = 0
     // S = -(Q + R)
     public readonly int Q; // Column

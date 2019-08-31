@@ -69,6 +69,7 @@ namespace MonoNS
     public Material UnitHightlight;
     public Material OverLayMat;
     public Material TransMat;
+    public Material WarningMat;
     [System.NonSerialized] public float HeightMountain = 0.33f, HeightHill = 0.28f, HeightFlat = 0f;
     public GameObject InfantryPrefab;
     public GameObject CavalryPrefab;
@@ -147,25 +148,21 @@ namespace MonoNS
       return warParties[1];
     }
 
-    HashSet<Tile> enemyScoutArea;
-    public void ClearEnemyScoutArea() {
-      enemyScoutArea = new HashSet<Tile>();
-    }
-
-    public void FindEnemyScoutArea(bool AI) {
-      ClearEnemyScoutArea();
-      WarParty party = AI ? GetPlayerParty() : GetAIParty();
+    public bool IsInEnemyScoutRange(Unit unit, Tile tile, bool ignoreConcealed = false) {
+      HashSet<Tile> enemyScoutArea = new HashSet<Tile>();
+      WarParty party = unit.IsAI() ? GetPlayerParty() : GetAIParty();
       foreach (Unit u in party.GetUnits())
       {
         foreach(Tile t in u.GetScoutArea()) {
+          if (u.IsConcealed() && ignoreConcealed) {
+            continue;
+          }
           enemyScoutArea.Add(t);
         }
       }
-    }
-
-    public bool IsInEnemyScoutRange(Tile tile) {
       return enemyScoutArea.Contains(tile);
     }
+
     public void CreateLine(Tile[] path)
     {
       if (path.Length == 0) return;
@@ -468,14 +465,19 @@ namespace MonoNS
       highlightedArea = null;
     }
 
-    public void HighlightArea(Tile[] tiles, RangeType type)
+    public void HighlightArea(Tile[] tiles, RangeType type, Unit unit = null)
     {
       DehighlightArea();
       foreach (Tile tile in tiles)
       {
         Material mat = null;
         if (type == RangeType.attack) mat = AttackRange;
-        if (type == RangeType.movement) mat = MovementRange;
+        if (type == RangeType.movement) {
+          mat = MovementRange;
+          if (unit != null && unit.IsConcealed() && IsInEnemyScoutRange(unit, tile, true)) {
+            mat = WarningMat;
+          }
+        }
         if (type == RangeType.camp) mat = CampRange;
         if (type == RangeType.supplyRange) mat = SupplyRange;
         Overlay(tile, mat);

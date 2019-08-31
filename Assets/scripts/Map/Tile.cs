@@ -553,7 +553,7 @@ namespace MapTileNS
       }
     }
 
-    public override int GetCost(Unit unit, bool ignoreUnit = true)
+    public override int GetCost(Unit unit, Mode mode)
     {
       //if (settlement != null && settlement.owner.isAI == unit.IsAI()
       //  && settlement.state == Settlement.State.normal)
@@ -564,9 +564,20 @@ namespace MapTileNS
       Unit u = GetUnit();
       if (u != null)
       {
-        if (!ignoreUnit || (u.IsAI() != unit.IsAI() && !u.IsConcealed()))
-        {
-          return Unit.MovementCostOnUnaccesible;
+        if (mode == Mode.Supply) {
+          // for supply routine, should ignore same side units and ignore enemy's side hidden units
+          if (u.IsAI() != unit.IsAI() && !u.IsConcealed()) {
+            return Unit.MovementCostOnUnaccesible;
+          }
+        } else {
+          // normal path find and access range
+          if (u.IsAI() == unit.IsAI()) {
+            return Unit.MovementCostOnUnaccesible;
+          } else {
+            if (!u.IsConcealed()) {
+              return Unit.MovementCostOnUnaccesible;
+            }
+          }
         }
       }
 
@@ -719,9 +730,9 @@ namespace MapTileNS
       return ret.ToArray();
     }
 
-    public int AggregateCostToEnter(int costSoFar, PFTile sourceTile, PFUnit unit, bool ignoreUnit)
+    public int AggregateCostToEnter(int costSoFar, PFTile sourceTile, PFUnit unit, Mode mode)
     {
-      return ((Unit)unit).AggregateCostToEnterTile(this, costSoFar, ignoreUnit);
+      return ((Unit)unit).AggregateCostToEnterTile(this, costSoFar, mode);
     }
   }
 

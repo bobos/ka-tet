@@ -194,10 +194,6 @@ namespace MonoNS
     // Make sure this is sequential
     public bool move(Unit unit)
     {
-      hexMap.ClearEnemyScoutArea();
-      if (unit.IsConcealed()) {
-        hexMap.FindEnemyScoutArea(unit.IsAI());
-      }
       return DoAction(unit, null, actionName.MOVE);
     }
 

@@ -530,8 +530,7 @@ namespace UnitNS
         concealCoolDownTurn--;
       } else {
         if (Concealable() && state == State.Stand) {
-          hexMap.FindEnemyScoutArea(IsAI());
-          if (!hexMap.IsInEnemyScoutRange(tile)) SetState(State.Conceal);
+          if (!hexMap.IsInEnemyScoutRange(this, tile)) SetState(State.Conceal);
         }
       }
     }
@@ -791,7 +790,7 @@ namespace UnitNS
       foreach(Tile tile in path) {
         if (!Util.eq<Tile>(this.tile, tile)) {
           // get rid of the first tile
-          totalCost = AggregateCostToEnterTile(tile, totalCost, false);
+          totalCost = AggregateCostToEnterTile(tile, totalCost, PathFind.Mode.Normal);
         }
       }
       if (totalCost < 0 || totalCost > movementRemaining) {
@@ -836,6 +835,38 @@ namespace UnitNS
       SetState(State.Stand);
     }
 
+    bool MoveTo(Tile t, bool preMove = false) {
+      bool continueMoving = true;
+      if (!preMove && IsConcealed() && hexMap.IsInEnemyScoutRange(this, t)) {
+        DiscoveredByEnemy();
+        continueMoving = false;
+      }
+
+      if (t.IsThereConcealedEnemy(IsAI())) {
+        Unit u = t.GetUnit();
+        u.DiscoveredByEnemy();
+        if(u.IsAmbushing()) {
+          bool triggerAmbush = false;
+          HashSet<Unit> ambushers = new HashSet<Unit>();
+          foreach(Tile tt in tile.neighbours) {
+            Unit candidate = tt.GetUnit();
+            if (candidate != null && candidate.IsAI() != IsAI()) {
+              ambushers.Add(candidate);
+              if (Util.eq<Unit>(candidate, u)) {
+                triggerAmbush = true;
+              }
+            }
+          }
+
+          if (triggerAmbush) {
+            // TODO: trigger ambush event
+          }
+        }
+        continueMoving = false;
+      }
+      return continueMoving;
+    }
+
     public bool DoMove()
     {
       if (path == null || path.Count == 0 || movementRemaining <= 0)
@@ -843,7 +874,10 @@ namespace UnitNS
         return false;
       }
       Tile next = path.Peek();
-      int takenMovement = CostToEnterTile(next, false);
+      if(!MoveTo(next)) {
+        return false;
+      }
+      int takenMovement = CostToEnterTile(next, PathFind.Mode.Normal);
 
       if (takenMovement < 0)
       {
@@ -864,29 +898,15 @@ namespace UnitNS
       movementRemaining -= takenMovement;
       SetTile(nxtTile);
 
-      bool continueMoving = true;
-      // discovered by enemy
-      if (IsConcealed() && hexMap.IsInEnemyScoutRange(nxtTile)) {
-        DiscoveredByEnemy();
-        continueMoving = false;
-      }
-
+      bool continueMove = true;
       // discover nearby enemy
       foreach(Tile t in GetScoutArea()) {
-        if (t.IsThereConcealedEnemy(IsAI())) {
-          continueMoving = false;
-          Unit u = t.GetUnit();
-          u.DiscoveredByEnemy();
-          if(u.IsAmbushing()) {
-            // no ambush when the ambushed unit was in conceal state too
-            if (Cons.MostLikely() && !continueMoving) {
-              // TODO: trigger ambush
-            }
-          }
+        if(!MoveTo(t, true)) {
+          continueMove = false;
         }
       }
 
-      return continueMoving;
+      return continueMove;
     }
 
     public void SetTile(Tile h, bool dontAddToNewTile = false)
@@ -928,12 +948,12 @@ namespace UnitNS
 
     public Tile[] GetAccessibleTiles()
     {
-      return PFTile2Tile(PathFinder.FindAccessibleTiles(tile, this, movementRemaining, false, false));
+      return PFTile2Tile(PathFinder.FindAccessibleTiles(tile, this, movementRemaining));
     }
 
     public Tile[] GetAccessibleTilesForSupply(Tile start, int remaining)
     {
-      return PFTile2Tile(PathFinder.FindAccessibleTiles(start, this, remaining));
+      return PFTile2Tile(PathFinder.FindAccessibleTiles(start, this, remaining, PathFind.Mode.Supply));
       /*
       HashSet<Tile> tiles = new HashSet<Tile>();
       foreach (Tile tile in PFTile2Tile(PathFinder.FindAccessibleTiles(start, this, remaining, true)))
@@ -954,13 +974,13 @@ namespace UnitNS
     // only for Ghost unit to pathfind settlement path
     public Tile[] FindPath(Tile source, Tile target, bool targetAlwaysReachable)
     {
-      return PFTile2Tile(PathFinder.FindPath(source, target, this, targetAlwaysReachable));
+      return PFTile2Tile(PathFinder.FindPath(source, target, this, PathFind.Mode.Supply));
     }
 
     // movement pathfind
     public Tile[] FindPath(Tile target)
     {
-      return PFTile2Tile(PathFinder.FindPath(tile, target, this, false, false));
+      return PFTile2Tile(PathFinder.FindPath(tile, target, this));
     }
 
     protected Tile[] PFTile2Tile(PFTile[] tiles)
@@ -986,21 +1006,21 @@ namespace UnitNS
       return p;
     }
 
-    public int MovementCostToEnterTile(Tile tile, bool ignoreUnit)
+    public int MovementCostToEnterTile(Tile tile, PathFind.Mode mode)
     {
-      return tile.GetCost(this, ignoreUnit);
+      return tile.GetCost(this, mode);
     }
 
-    public int AggregateCostToEnterTile(Tile tile, int costToDate, bool ignoreUnit)
+    public int AggregateCostToEnterTile(Tile tile, int costToDate, PathFind.Mode mode)
     {
-      int cost = CostToEnterTile(tile, ignoreUnit);
+      int cost = CostToEnterTile(tile, mode);
       cost = cost < 0 ? cost : (cost + costToDate);
       return cost;
     }
 
-    public int CostToEnterTile(Tile target, bool ignoreUnit)
+    public int CostToEnterTile(Tile target, PathFind.Mode mode)
     {
-      int cost = MovementCostToEnterTile(target, ignoreUnit);
+      int cost = MovementCostToEnterTile(target, mode);
       // if tile takes 3 turns to enter, we can still enter it with 1 full turn
       cost = cost > GetFullMovement() ? GetFullMovement() : cost;
       return cost;

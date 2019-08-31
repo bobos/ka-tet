@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace PathFind
@@ -13,16 +12,14 @@ namespace PathFind
     //CostEstimateDelegate estimator,
     bool findRange,
     int remaining,
-    bool targetAlwaysAccessible,
-    bool ignoreUnit)
+    Mode mode)
     {
       this.start = start;
       this.target = target;
       this.unit = unit;
       this.findRange = findRange;
       this.remaining = remaining;
-      this.targetAlwaysAccessible = targetAlwaysAccessible;
-      this.ignoreUnit = ignoreUnit;
+      this.mode = mode;
       path = new Queue<T>();
     }
 
@@ -31,8 +28,7 @@ namespace PathFind
     PFUnit unit;
     bool findRange;
     int remaining;
-    bool targetAlwaysAccessible;
-    bool ignoreUnit;
+    Mode mode;
 
     Queue<T> path;
     public T[] Find()
@@ -73,8 +69,8 @@ namespace PathFind
 
           // If it's target tile, ignore the restrain
           int total_pathfinding_cost_to_neighbor = 
-            (targetAlwaysAccessible && System.Object.ReferenceEquals(neighbour, target)) ? 0 :
-            neighbour.AggregateCostToEnter(g_score[current], current, unit, ignoreUnit);
+            (mode == Mode.Supply && System.Object.ReferenceEquals(neighbour, target)) ? 0 :
+            neighbour.AggregateCostToEnter(g_score[current], current, unit, mode);
 
           if (total_pathfinding_cost_to_neighbor < 0)
           {

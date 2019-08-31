@@ -107,8 +107,17 @@ namespace MonoNS
       offense.text = "攻击: " + unit.atk;
       defense.text = "防御: " + unit.def;
       stamina.text = "体力: " + unit.GetStaminaLvlName();
-      state.text = "部队状态: " + unit.GetStateName() + (unit.starving ? " 饥饿[本轮" + unit.GetStarvingDessertNum() +"人逃"
-        + unit.GetStarvingKillNum() + "人亡]" : "" + (unit.IsWarWeary() ? " 毫无战意[本轮" + unit.GetWarWearyDissertNum() + "人逃亡]" : ""));
+      string stateStr = unit.IsWarWeary() ? " 行将崩溃" : "";
+      stateStr += unit.starving ? " 饥饿" : "";
+      stateStr += unit.GetStateName();
+      int desserter = unit.starving ? unit.GetStarvingDessertNum() : 0;
+      int killed = unit.starving ? unit.GetStarvingKillNum() : 0;
+      desserter += unit.IsWarWeary() ? unit.GetWarWearyDissertNum() : 0;
+      state.text = "";
+      if (desserter != 0) {
+        stateStr += "[本轮" + desserter + "人逃亡" + (killed > 0 ? (killed + "人亡") : "") + "]";
+      }
+      state.text = stateStr;
       illness.text = unit.GetIllTurns() > 0 ? "疫情: 预计本轮致伤"+ unit.GetIllDisableNum() + "人,致死" + unit.GetIllKillNum() +"人,疫情还将持续" + unit.GetIllTurns() + "回合" : "";
 
       ToggleButtons(false);

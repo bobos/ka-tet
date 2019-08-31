@@ -1,8 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-
-namespace PathFind
+﻿namespace PathFind
 {
+
+  public enum Mode {
+    Normal,
+    Supply
+  }
 
   public static class PathFinder
   {
@@ -10,22 +12,20 @@ namespace PathFind
                                     PFTile target,
                                     PFUnit unit,
                                     //CostEstimateDelegate estimator,
-                                    bool unaccessibleHill = false,
-                                    bool ignoreUnit = true)
+                                    Mode mode = Mode.Normal)
     {
       if (start == null || target == null || unit == null)
       {
         return null;
       }
-      AStar<PFTile> resolver = new AStar<PFTile>(start, target, unit, false, 0, unaccessibleHill, ignoreUnit);
+      AStar<PFTile> resolver = new AStar<PFTile>(start, target, unit, false, 0, mode);
       return resolver.Find();
     }
 
     public static PFTile[] FindAccessibleTiles(PFTile start,
     PFUnit unit,
     int remainingPoint,
-    bool unaccessibleHill = false,
-    bool ignoreUnit = true)
+    Mode mode = Mode.Normal)
     {
       if (start == null || unit == null)
       {
@@ -34,7 +34,7 @@ namespace PathFind
       AStar<PFTile> resolver = new AStar<PFTile>(start, start, unit,
                                        // anonymous function
                                        //(IQPathTile a, IQPathTile b) => 0,
-                                       true, remainingPoint, unaccessibleHill, ignoreUnit);
+                                       true, remainingPoint, mode);
       return resolver.Find();
     }
   }

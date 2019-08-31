@@ -3526,6 +3526,7 @@ MonoBehaviour:
   UnitHightlight: {fileID: 2100000, guid: 9ec0fae0192974dcfba07b95564c7a33, type: 2}
   OverLayMat: {fileID: 2100000, guid: d9e71a99305734c11b036ceb7d61febb, type: 2}
   TransMat: {fileID: 2100000, guid: 70ccfb56c449b4ad6ab53f59f7aaf1b8, type: 2}
+  WarningMat: {fileID: 2100000, guid: 9e14844fe780f4236a8c30e6cc01a910, type: 2}
   InfantryPrefab: {fileID: 1193126689161024, guid: 0386ac77b565f4917b9b36912b098329,
     type: 2}
   CavalryPrefab: {fileID: 1684031216514598, guid: bc217d72285d541e68de63aaf7b5fc63,
@@ -7318,7 +7319,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: -6.799988, y: -210}
-  m_SizeDelta: {x: 730.6, y: 34.2}
+  m_SizeDelta: {x: 736.5, y: 37.2}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &2023329513
 MonoBehaviour:

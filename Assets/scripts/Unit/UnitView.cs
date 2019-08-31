@@ -95,7 +95,7 @@ namespace UnitNS
     {
       if (Util.eq<Unit>(unit, this.unit))
       {
-        hexMap.HighlightArea(unit.GetAccessibleTiles(), HexMap.RangeType.movement);
+        hexMap.HighlightArea(unit.GetAccessibleTiles(), HexMap.RangeType.movement, this.unit);
         hexMap.HighlightPath(unit.GetPath());
         if (!unit.IsAI() && !unit.TurnDone()) hexMap.HighlightUnit(unit);
       }
@@ -117,7 +117,7 @@ namespace UnitNS
       {
         if (name == ActionController.actionName.MOVE)
         {
-          hexMap.HighlightArea(unit.GetAccessibleTiles(), HexMap.RangeType.movement);
+          hexMap.HighlightArea(unit.GetAccessibleTiles(), HexMap.RangeType.movement, this.unit);
         }
         if (name == ActionController.actionName.ATTACK)
         {
