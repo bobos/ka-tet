@@ -67,10 +67,16 @@ namespace MonoNS
     public Material GreySkin;
     public Material AISkin;
     public Material UnitHightlight;
+    public Material OverLayMat;
+    public Material TransMat;
     [System.NonSerialized] public float HeightMountain = 0.33f, HeightHill = 0.28f, HeightFlat = 0f;
     public GameObject InfantryPrefab;
     public GameObject CavalryPrefab;
     public GameObject HexPrefab;
+    public GameObject HighGroundPrefab;
+    public GameObject MountainRootPrefab;
+    public GameObject MountainPeakPrefab;
+    public GameObject MountainPrefab;
     public GameObject TentPrefab;
     public GameObject CampPrefab;
     public WarParty[] warParties = new WarParty[2];
@@ -84,7 +90,6 @@ namespace MonoNS
     Dictionary<Tile, GameObject> tile2GO;
     Dictionary<GameObject, Tile> GO2Tile;
     Dictionary<Unit, GameObject> unit2GO = new Dictionary<Unit, GameObject>();
-    Dictionary<Tile, Material> matMap = new Dictionary<Tile, Material>();
 
     public Tile GetTile(int x, int y)
     {
@@ -219,6 +224,7 @@ namespace MonoNS
           SetTileVisual(tile);
         }
       }
+      StaticBatchingUtility.Combine(this.gameObject);
     }
 
     public void RerenderTileTxt() {
@@ -283,76 +289,102 @@ namespace MonoNS
 
     void SetTileVisual(Tile tile)
     {
+      GameObject prefab = null;
+      FieldType fieldType = FieldType.Wild;
       float elevation = tile.getElevation();
       if (elevation >= HeightMountain)
       {
+        if (Cons.SlimChance()) {
+          prefab = MountainPeakPrefab;
+        } else if (Cons.FairChance()) {
+          prefab = MountainPrefab;
+        } else {
+          prefab = MountainRootPrefab;
+        }
+        fieldType = FieldType.Wild;
         tile.SetTerrianType(TerrianType.Mountain);
-        tile.SetFieldType(FieldType.Wild);
         if(Cons.SlimChance()) {
           tile.burnable = true;
         }
       }
       else if (elevation >= HeightHill)
       {
+        prefab = HighGroundPrefab;
+        fieldType = Cons.MostLikely() ? FieldType.Wild : FieldType.Farm;
         tile.SetTerrianType(TerrianType.Hill);
-        tile.SetFieldType(Cons.MostLikely() ? FieldType.Wild : FieldType.Farm);
-        if(tile.field == FieldType.Wild && Cons.SlimChance()) {
+        if(fieldType == FieldType.Wild && Cons.SlimChance()) {
           tile.burnable = true;
         }
       }
       else if (elevation >= HeightFlat)
       {
+        prefab = HexPrefab;
         tile.SetTerrianType(TerrianType.Plain);
-        tile.SetFieldType(Cons.MostLikely() ? FieldType.Farm : FieldType.Wild);
+        fieldType = Cons.MostLikely() ? FieldType.Farm : FieldType.Wild;
       }
       else
       {
+        prefab = HexPrefab;
         tile.SetTerrianType(TerrianType.Water);
-        tile.SetFieldType(FieldType.Wild);
+        fieldType = FieldType.Wild;
       }
+      GameObject tileGO = (GameObject)Instantiate(prefab, tile.Position(), Quaternion.identity, this.transform);
+      tile2GO[tile] = tileGO;
+      tileGO.name = tile.GetCoord().x + "," + tile.GetCoord().y;
+      GO2Tile[tileGO] = tile;
+      tile.SetFieldType(fieldType);
       UpdateTileTextAndSkin(tile);
     }
 
     void SetTileMat(Tile tile)
     {
-      GameObject tileGO = tile2GO[tile];
-      MeshRenderer mr = tileGO.GetComponentsInChildren<MeshRenderer>()[1];
+      Material mat = null;
       // MeshFilter points to the model
-      //MeshFilter mf = hexGO.GetComponentInChildren<MeshFilter>();
+      //MeshFilter mf = tileGO.GetComponentInChildren<MeshFilter>();
       //mf.mesh = MeshFlat;
       if (tile.field == FieldType.Burning)
       {
-        mr.material = MatBurning;
+        mat = MatBurning;
+      } else if (tile.field == FieldType.Settlement)
+      {
+        mat = MatGrassland;
       }
       else if (tile.field == FieldType.Schorched)
       {
-        mr.material = MatSchorched;
+        mat = MatSchorched;
       }
       else if (tile.field == FieldType.Flooding)
       {
-        mr.material = MatOcean;
+        mat = MatOcean;
       }
       else if (tile.field == FieldType.Flooded)
       {
-        mr.material = MatFlooded;
+        mat = MatFlooded;
       }
       else if (tile.terrian == TerrianType.Mountain)
       {
-        mr.material = MatMountain;
+        mat = MatMountain;
       }
-      else if (tile.terrian == TerrianType.Hill)
+      else if (tile.field == FieldType.Farm)
       {
-        mr.material = MatGrassland;
+        mat = MatGrassland;
       }
-      else if (tile.terrian == TerrianType.Plain)
+      else if (tile.terrian != TerrianType.Water && tile.field == FieldType.Wild)
       {
-        mr.material = MatPlain;
+        mat = MatPlain;
       }
       else
       {
-        mr.material = MatOcean;
+        mat = MatOcean;
       }
-      matMap[tile] = mr.material;
+      GameObject tileGO = tile2GO[tile];
+      MeshRenderer[] mrs = tileGO.GetComponentsInChildren<MeshRenderer>();
+      foreach(MeshRenderer mr in mrs) {
+        if (mr.name == "HexCoordLabel" || mr.name == "overlay") {
+          continue;
+        }
+        mr.material = mat;
+      }
     }
 
     public void UpdateTileTextAndSkin(Tile tile)
@@ -365,15 +397,12 @@ namespace MonoNS
       if (tile.terrian == TerrianType.Water) {
         if (tile.isDam)
         {
-          txt = txt + "D\n";
+          txt = txt + "Dam\n";
         }
       } else if (tile.terrian != TerrianType.Mountain) {
-        txt = txt + (tile.isHighGround ? "V" : "");
-        txt = txt + (tile.terrian == TerrianType.Hill ? "H" : "");
-        txt = txt + (tile.field == FieldType.Wild ? "W" : "");
-        txt = txt + (tile.CanSetFire() && tile.burnable ? "F" : "");
+        txt = txt + (tile.CanSetFire() && tile.burnable ? " Fire" : "");
         if (settlementMgr.IsCampable(tile)) {
-          txt = txt + "C\n";
+          txt = txt + " Camp\n";
         }
       }
       Color fontColor;
@@ -384,14 +413,6 @@ namespace MonoNS
       } else {
         fontColor = Color.white;
       }
-      //if (tile.field == FieldType.Burning)
-      //{
-      //  txt = txt + "Burning will last: " + tile.burningCntDown + " days\n";
-      //}
-      //if (tile.field == FieldType.Flooding)
-      //{
-      //  txt = txt + "Flooding will last: " + tile.floodingCntDown + " days\n";
-      //}
       tileGO.GetComponentInChildren<TextMesh>().fontSize = 10;
       tileGO.GetComponentInChildren<TextMesh>().color = fontColor;
       tileGO.GetComponentInChildren<TextMesh>().text = txt;
@@ -426,12 +447,23 @@ namespace MonoNS
     {
     }
 
+    void Overlay(Tile tile, Material mat) {
+      GameObject tileGO = tile2GO[tile];
+      MeshRenderer[] mrs = tileGO.GetComponentsInChildren<MeshRenderer>();
+      foreach(MeshRenderer mr in mrs) {
+        if (mr.name == "overlay") {
+          mr.material = mat;
+          break;
+        }
+      }
+    }
+
     public void DehighlightArea()
     {
       if (highlightedArea == null) return;
       foreach (Tile tile in highlightedArea)
       {
-        tile2GO[tile].GetComponentsInChildren<MeshRenderer>()[1].material = matMap[tile];
+        Overlay(tile, TransMat);
       }
       highlightedArea = null;
     }
@@ -441,12 +473,12 @@ namespace MonoNS
       DehighlightArea();
       foreach (Tile tile in tiles)
       {
-        GameObject GO = tile2GO[tile];
-        MeshRenderer mr = GO.GetComponentsInChildren<MeshRenderer>()[1];
-        if (type == RangeType.attack) mr.material = AttackRange;
-        if (type == RangeType.movement) mr.material = MovementRange;
-        if (type == RangeType.camp) mr.material = CampRange;
-        if (type == RangeType.supplyRange) mr.material = SupplyRange;
+        Material mat = null;
+        if (type == RangeType.attack) mat = AttackRange;
+        if (type == RangeType.movement) mat = MovementRange;
+        if (type == RangeType.camp) mat = CampRange;
+        if (type == RangeType.supplyRange) mat = SupplyRange;
+        Overlay(tile, mat);
       }
       highlightedArea = tiles;
     }
@@ -540,18 +572,10 @@ namespace MonoNS
           Tile tile = new Tile(x, y, this);
           tile.setElevation(-0.3f);
           tiles[x, y] = tile;
-          GameObject tileGO = (GameObject)Instantiate(HexPrefab,
-            tile.Position(),
-            Quaternion.identity, this.transform);
-          //hexGO.GetComponent<HexComponent>().hex = hex;
-          //hexGO.GetComponent<HexComponent>().hexMap = this;
-          tile2GO[tile] = tileGO;
-          tileGO.name = x + "," + y;
-          GO2Tile[tileGO] = tile;
+          
           //hexGO.GetComponentInChildren<TextMesh>().text = x + "," + y;
         }
       }
-      StaticBatchingUtility.Combine(this.gameObject);
 
       float noiseResolution = 0.3f;
       float noiseScale = 1.1f; //larger value, more islands

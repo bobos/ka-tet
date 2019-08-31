@@ -11,7 +11,7 @@ namespace PathFind
   public interface PFTile
   {
 		PFTile[] GetNeighbourTiles();
-		int AggregateCostToEnter(int costSoFar, PFTile sourceTile, PFUnit unit);
+		int AggregateCostToEnter(int costSoFar, PFTile sourceTile, PFUnit unit, bool ignoreUnit);
     //float GetCost(PFUnit unit, bool unaccessibleHill=false);
   }
 

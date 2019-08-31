@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
-using PathFind;
 using UnitNS;
 using MonoNS;
 
@@ -10,7 +8,7 @@ namespace MapTileNS
 {
   public abstract class Hex
   {
-    public abstract int GetCost(Unit unit);
+    public abstract int GetCost(Unit unit, bool ignoreUnit);
     // Q + R + S = 0
     // S = -(Q + R)
     public readonly int Q; // Column

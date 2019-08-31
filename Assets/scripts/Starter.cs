@@ -134,6 +134,9 @@ public class Starter : MonoBehaviour {
     troop = new Troop(400, Cons.Liang, Cons.middleEarth, Type.Cavalry);
     xuchu.Assign(troop);
 
+    troop = new Troop(1000, Cons.HeJian, Cons.middleEarth, Type.Cavalry);
+    zhangfei.Assign(troop);
+
     // step 4, on field assignment
     hexMap.SetWarParties(
       new WarParty(false, false, Cons.HeJian),
@@ -153,8 +156,9 @@ public class Starter : MonoBehaviour {
 
     // after settlement created, general enters campaign
     liubei.EnterCampaign(hexMap.GetPlayerParty(), hexMap.GetTile(4, 1), 0, 2000);
-    zhaoyun.EnterCampaign(hexMap.GetPlayerParty(), hexMap.GetTile(10, 18), 0);
-    guanyu.EnterCampaign(hexMap.GetPlayerParty(), hexMap.GetTile(29, 16), 0);
+    zhaoyun.EnterCampaign(hexMap.GetPlayerParty(), hexMap.GetTile(2, 2), 0);
+    guanyu.EnterCampaign(hexMap.GetPlayerParty(), hexMap.GetTile(3, 2), 0);
+    zhangfei.EnterCampaign(hexMap.GetPlayerParty(), hexMap.GetTile(3, 3), 0);
 
     // * AI *
     caocao.EnterCampaign(hexMap.GetAIParty(), hexMap.GetTile(1, 1), 0, 6000);

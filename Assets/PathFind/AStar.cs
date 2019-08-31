@@ -13,7 +13,8 @@ namespace PathFind
     //CostEstimateDelegate estimator,
     bool findRange,
     int remaining,
-    bool targetAlwaysAccessible)
+    bool targetAlwaysAccessible,
+    bool ignoreUnit)
     {
       this.start = start;
       this.target = target;
@@ -21,6 +22,7 @@ namespace PathFind
       this.findRange = findRange;
       this.remaining = remaining;
       this.targetAlwaysAccessible = targetAlwaysAccessible;
+      this.ignoreUnit = ignoreUnit;
       path = new Queue<T>();
     }
 
@@ -30,6 +32,7 @@ namespace PathFind
     bool findRange;
     int remaining;
     bool targetAlwaysAccessible;
+    bool ignoreUnit;
 
     Queue<T> path;
     public T[] Find()
@@ -71,7 +74,7 @@ namespace PathFind
           // If it's target tile, ignore the restrain
           int total_pathfinding_cost_to_neighbor = 
             (targetAlwaysAccessible && System.Object.ReferenceEquals(neighbour, target)) ? 0 :
-            neighbour.AggregateCostToEnter(g_score[current], current, unit);
+            neighbour.AggregateCostToEnter(g_score[current], current, unit, ignoreUnit);
 
           if (total_pathfinding_cost_to_neighbor < 0)
           {

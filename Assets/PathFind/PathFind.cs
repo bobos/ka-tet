@@ -10,20 +10,22 @@ namespace PathFind
                                     PFTile target,
                                     PFUnit unit,
                                     //CostEstimateDelegate estimator,
-                                    bool unaccessibleHill = false)
+                                    bool unaccessibleHill = false,
+                                    bool ignoreUnit = true)
     {
       if (start == null || target == null || unit == null)
       {
         return null;
       }
-      AStar<PFTile> resolver = new AStar<PFTile>(start, target, unit, false, 0, unaccessibleHill);
+      AStar<PFTile> resolver = new AStar<PFTile>(start, target, unit, false, 0, unaccessibleHill, ignoreUnit);
       return resolver.Find();
     }
 
     public static PFTile[] FindAccessibleTiles(PFTile start,
     PFUnit unit,
     int remainingPoint,
-    bool unaccessibleHill = false)
+    bool unaccessibleHill = false,
+    bool ignoreUnit = true)
     {
       if (start == null || unit == null)
       {
@@ -32,7 +34,7 @@ namespace PathFind
       AStar<PFTile> resolver = new AStar<PFTile>(start, start, unit,
                                        // anonymous function
                                        //(IQPathTile a, IQPathTile b) => 0,
-                                       true, remainingPoint, unaccessibleHill);
+                                       true, remainingPoint, unaccessibleHill, ignoreUnit);
       return resolver.Find();
     }
   }

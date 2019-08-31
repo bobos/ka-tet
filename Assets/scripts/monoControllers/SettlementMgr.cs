@@ -217,7 +217,7 @@ namespace MonoNS
       if (tileGO == null) Util.Throw("CreateSettlement: Tile doesn't exist!");
       // TODO: use different prefab for different type
       GameObject GO = (GameObject)Instantiate(settlement.type == Settlement.Type.camp ? hexMap.CampPrefab : hexMap.TentPrefab,
-              settlement.baseTile.Position(),
+              new Vector3(tileGO.transform.position.x, settlement.baseTile.GetHeight(), tileGO.transform.position.z),
               Quaternion.identity,
               tileGO.transform);
       GO.GetComponent<SettlementView>().settlement = settlement;
@@ -321,7 +321,7 @@ namespace MonoNS
 
     int GetGhostUnitRangeForSettlementSupply()
     {
-      return (int)(ghostUnit.GetFullMovement() * 2.5);
+      return (int)(ghostUnit.GetFullMovement() * 2);
     }
 
     int GetGhostUnitRangeForSettlementLink()

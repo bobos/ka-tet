@@ -18,6 +18,7 @@ namespace MapTileNS
     public const int Work2BuildCamp = 10;
     public const int BurningLasts = 6; 
     public const int FloodingLasts = 15;
+    public const float HighGround = 0.312f;
 
     public Tile(int q, int r, HexMap hexMap) : base(q, r, hexMap) { }
     public void PostCreation()
@@ -30,7 +31,7 @@ namespace MapTileNS
       {
         ListenOnHeavyRain();
       }
-      if (terrian == TerrianType.Hill)
+      if (field == FieldType.Wild)
       {
         ListenOnHeat();
       }
@@ -40,6 +41,12 @@ namespace MapTileNS
       }
     }
     
+    public float GetHeight() {
+      if (terrian == TerrianType.Hill || terrian == TerrianType.Mountain) {
+        return HighGround;
+      }
+      return 0f;
+    }
     // ==============================================================
     // ================= Information ================================
     // ==============================================================
@@ -236,29 +243,20 @@ namespace MapTileNS
       {
         PutOutFire();
       }
+
+      if (field == FieldType.Farm && Cons.HighlyLikely())
+      {
+        Unit u = GetUnit();
+        if (u != null)
+        {
+          u.SetSickness(Util.Rand(2, 5) * 0.01f, Util.Rand(1, 2) * 0.01f);
+        }
+      }
     }
 
     public void OnHeat()
     {
-      // heat in hill causes illness
-      if (terrian == TerrianType.Hill && Cons.HighlyLikely())
-      {
-        if (settlement != null)
-        {
-          foreach (Unit u in settlement.garrison)
-          {
-            u.SetSickness(Util.Rand(5, 10) * 0.01f, Util.Rand(1, 4) * 0.01f);
-          }
-        }
-        else
-        {
-          Unit u = GetUnit();
-          if (u != null)
-          {
-            u.SetSickness(Util.Rand(2, 5) * 0.01f, Util.Rand(1, 2) * 0.01f);
-          }
-        }
-      }
+      // TODO: add near water check
     }
 
     public void OnDry()
@@ -456,8 +454,7 @@ namespace MapTileNS
 
     public bool CanBeFloodedByNearByTile()
     {
-      if ((terrian == TerrianType.Hill || terrian == TerrianType.Plain)
-        && !isHighGround)
+      if (terrian == TerrianType.Plain)
       {
         if (field == FieldType.Settlement)
         {
@@ -487,7 +484,6 @@ namespace MapTileNS
     // ==============================================================
     public TerrianType terrian;
     public FieldType field;
-    public bool isHighGround = true;
     public bool isDam = false;
 
     int movementCost = Unit.BasicMovementCost;
@@ -539,19 +535,6 @@ namespace MapTileNS
     {
       terrian = type;
       UpdateMovementcost();
-      if (type == TerrianType.Hill)
-      {
-        // Higher possibility for hill to be a high ground
-        isHighGround = Util.Rand(HillHeightStart, HillHeightEnd) > HighgroundWatermark;
-      }
-      else if (type == TerrianType.Plain)
-      {
-        isHighGround = Util.Rand(PlainHeightStart, PlainHeightEnd) > HighgroundWatermark;
-      }
-      else
-      {
-        isHighGround = type == TerrianType.Mountain ? true : false;
-      }
     }
 
     private void UpdateMovementcost()
@@ -570,7 +553,7 @@ namespace MapTileNS
       }
     }
 
-    public override int GetCost(Unit unit)
+    public override int GetCost(Unit unit, bool ignoreUnit = true)
     {
       //if (settlement != null && settlement.owner.isAI == unit.IsAI()
       //  && settlement.state == Settlement.State.normal)
@@ -581,7 +564,7 @@ namespace MapTileNS
       Unit u = GetUnit();
       if (u != null)
       {
-        if (u.IsAI() != unit.IsAI() && !u.IsConcealed())
+        if (!ignoreUnit || (u.IsAI() != unit.IsAI() && !u.IsConcealed()))
         {
           return Unit.MovementCostOnUnaccesible;
         }
@@ -736,9 +719,9 @@ namespace MapTileNS
       return ret.ToArray();
     }
 
-    public int AggregateCostToEnter(int costSoFar, PFTile sourceTile, PFUnit unit)
+    public int AggregateCostToEnter(int costSoFar, PFTile sourceTile, PFUnit unit, bool ignoreUnit)
     {
-      return ((Unit)unit).AggregateCostToEnterTile(this, costSoFar);
+      return ((Unit)unit).AggregateCostToEnterTile(this, costSoFar, ignoreUnit);
     }
   }
 

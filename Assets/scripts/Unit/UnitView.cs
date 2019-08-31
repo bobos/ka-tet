@@ -140,6 +140,7 @@ namespace UnitNS
       newPosition, ref currentVelocity, 0.2f);
       if (Vector3.Distance(this.transform.position, newPosition) < 0.1f)
       {
+        this.transform.position = new Vector3(this.transform.position.x, this.unit.tile.GetHeight(), this.transform.position.z);
         Animating = false;
       }
     }

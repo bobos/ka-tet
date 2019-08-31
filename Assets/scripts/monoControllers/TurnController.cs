@@ -77,6 +77,10 @@ namespace MonoNS
       WarParty otherP = !player ? playerParty : aiParty;
       player = !player;
       cnt++;
+      if (cnt == 2) {
+        cnt = 0;
+        turnNum++;
+      }
 
       foreach (Unit unit in p.GetUnits())
       {
@@ -148,9 +152,7 @@ namespace MonoNS
       }
       */
       endingTurn = false;
-      if (cnt == 2) {
-        cnt = 0;
-        turnNum++;
+      if (cnt == 0) {
         if (onNewTurn != null) onNewTurn();
       }
       // TurnChange();

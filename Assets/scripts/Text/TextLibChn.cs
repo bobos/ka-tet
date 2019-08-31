@@ -70,8 +70,8 @@ namespace TextNS
   //   unit
   	  {"u_exhausted", "精疲力竭"},
   	  {"u_tired", "人困马乏"},
-  	  {"u_fresh", "体力充沛"},
-  	  {"u_vigorous", "状态极佳"},
+  	  {"u_fresh", "充沛"},
+  	  {"u_vigorous", "极佳"},
       {"u_concealing", "隐蔽中"},
       {"u_camping", "驻扎中"},
       {"u_routing", "溃败中"},
@@ -110,6 +110,7 @@ namespace TextNS
       {"g_liubei", "刘备"},
       {"g_guanyu", "关羽"},
       {"g_zhaoyun", "赵云"},
+      {"g_zhangfei", "张飞"},
       {"g_caocao", "曹操"},
       {"g_xuchu", "许褚"},
 

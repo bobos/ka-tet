@@ -17,7 +17,7 @@ namespace UnitNS
     protected abstract Unit Clone();
 
     public const int BasicMovementCost = 30; // For actions like: attack
-    public const int MovementcostOnHill = 40;
+    public const int MovementcostOnHill = 50;
     public const int MovementcostOnPlain = 30;
     public const int MovementCostOnUnaccesible = -1;
     public const float Starving2DeathRate = 0.005f;
@@ -791,7 +791,7 @@ namespace UnitNS
       foreach(Tile tile in path) {
         if (!Util.eq<Tile>(this.tile, tile)) {
           // get rid of the first tile
-          totalCost = AggregateCostToEnterTile(tile, totalCost);
+          totalCost = AggregateCostToEnterTile(tile, totalCost, false);
         }
       }
       if (totalCost < 0 || totalCost > movementRemaining) {
@@ -843,7 +843,7 @@ namespace UnitNS
         return false;
       }
       Tile next = path.Peek();
-      int takenMovement = CostToEnterTile(next);
+      int takenMovement = CostToEnterTile(next, false);
 
       if (takenMovement < 0)
       {
@@ -928,7 +928,7 @@ namespace UnitNS
 
     public Tile[] GetAccessibleTiles()
     {
-      return PFTile2Tile(PathFinder.FindAccessibleTiles(tile, this, movementRemaining));
+      return PFTile2Tile(PathFinder.FindAccessibleTiles(tile, this, movementRemaining, false, false));
     }
 
     public Tile[] GetAccessibleTilesForSupply(Tile start, int remaining)
@@ -957,9 +957,10 @@ namespace UnitNS
       return PFTile2Tile(PathFinder.FindPath(source, target, this, targetAlwaysReachable));
     }
 
+    // movement pathfind
     public Tile[] FindPath(Tile target)
     {
-      return PFTile2Tile(PathFinder.FindPath(tile, target, this));
+      return PFTile2Tile(PathFinder.FindPath(tile, target, this, false, false));
     }
 
     protected Tile[] PFTile2Tile(PFTile[] tiles)
@@ -985,21 +986,21 @@ namespace UnitNS
       return p;
     }
 
-    public int MovementCostToEnterTile(Tile tile)
+    public int MovementCostToEnterTile(Tile tile, bool ignoreUnit)
     {
-      return tile.GetCost(this);
+      return tile.GetCost(this, ignoreUnit);
     }
 
-    public int AggregateCostToEnterTile(Tile tile, int costToDate)
+    public int AggregateCostToEnterTile(Tile tile, int costToDate, bool ignoreUnit)
     {
-      int cost = CostToEnterTile(tile);
+      int cost = CostToEnterTile(tile, ignoreUnit);
       cost = cost < 0 ? cost : (cost + costToDate);
       return cost;
     }
 
-    public int CostToEnterTile(Tile target)
+    public int CostToEnterTile(Tile target, bool ignoreUnit)
     {
-      int cost = MovementCostToEnterTile(target);
+      int cost = MovementCostToEnterTile(target, ignoreUnit);
       // if tile takes 3 turns to enter, we can still enter it with 1 full turn
       cost = cost > GetFullMovement() ? GetFullMovement() : cost;
       return cost;
