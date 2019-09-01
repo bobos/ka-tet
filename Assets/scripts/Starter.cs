@@ -155,15 +155,16 @@ public class Starter : MonoBehaviour {
       Util.Throw("Failed to build city at 29,12");}
 
     // after settlement created, general enters campaign
-    liubei.EnterCampaign(hexMap.GetPlayerParty(), hexMap.GetTile(4, 1), 0, 2000);
-    zhaoyun.EnterCampaign(hexMap.GetPlayerParty(), hexMap.GetTile(2, 2), 0);
-    guanyu.EnterCampaign(hexMap.GetPlayerParty(), hexMap.GetTile(3, 2), 0);
-    zhangfei.EnterCampaign(hexMap.GetPlayerParty(), hexMap.GetTile(3, 3), 0);
+    liubei.EnterCampaign(hexMap.GetPlayerParty(), hexMap.GetTile(27, 18), 0, 2000);
+    zhaoyun.EnterCampaign(hexMap.GetPlayerParty(), hexMap.GetTile(28, 18), 0);
+    guanyu.EnterCampaign(hexMap.GetPlayerParty(), hexMap.GetTile(27, 17), 0);
+    zhangfei.EnterCampaign(hexMap.GetPlayerParty(), hexMap.GetTile(28, 17), 0);
 
     // * AI *
     caocao.EnterCampaign(hexMap.GetAIParty(), hexMap.GetTile(1, 1), 0, 6000);
     xuchu.EnterCampaign(hexMap.GetAIParty(), hexMap.GetTile(2, 1), 0);
     SettlementMgr.Ready4Refresh = true;
+    FoW.Init(hexMap);
   }
 
   List<FieldParty> CreateFieldParties(LinkedList<General> generals) {

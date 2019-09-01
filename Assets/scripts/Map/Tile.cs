@@ -4,6 +4,7 @@ using PathFind;
 using UnitNS;
 using MonoNS;
 using NatureNS;
+using UnityEngine;
 
 namespace MapTileNS
 {
@@ -41,11 +42,12 @@ namespace MapTileNS
       }
     }
     
-    public float GetHeight() {
+    public Vector3 GetSurfacePosition() {
+      float y = 0f;
       if (terrian == TerrianType.Hill || terrian == TerrianType.Mountain) {
-        return HighGround;
+        y = HighGround;
       }
-      return 0f;
+      return new Vector3(Position().x, y, Position().z);
     }
     // ==============================================================
     // ================= Information ================================

@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-
-namespace FieldNS
+﻿namespace FieldNS
 {
   public class WarPoint
   {

@@ -200,7 +200,6 @@ namespace MapTileNS
       hexes.Add(this);
       core.Add(this);
       FindNeighbours(hexes, core, range, filter);
-      hexes.Remove(this);
       return ToDescendentType<T>(hexes.ToArray());
     }
    

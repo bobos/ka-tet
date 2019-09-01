@@ -51,7 +51,7 @@ namespace UnitNS
     }
 
     public void Activate() {
-      transform.position = unit.tile.Position();
+      transform.position = unit.tile.GetSurfacePosition();
       viewActivated = true;
     }
 
@@ -87,7 +87,7 @@ namespace UnitNS
       if (!viewActivated) return;
       hexMap.HighlightPath(unit.GetPath());
       Animating = true;
-      newPosition = newTile.Position();
+      newPosition = newTile.GetSurfacePosition();
       currentVelocity = Vector3.zero;
     }
 
@@ -140,7 +140,6 @@ namespace UnitNS
       newPosition, ref currentVelocity, 0.2f);
       if (Vector3.Distance(this.transform.position, newPosition) < 0.1f)
       {
-        this.transform.position = new Vector3(this.transform.position.x, this.unit.tile.GetHeight(), this.transform.position.z);
         Animating = false;
       }
     }

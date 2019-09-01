@@ -24,6 +24,7 @@ namespace MonoNS
     public HoverInfo hoverInfo;
     public TurnIndicator turnIndicator;
     public TurnPhaseTitle turnPhaseTitle;
+    public UnitActionBroker actionBroker;
     public InputField inputField;
 
     // ==============================================================
@@ -83,7 +84,7 @@ namespace MonoNS
     public WarParty[] warParties = new WarParty[2];
     public List<GameObject> lineCache = new List<GameObject>();
 
-    Tile[,] tiles;
+    public Tile[,] tiles;
 
     //bool updateReady = false;
     Tile[] highlightedArea;
@@ -117,7 +118,7 @@ namespace MonoNS
       turnPhaseTitle = GameObject.FindObjectOfType<TurnPhaseTitle>();
       inputField = GameObject.FindObjectOfType<InputField>();
       // init actionBroker
-      UnitActionBroker actionBroker = UnitActionBroker.GetBroker();
+      actionBroker = UnitActionBroker.GetBroker();
       actionBroker.onUnitAction += OnUnitAction;
 
       GenerateMap();
@@ -265,6 +266,7 @@ namespace MonoNS
     public void OnUnitAction(Unit unit, ActionType type, Tile tile) {
       if (type == ActionType.UnitLeft || type == ActionType.UnitDestroyed) {
         DestroyUnitView(unit);
+        return;
       }
 
       if (type == ActionType.UnitHidden) {
@@ -455,12 +457,20 @@ namespace MonoNS
       }
     }
 
+    public void OverlayFoW(Tile tile) {
+      Overlay(tile, OverLayMat);
+    }
+
+    public void OverlayDisable(Tile tile) {
+      Overlay(tile, TransMat);
+    }
+
     public void DehighlightArea()
     {
       if (highlightedArea == null) return;
       foreach (Tile tile in highlightedArea)
       {
-        Overlay(tile, TransMat);
+        OverlayDisable(tile);
       }
       highlightedArea = null;
     }
@@ -552,8 +562,8 @@ namespace MonoNS
       GameObject tileGO = tile2GO[tile];
       //NOTE: spawn as child gameobject of hex
       GameObject unitGO = (GameObject)Instantiate(prefab,
-           tile.Position(),
-           Quaternion.identity, tileGO.transform);
+          tile.GetSurfacePosition(),
+          Quaternion.identity, tileGO.transform);
       UnitView view = unitGO.GetComponent<UnitView>();
       view.unit = unit;
       view.OnCreate();

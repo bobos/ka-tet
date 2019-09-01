@@ -11,6 +11,7 @@ public abstract class Settlement
   public const int MaxGarrisonPerBase = 20;
   public const int DefensePrepMax = 100;
   public const int DefensePrepDeductRate = 10;
+  public const int Visibility = 3;
 
   public int supplyDeposit = 0;
   public int parkSlots { get; private set; }
@@ -72,6 +73,10 @@ public abstract class Settlement
       int turns  = (buildWork - remaining) / canBeDone;
       return turns + (remaining > 0 ? 1 : 0);
     }
+  }
+
+  public Tile[] GetVisibleArea() {
+      return baseTile.GetNeighboursWithinRange<Tile>(Visibility, (Tile _tile) => true);
   }
 
   public class SupplySuggestion {

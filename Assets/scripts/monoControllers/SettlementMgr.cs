@@ -217,9 +217,9 @@ namespace MonoNS
       if (tileGO == null) Util.Throw("CreateSettlement: Tile doesn't exist!");
       // TODO: use different prefab for different type
       GameObject GO = (GameObject)Instantiate(settlement.type == Settlement.Type.camp ? hexMap.CampPrefab : hexMap.TentPrefab,
-              new Vector3(tileGO.transform.position.x, settlement.baseTile.GetHeight(), tileGO.transform.position.z),
-              Quaternion.identity,
-              tileGO.transform);
+        settlement.baseTile.GetSurfacePosition(),
+        Quaternion.identity,
+        tileGO.transform);
       GO.GetComponent<SettlementView>().settlement = settlement;
       settlement2GO[settlement] = GO;
       SetSettlementSkin(settlement);
@@ -317,6 +317,14 @@ namespace MonoNS
       SetGhostOwner(source);
       ghostUnit.movementRemaining = GetGhostUnitRangeForSettlementLink();
       return ghostUnit.FindPath(source.baseTile, target, true);
+    }
+
+    public void GetVisibleArea(bool attackSide, HashSet<Tile> tiles) {
+      foreach(Settlement settlement in attackSide ? attackerRoots : defenderRoots) {
+        foreach(Tile tile in settlement.GetVisibleArea()) {
+          tiles.Add(tile);
+        }
+      }
     }
 
     int GetGhostUnitRangeForSettlementSupply()

@@ -30,8 +30,8 @@ namespace UnitNS
     public const float HeatDisableRate = 0.0025f;
     public const int DisbandUnitUnder = 10;
 
-    public const int L1Visibility = 8; // under 4000 
-    public const int L2Visibility = 14; // > 4000
+    public const int L1Visibility = 5; // under 4000 
+    public const int L2Visibility = 8; // > 4000
     public const int L1DiscoverRange = 1; // under 4000
     public const int L2DiscoverRange = 2; // > 4000
     public const int ConcealCoolDownIn = 3;
@@ -84,45 +84,41 @@ namespace UnitNS
     }
 
     State[] visibleStates = {State.Routing, State.Stand};
-    void SetState(State state) {
-      State previousState = this.state;
+    public void SetState(State state) {
+      UnitActionBroker broker = UnitActionBroker.GetBroker();
       if (state == State.Stand && Concealable() && concealCoolDownTurn == 0) {
         state = State.Conceal;
       }
-
-      if (previousState == state) {
-        return;
-      }
-
-      bool previousVisible;
-      if (previousState == State.Conceal) {
-        previousVisible = IsAI() ? false : true;
-      } else {
-        previousVisible = _IsVisible(previousState);
-      }
-
       this.state = state;
-      UnitActionBroker broker = UnitActionBroker.GetBroker();
       if (state == State.Disbanded || state == State.Retreated) {
         broker.BrokeChange(this, ActionType.UnitDestroyed, tile);
         return;
       }
-      if (state == State.Conceal) {
-        if (IsAI()) {
+      if (state == State.Camping) {
+        broker.BrokeChange(this, ActionType.UnitLeft, tile);
+        return;
+      }
+      bool myTurn = !hexMap.turnController.playerTurn == IsAI();
+      FoW fow = FoW.Get();
+      if (!myTurn && fow != null) {
+        // is covered by fow
+        HashSet<Tile> tiles = fow.GetEnemyVisibleArea(!IsAI());
+        if (!tiles.Contains(tile)) {
+          // under fow
           broker.BrokeChange(this, ActionType.UnitHidden, tile);
           return;
         }
-        broker.BrokeChange(this, ActionType.UnitVisible, tile);
-        return;
       }
 
-      if (previousVisible) {
-        if (state == State.Camping)
-          broker.BrokeChange(this, ActionType.UnitLeft, tile);
-      } else {
-        if (state == State.Routing || state == State.Stand)
+      if (state == State.Conceal) {
+        if (myTurn) {
           broker.BrokeChange(this, ActionType.UnitVisible, tile);
+          return;
+        }
+        broker.BrokeChange(this, ActionType.UnitHidden, tile);
+        return;
       }
+      broker.BrokeChange(this, ActionType.UnitVisible, tile);
     }
 
     public int honorMeter = 0; // -2, -1, 0, 1, 2
@@ -155,7 +151,7 @@ namespace UnitNS
       }
     }
     public Troop rf;
-    protected State state = State.Stand;
+    public State state = State.Stand;
 
     int __labor;
     int __movementRemaining;
@@ -338,6 +334,11 @@ namespace UnitNS
 
     public Tile[] GetScoutArea() {
       return tile.GetNeighboursWithinRange<Tile>(rf.soldiers > 4000 ? L2DiscoverRange : L1DiscoverRange,
+                                                 (Tile _tile) => true);
+    }
+
+    public Tile[] GetVisibleArea() {
+      return tile.GetNeighboursWithinRange<Tile>(rf.soldiers > 4000 ? L2Visibility : L1Visibility,
                                                  (Tile _tile) => true);
     }
 
@@ -922,6 +923,8 @@ namespace UnitNS
         if (onUnitMove != null)
         {
           onUnitMove(h);
+          UnitActionBroker broker = UnitActionBroker.GetBroker();
+          broker.BrokeChange(this, ActionType.UnitMove, tile);
         }
       }
       tile = h;

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnitNS;
 using CourtNS;
+using MapTileNS;
 
 namespace FieldNS
 {
@@ -92,6 +93,15 @@ namespace FieldNS
 
       return new WarPartyStat(numOfTroops, numOfSoldiers,
                               numOfDead, numOfWound, numOfLabor);
+    }
+
+    public void GetVisibleArea(HashSet<Tile> tiles) {
+      foreach (Unit u in GetUnits())
+      {
+        foreach(Tile tile in u.GetVisibleArea()) {
+          tiles.Add(tile);
+        }
+      }
     }
 
   }

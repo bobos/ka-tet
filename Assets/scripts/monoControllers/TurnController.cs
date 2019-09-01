@@ -100,6 +100,20 @@ namespace MonoNS
 
       // AI turn
       TurnChange();
+
+      // TODO
+      foreach(Unit u in playerParty.GetUnits()) {
+        if (u.state != State.Camping) {
+          u.SetState(u.state);
+        }
+      }
+      foreach(Unit u in aiParty.GetUnits()) {
+        if (u.state != State.Camping) {
+          u.SetState(u.state);
+        }
+      }
+      FoW.Get().Fog(!playerTurn);
+
       while (showingTitle) { yield return null; }
       // refresh AI
       settlementMgrDone = false;
