@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using MapTileNS;
 using UnityEngine;
 
@@ -36,7 +35,6 @@ namespace MonoNS
     {
       if (settlement != null && Util.eq<Settlement>(settlement, this.settlement))
       {
-        settlementMgr.HighlightSettlement(settlement);
         HashSet<Tile> tiles = settlementMgr.GetSupplyRangeTiles(settlement);
         Tile[] tileArray = new Tile[tiles.Count];
         tiles.CopyTo(tileArray);
@@ -48,7 +46,6 @@ namespace MonoNS
     {
       if (settlement != null && Util.eq<Settlement>(settlement, this.settlement))
       {
-        settlementMgr.SetSettlementSkin(settlement);
         hexMap.DehighlightArea();
       }
     }

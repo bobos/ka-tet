@@ -2494,8 +2494,8 @@ LineRenderer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 684696110}
   m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
   m_DynamicOccludee: 1
   m_MotionVectors: 0
   m_LightProbeUsage: 0
@@ -3527,6 +3527,7 @@ MonoBehaviour:
   OverLayMat: {fileID: 2100000, guid: d9e71a99305734c11b036ceb7d61febb, type: 2}
   TransMat: {fileID: 2100000, guid: 70ccfb56c449b4ad6ab53f59f7aaf1b8, type: 2}
   WarningMat: {fileID: 2100000, guid: 9e14844fe780f4236a8c30e6cc01a910, type: 2}
+  SupplyRouteMat: {fileID: 2100000, guid: e69d852a8fbb741658774f8d5989cfd3, type: 2}
   InfantryPrefab: {fileID: 1193126689161024, guid: 0386ac77b565f4917b9b36912b098329,
     type: 2}
   CavalryPrefab: {fileID: 1684031216514598, guid: bc217d72285d541e68de63aaf7b5fc63,

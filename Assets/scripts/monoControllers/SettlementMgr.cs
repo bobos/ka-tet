@@ -222,38 +222,10 @@ namespace MonoNS
         tileGO.transform);
       GO.GetComponent<SettlementView>().settlement = settlement;
       settlement2GO[settlement] = GO;
-      SetSettlementSkin(settlement);
-    }
-
-    public void HighlightSettlement(Settlement settlement)
-    {
-      if (settlement == null) return;
-      MeshRenderer mr = settlement2GO[settlement].GetComponentInChildren<MeshRenderer>();
-      mr.material = hexMap.UnitHightlight;
-    }
-
-    public void SetSettlementSkin(Settlement settlement)
-    {
-      if (settlement == null) return;
-      if (!settlement2GO.ContainsKey(settlement))
-      {
-        return;
-      }
-      foreach(MeshRenderer mr in settlement2GO[settlement].GetComponentsInChildren<MeshRenderer>()) {
-        if (settlement.state == Settlement.State.constructing)
-        {
-          mr.material = hexMap.GreySkin;
-        }
-        else
-        {
-          mr.material = settlement.owner.isAI ? hexMap.AISkin : hexMap.PlayerSkin;
-        }
-      }
     }
 
     public void SettlementReady(Settlement settlement)
     {
-      SetSettlementSkin(settlement);
       buildingQueue.Remove(settlement);
     }
 
@@ -300,6 +272,7 @@ namespace MonoNS
     }
 
     public void ShowSupplyNetwork(List<Settlement> settlements) {
+      FoW.Get().Fog();
       foreach(Settlement s in settlements) {
         s.GetReachableSettlements(true);
         s.GetReachableUnits(true);

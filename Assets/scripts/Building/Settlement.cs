@@ -4,6 +4,7 @@ using UnitNS;
 using MapTileNS;
 using MonoNS;
 using FieldNS;
+using BuildingNS;
 
 public abstract class Settlement
 {
@@ -62,6 +63,8 @@ public abstract class Settlement
   protected int buildWork = 0;
   SettlementMgr settlementMgr;
   HexMap hexMap;
+  Supply supply;
+
 
   public int buildTurns {
     get {
@@ -114,6 +117,7 @@ public abstract class Settlement
     supplyDeposit = supply > SupplyCanTakeIn() ? SupplyCanTakeIn() : supply;
     parkSlots = room;
     this.name = name;
+    this.supply = new Supply(hexMap);
   }
 
   public void Destroy()
@@ -435,7 +439,7 @@ public abstract class Settlement
           if (path.Length > 0) {
             settlements.Add(tile.settlement);
             if (link) {
-              hexMap.CreateLine(path);
+              supply.RenderSupplyLine(path);
             }
           }
         }
@@ -455,8 +459,7 @@ public abstract class Settlement
       if (tiles.Contains(unit.tile)) {
         units.Add(unit);
         if (link) {
-          if (unit.IsAI() && unit.IsConcealed()) continue;
-          hexMap.CreateLine(settlementMgr.GetRoute(this, unit.tile));
+          supply.RenderSupplyLine(settlementMgr.GetRoute(this, unit.tile));
         }
       }
     }

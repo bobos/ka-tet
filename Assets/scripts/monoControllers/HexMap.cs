@@ -71,6 +71,7 @@ namespace MonoNS
     public Material OverLayMat;
     public Material TransMat;
     public Material WarningMat;
+    public Material SupplyRouteMat;
     [System.NonSerialized] public float HeightMountain = 0.33f, HeightHill = 0.28f, HeightFlat = 0f;
     public GameObject InfantryPrefab;
     public GameObject CavalryPrefab;
@@ -459,6 +460,24 @@ namespace MonoNS
 
     public void OverlayFoW(Tile tile) {
       Overlay(tile, OverLayMat);
+    }
+
+    public void OverlaySupplyLine(Tile tile) {
+      Overlay(tile, SupplyRouteMat);
+    }
+
+    public bool IsOverlayFoW(Tile tile) {
+      GameObject tileGO = tile2GO[tile];
+      MeshRenderer[] mrs = tileGO.GetComponentsInChildren<MeshRenderer>();
+      foreach(MeshRenderer mr in mrs) {
+        if (mr.name == "overlay") {
+          if(mr.material.name == "OverlayMat (Instance)") {
+            return true;
+          }
+          return false;
+        }
+      }
+      return false;
     }
 
     public void OverlayDisable(Tile tile) {

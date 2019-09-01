@@ -13,25 +13,25 @@ namespace FieldNS
       this.hexMap = hexMap;
       hexMap.actionBroker.onUnitAction += OnUnitAction;
       // init fow for player at game start
-      Fog(false);
+      Fog();
     }
 
-    public void OnUnitAction(Unit unit, ActionType action, Tile _tile) {
+    public void OnUnitAction(Unit _unit, ActionType action, Tile _tile) {
       if (action == ActionType.UnitMove) {
-        Fog(unit.IsAI());
+        Fog();
       }
     }
 
-    public HashSet<Tile> GetEnemyVisibleArea(bool isAI) {
+    public HashSet<Tile> GetEnemyVisibleArea() {
       HashSet<Tile> tiles = new HashSet<Tile>();
-      WarParty party = isAI ? hexMap.GetAIParty() : hexMap.GetPlayerParty();
+      WarParty party = hexMap.turnController.playerTurn ? hexMap.GetPlayerParty() : hexMap.GetAIParty();
       party.GetVisibleArea(tiles);
       hexMap.settlementMgr.GetVisibleArea(party.attackside, tiles);
       return tiles;
     }
 
-    public void Fog(bool isAI) {
-      HashSet<Tile> tiles = GetEnemyVisibleArea(isAI);
+    public void Fog() {
+      HashSet<Tile> tiles = GetEnemyVisibleArea();
       foreach (Tile tile in hexMap.tiles)
       {
         if (tiles.Contains(tile)) {
@@ -40,6 +40,10 @@ namespace FieldNS
           hexMap.OverlayFoW(tile);
         }
       }
+    }
+
+    public bool IsFogged(Tile tile) {
+      return hexMap.IsOverlayFoW(tile);
     }
 
     public static void Init(HexMap hexMap) {

@@ -460,6 +460,10 @@ namespace MonoNS
         msgBox.Show(tileUnderMouse.Q + ", " + tileUnderMouse.R);
       }
       Unit u = tileUnderMouse.GetUnit();
+      // TODO: search playerTurn when disable AI turn debug
+      if (tileUnderMouse.IsThereConcealedEnemy(!hexMap.turnController.playerTurn)) {
+        u = null;
+      }
       Settlement s = tileUnderMouse.settlement;
       if (mouseMode == mode.attack)
       {

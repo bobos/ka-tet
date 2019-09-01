@@ -102,6 +102,7 @@ namespace MonoNS
       TurnChange();
 
       // TODO
+      FoW.Get().Fog();
       foreach(Unit u in playerParty.GetUnits()) {
         if (u.state != State.Camping) {
           u.SetState(u.state);
@@ -112,7 +113,6 @@ namespace MonoNS
           u.SetState(u.state);
         }
       }
-      FoW.Get().Fog(!playerTurn);
 
       while (showingTitle) { yield return null; }
       // refresh AI

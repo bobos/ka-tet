@@ -102,8 +102,9 @@ namespace UnitNS
       FoW fow = FoW.Get();
       if (!myTurn && fow != null) {
         // is covered by fow
-        HashSet<Tile> tiles = fow.GetEnemyVisibleArea(!IsAI());
-        if (!tiles.Contains(tile)) {
+        // HashSet<Tile> tiles = fow.GetEnemyVisibleArea(!IsAI());
+        // if (!tiles.Contains(tile)) {
+        if (fow.IsFogged(tile)) {
           // under fow
           broker.BrokeChange(this, ActionType.UnitHidden, tile);
           return;
