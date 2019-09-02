@@ -121,6 +121,7 @@ namespace MonoNS
       illness.text = unit.GetIllTurns() > 0 ? "疫情: 预计本轮致伤"+ unit.GetIllDisableNum() + "人,致死" + unit.GetIllKillNum() +"人,疫情还将持续" + unit.GetIllTurns() + "回合" : "";
 
       ToggleButtons(false);
+      // TODO: AI test
       if (unit.IsAI() == !turnController.player) {
         RefreshButtons(unit);
       }

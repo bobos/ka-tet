@@ -20,4 +20,11 @@ namespace MapTileNS
     Burning,
     Flooding
   }
+
+  public enum DisasterType {
+    Flood,
+    WildFire,
+    EarthQuake,
+    LandSlide
+  }
 }

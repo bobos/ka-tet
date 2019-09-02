@@ -215,7 +215,6 @@ namespace MonoNS
     {
       GameObject tileGO = hexMap.GetTileGO(settlement.baseTile);
       if (tileGO == null) Util.Throw("CreateSettlement: Tile doesn't exist!");
-      // TODO: use different prefab for different type
       GameObject GO = (GameObject)Instantiate(settlement.type == Settlement.Type.camp ? hexMap.CampPrefab : hexMap.TentPrefab,
         settlement.baseTile.GetSurfacePosition(),
         Quaternion.identity,

@@ -27,7 +27,6 @@ namespace UnitNS
     public const float SnowDisableRate = 0.005f;
     public const float BlizardKillRate = 0.0125f;
     public const float BlizardDisableRate = 0.025f;
-    public const float HeatDisableRate = 0.0025f;
     public const int DisbandUnitUnder = 10;
 
     public const int L1Visibility = 5; // under 4000 
@@ -41,6 +40,9 @@ namespace UnitNS
 
     HexMap hexMap;
     bool clone = false;
+    ArmorRemEvent armorRemEvent;
+    HeatSick heatSick;
+    UnitPoisioned unitPoisioned;
     public Unit(bool clone, Troop troop, Tile tile, State state,
                 int supply, int labor, int kia, int mia, int movement = -1)
     {
@@ -67,6 +69,7 @@ namespace UnitNS
 
         SetTile(tile);
         SetState(rf.morale == 0 ? State.Routing : state);
+
       }
       movementRemaining = movement < 0 ? GetFullMovement() : movement;
     }
@@ -75,6 +78,9 @@ namespace UnitNS
       if (clone) {
         return;
       }
+      heatSick = new HeatSick(this);
+      armorRemEvent = new ArmorRemEvent(this);
+      unitPoisioned = new UnitPoisioned(this);
       hexMap.SpawnUnit(this);
       if (tile != null && tile.settlement != null && tile.settlement.owner.isAI == IsAI()) {
         // spawn unit in settlement
@@ -98,14 +104,12 @@ namespace UnitNS
         broker.BrokeChange(this, ActionType.UnitLeft, tile);
         return;
       }
+      // TODO: AI test
       bool myTurn = !hexMap.turnController.playerTurn == IsAI();
       FoW fow = FoW.Get();
       if (!myTurn && fow != null) {
         // is covered by fow
-        // HashSet<Tile> tiles = fow.GetEnemyVisibleArea(!IsAI());
-        // if (!tiles.Contains(tile)) {
         if (fow.IsFogged(tile)) {
-          // under fow
           broker.BrokeChange(this, ActionType.UnitHidden, tile);
           return;
         }
@@ -156,30 +160,6 @@ namespace UnitNS
 
     int __labor;
     int __movementRemaining;
-    float __illDisableRate = 0f;
-    float illDisableRate
-    {
-      get
-      {
-        return __illDisableRate;
-      }
-      set
-      {
-        __illDisableRate = value < 0 ? 0 : value;
-      }
-    }
-    float __illDeathRate = 0f;
-    float illDeathRate
-    {
-      get
-      {
-        return __illDeathRate;
-      }
-      set
-      {
-        __illDeathRate = value < 0 ? 0 : value;
-      }
-    }
     Queue<Tile> path;
     // ==============================================================
     // ================= Unit Stat ==================================
@@ -237,24 +217,19 @@ namespace UnitNS
       return txtLib.get("u_vigorous");
     }
 
-    public int GetIllTurns()
+    public int GetHeatSickTurns()
     {
-      return (int)(illDisableRate * 100);
+      return heatSick.GetIllTurns();
     }
 
-    public int GetIllDeathTurns()
+    public int GetHeatSickDisableNum()
     {
-      return (int)(illDeathRate * 100);
+      return heatSick.GetIllDisableNum();
     }
 
-    public int GetIllDisableNum()
+    public int GetHeatSickKillNum()
     {
-      return (int)(rf.soldiers * illDisableRate);
-    }
-
-    public int GetIllKillNum()
-    {
-      return (int)(rf.soldiers * illDeathRate);
+      return heatSick.GetIllKillNum();
     }
 
     public int GetStarvingDessertNum()
@@ -286,7 +261,7 @@ namespace UnitNS
     }
 
     public bool IsSicknessAffected() {
-      return GetIllTurns() > 0;
+      return heatSick.IsValid();
     }
 
     public bool IsStarving() {
@@ -443,24 +418,7 @@ namespace UnitNS
         labor -= miaNum;
       }
 
-      if (illDisableRate > 0)
-      {
-        int woundedNum = GetIllDisableNum();
-        rf.wounded += woundedNum;
-        rf.soldiers -= woundedNum;
-        labor -= (int)(woundedNum / 4);
-        illDisableRate -= 0.005f;
-      }
-
-      if (illDeathRate > 0)
-      {
-        rf.morale -= 2;
-        int kiaNum = GetIllKillNum();
-        kia += kiaNum;
-        rf.soldiers -= kiaNum;
-        labor -= kiaNum;
-        illDeathRate -= 0.0025f;
-      }
+      heatSick.Apply();
 
       if (rf.soldiers <= DisbandUnitUnder)
       {
@@ -474,6 +432,18 @@ namespace UnitNS
         // maybe we can set skip flags to skip the turn, e.g. defend/fortify etc.
         return false;
       return true;
+    }
+
+    public void TakeEffect(int reduceMorale, float movementDropRatio = 0f, float disableRatio = 0f, float killRatio = 0f) {
+      rf.morale -= reduceMorale;
+      movementRemaining = movementRemaining - (int)(movementRemaining * movementDropRatio);
+      int woundedNum = (int)(rf.soldiers * disableRatio);
+      rf.wounded += woundedNum;
+      rf.soldiers -= woundedNum;
+      int kiaNum = (int)(rf.soldiers * killRatio);
+      kia += kiaNum;
+      rf.soldiers -= kiaNum;
+      labor -= kiaNum;
     }
 
     // ==============================================================
@@ -509,16 +479,6 @@ namespace UnitNS
       labor -= kiaNum;
     }
 
-    public void OnHeat()
-    {
-      rf.morale -= 2;
-      movementRemaining = BasicMovementCost * 2;
-      int woundedNum = (int)(rf.soldiers * HeatDisableRate);
-      rf.wounded += woundedNum;
-      rf.soldiers -= woundedNum;
-      labor -= (int)(woundedNum / 4);
-    }
-
     public void OnHeavyRain()
     {
       if (state == State.Camping) return;
@@ -546,7 +506,7 @@ namespace UnitNS
           rf.mov * GetMovementModifier() *
           (rf.morale >= Troop.MaxMorale ? 1.2f : 1f) *
           (1f + (IsStarving() ? -0.45f : 0f)) * 
-          (illDeathRate > 0 || illDisableRate > 0 ? 0.7f : 1f));
+          (heatSick.IsValid() ? 0.7f : 1f));
     }
 
     public StaminaLvl GetStaminaLevel()
@@ -712,16 +672,21 @@ namespace UnitNS
       }
     }
 
-    public void SetSickness(float illRate, float deathRate)
+    public void CaughtHeatSickness()
     {
-      illDisableRate += illRate;
-      illDeathRate += deathRate;
+      heatSick.Worsen();
     }
 
-    public void EscapeFromWildFire()
-    {
-      rf.morale -= 8;
-      movementRemaining = 0;
+    public void SoldiersDrown() {
+      UnitDrown.Drown(this);
+    }
+
+    public void Dehydrate() {
+      UnitDehydration.dehydrate(this);
+    }
+
+    public void Poisioned() {
+      unitPoisioned.Poision();
     }
 
     float GetBuff()
@@ -1028,6 +993,17 @@ namespace UnitNS
       // if tile takes 3 turns to enter, we can still enter it with 1 full turn
       cost = cost > GetFullMovement() ? GetFullMovement() : cost;
       return cost;
+    }
+
+    public void ListenOnHeat(OnWeather onHeat)
+    {
+      weatherGenerator.onHeat -= onHeat;
+      weatherGenerator.onHeat += onHeat;
+    }
+
+    public void RemoveOnHeatListener(OnWeather onHeat)
+    {
+      weatherGenerator.onHeat -= onHeat;
     }
   }
 }

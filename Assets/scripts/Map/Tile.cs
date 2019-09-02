@@ -17,9 +17,15 @@ namespace MapTileNS
     public const float HighgroundWatermark = 0.65f;
     //public const int Work2BuildCamp = 34;
     public const int Work2BuildCamp = 10;
-    public const int BurningLasts = 6; 
-    public const int FloodingLasts = 15;
     public const float HighGround = 0.312f;
+    public Flood flood = null;
+    public WildFire wildFire = null;
+    public LandSlide landSlide = null;
+    public HeatSickness heatSickness = null;
+    public Dehydration dehydration = null;
+    public Drowning drowning = null;
+    public Poision poision = null;
+    public bool waterBound = false;
 
     public Tile(int q, int r, HexMap hexMap) : base(q, r, hexMap) { }
     public void PostCreation()
@@ -28,17 +34,32 @@ namespace MapTileNS
       turnController = hexMap.turnController;
       windGenerator = hexMap.windGenerator;
       settlementMgr = hexMap.settlementMgr;
-      if (isDam)
-      {
-        ListenOnHeavyRain();
+      if (terrian != TerrianType.Mountain) {
+        flood = new Flood(this, isDam);
       }
-      if (field == FieldType.Wild)
-      {
-        ListenOnHeat();
+      if (terrian != TerrianType.Water) {
+        wildFire = new WildFire(this, burnable);
       }
-      if (terrian == TerrianType.Mountain)
-      {
-        ListenOnDry();
+      if (terrian == TerrianType.Water) {
+        poision = new Poision(this);
+      }
+      if (field == FieldType.Wild) {
+        heatSickness = new HeatSickness(this);
+      }
+      if (terrian == TerrianType.Hill) {
+        landSlide = new LandSlide(this);
+      }
+
+      foreach (Tile tile in neighbours) {
+        if (tile.terrian == TerrianType.Water) {
+          drowning = new Drowning(this);
+          waterBound = true;
+          break;
+        }
+      }
+
+      if (!waterBound) {
+        dehydration = new Dehydration(this);
       }
     }
     
@@ -85,400 +106,103 @@ namespace MapTileNS
     }
 
     // ==============================================================
-    // ================= On Turn End ================================
+    // ================= Listeners ==================================
     // ==============================================================
-    WindGenerator windGenerator;
-    WeatherGenerator weatherGenerator;
+    public WindGenerator windGenerator;
+    public WeatherGenerator weatherGenerator;
+    public TurnController turnController;
 
-    bool onHeavyRainEventRegistered = false;
-    void ListenOnHeavyRain()
+    public void ListenOnHeavyRain(OnWeather onHeavyRain)
     {
-      if (!onHeavyRainEventRegistered)
-      {
-        weatherGenerator.onHeavyRain += OnHeavyRain;
-        onHeavyRainEventRegistered = true;
-      }
+      weatherGenerator.onHeavyRain -= onHeavyRain;
+      weatherGenerator.onHeavyRain += onHeavyRain;
     }
 
-    void RemoveOnHeavyRainListener()
+    public void RemoveOnHeavyRainListener(OnWeather onHeavyRain)
     {
-      if (onHeavyRainEventRegistered)
-      {
-        weatherGenerator.onHeavyRain -= OnHeavyRain;
-        onHeavyRainEventRegistered = false;
-      }
+      weatherGenerator.onHeavyRain -= onHeavyRain;
     }
 
-    bool onRainEventRegistered = false;
-    void ListenOnRain()
+    public void ListenOnRain(OnWeather onRain)
     {
-      if (!onRainEventRegistered)
-      {
-        weatherGenerator.onRain += OnRain;
-        onRainEventRegistered = true;
-      }
+      weatherGenerator.onRain -= OnRain;
+      weatherGenerator.onRain += OnRain;
     }
 
-    void RemoveOnRainListener()
+    public void RemoveOnRainListener(OnWeather onRain)
     {
-      if (onRainEventRegistered)
-      {
-        weatherGenerator.onRain -= OnRain;
-        onRainEventRegistered = false;
-      }
+      weatherGenerator.onRain -= onRain;
     }
 
-    bool onHeatEventRegistered = false;
-    void ListenOnHeat()
+    public void ListenOnHeat(OnWeather onHeat)
     {
-      if (!onHeatEventRegistered)
-      {
-        weatherGenerator.onHeat += OnHeat;
-        onHeatEventRegistered = true;
-      }
+      weatherGenerator.onHeat -= onHeat;
+      weatherGenerator.onHeat += onHeat;
     }
 
-    void RemoveOnHeatListener()
+    public void RemoveOnHeatListener(OnWeather onHeat)
     {
-      if (onHeatEventRegistered)
-      {
-        weatherGenerator.onHeat -= OnHeat;
-        onHeatEventRegistered = false;
-      }
+      weatherGenerator.onHeat -= onHeat;
     }
 
-    bool onDryEventRegistered = false;
-    void ListenOnDry()
+    public void ListenOnDry(OnWeather onDry)
     {
-      if (!onDryEventRegistered)
-      {
-        weatherGenerator.onDry += OnDry;
-        onDryEventRegistered = true;
-      }
+      weatherGenerator.onDry -= onDry;
+      weatherGenerator.onDry += onDry;
     }
 
-    void RemoveOnDryListener()
+    public void RemoveOnDryListener(OnWeather onDry)
     {
-      if (onDryEventRegistered)
-      {
-        weatherGenerator.onDry -= OnDry;
-        onDryEventRegistered = false;
-      }
+      weatherGenerator.onDry -= onDry;
     }
 
-    bool seasonEventRegistered = false;
-    void ListenOnSeason()
+    public void ListenOnSeason(OnSeasonChange onSeasonChange)
     {
-      if (!seasonEventRegistered)
-      {
-        weatherGenerator.onSeasonChange += OnSeasonChange;
-        seasonEventRegistered = true;
-      }
+      weatherGenerator.onSeasonChange -= onSeasonChange;
+      weatherGenerator.onSeasonChange += onSeasonChange;
     }
 
-    void RemoveSeasonListener()
+    public void RemoveOnSeasonListener(OnSeasonChange onSeasonChange)
     {
-      if (!seasonEventRegistered)
-      {
-        weatherGenerator.onSeasonChange -= OnSeasonChange;
-        seasonEventRegistered = false;
-      }
+      weatherGenerator.onSeasonChange -= onSeasonChange;
     }
 
-    bool turnEndRegistered = false;
-    TurnController turnController;
-    void ListenOnTurnEnd()
+    public void ListenOnTurnEnd(OnTurnEnd onTurnEnd)
     {
-      if (!turnEndRegistered)
-      {
-        turnController.onNewTurn += OnTurnEnd;
-        turnEndRegistered = true;
-      }
+      turnController.onNewTurn -= onTurnEnd;
+      turnController.onNewTurn += onTurnEnd;
     }
 
-    void RemoveTurnEndListener()
+    public void RemoveTurnEndListener(OnTurnEnd onTurnEnd)
     {
-      if (turnEndRegistered)
-      {
-        turnController.onNewTurn -= OnTurnEnd;
-        turnEndRegistered = false;
-      }
-    }
-
-    public void OnTurnEnd()
-    {
-      if (field == FieldType.Burning)
-      {
-        burningCntDown--;
-        if (burningCntDown < 1)
-        {
-          PutOutFire();
-        }
-      }
-      else if (field == FieldType.Flooding)
-      {
-        floodingCntDown--;
-        if (floodingCntDown < 1)
-        {
-          FloodRecede();
-        }
-      }
-      hexMap.UpdateTileTextAndSkin(this);
-    }
-
-    public void OnRain()
-    {
-      if (field == FieldType.Burning)
-      {
-        PutOutFire();
-      }
-    }
-
-    public void OnHeavyRain()
-    {
-      if (isDam && Cons.FairChance())
-      {
-        SabotageDam();
-      }
-
-      if (field == FieldType.Burning)
-      {
-        PutOutFire();
-      }
-
-      if (field == FieldType.Farm && Cons.HighlyLikely())
-      {
-        Unit u = GetUnit();
-        if (u != null)
-        {
-          u.SetSickness(Util.Rand(2, 5) * 0.01f, Util.Rand(1, 2) * 0.01f);
-        }
-      }
-    }
-
-    public void OnHeat()
-    {
-      // TODO: add near water check
-    }
-
-    public void OnDry()
-    {
-      if (terrian == TerrianType.Mountain && Cons.SlimChance() && CanSetFire() && burnable)
-      {
-        SpreadFire();
-      }
-    }
-
-    public void OnSeasonChange(Season season)
-    {
-      if (Cons.IsWinter(season))
-      {
-        if (field == FieldType.Burning)
-        {
-          PutOutFire();
-        }
-      }
+      turnController.onNewTurn -= onTurnEnd;
     }
 
     // ==============================================================
-    // ================= Wild Fire ==================================
+    // ================= Disasters ==================================
     // ==============================================================
-    public int burningCntDown = 0;
-    public bool burnable = false;
     public bool SetFire()
     {
-      if (Cons.IsSpring(weatherGenerator.season) || Cons.IsWinter(weatherGenerator.season))
-      {
-        return false;
-      }
-
-      if (Cons.IsRain(weatherGenerator.currentWeather) || Cons.IsHeavyRain(weatherGenerator.currentWeather))
-      {
-        return false;
-      }
-
-      if (!CanSetFire() || !burnable)
-      {
-        return false;
-      }
-      
-      SpreadFire();
-      return true;
-    }
-
-    void SpreadFire()
-    {
-      DisaterAffectUnit();
-      SetFieldType(FieldType.Burning);
-      ListenOnTurnEnd();
-      ListenOnSeason();
-      ListenOnRain();
-      ListenOnHeavyRain();
-      // spread to neighbours depends on season and wind and directions
-      Cons.Direction windDirection = windGenerator.direction;
-      List<Tile> affectedTiles = new List<Tile>();
-      bool chance1 = Cons.FairChance();
-      bool chance2 = Cons.SlimChance();
-      bool chance3 = Cons.SlimChance();
-      if (Cons.IsGale(windGenerator.current))
-      {
-        chance1 = Cons.MostLikely();
-        chance2 = Cons.EvenChance();
-        chance3 = Cons.EvenChance();
-      }
-      else if (Cons.IsWind(windGenerator.current))
-      {
-        chance1 = Cons.EvenChance();
-        chance2 = Cons.FairChance();
-        chance3 = Cons.FairChance();
-      }
-
-      if (windDirection == Cons.Direction.dueNorth)
-      {
-        PickTile2Burn(affectedTiles, NorthTile<Tile>(), NorthEastTile<Tile>(),
-                      NorthWestTile<Tile>(), chance1, chance2, chance3);
-      }
-
-      if (windDirection == Cons.Direction.dueSouth)
-      {
-        PickTile2Burn(affectedTiles, SouthTile<Tile>(), SouthEastTile<Tile>(),
-                      SouthWestTile<Tile>(), chance1, chance2, chance3);
-      }
-
-      if (windDirection == Cons.Direction.northEast)
-      {
-        PickTile2Burn(affectedTiles, NorthEastTile<Tile>(), NorthTile<Tile>(),
-                      SouthEastTile<Tile>(), chance1, chance2, chance3);
-      }
-
-      if (windDirection == Cons.Direction.northWest)
-      {
-        PickTile2Burn(affectedTiles, NorthWestTile<Tile>(), NorthTile<Tile>(),
-                      SouthWestTile<Tile>(), chance1, chance2, chance3);
-      }
-
-      if (windDirection == Cons.Direction.southWest)
-      {
-        PickTile2Burn(affectedTiles, SouthWestTile<Tile>(), SouthTile<Tile>(),
-                      NorthWestTile<Tile>(), chance1, chance2, chance3);
-      }
-
-      if (windDirection == Cons.Direction.southEast)
-      {
-        PickTile2Burn(affectedTiles, SouthEastTile<Tile>(), SouthTile<Tile>(),
-                      NorthEastTile<Tile>(), chance1, chance2, chance3);
-      }
-
-      foreach (Tile tile in affectedTiles)
-      {
-        if (tile.CanSetFire() || (tile.terrian == TerrianType.Plain && tile.CanPlainCatchFire()))
-        {
-          tile.SpreadFire();
-        }
-      }
-    }
-    
-    void PickTile2Burn(List<Tile> tiles, Tile tile1, Tile tile2, Tile tile3, bool chance1, bool chance2, bool chance3)
-    {
-      if (tile1 != null && chance1) tiles.Add(tile1);
-      if (tile2 != null && chance2) tiles.Add(tile2);
-      if (tile3 != null && chance3) tiles.Add(tile3);
-    }
-
-    void PutOutFire()
-    {
-      SetFieldType(FieldType.Schorched);
-      RemoveTurnEndListener();
-      RemoveOnHeavyRainListener();
-      RemoveOnRainListener();
-    }
-
-    public bool CanSetFire()
-    {
-      if (field == FieldType.Wild && terrian == TerrianType.Hill || terrian == TerrianType.Mountain)
-      {
-        return true;
+      if (wildFire != null) {
+        return wildFire.Start();
       }
       return false;
     }
-
-    // Can the plain tile caught fire by nearby burning tiles
-    public bool CanPlainCatchFire()
-    {
-      if (field == FieldType.Wild && Cons.IsAutumn(weatherGenerator.season))
-      {
-        return true;
-      }
-      return false;
-    }
-
-    // ==============================================================
-    // ================= Flood ======================================
-    // ==============================================================
-    public int floodingCntDown = 0;
 
     public bool SabotageDam()
     {
-      if (isDam &&
-          (Cons.IsSpring(weatherGenerator.season) || Cons.IsSummer(weatherGenerator.season))
-          && (Cons.IsRain(weatherGenerator.currentWeather) || Cons.IsHeavyRain(weatherGenerator.currentWeather))) 
-      {
-        // TODO: set Dam from outside
-        SpreadFlood();
-        return true;
+      if (flood != null) {
+        return flood.Start();
       }
       return false;
     }
 
-    public void SpreadFlood()
-    {
-      isDam = false;
-      DisaterAffectUnit();
-      foreach (Tile tile in DownstreamTiles<Tile>())
-      {
-        if (tile.terrian == TerrianType.Water || tile.field == FieldType.Flooding)
-        {
-          tile.SpreadFlood();
-        }
-        else if (tile.CanBeFloodedByNearByTile() &&
-         (Cons.IsHeavyRain(weatherGenerator.currentWeather) ? Cons.HighlyLikely() : Cons.MostLikely()))
-        {
-          if (tile.field == FieldType.Burning)
-          {
-            tile.PutOutFire();
-          }
-          tile.SetFieldType(FieldType.Flooding);
-          tile.ListenOnTurnEnd();
-          tile.SpreadFlood();
-        }
+    public bool Poision() {
+      if (poision == null) {
+        return false;
       }
-    }
-
-    public bool CanBeFloodedByNearByTile()
-    {
-      if (terrian == TerrianType.Plain)
-      {
-        if (field == FieldType.Settlement)
-        {
-          // camp can be flooded
-          if (settlement.type == Settlement.Type.camp)
-          {
-            return true;
-          }
-          return false;
-        }
-        else
-        {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    void FloodRecede()
-    {
-      SetFieldType(FieldType.Flooded);
-      RemoveTurnEndListener();
+      poision.Poision();
+      return true;
     }
 
     // ==============================================================
@@ -492,24 +216,6 @@ namespace MapTileNS
     public void SetFieldType(FieldType type)
     {
       field = type;
-      if (type == FieldType.Burning)
-      {
-        burningCntDown = Util.Rand(2, BurningLasts);
-      }
-      if (type == FieldType.Schorched)
-      {
-        burningCntDown = 0;
-      }
-
-      if (type == FieldType.Flooding)
-      {
-        floodingCntDown = Util.Rand(2, FloodingLasts);
-      }
-      if (type == FieldType.Flooded)
-      {
-        floodingCntDown = 0;
-      }
-
       if (type == FieldType.Settlement || type == FieldType.Burning || type == FieldType.Flooding)
       {
         movementCost = Unit.MovementCostOnUnaccesible;
@@ -691,7 +397,7 @@ namespace MapTileNS
       return units.First();
     }
 
-    void DisaterAffectUnit()
+    public void DisasterAffectUnit(DisasterType type)
     {
       if (field == FieldType.Settlement && settlement != null)
       {
@@ -715,7 +421,7 @@ namespace MapTileNS
         }
         else
         {
-          u.EscapeFromWildFire();
+          DisasterEffect.Apply(type, u);
           u.SetTile(retreatTile);
         }
       }
