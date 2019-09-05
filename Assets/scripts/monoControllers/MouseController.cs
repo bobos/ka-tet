@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using System.Linq;
@@ -22,6 +21,8 @@ namespace MonoNS
       tc.onEndTurnClicked += OnEndTurnClicked;
       msgBox = hexMap.msgBox;
       settlementMgr = hexMap.settlementMgr;
+      hexMap.eventDialog.eventDialogOn += EventDialogOn;
+      hexMap.eventDialog.eventDialogOff += EventDialogOff;
       ResetUpdateFunc();
     }
 
@@ -76,6 +77,14 @@ namespace MonoNS
       // we wish to clean up all highlights for next turn start
       mouseMode = mode.detect;
       Escape();
+    }
+
+    public void EventDialogOn() {
+      updateReady = false;
+    }
+
+    public void EventDialogOff() {
+      updateReady = true;
     }
 
     Tile[] tmpTiles;

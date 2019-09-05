@@ -16,6 +16,8 @@ namespace MonoNS
       buttons = btns;
       mouseController.onSettlementSelect += OnSettlementSelect;
       mouseController.onSettlementDeselect += OnSettlementDeselect;
+      hexMap.eventDialog.eventDialogOn += EventDialogOn;
+      hexMap.eventDialog.eventDialogOff += EventDialogOff;
       self = this.transform.gameObject;
       self.SetActive(false);
     }
@@ -36,6 +38,18 @@ namespace MonoNS
     public Text defenseWill;
     public Text state;
     public Text inNetwork;
+
+    public void EventDialogOn() {
+      if (self.activeSelf) {
+        DisableButtons();
+      }
+    }
+
+    public void EventDialogOff() {
+      if (self.activeSelf) {
+        EnableButtons(true);
+      }
+    }
 
     void DisableButtons() {
       foreach (GameObject button in buttons)

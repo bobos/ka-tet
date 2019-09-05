@@ -1,12 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using PathFind;
-using UnitNS;
-using MonoNS;
-using NatureNS;
-using UnityEngine;
-
-namespace MapTileNS
+﻿namespace MapTileNS
 {
   public class Drowning
   {
@@ -18,7 +10,7 @@ namespace MapTileNS
 
     public void OnRain()
     {
-      if (tile.type != FieldType.Settlement && Cons.SlimChance()
+      if (tile.field != FieldType.Settlement && Cons.SlimChance()
       && !Cons.IsAutumn(tile.weatherGenerator.season) && !Cons.IsWinter(tile.weatherGenerator.season)
       && tile.GetUnit() != null)
       {

@@ -1,12 +1,4 @@
-﻿using System.Collections.Generic;
-using PathFind;
-using MapTileNS;
-using MonoNS;
-using UnityEngine;
-using CourtNS;
-using FieldNS;
-
-namespace UnitNS
+﻿namespace UnitNS
 {
   public class UnitPoisioned
   {
@@ -50,28 +42,30 @@ namespace UnitNS
       killRatio = GetKillRatio();
     }
 
+    public void Destroy() {}
+
     public bool IsValid() {
-      return ;
+      return disableRatio > 0f;;
     }
 
     public void Apply() {
-       if (illDisableRate > 0)
+       if (disableRatio > 0)
       {
         int woundedNum = GetIllDisableNum();
-        rf.wounded += woundedNum;
-        rf.soldiers -= woundedNum;
-        labor -= (int)(woundedNum / 4);
-        illDisableRate -= 0.005f;
+        unit.rf.wounded += woundedNum;
+        unit.rf.soldiers -= woundedNum;
+        unit.labor -= (int)(woundedNum / 4);
+        disableRatio -= 0.005f;
       }
 
-      if (illDeathRate > 0)
+      if (killRatio  > 0)
       {
-        rf.morale -= 2;
+        unit.rf.morale -= 2;
         int kiaNum = GetIllKillNum();
-        kia += kiaNum;
-        rf.soldiers -= kiaNum;
-        labor -= kiaNum;
-        illDeathRate -= 0.0025f;
+        unit.kia += kiaNum;
+        unit.rf.soldiers -= kiaNum;
+        unit.labor -= kiaNum;
+        killRatio -= 0.005f;
       }
     }
 

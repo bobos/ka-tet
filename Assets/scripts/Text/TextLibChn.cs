@@ -119,7 +119,11 @@ namespace TextNS
       {"pr_sloppyOnDrill_d", "General is sloppy on drill, which leads the shameful defeat"},
 
       // building
-      {"b_ownedCamp", "所部所筑营寨"}
+      {"b_ownedCamp", "所部所筑营寨"},
+
+      // event
+      {"event_wildFire_title", "山火侵袭"},
+      {"event_wildFire", @"{0}将军所部{1}突遭猛烈山火所袭，军中士卒疲于避险，已有{2}名士兵和{3}民夫丧命于火海，{4}人不同程度为烈火所伤，部队士气下降{5}点, 若天气干燥之时，将军务必带军避开山高林密之处，以免再为山火所伤！"}
       };
     }
   }

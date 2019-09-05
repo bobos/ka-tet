@@ -1,12 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using PathFind;
-using UnitNS;
-using MonoNS;
-using NatureNS;
-using UnityEngine;
-
-namespace MapTileNS
+﻿namespace MapTileNS
 {
   public class Dehydration
   {
@@ -18,14 +10,12 @@ namespace MapTileNS
 
     public void OnHeat()
     {
-      if (tile.type == FieldType.Settlement || tile.type == FieldType.Burning || tile.type == FieldType.Flooding) {
+      if (tile.field == FieldType.Settlement || tile.field == FieldType.Burning || tile.field == FieldType.Flooding) {
         return;
       }
       if (Cons.FairChance() && tile.GetUnit() != null)
       {
-        if (!tile.IsWaterBound()) {
-          tile.GetUnit().Dehydrate();
-        }
+        tile.GetUnit().Dehydrate();
       }
     }
 

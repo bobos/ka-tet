@@ -26,6 +26,7 @@ namespace MonoNS
     public TurnPhaseTitle turnPhaseTitle;
     public UnitActionBroker actionBroker;
     public InputField inputField;
+    public EventDialog eventDialog;
 
     // ==============================================================
     // ================= Interfaces required from hex map plugin ====
@@ -118,6 +119,7 @@ namespace MonoNS
       turnIndicator = GameObject.FindObjectOfType<TurnIndicator>();
       turnPhaseTitle = GameObject.FindObjectOfType<TurnPhaseTitle>();
       inputField = GameObject.FindObjectOfType<InputField>();
+      eventDialog = GameObject.FindObjectOfType<EventDialog>();
       // init actionBroker
       actionBroker = UnitActionBroker.GetBroker();
       actionBroker.onUnitAction += OnUnitAction;
@@ -400,7 +402,7 @@ namespace MonoNS
           txt = txt + "Dam\n";
         }
       } else if (tile.terrian != TerrianType.Mountain) {
-        txt = txt + (tile.CanSetFire() && tile.burnable ? " Fire" : "");
+        txt = txt + (tile.burnable ? " Fire" : "");
         if (settlementMgr.IsCampable(tile)) {
           txt = txt + " Camp\n";
         }

@@ -1,10 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using PathFind;
-using UnitNS;
-using MonoNS;
 using NatureNS;
-using UnityEngine;
 
 namespace MapTileNS
 {
@@ -19,7 +14,7 @@ namespace MapTileNS
     public WildFire(Tile tile, bool burnable) {
       this.tile = tile;
       this.burnable = burnable;
-      if (CanSetFire() && burnable) {
+      if (CanSetFire()) {
         tile.ListenOnDry(OnDry);
       }
     }
@@ -55,17 +50,17 @@ namespace MapTileNS
 
     public bool Start()
     {
-      if (Cons.IsSpring(weatherGenerator.season) || Cons.IsWinter(weatherGenerator.season))
+      if (Cons.IsSpring(tile.weatherGenerator.season) || Cons.IsWinter(tile.weatherGenerator.season))
       {
         return false;
       }
 
-      if (Cons.IsRain(weatherGenerator.currentWeather) || Cons.IsHeavyRain(weatherGenerator.currentWeather))
+      if (Cons.IsRain(tile.weatherGenerator.currentWeather) || Cons.IsHeavyRain(tile.weatherGenerator.currentWeather))
       {
         return false;
       }
 
-      if (!CanSetFire() || !burnable)
+      if (!burnable)
       {
         return false;
       }
@@ -151,7 +146,7 @@ namespace MapTileNS
     
     public void PutOutFire()
     {
-      SetFieldType(FieldType.Schorched);
+      tile.SetFieldType(FieldType.Schorched);
       tile.RemoveTurnEndListener(OnTurnEnd);
       tile.RemoveOnHeavyRainListener(OnRain);
       tile.RemoveOnRainListener(OnRain);
@@ -170,7 +165,7 @@ namespace MapTileNS
     // Can the plain tile caught fire by nearby burning tiles
     public bool CanPlainCatchFire()
     {
-      if (field == FieldType.Wild && Cons.IsAutumn(tile.weatherGenerator.season))
+      if (tile.field == FieldType.Wild && Cons.IsAutumn(tile.weatherGenerator.season))
       {
         return true;
       }

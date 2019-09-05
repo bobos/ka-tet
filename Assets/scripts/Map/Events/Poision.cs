@@ -1,10 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using PathFind;
 using UnitNS;
-using MonoNS;
-using NatureNS;
-using UnityEngine;
 
 namespace MapTileNS
 {
@@ -14,7 +9,7 @@ namespace MapTileNS
     public HashSet<Tile> downStreams = new HashSet<Tile>();
     public Poision(Tile tile) {
       this.tile = tile;
-      List<Tile> tiles = AddDownstream(tile);
+      HashSet<Tile> tiles = AddDownstream(tile);
       for (int i = 0; i < 8; i++)
       {
         HashSet<Tile> tiles1 = new HashSet<Tile>();
@@ -27,9 +22,9 @@ namespace MapTileNS
       }
     }
 
-    List<Tile> AddDownstream(Tile tile) {
-      List<Tile> tiles = new List<Tile>();
-      foreach (Tile t in tile.DownstreamTiles()) {
+    HashSet<Tile> AddDownstream(Tile tile) {
+      HashSet<Tile> tiles = new HashSet<Tile>();
+      foreach (Tile t in tile.DownstreamTiles<Tile>()) {
         if (t.terrian == TerrianType.Water) {
           downStreams.Add(t);
           tiles.Add(t);
@@ -38,12 +33,15 @@ namespace MapTileNS
       return tiles;
     }
 
-    public void Poision()
+    public void SetPoision()
     {
       foreach(Tile tile in downStreams) {
-        foreach (Unit unit in tile.GetUnitsNearBy())
+        foreach (Tile t in tile.neighbours)
         {
-          unit.Poisioned();   
+          Unit unit = t.GetUnit();
+          if (unit != null) {
+            unit.Poisioned();   
+          }
         }
       }
     }

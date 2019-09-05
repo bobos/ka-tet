@@ -39,7 +39,7 @@ namespace UnitNS
     private TextNS.TextLib txtLib = Cons.GetTextLib();
 
     HexMap hexMap;
-    bool clone = false;
+    public bool clone = false;
     ArmorRemEvent armorRemEvent;
     HeatSick heatSick;
     UnitPoisioned unitPoisioned;
@@ -61,7 +61,6 @@ namespace UnitNS
         weatherGenerator = hexMap.weatherGenerator;
         weatherGenerator.onSnow += OnSnow;
         weatherGenerator.onBlizard += OnBlizard;
-        weatherGenerator.onHeat += OnHeat;
         weatherGenerator.onHeavyRain += OnHeavyRain;
 
         turnController = hexMap.turnController;
@@ -69,7 +68,6 @@ namespace UnitNS
 
         SetTile(tile);
         SetState(rf.morale == 0 ? State.Routing : state);
-
       }
       movementRemaining = movement < 0 ? GetFullMovement() : movement;
     }
@@ -141,9 +139,9 @@ namespace UnitNS
     public event UnitMovedCallback onUnitMove;
     public int supply;
     public bool consumed = false;
-    public int kia { get; private set; }
-    public int mia { get; private set; }
-    public int kills { get; private set; } // TODO
+    public int kia;
+    public int mia;
+    public int kills;
     public int labor
     {
       get
@@ -365,6 +363,12 @@ namespace UnitNS
       turnDone = true;
     }
 
+    public void DestroyEvents() {
+      heatSick.Destroy();
+      armorRemEvent.Destroy();
+      unitPoisioned.Destroy();
+    }
+
     public void Retreat() {
       rf.LeaveCampaign();
       SetState(State.Retreated);
@@ -373,9 +377,9 @@ namespace UnitNS
         tile.settlement.RemoveUnit(this);
       }
       rf.general.ReportFieldEvent(FieldEvent.Retreated);
+      DestroyEvents();
       weatherGenerator.onBlizard -= OnBlizard;
       weatherGenerator.onSnow -= OnSnow;
-      weatherGenerator.onHeat -= OnHeat;
       weatherGenerator.onHeavyRain -= OnHeavyRain;
       turnController.onNewTurn -= OnNewTurn;
       MsgBox.ShowMsg("Unit " + Name() + " has left the campaign");
@@ -392,9 +396,9 @@ namespace UnitNS
         tile.settlement.RemoveUnit(this);
       }
       rf.general.ReportFieldEvent(FieldEvent.Destroyed);
+      DestroyEvents();
       weatherGenerator.onBlizard -= OnBlizard;
       weatherGenerator.onSnow -= OnSnow;
-      weatherGenerator.onHeat -= OnHeat;
       weatherGenerator.onHeavyRain -= OnHeavyRain;
       turnController.onNewTurn -= OnNewTurn;
       MsgBox.ShowMsg("Unit " + Name() + " with " + (rf.soldiers + rf.wounded) + " soldiers is destroyed");
@@ -434,7 +438,8 @@ namespace UnitNS
       return true;
     }
 
-    public void TakeEffect(int reduceMorale, float movementDropRatio = 0f, float disableRatio = 0f, float killRatio = 0f) {
+    public void TakeEffect(DisasterType type, int reduceMorale, float movementDropRatio = 0f,
+      float disableRatio = 0f, float killRatio = 0f) {
       rf.morale -= reduceMorale;
       movementRemaining = movementRemaining - (int)(movementRemaining * movementDropRatio);
       int woundedNum = (int)(rf.soldiers * disableRatio);
@@ -444,6 +449,19 @@ namespace UnitNS
       kia += kiaNum;
       rf.soldiers -= kiaNum;
       labor -= kiaNum;
+
+      EventDialog.EventName eventType = EventDialog.EventName.Null;
+      if (type == DisasterType.WildFire) {
+        eventType = EventDialog.EventName.WildFire;
+      }
+      if (type == DisasterType.Flood) {
+        eventType = EventDialog.EventName.Flood;
+      }
+      if (type == DisasterType.LandSlide) {
+        eventType = EventDialog.EventName.LandSlide;
+      }
+
+      hexMap.eventDialog.Show(eventType, this, null, reduceMorale, woundedNum, kiaNum, kiaNum);
     }
 
     // ==============================================================
@@ -506,7 +524,7 @@ namespace UnitNS
           rf.mov * GetMovementModifier() *
           (rf.morale >= Troop.MaxMorale ? 1.2f : 1f) *
           (1f + (IsStarving() ? -0.45f : 0f)) * 
-          (heatSick.IsValid() ? 0.7f : 1f));
+          (heatSick != null && heatSick.IsValid() ? 0.7f : 1f));
     }
 
     public StaminaLvl GetStaminaLevel()
@@ -682,7 +700,7 @@ namespace UnitNS
     }
 
     public void Dehydrate() {
-      UnitDehydration.dehydrate(this);
+      UnitDehydrate.Dehydrate(this);
     }
 
     public void Poisioned() {
@@ -995,13 +1013,13 @@ namespace UnitNS
       return cost;
     }
 
-    public void ListenOnHeat(OnWeather onHeat)
+    public void ListenOnHeat(WeatherGenerator.OnWeather onHeat)
     {
       weatherGenerator.onHeat -= onHeat;
       weatherGenerator.onHeat += onHeat;
     }
 
-    public void RemoveOnHeatListener(OnWeather onHeat)
+    public void RemoveOnHeatListener(WeatherGenerator.OnWeather onHeat)
     {
       weatherGenerator.onHeat -= onHeat;
     }

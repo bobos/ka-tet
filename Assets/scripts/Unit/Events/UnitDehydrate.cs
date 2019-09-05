@@ -1,12 +1,4 @@
-﻿using System.Collections.Generic;
-using PathFind;
-using MapTileNS;
-using MonoNS;
-using UnityEngine;
-using CourtNS;
-using FieldNS;
-
-namespace UnitNS
+﻿namespace UnitNS
 {
   public static class UnitDehydrate
   {

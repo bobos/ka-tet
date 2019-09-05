@@ -29,7 +29,7 @@ namespace MonoNS
       updateReady = true;
     }
 
-    bool updateReady = false;
+    protected bool updateReady = false;
 
     /// <summary>
     /// Update is called every frame, if the MonoBehaviour is enabled.

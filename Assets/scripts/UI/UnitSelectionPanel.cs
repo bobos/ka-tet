@@ -26,6 +26,8 @@ namespace MonoNS
       mouseController.onUnitPreflight += OnUnitSelect;
       mouseController.onUnitDeselect += OnUnitDeselect;
       mouseController.onModeQuit += OnModeQuit;
+      hexMap.eventDialog.eventDialogOn += EventDialogOn;
+      hexMap.eventDialog.eventDialogOff += EventDialogOff;
       self = this.transform.gameObject;
       self.SetActive(false);
     }
@@ -69,6 +71,18 @@ namespace MonoNS
       NextTurnButton.SetActive(true);
     }
 
+    public void EventDialogOn() {
+      if (self.activeSelf) {
+        ToggleButtons(false);
+      }
+    }
+
+    public void EventDialogOff() {
+      if (self.activeSelf) {
+        ToggleButtons(true);
+      }
+    }
+
     public void ActionDone(Unit unit, Unit[] units, ActionController.actionName name)
     {
       if ((unit != null && !unit.IsAI() && name == ActionController.actionName.MOVE)
@@ -107,6 +121,9 @@ namespace MonoNS
       offense.text = "攻击: " + unit.atk;
       defense.text = "防御: " + unit.def;
       stamina.text = "体力: " + unit.GetStaminaLvlName();
+      if (unit.clone) {
+        return;
+      }
       string stateStr = unit.IsWarWeary() ? " 行将崩溃" : "";
       stateStr += unit.starving ? " 饥饿" : "";
       stateStr += unit.GetStateName();
@@ -118,7 +135,8 @@ namespace MonoNS
         stateStr += "[本轮" + desserter + "人逃亡" + (killed > 0 ? (killed + "人亡") : "") + "]";
       }
       state.text = stateStr;
-      illness.text = unit.GetIllTurns() > 0 ? "疫情: 预计本轮致伤"+ unit.GetIllDisableNum() + "人,致死" + unit.GetIllKillNum() +"人,疫情还将持续" + unit.GetIllTurns() + "回合" : "";
+      illness.text = unit.GetHeatSickTurns() > 0 ? "痢疾: 预计本轮致伤"+ unit.GetHeatSickDisableNum() + "人,致死"
+      + unit.GetHeatSickKillNum() +"人,疫情还将持续" + unit.GetHeatSickTurns() + "回合" : "";
 
       ToggleButtons(false);
       // TODO: AI test
@@ -132,6 +150,7 @@ namespace MonoNS
       ToggleButtons(false);
       self.SetActive(false);
     }
+
 
     public void OnBtnClick(ActionController.actionName action)
     {

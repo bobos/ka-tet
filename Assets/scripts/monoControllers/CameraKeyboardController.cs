@@ -9,10 +9,20 @@ namespace MonoNS
     {
       base.PreGameInit(hexMap, me);
       turnController = hexMap.turnController;
+      hexMap.eventDialog.eventDialogOn += EventDialogOn;
+      hexMap.eventDialog.eventDialogOff += EventDialogOff;
     }
 
     float moveSpeed = 20;
     TurnController turnController;
+
+    public void EventDialogOff() {
+      updateReady = true;
+    }
+
+    public void EventDialogOn() {
+      updateReady = false;
+    }
 
     public override void UpdateChild()
     {

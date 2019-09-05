@@ -114,6 +114,7 @@ namespace MonoNS
       }
       else if (Cons.IsAutumn(season))
       {
+        return Cons.cloudy;
         if (luckNum < 3)
         {
           return Cons.cloudy;

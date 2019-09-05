@@ -162,6 +162,12 @@ namespace MonoNS
       }
     }
 
+    public void OnEventDialogConfirm() {
+      if (onBtnClick != null) {
+        onBtnClick(actionName.EVENTDIALOGCONFIRM);
+      }
+    }
+
     public void PerformImmediateAction(Unit unit, actionName action)
     {
       unit.SetEndState(action);
@@ -188,7 +194,8 @@ namespace MonoNS
       LABOR2Unit,
       TRANSFERSUPPLY,
       TRANSFERLABOR,
-      INPUTCONFIRM
+      INPUTCONFIRM,
+      EVENTDIALOGCONFIRM
     }
 
     // Make sure this is sequential

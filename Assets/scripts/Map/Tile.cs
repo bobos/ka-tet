@@ -3,7 +3,6 @@ using System.Linq;
 using PathFind;
 using UnitNS;
 using MonoNS;
-using NatureNS;
 using UnityEngine;
 
 namespace MapTileNS
@@ -26,6 +25,7 @@ namespace MapTileNS
     public Drowning drowning = null;
     public Poision poision = null;
     public bool waterBound = false;
+    public bool burnable = false;
 
     public Tile(int q, int r, HexMap hexMap) : base(q, r, hexMap) { }
     public void PostCreation()
@@ -35,7 +35,7 @@ namespace MapTileNS
       windGenerator = hexMap.windGenerator;
       settlementMgr = hexMap.settlementMgr;
       if (terrian != TerrianType.Mountain) {
-        flood = new Flood(this, isDam);
+        flood = new Flood(this);
       }
       if (terrian != TerrianType.Water) {
         wildFire = new WildFire(this, burnable);
@@ -112,70 +112,70 @@ namespace MapTileNS
     public WeatherGenerator weatherGenerator;
     public TurnController turnController;
 
-    public void ListenOnHeavyRain(OnWeather onHeavyRain)
+    public void ListenOnHeavyRain(WeatherGenerator.OnWeather onHeavyRain)
     {
       weatherGenerator.onHeavyRain -= onHeavyRain;
       weatherGenerator.onHeavyRain += onHeavyRain;
     }
 
-    public void RemoveOnHeavyRainListener(OnWeather onHeavyRain)
+    public void RemoveOnHeavyRainListener(WeatherGenerator.OnWeather onHeavyRain)
     {
       weatherGenerator.onHeavyRain -= onHeavyRain;
     }
 
-    public void ListenOnRain(OnWeather onRain)
+    public void ListenOnRain(WeatherGenerator.OnWeather onRain)
     {
-      weatherGenerator.onRain -= OnRain;
-      weatherGenerator.onRain += OnRain;
+      weatherGenerator.onRain -= onRain;
+      weatherGenerator.onRain += onRain;
     }
 
-    public void RemoveOnRainListener(OnWeather onRain)
+    public void RemoveOnRainListener(WeatherGenerator.OnWeather onRain)
     {
       weatherGenerator.onRain -= onRain;
     }
 
-    public void ListenOnHeat(OnWeather onHeat)
+    public void ListenOnHeat(WeatherGenerator.OnWeather onHeat)
     {
       weatherGenerator.onHeat -= onHeat;
       weatherGenerator.onHeat += onHeat;
     }
 
-    public void RemoveOnHeatListener(OnWeather onHeat)
+    public void RemoveOnHeatListener(WeatherGenerator.OnWeather onHeat)
     {
       weatherGenerator.onHeat -= onHeat;
     }
 
-    public void ListenOnDry(OnWeather onDry)
+    public void ListenOnDry(WeatherGenerator.OnWeather onDry)
     {
       weatherGenerator.onDry -= onDry;
       weatherGenerator.onDry += onDry;
     }
 
-    public void RemoveOnDryListener(OnWeather onDry)
+    public void RemoveOnDryListener(WeatherGenerator.OnWeather onDry)
     {
       weatherGenerator.onDry -= onDry;
     }
 
-    public void ListenOnSeason(OnSeasonChange onSeasonChange)
+    public void ListenOnSeason(WeatherGenerator.OnSeasonChange onSeasonChange)
     {
       weatherGenerator.onSeasonChange -= onSeasonChange;
       weatherGenerator.onSeasonChange += onSeasonChange;
     }
 
-    public void RemoveOnSeasonListener(OnSeasonChange onSeasonChange)
+    public void RemoveOnSeasonListener(WeatherGenerator.OnSeasonChange onSeasonChange)
     {
       weatherGenerator.onSeasonChange -= onSeasonChange;
     }
 
-    public void ListenOnTurnEnd(OnTurnEnd onTurnEnd)
+    public void ListenOnTurnEnd(TurnController.OnNewTurn onNewTurn)
     {
-      turnController.onNewTurn -= onTurnEnd;
-      turnController.onNewTurn += onTurnEnd;
+      turnController.onNewTurn -= onNewTurn;
+      turnController.onNewTurn += onNewTurn;
     }
 
-    public void RemoveTurnEndListener(OnTurnEnd onTurnEnd)
+    public void RemoveTurnEndListener(TurnController.OnNewTurn onNewTurn)
     {
-      turnController.onNewTurn -= onTurnEnd;
+      turnController.onNewTurn -= onNewTurn;
     }
 
     // ==============================================================
@@ -201,7 +201,7 @@ namespace MapTileNS
       if (poision == null) {
         return false;
       }
-      poision.Poision();
+      poision.SetPoision();
       return true;
     }
 
@@ -216,6 +216,9 @@ namespace MapTileNS
     public void SetFieldType(FieldType type)
     {
       field = type;
+      if (type == FieldType.Burning) {
+        burnable = false;
+      }
       if (type == FieldType.Settlement || type == FieldType.Burning || type == FieldType.Flooding)
       {
         movementCost = Unit.MovementCostOnUnaccesible;
@@ -356,7 +359,7 @@ namespace MapTileNS
     public void RemoveCamp(bool setFire)
     {
       _settlement = null;
-      if (setFire) SpreadFire();
+      if (setFire) SetFire();
     }
     
     public void BuildDam()
@@ -364,6 +367,7 @@ namespace MapTileNS
       SetTerrianType(TerrianType.Water);
       SetFieldType(FieldType.Wild);
       isDam = true;
+      flood.BuildDam();
     }
     
     // ==============================================================
@@ -401,6 +405,7 @@ namespace MapTileNS
     {
       if (field == FieldType.Settlement && settlement != null)
       {
+        hexMap.eventDialog.Show(EventDialog.EventName.WildFireDestroyCamp, null, settlement, 0, 0, 0, 0);
         settlementMgr.DestroyCamp(settlement, false);
       }
       Unit u = GetUnit();
@@ -417,6 +422,7 @@ namespace MapTileNS
         }
         if (retreatTile == null)
         {
+          hexMap.eventDialog.Show(EventDialog.EventName.WildFireDestroyUnit, u, null, 0, 0, u.rf.soldiers + u.rf.wounded, u.labor);
           u.Destroy();
         }
         else

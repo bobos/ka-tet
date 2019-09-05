@@ -1,12 +1,4 @@
-﻿using System.Collections.Generic;
-using PathFind;
-using MapTileNS;
-using MonoNS;
-using UnityEngine;
-using CourtNS;
-using FieldNS;
-
-namespace UnitNS
+﻿namespace UnitNS
 {
   public class ArmorRemEvent
   {
@@ -18,6 +10,10 @@ namespace UnitNS
 
     public void OnHeat() {
       // TODO: interactive event
+      unit.RemoveOnHeatListener(OnHeat);
+    }
+
+    public void Destroy() {
       unit.RemoveOnHeatListener(OnHeat);
     }
 

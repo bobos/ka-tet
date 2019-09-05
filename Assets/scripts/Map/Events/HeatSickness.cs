@@ -1,12 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using PathFind;
-using UnitNS;
-using MonoNS;
-using NatureNS;
-using UnityEngine;
-
-namespace MapTileNS
+﻿namespace MapTileNS
 {
   public class HeatSickness
   {
@@ -18,7 +10,7 @@ namespace MapTileNS
 
     public void OnHeat()
     {
-      if (tile.type != FieldType.Wild) {
+      if (tile.field != FieldType.Wild) {
         tile.RemoveOnHeatListener(OnHeat);
         return;
       }

@@ -1,12 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using PathFind;
-using UnitNS;
-using MonoNS;
-using NatureNS;
-using UnityEngine;
-
-namespace MapTileNS
+﻿namespace MapTileNS
 {
   public class Flood
   {
@@ -15,14 +7,13 @@ namespace MapTileNS
 
     Tile tile;
     bool flooded = false;
-    bool isDam = false;
 
-    public Flood(Tile tile, bool isDam) {
+    public Flood(Tile tile) {
       this.tile = tile;
-      this.isDam = isDam;
-      if (isDam) {
-        tile.ListenOnHeavyRain(OnHeavyRain);
-      }
+    }
+
+    public void BuildDam() {
+      tile.ListenOnHeavyRain(OnHeavyRain);
     }
 
     public void OnHeavyRain()
@@ -44,8 +35,8 @@ namespace MapTileNS
 
     public bool Start()
     {
-      if (!flooded && (Cons.IsSpring(weatherGenerator.season) || Cons.IsSummer(weatherGenerator.season))
-          && (Cons.IsRain(weatherGenerator.currentWeather) || Cons.IsHeavyRain(weatherGenerator.currentWeather))) 
+      if (!flooded && (Cons.IsSpring(tile.weatherGenerator.season) || Cons.IsSummer(tile.weatherGenerator.season))
+          && (Cons.IsRain(tile.weatherGenerator.currentWeather) || Cons.IsHeavyRain(tile.weatherGenerator.currentWeather))) 
       {
         SpreadFlood();
         return true;
@@ -64,10 +55,10 @@ namespace MapTileNS
           tile.flood.SpreadFlood();
         }
         else if (tile.flood.CanBeFloodedByNearByTile() &&
-         (Cons.IsHeavyRain(weatherGenerator.currentWeather) ? Cons.HighlyLikely() : Cons.MostLikely()))
+         (Cons.IsHeavyRain(tile.weatherGenerator.currentWeather) ? Cons.HighlyLikely() : Cons.MostLikely()))
         {
           tile.wildFire.PutOutFire();
-          tile.floodingCntDown = Util.Rand(2, FloodingLasts);
+          tile.flood.floodingCntDown = Util.Rand(2, FloodingLasts);
           tile.SetFieldType(FieldType.Flooding);
           tile.ListenOnTurnEnd(OnTurnEnd);
           tile.flood.SpreadFlood();
