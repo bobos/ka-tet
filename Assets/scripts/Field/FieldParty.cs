@@ -7,7 +7,6 @@ namespace FieldNS
   {
     public Party party;
     public PartyReport[] reports;
-    public int fieldPressure = 0;
     public FieldParty counterFieldParty;
     public HashSet<General> generals = new HashSet<General>();
     public FieldParty(Party party)

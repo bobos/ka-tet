@@ -34,7 +34,6 @@ namespace UnitNS
     public const int L1DiscoverRange = 1; // under 4000
     public const int L2DiscoverRange = 2; // > 4000
     public const int ConcealCoolDownIn = 3;
-    public const int FoodPerTenMenPerTurn = 1; // 1 Dan(50 KG)
 
     private TextNS.TextLib txtLib = Cons.GetTextLib();
 
@@ -43,6 +42,8 @@ namespace UnitNS
     ArmorRemEvent armorRemEvent;
     HeatSick heatSick;
     UnitPoisioned unitPoisioned;
+    WeatherGenerator weatherGenerator;
+    TurnController turnController;
     public Unit(bool clone, Troop troop, Tile tile, State state,
                 int supply, int labor, int kia, int mia, int movement = -1)
     {
@@ -59,12 +60,7 @@ namespace UnitNS
         this.state = state;
       } else {
         weatherGenerator = hexMap.weatherGenerator;
-        weatherGenerator.onSnow += OnSnow;
-        weatherGenerator.onBlizard += OnBlizard;
-        weatherGenerator.onHeavyRain += OnHeavyRain;
-
         turnController = hexMap.turnController;
-        turnController.onNewTurn += OnNewTurn;
 
         SetTile(tile);
         SetState(rf.morale == 0 ? State.Routing : state);
@@ -350,6 +346,43 @@ namespace UnitNS
       // recalculate supply based on labor
       int canCarry = GetMaxSupplySlots() * SupplyNeededPerTurn();
       supply = supply > canCarry ? canCarry : supply;
+      if (Cons.IsHeavyRain(hexMap.weatherGenerator.currentWeather)) {
+        if (state == State.Camping) return;
+        rf.morale -= 1;
+        movementRemaining = BasicMovementCost * 2;
+      }
+      if (Cons.IsSnow(hexMap.weatherGenerator.currentWeather)) {
+        if (state == State.Camping) return;
+        rf.morale -= 5;
+        movementRemaining = BasicMovementCost * 2;
+        int woundedNum = (int)(rf.soldiers * SnowDisableRate);
+        rf.wounded += woundedNum;
+        rf.soldiers -= woundedNum;
+        int kiaNum = (int)(rf.soldiers * SnowKillRate);
+        kia += kiaNum;
+        rf.soldiers -= kiaNum;
+        labor -= kiaNum;
+      }
+      if (Cons.IsBlizard(hexMap.weatherGenerator.currentWeather)) {
+        if (state == State.Camping) return;
+        rf.morale -= 10;
+        movementRemaining = BasicMovementCost;
+        int woundedNum = (int)(rf.soldiers * BlizardDisableRate);
+        rf.wounded += woundedNum;
+        rf.soldiers -= woundedNum;
+        int kiaNum = (int)(rf.soldiers * BlizardKillRate);
+        kia += kiaNum;
+        rf.soldiers -= kiaNum;
+        labor -= kiaNum;
+      }
+
+      if (concealCoolDownTurn > 0) {
+        concealCoolDownTurn--;
+      } else {
+        if (Concealable() && state == State.Stand) {
+          if (!hexMap.IsInEnemyScoutRange(this, tile)) SetState(State.Conceal);
+        }
+      }
     }
 
     bool turnDone = false;
@@ -378,16 +411,22 @@ namespace UnitNS
       }
       rf.general.ReportFieldEvent(FieldEvent.Retreated);
       DestroyEvents();
-      weatherGenerator.onBlizard -= OnBlizard;
-      weatherGenerator.onSnow -= OnSnow;
-      weatherGenerator.onHeavyRain -= OnHeavyRain;
-      turnController.onNewTurn -= OnNewTurn;
       MsgBox.ShowMsg("Unit " + Name() + " has left the campaign");
     }
 
-    public void Destroy()
+    public void Destroy(DestroyType type)
     {
-      kia += rf.soldiers + rf.wounded;
+      int killed = rf.soldiers + rf.wounded;
+      if (type == DestroyType.ByBurningCamp) {
+        hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.BurningCampDestroyUnit, this, null, 0, 0, killed));
+      } else if (type == DestroyType.ByWildFire) {
+        hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.WildFireDestroyUnit, this, null, 0, 0, killed));
+      } else if (type == DestroyType.ByFlood) {
+        hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.Flood, this, null, 0, 0, killed));
+      } else {
+        hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.Disbanded, this, null, 0, 0, killed));
+      }
+      kia += killed;
       rf.soldiers = rf.wounded = labor = 0;
       rf.Destroy();
       SetState(State.Disbanded);
@@ -397,11 +436,6 @@ namespace UnitNS
       }
       rf.general.ReportFieldEvent(FieldEvent.Destroyed);
       DestroyEvents();
-      weatherGenerator.onBlizard -= OnBlizard;
-      weatherGenerator.onSnow -= OnSnow;
-      weatherGenerator.onHeavyRain -= OnHeavyRain;
-      turnController.onNewTurn -= OnNewTurn;
-      MsgBox.ShowMsg("Unit " + Name() + " with " + (rf.soldiers + rf.wounded) + " soldiers is destroyed");
     }
 
     // After an unit finishes its turn
@@ -426,7 +460,7 @@ namespace UnitNS
 
       if (rf.soldiers <= DisbandUnitUnder)
       {
-        Destroy();
+        Destroy(DestroyType.ByDisband);
       }
     }
 
@@ -448,7 +482,8 @@ namespace UnitNS
       int kiaNum = (int)(rf.soldiers * killRatio);
       kia += kiaNum;
       rf.soldiers -= kiaNum;
-      labor -= kiaNum;
+      int killLabor = (int)(kiaNum * 0.8f);
+      labor -= killLabor;
 
       EventDialog.EventName eventType = EventDialog.EventName.Null;
       if (type == DisasterType.WildFire) {
@@ -461,59 +496,9 @@ namespace UnitNS
         eventType = EventDialog.EventName.LandSlide;
       }
 
-      hexMap.eventDialog.Show(eventType, this, null, reduceMorale, woundedNum, kiaNum, kiaNum);
+      hexMap.eventDialog.Show(new MonoNS.Event(eventType, this, null, reduceMorale, woundedNum, kiaNum, killLabor, 0));
     }
 
-    // ==============================================================
-    // ================= callbacks ==========================
-    // ==============================================================
-    WeatherGenerator weatherGenerator;
-    TurnController turnController;
-    public void OnSnow()
-    {
-      if (state == State.Camping) return;
-      rf.morale -= 5;
-      movementRemaining = BasicMovementCost * 2;
-      int woundedNum = (int)(rf.soldiers * SnowDisableRate);
-      rf.wounded += woundedNum;
-      rf.soldiers -= woundedNum;
-      int kiaNum = (int)(rf.soldiers * SnowKillRate);
-      kia += kiaNum;
-      rf.soldiers -= kiaNum;
-      labor -= kiaNum;
-    }
-
-    public void OnBlizard()
-    {
-      if (state == State.Camping) return;
-      rf.morale -= 10;
-      movementRemaining = BasicMovementCost;
-      int woundedNum = (int)(rf.soldiers * BlizardDisableRate);
-      rf.wounded += woundedNum;
-      rf.soldiers -= woundedNum;
-      int kiaNum = (int)(rf.soldiers * BlizardKillRate);
-      kia += kiaNum;
-      rf.soldiers -= kiaNum;
-      labor -= kiaNum;
-    }
-
-    public void OnHeavyRain()
-    {
-      if (state == State.Camping) return;
-      rf.morale -= 1;
-      movementRemaining = BasicMovementCost * 2;
-    }
-
-    public void OnNewTurn()
-    {
-      if (concealCoolDownTurn > 0) {
-        concealCoolDownTurn--;
-      } else {
-        if (Concealable() && state == State.Stand) {
-          if (!hexMap.IsInEnemyScoutRange(this, tile)) SetState(State.Conceal);
-        }
-      }
-    }
 
     // ==============================================================
     // ================= movement mangement =========================
@@ -655,7 +640,7 @@ namespace UnitNS
 
     public int SupplyNeededPerTurn()
     {
-      return (int)(((rf.soldiers + rf.wounded + labor) / 10 ) * FoodPerTenMenPerTurn);
+      return (int)(((rf.soldiers + rf.wounded + labor) / 10 ) * hexMap.FoodPerTenMenPerTurn(IsAI()));
     }
 
     public int MinSupplyNeeded() {

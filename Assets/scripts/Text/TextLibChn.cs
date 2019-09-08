@@ -107,12 +107,12 @@ namespace TextNS
       {"f_hejian", "河间"},
 
       // generals
-      {"g_liubei", "刘备"},
-      {"g_guanyu", "关羽"},
-      {"g_zhaoyun", "赵云"},
-      {"g_zhangfei", "张飞"},
-      {"g_caocao", "曹操"},
-      {"g_xuchu", "许褚"},
+      {"g_liubei", "李存勖"},
+      {"g_guanyu", "李存审"},
+      {"g_zhaoyun", "李嗣昭"},
+      {"g_zhangfei", "元行钦"},
+      {"g_caocao", "朱温"},
+      {"g_xuchu", "王彦章"},
 
       // party report
       {"pr_sloppyOnDrill", "疏于操练"},
@@ -123,7 +123,31 @@ namespace TextNS
 
       // event
       {"event_wildFire_title", "山火侵袭"},
-      {"event_wildFire", @"{0}将军所部{1}突遭猛烈山火所袭，军中士卒疲于避险，已有{2}名士兵和{3}民夫丧命于火海，{4}人不同程度为烈火所伤，部队士气下降{5}点, 若天气干燥之时，将军务必带军避开山高林密之处，以免再为山火所伤！"}
+      {"event_wildFire", @"{0}将军所部{1}突遭猛烈山火所袭，军中士卒疲于避险，已有{2}名士兵和{3}民夫丧命于火海，{4}人不同程度为烈火所伤，部队士气下降{5}点, 若天气干燥之时，将军务必带军避开山高林密之处，以免再为山火所伤！"},
+      {"event_fireDestroyCamp_title", "火烧连营"},
+      {"event_fireDestroyCamp", @"我军{0}突发火情，扑之不灭，营寨终遭烈火焚毁，营中{1}民夫丧命于火海，{2}石粮草付诸一炬, 营中守军亦全数丧生于火海，损失极为惨重，将军扎营下寨尽量避开山高地陡之处，此等地形易被山火覆盖！"},
+      {"event_burningCampDestroyUnit_title", "军营大火"},
+      {"event_burningCampDestroyUnit", @"{0}将军所部{1}遭遇军营大火，军中{2}官兵民夫全数丧生火海！"},
+      {"event_enemyCaptureCamp_title", "军营失守"},
+      {"event_enemyCaptureCamp", @"我军{0}已落入敌军之手！"},
+      {"event_insufficientLabor_title", "转移失败"},
+      {"event_insufficientLabor", @"{0}仅有{2}民夫可用，无法满足{1}民夫的转移请求！"},
+      {"event_insufficientSupply_title", "粮草转运失败"},
+      {"event_insufficientSupply", @"{0}仅存{2}石粮草，无法满足{1}石粮草的转运请求！"},
+      {"event_insufficientSupplyLabor_title", "粮草转运失败"},
+      {"event_insufficientSupplyLabor", @"转运{0}石粮草需要{1}名民夫运输，目前{2}中仅有{3}名民夫可用差遣，其余民夫已有其他担负任务在身"},
+      {"event_supplyDone_title", "粮草转运完成"},
+      {"event_supplyDone", @"{1}石粮草已成功转运至{0}！"},
+      {"event_laborDone_title", "转移完成"},
+      {"event_laborDone", @"{1}民夫已成功转移至{0}！"},
+      {"event_supplyIntercepted_title", "粮道遭劫"},
+      {"event_supplyIntercepted", @"发往{0}的运粮队遭敌军伏击，{1}石粮草落入敌手，参与押运的{2}名民夫被杀，余者已逃回，请立即派兵肃清后方袭扰之敌！"},
+      {"event_laborIntercepted_title", "转移失败"},
+      {"event_laborIntercepted", @"往{0}方向转移的民夫队伍遭敌军伏击，{1}名民夫被杀，余者已逃回，请立即派兵肃清后方袭扰之敌！"},
+      {"event_unitSupplyIntercepted_title", "粮道遭袭"},
+      {"event_unitSupplyIntercepted", @"给{0}将军所部{1}提供日常补给的补给队遭敌军伏击，{2}石粮草落入敌手，{3}名押运民夫被杀，余者已逃回，请立即派兵肃清后方袭扰之敌！"},
+      {"event_supplyRouteBlocked_title", "补给线阻断"},
+      {"event_supplyRouteBlocked", @"我军{0}与{1}之间的所有补给线遭到敌军切断，请立即派兵驱逐补给线上敌军以恢复两地交通补给！"},
       };
     }
   }

@@ -430,6 +430,22 @@ MonoBehaviour:
   wildfire: {fileID: 21300000, guid: d49afcd09cba1437abd191492d896cd5, type: 3}
   drown: {fileID: 21300000, guid: 254a97c62569347c296b72632cba97d2, type: 3}
   Gale: {fileID: 21300000, guid: 7539bd2e1e51e4faaad98317af845eda, type: 3}
+  UnitDestroyByWildFire: {fileID: 21300000, guid: c803f4fa9dd8048088282c8d286045f6,
+    type: 3}
+  UnitDestroyByBurningCamp: {fileID: 21300000, guid: c803f4fa9dd8048088282c8d286045f6,
+    type: 3}
+  UnitDestroyByFlood: {fileID: 21300000, guid: 747f92fcf77434ee0b28c5026810c1a0, type: 3}
+  UnitDestroyByDisband: {fileID: 21300000, guid: c7e2413d0749a4ddc93273bff9653e8d,
+    type: 3}
+  CampDestoyedByFire: {fileID: 21300000, guid: c7e2413d0749a4ddc93273bff9653e8d, type: 3}
+  Ambushed: {fileID: 21300000, guid: cf488fb1f91ff4e748b0655b878ab15f, type: 3}
+  SupplyIntercepted: {fileID: 21300000, guid: 7ea3f6e3047914bfb9f4d62906290688, type: 3}
+  LaborIntercepted: {fileID: 21300000, guid: ae6914b3748c04286b88b3c1ff59c01b, type: 3}
+  SupplyReached: {fileID: 21300000, guid: 441fe3fd0f46f41599dea1f42f1d592a, type: 3}
+  InsufficientSupply: {fileID: 21300000, guid: 422d0a25984ef4175a79ef32b7e176e0, type: 3}
+  InsufficientLabor: {fileID: 21300000, guid: 27eb635276c2c42fda48435b0ca45708, type: 3}
+  CampLost: {fileID: 21300000, guid: 59472041d77804acd85d996d35d88200, type: 3}
+  Defeated: {fileID: 21300000, guid: 675caf01e27d14b7394a8885b948b188, type: 3}
 --- !u!1 &124494888
 GameObject:
   m_ObjectHideFlags: 0
@@ -1511,7 +1527,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u968F\u519B\u5175\u5F79"
+  m_Text: "\u5F81\u8C03\u6C11\u592B"
 --- !u!222 &408654150
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -6088,7 +6104,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u8F6C\u79FB\u5175\u5F79"
+  m_Text: "\u8F6C\u79FB\u6C11\u592B"
 --- !u!222 &1555420892
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -6793,7 +6809,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: -6.799988, y: 8}
+  m_AnchoredPosition: {x: -8.600006, y: 0}
   m_SizeDelta: {x: 730.6, y: 48.1}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1702976408
@@ -7637,7 +7653,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: -4.0000916, y: 10}
+  m_AnchoredPosition: {x: 1.9999084, y: 2}
   m_SizeDelta: {x: 644.1, y: 55}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1912663370
@@ -8144,7 +8160,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: -6.799988, y: -28}
+  m_AnchoredPosition: {x: -4.299988, y: -31}
   m_SizeDelta: {x: 730.6, y: 33.9}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &2078130525

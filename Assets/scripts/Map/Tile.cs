@@ -405,8 +405,7 @@ namespace MapTileNS
     {
       if (field == FieldType.Settlement && settlement != null)
       {
-        hexMap.eventDialog.Show(EventDialog.EventName.WildFireDestroyCamp, null, settlement, 0, 0, 0, 0);
-        settlementMgr.DestroyCamp(settlement, false);
+        settlementMgr.DestroyCamp(settlement, BuildingNS.DestroyType.ByFire, false);
       }
       Unit u = GetUnit();
       if (u != null)
@@ -422,8 +421,7 @@ namespace MapTileNS
         }
         if (retreatTile == null)
         {
-          hexMap.eventDialog.Show(EventDialog.EventName.WildFireDestroyUnit, u, null, 0, 0, u.rf.soldiers + u.rf.wounded, u.labor);
-          u.Destroy();
+          u.Destroy(DestroyType.ByWildFire);
         }
         else
         {

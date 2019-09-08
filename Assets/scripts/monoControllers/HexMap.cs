@@ -152,6 +152,11 @@ namespace MonoNS
       return warParties[1];
     }
 
+    public int FoodPerTenMenPerTurn(bool isAI) {
+      WarParty wp = isAI ? GetAIParty() : GetPlayerParty();
+      return wp.attackside ? 2 : 1;
+    }
+
     public bool IsInEnemyScoutRange(Unit unit, Tile tile, bool ignoreConcealed = false) {
       HashSet<Tile> enemyScoutArea = new HashSet<Tile>();
       WarParty party = unit.IsAI() ? GetPlayerParty() : GetAIParty();

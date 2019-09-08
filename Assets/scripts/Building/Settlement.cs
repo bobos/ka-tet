@@ -61,8 +61,8 @@ public abstract class Settlement
   public string name = "default";
 
   protected int buildWork = 0;
+  protected HexMap hexMap;
   SettlementMgr settlementMgr;
-  HexMap hexMap;
   Supply supply;
 
 
@@ -120,11 +120,23 @@ public abstract class Settlement
     this.supply = new Supply(hexMap);
   }
 
-  public void Destroy()
+  public void Destroy(BuildingNS.DestroyType type)
   {
+    if (type == BuildingNS.DestroyType.ByFire) {
+      hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.WildFireDestroyCamp, null, this));
+    }
     foreach (Unit unit in garrison)
     {
-      unit.Destroy();
+      unit.Destroy(UnitNS.DestroyType.ByBurningCamp);
+    }
+  }
+
+  public void Capture() {
+    if (type == Settlement.Type.camp) {
+      hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.EnemyCaptureCamp, null, this));
+    }
+    if (type == Settlement.Type.city) {
+      hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.EnemyCaptureCity, null, this));
     }
   }
 
@@ -230,7 +242,7 @@ public abstract class Settlement
   }
 
   public int MinSupplyNeeded(int labor = 0) {
-    return (int)((civillian + (labor == 0 ? this.labor : labor)) / 10) * Infantry.FoodPerTenMenPerTurn;
+    return (int)((civillian + (labor == 0 ? this.labor : labor)) / 10) * hexMap.FoodPerTenMenPerTurn(owner.isAI);
   }
 
   public int SupplyLastingTurns() {
@@ -242,34 +254,38 @@ public abstract class Settlement
     return state == State.normal;
   }
 
-  public string DistSupply(int amount, Settlement to) {
+  public void DistSupply(int amount, Settlement to) {
     if (amount > supplyDeposit) {
-      return "粮草不足，无法完成后勤补给任务";
+      hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.InsufficientSupply, null, this, amount, supplyDeposit));
+      return;
     }
 
     int neededLabor = CalcNeededLabor(amount);
     if (neededLabor > availableLabor) {
-      return "兵役不足，无法完成后勤补给任务";
+      hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.InsufficientSupplyLabor, null, this, amount,
+        neededLabor, availableLabor));
+      return;
     }
 
     availableLabor -= neededLabor;
     supplyDeposit -= amount;
     to.TakeInSupply(amount);
-    return "后勤补给完成";
+    hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.SupplyReached, null, to, amount));
   }
 
-  public string DistLabor(int amount, Settlement to) {
+  public void DistLabor(int amount, Settlement to) {
     if (amount > availableLabor) {
-      return "兵役不足，无法向友军提供请求的兵役人口";
+      hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.InsufficientLabor, null, this, amount, availableLabor));
+      return;
     }
 
     availableLabor -= amount;
     labor -= amount;
     to.TakeInLabor(amount);
-    return "兵役补充完成";
+    hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.LaborReached, null, to, amount));
   }
 
-  public void SupplyIntercepted(Unit enemy, int amount, int labors = 0) {
+  public void SupplyIntercepted(Unit enemy, Settlement to, int amount, int labors = 0, Unit unit = null) {
     int adjustedAmount = amount;
     int adjustedLabor = labors;
     if (adjustedLabor == 0) {
@@ -289,18 +305,20 @@ public abstract class Settlement
     int needed = enemy.GetNeededSupply();
     int supplyTaken = needed > adjustedAmount ? adjustedAmount : needed;
     enemy.TakeInSupply(supplyTaken);
-    MsgBox.ShowMsg("粮草补给队遭遇" + enemy.GeneralName() + "所部伏击, " + killedLaborEscort + "押运民夫被杀余者逃回" + name + "," + 
-                   supplyTaken + "石粮草为敌军所夺，余下" + 
-                   (adjustedAmount - supplyTaken)
-                   + "石粮草遭悉数焚毁");
+    if (to != null) {
+      hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.SupplyIntercepted, null, to, adjustedAmount, killedLaborEscort));
+    }
+    if (unit != null) {
+      hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.unitSupplyIntercepted, unit, null, adjustedAmount, killedLaborEscort));
+    }
   }
 
-  public void LaborIntercepted(Unit enemy, int amount) {
+  public void LaborIntercepted(Unit enemy, Settlement to, int amount) {
     int adjustedLabor = availableLabor > amount ? amount : availableLabor;
     availableLabor -= adjustedLabor;
     int killedLabor = (int)(Util.Rand(0.008f, 0.04f) * adjustedLabor);
     labor -= killedLabor;
-    MsgBox.ShowMsg("民夫驰援队遭遇" + enemy.GeneralName() + "所部伏击, " + killedLabor + "民夫被杀余者逃回" + name);
+    hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.LaborIntercepted, null, to, killedLabor));
   }
 
   public void TakeInSupply(int supply) {
@@ -355,20 +373,18 @@ public abstract class Settlement
     }
 
     Unit[] nearbyUnits = GetReachableUnits();
-    int remainLabor = labor;
     foreach (Unit unit in nearbyUnits)
     {
-      if (supplyDeposit == 0 || remainLabor == 0) {
-        MsgBox.ShowMsg(name + " has no supply or labor to distribute supply");
+      if (supplyDeposit == 0 || labor == 0) {
         break;
       }
 
       int neededPerTurn = unit.SupplyNeededPerTurn();
       int neededLabor = CalcNeededLabor(neededPerTurn);
-      int supplyCanProvide = CalcSupplyCanProvide(remainLabor);
+      int supplyCanProvide = CalcSupplyCanProvide(labor);
       supplyCanProvide = supplyCanProvide > supplyDeposit ? supplyDeposit : supplyCanProvide;
 
-      if (neededPerTurn > supplyDeposit || neededLabor > remainLabor) {
+      if (neededPerTurn > supplyDeposit || neededLabor > labor) {
         MsgBox.ShowMsg(unit.GeneralName() + " failed to retrieve supply from camp due to insufficient labor or supply");
         continue;
       }
@@ -376,22 +392,21 @@ public abstract class Settlement
       Unit ambusher = settlementMgr.IsSupplyRouteAmbushed(settlementMgr.GetRoute(this, unit.tile), unit.IsAI());
       if (ambusher != null) {
         // supply caravans ambushed
-        SupplyIntercepted(ambusher, neededPerTurn, neededLabor);
+        SupplyIntercepted(ambusher, null, neededPerTurn, neededLabor, unit);
         continue;
       }
 
       unit.consumed = true;
       supplyDeposit -= neededPerTurn;
-      remainLabor -= neededLabor;
     }
   }
 
   public int CalcNeededLabor(int supply) {
-    return (int)(supply / Infantry.FoodPerTenMenPerTurn);
+    return supply;
   }
 
   public int CalcSupplyCanProvide(int labor) {
-    return (int)(labor * Infantry.FoodPerTenMenPerTurn);
+    return labor;
   }
 
   public int MaxDistSupply() {
@@ -400,7 +415,7 @@ public abstract class Settlement
   }
 
   public int LaborCanTakeInForOneTurn() {
-    int maxLabor = (int)(supplyDeposit * 10 / Infantry.FoodPerTenMenPerTurn);
+    int maxLabor = (int)(supplyDeposit * 10 / hexMap.FoodPerTenMenPerTurn(owner.isAI));
     int canTake = maxLabor - labor;
     return canTake > 0 ? canTake : 0;
   }
@@ -413,7 +428,7 @@ public abstract class Settlement
     List<SupplySuggestion> suggestion = new List<SupplySuggestion>();
 
     foreach (int scale in troopScale) {
-      int supplyPerTurn = (scale / 10) * Unit.FoodPerTenMenPerTurn;  
+      int supplyPerTurn = (scale / 10) * hexMap.FoodPerTenMenPerTurn(owner.isAI);  
       int laborPerTurn = CalcNeededLabor(supplyPerTurn);
       int delta = labor - laborPerTurn;
       int laborNeeded = delta > 0 ? 0 : -delta;
@@ -536,7 +551,7 @@ public class Camp : Settlement
 
   public override int MaxSupplyDeposit() {
     int supplyTroop = MaxTroopSupply();
-    int extraForLabor = (int)(CalcNeededLabor(supplyTroop) / 10) * SupportTurns * Infantry.FoodPerTenMenPerTurn;;
+    int extraForLabor = (int)(CalcNeededLabor(supplyTroop) / 10) * SupportTurns * hexMap.FoodPerTenMenPerTurn(owner.isAI);
     return supplyTroop + extraForLabor;
   }
 
@@ -545,6 +560,6 @@ public class Camp : Settlement
   }
 
   private int MaxTroopSupply() {
-    return (int)((Infantry.MaxTroopNum * 5 * SupportTurns) / 10 ) * Infantry.FoodPerTenMenPerTurn;
+    return (int)((Infantry.MaxTroopNum * 5 * SupportTurns) / 10 ) * hexMap.FoodPerTenMenPerTurn(owner.isAI);
   }
 }

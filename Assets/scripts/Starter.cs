@@ -146,7 +146,7 @@ public class Starter : MonoBehaviour {
     );
 
     // create settlements
-    const int supply = 4 * Infantry.MaxTroopNum / 10 * Infantry.FoodPerTenMenPerTurn * Infantry.BaseSlots;
+    const int supply = 4 * Infantry.MaxTroopNum / 10 * Infantry.BaseSlots;
     if (!settlementMgr.BuildSettlement("梁军大本营", hexMap.GetTile(1,1),
                     Settlement.Type.strategyBase,
                     hexMap.GetAIParty(), 0, 10000, supply * 5 * 5)) {

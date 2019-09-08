@@ -29,12 +29,12 @@ namespace MonoNS
       {
         if (unitUnderAttack.attackReaction == Reaction.Disband)
         {
-          unitUnderAttack.Destroy();
+          unitUnderAttack.Destroy(DestroyType.ByDisband);
           return;
         }
         if (attackers[0].attackReaction == Reaction.Disband)
         {
-          attackers[0].Destroy();
+          attackers[0].Destroy(DestroyType.ByDisband);
           return;
         }
       }

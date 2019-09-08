@@ -91,30 +91,29 @@ namespace MonoNS
       List<DistJob> jobs = warParty.attackside ? attackerDistJobs : defenderDistJobs;
       foreach(DistJob job in jobs) {
         if (!job.from.IsFunctional() || !job.to.IsFunctional()) {
-          msgBox.Show("城寨被包围，无法运送粮草或兵役");
           continue;
         }
         // ambush supply caravans
         Tile[] route = PickASupplyRoute(job.from, job.to);
         if (route.Length == 0) {
-          msgBox.Show("后勤线路被敌军阻隔，无法运送粮草或兵役");
+          hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.SupplyRouteBlocked, null, job.from, 0, 0, 0, 0, 0, job.to));
           continue;
         }
         Unit ambusher = IsSupplyRouteAmbushed(route, units.First().IsAI());
         if (ambusher != null) {
           // There is enemy unit ambushed on the supply route
           if (job.type == QueueJobType.DistSupply) {
-            job.from.SupplyIntercepted(ambusher, job.amount);
+            job.from.SupplyIntercepted(ambusher, job.to, job.amount);
           } else {
-            job.from.LaborIntercepted(ambusher, job.amount);
+            job.from.LaborIntercepted(ambusher, job.to, job.amount);
           }
           continue;
         }
 
         if (job.type == QueueJobType.DistSupply) {
-          msgBox.Show(job.from.DistSupply(job.amount, job.to));
+          job.from.DistSupply(job.amount, job.to);
         } else {
-          msgBox.Show(job.from.DistLabor(job.amount, job.to));
+          job.from.DistLabor(job.amount, job.to);
         }
       }
 
@@ -252,7 +251,7 @@ namespace MonoNS
       return tiles.ToArray();
     }
 
-    public void DestroyCamp(Settlement camp, bool setFire = true)
+    public void DestroyCamp(Settlement camp, BuildingNS.DestroyType type, bool setFire = true)
     {
       buildingQueue.Remove(camp);
       if (camp.owner.attackside)
@@ -267,7 +266,7 @@ namespace MonoNS
       view.GetComponent<SettlementView>().Destroy();
       GameObject.Destroy(view);
       camp.baseTile.RemoveCamp(setFire);
-      camp.Destroy();
+      camp.Destroy(type);
     }
 
     public void ShowSupplyNetwork(List<Settlement> settlements) {

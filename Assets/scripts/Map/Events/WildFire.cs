@@ -155,7 +155,7 @@ namespace MapTileNS
 
     public bool CanSetFire()
     {
-      if (tile.field == FieldType.Wild && tile.terrian == TerrianType.Hill || tile.terrian == TerrianType.Mountain)
+      if (tile.terrian == TerrianType.Hill || tile.terrian == TerrianType.Mountain)
       {
         return true;
       }

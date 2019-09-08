@@ -784,7 +784,7 @@ namespace MonoNS
       {
         if (tileUnderMouse.settlement != null)
         {
-          settlementMgr.DestroyCamp(tileUnderMouse.settlement);
+          settlementMgr.DestroyCamp(tileUnderMouse.settlement, BuildingNS.DestroyType.ByFire);
           Escape();
         }
       }

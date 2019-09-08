@@ -59,4 +59,11 @@
     TopLvl
   }
 
+  public enum DestroyType {
+    ByWildFire,
+    ByBurningCamp,
+    ByFlood,
+    ByDisband
+  }
+
 }

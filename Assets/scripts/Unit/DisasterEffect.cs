@@ -15,7 +15,7 @@ namespace UnitNS
         unit.TakeEffect(type, 8, 1f, 0.025f, 0.0125f);
       }
 
-      if (type == DisasterType.WildFire) {
+      if (type == DisasterType.Flood) {
         unit.TakeEffect(type, 8, 1f, 0.05f, 0.025f);
       }
 
