@@ -28,6 +28,10 @@ public class Cons {
     return Util.Rand(0f, 1f) < 0.1f;
   }
 
+  public static bool TinyChance() {
+    return Util.Rand(0f, 1f) < 0.05f;
+  }
+
   public static Season spring = new Spring();
   public static bool IsSpring(Season season) {
     return Util.eq<Season>(season, spring);

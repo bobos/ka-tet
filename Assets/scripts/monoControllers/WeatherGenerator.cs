@@ -87,9 +87,7 @@ namespace MonoNS
           return Cons.cloudy;
         } else if (luckNum < 9) {
           return Cons.rain;
-        }
-        else
-        {
+        } else {
           return Cons.heavyRain;
         }
       }
@@ -123,6 +121,8 @@ namespace MonoNS
           return Cons.rain;
         } else if (luckNum < 7) {
           return Cons.heavyRain;
+        } else if (luckNum < 8) {
+          return Cons.heat;
         }
         else
         {

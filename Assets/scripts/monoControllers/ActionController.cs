@@ -195,7 +195,7 @@ namespace MonoNS
       TRANSFERSUPPLY,
       TRANSFERLABOR,
       INPUTCONFIRM,
-      EVENTDIALOGCONFIRM
+      EVENTDIALOGCONFIRM,
     }
 
     // Make sure this is sequential

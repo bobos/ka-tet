@@ -24,7 +24,6 @@ namespace MonoNS
       mouseController = hexMap.mouseController;
       actionController = hexMap.actionController;
       actionController.onBtnClick += OnBtnClick;
-      msgBox = hexMap.msgBox;
       ghostUnit = GhostUnit.createGhostUnit();
     }
 
@@ -165,7 +164,6 @@ namespace MonoNS
 
     ActionController actionController;
     MouseController mouseController;
-    MsgBox msgBox;
     GhostUnit ghostUnit;
     List<Settlement> attackerRoots;
     List<Settlement> defenderRoots;

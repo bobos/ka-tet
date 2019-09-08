@@ -21,7 +21,6 @@ namespace MapTileNS
     public WildFire wildFire = null;
     public LandSlide landSlide = null;
     public HeatSickness heatSickness = null;
-    public Dehydration dehydration = null;
     public Drowning drowning = null;
     public Poision poision = null;
     public bool waterBound = false;
@@ -56,10 +55,6 @@ namespace MapTileNS
           waterBound = true;
           break;
         }
-      }
-
-      if (!waterBound) {
-        dehydration = new Dehydration(this);
       }
     }
     

@@ -5,16 +5,18 @@
     Tile tile;
     public HeatSickness(Tile tile) {
       this.tile = tile;
-      tile.ListenOnHeat(OnHeat);
+      tile.ListenOnHeavyRain(onHeavyRain);
     }
 
-    public void OnHeat()
+    public void onHeavyRain()
     {
       if (tile.field != FieldType.Wild) {
-        tile.RemoveOnHeatListener(OnHeat);
+        tile.RemoveOnHeatListener(onHeavyRain);
         return;
       }
-      if (Cons.FairChance() && tile.GetUnit() != null)
+      if (((Cons.IsSpring(tile.weatherGenerator.season) && Cons.SlimChance())
+          || (Cons.IsSummer(tile.weatherGenerator.season) && Cons.FairChance()))
+          && tile.GetUnit() != null)
       {
         tile.GetUnit().CaughtHeatSickness();
       }

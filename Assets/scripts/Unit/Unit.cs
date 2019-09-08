@@ -37,7 +37,7 @@ namespace UnitNS
 
     private TextNS.TextLib txtLib = Cons.GetTextLib();
 
-    HexMap hexMap;
+    public HexMap hexMap;
     public bool clone = false;
     ArmorRemEvent armorRemEvent;
     HeatSick heatSick;
@@ -99,7 +99,7 @@ namespace UnitNS
         return;
       }
       // TODO: AI test
-      bool myTurn = !hexMap.turnController.playerTurn == IsAI();
+      bool myTurn = !turnController.playerTurn == IsAI();
       FoW fow = FoW.Get();
       if (!myTurn && fow != null) {
         // is covered by fow
@@ -270,6 +270,10 @@ namespace UnitNS
       return state == State.Conceal;
     }
 
+    public bool IsOnField() {
+      return state == State.Conceal || state == State.Stand;
+    }
+
     public bool IsAmbushing() {
       return tile.Ambushable() && IsConcealed();
     }
@@ -349,12 +353,12 @@ namespace UnitNS
       if (Cons.IsHeavyRain(hexMap.weatherGenerator.currentWeather)) {
         if (state == State.Camping) return;
         rf.morale -= 1;
-        movementRemaining = BasicMovementCost * 2;
+        movementRemaining = (int)(movementRemaining / 2);
       }
       if (Cons.IsSnow(hexMap.weatherGenerator.currentWeather)) {
         if (state == State.Camping) return;
         rf.morale -= 5;
-        movementRemaining = BasicMovementCost * 2;
+        movementRemaining = (int)(movementRemaining / 2);
         int woundedNum = (int)(rf.soldiers * SnowDisableRate);
         rf.wounded += woundedNum;
         rf.soldiers -= woundedNum;
@@ -366,7 +370,7 @@ namespace UnitNS
       if (Cons.IsBlizard(hexMap.weatherGenerator.currentWeather)) {
         if (state == State.Camping) return;
         rf.morale -= 10;
-        movementRemaining = BasicMovementCost;
+        movementRemaining = (int)(movementRemaining / 4);
         int woundedNum = (int)(rf.soldiers * BlizardDisableRate);
         rf.wounded += woundedNum;
         rf.soldiers -= woundedNum;
@@ -658,11 +662,12 @@ namespace UnitNS
     // ==============================================================
     // ================= buff & debuff ==============================
     // ==============================================================
+    public int disarmorDefDebuf = 0;
     public int def
     {
       get
       {
-        int defence = (int)(rf.def + (rf.def * GetBuff()));
+        int defence = (int)(rf.def + (rf.def * GetBuff()) - disarmorDefDebuf);
         return defence <= 0 ? 1 : defence;
       }
     }
@@ -682,10 +687,6 @@ namespace UnitNS
 
     public void SoldiersDrown() {
       UnitDrown.Drown(this);
-    }
-
-    public void Dehydrate() {
-      UnitDehydrate.Dehydrate(this);
     }
 
     public void Poisioned() {

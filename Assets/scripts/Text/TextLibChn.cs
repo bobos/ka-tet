@@ -148,6 +148,10 @@ namespace TextNS
       {"event_unitSupplyIntercepted", @"给{0}将军所部{1}提供日常补给的补给队遭敌军伏击，{2}石粮草落入敌手，{3}名押运民夫被杀，余者已逃回，请立即派兵肃清后方袭扰之敌！"},
       {"event_supplyRouteBlocked_title", "补给线阻断"},
       {"event_supplyRouteBlocked", @"我军{0}与{1}之间的所有补给线遭到敌军切断，请立即派兵驱逐补给线上敌军以恢复两地交通补给！"},
+      {"event_disarmor_title", "士卒抱怨"},
+      {"event_disarmor", @"{0}将军，酷暑连日，将士终日顶盔贯甲日夜巡逻操练以致多人中暑晕厥，军中颇多不满，{1}将士恳请将军允许士卒平素只用着毡帽上身可免披铁甲以解暑热"},
+      {"event_disarmor_approve_title", @"许!(部队防御-{0})"},
+      {"event_disarmor_disapprove_title", @"不许!(部队士气-{0})"},
       };
     }
   }

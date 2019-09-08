@@ -22,7 +22,7 @@ public class Starter : MonoBehaviour {
     MouseController mouseController = GameObject.FindObjectOfType<MouseController>();
     controllers.Add(mouseController);
     WeatherGenerator weatherGenerator = GameObject.FindObjectOfType<WeatherGenerator>();
-    weatherGenerator.season = Cons.autumn;
+    weatherGenerator.season = Cons.summer;
     controllers.Add(weatherGenerator);
     WindGenerator windGenerator = GameObject.FindObjectOfType<WindGenerator>();
     controllers.Add(windGenerator);

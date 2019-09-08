@@ -20,8 +20,13 @@ namespace MonoNS
 
     TextLib textLib = Cons.GetTextLib();
     GameObject self;
+    public GameObject configrmBtn;
+    public GameObject approveBtn;
+    public GameObject disapproveBtn;
     public Text description;
     public Text title;
+    public Text approveText;
+    public Text disapproveText;
     public Image image;
     public Sprite flood;
     public Sprite wildfire;
@@ -40,6 +45,7 @@ namespace MonoNS
     public Sprite InsufficientLabor;
     public Sprite CampLost;
     public Sprite Defeated;
+    public Sprite Disarmor;
 
     public delegate void DialogEvent();
     public event DialogEvent eventDialogOn;
@@ -67,18 +73,48 @@ namespace MonoNS
       InsufficientSupply,
       InsufficientLabor,
       InsufficientSupplyLabor,
+      Disarmor,
       Null
     }
+
+    Unit currentUnit = null;
+    Settlement currentSettlement = null;
+    EventName currentEvent = EventName.Null;
+
     public override void UpdateChild() {}
+
+    public void OnAcceptClick() {
+      if (currentEvent == EventName.Disarmor && onDisarmorDecisionClick != null) {
+        onDisarmorDecisionClick(true, currentUnit);
+      }
+      Continue();
+    }
+
+    public void OnRejectClick() {
+      if (currentEvent == EventName.Disarmor && onDisarmorDecisionClick != null) {
+        onDisarmorDecisionClick(false, currentUnit);
+      }
+      Continue();
+    }
+
+    public delegate void OnDecisionMade(bool accept, Unit unit);
+    public event OnDecisionMade onDisarmorDecisionClick;
 
     public void OnBtnClick(ActionController.actionName actionName) {
       if (actionName == ActionController.actionName.EVENTDIALOGCONFIRM) {
-        self.SetActive(false);
-        if (eventDialogOff != null) eventDialogOff();
-        isShowing = false;
-        if (events.Count > 0) {
-          Show(events.Dequeue());
-        }
+        Continue();
+      }
+    }
+
+    void Continue() {
+      self.SetActive(false);
+      if (eventDialogOff != null) eventDialogOff();
+      isShowing = false;
+      currentEvent = EventName.Null;
+      currentSettlement = null;
+      currentUnit = null;
+      if (events.Count > 0) {
+        Show(events.Dequeue());
       }
     }
 
@@ -86,9 +122,13 @@ namespace MonoNS
     Queue<Event> events = new Queue<Event>();
     // TODO: only for player
     public void Show(Event dialogEvent) {
-      EventName name = dialogEvent.name;
-      Unit unit = dialogEvent.unit;
-      Settlement settlement = dialogEvent.settlement;
+      if (isShowing) {
+        events.Enqueue(dialogEvent);
+        return;
+      }
+      EventName name = currentEvent = dialogEvent.name;
+      Unit unit = currentUnit = dialogEvent.unit;
+      Settlement settlement = currentSettlement = dialogEvent.settlement;
       Settlement settlement1 = dialogEvent.settlement1;
       int argu5 = dialogEvent.supply;
       int argu1 = dialogEvent.moraleReduce;
@@ -96,11 +136,8 @@ namespace MonoNS
       int argu3 = dialogEvent.killed;
       int argu4 = dialogEvent.killedLabor;
       if (name == EventName.Null) return; 
-      if (isShowing) {
-        events.Enqueue(dialogEvent);
-        return;
-      }
       isShowing = true;
+      ToggleConfirm();
 
       // TODO: AI Test
       // TODO: Queue Event
@@ -188,6 +225,28 @@ namespace MonoNS
           settlement.name, settlement1.name);
         image.sprite = Defeated;
       }
+
+      if (name == EventName.Disarmor) {
+        ToggleDecision();
+        title.text = textLib.get("event_disarmor_title");
+        description.text = System.String.Format(textLib.get("event_disarmor"),
+          unit.GeneralName(), unit.Name());
+        image.sprite = Disarmor;
+        approveText.text = System.String.Format(textLib.get("event_disarmor_approve_title"), argu1);
+        disapproveText.text = System.String.Format(textLib.get("event_disarmor_disapprove_title"), argu2);
+      }
+    }
+
+    void ToggleConfirm() {
+      configrmBtn.SetActive(true);
+      approveBtn.SetActive(false);
+      disapproveBtn.SetActive(false);
+    }
+
+    void ToggleDecision() {
+      configrmBtn.SetActive(false);
+      approveBtn.SetActive(true);
+      disapproveBtn.SetActive(true);
     }
 
   }
