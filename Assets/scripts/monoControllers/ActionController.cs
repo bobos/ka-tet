@@ -56,6 +56,10 @@ namespace MonoNS
 
     public void OnPoisionClick()
     {
+      if (onBtnClick != null)
+      {
+        onBtnClick(actionName.POISION);
+      }
     }
 
     public void OnCampClick()
@@ -179,6 +183,7 @@ namespace MonoNS
       MOVE,
       STAND,
       ATTACK,
+      POISION,
       SABOTAGE,
       FIRE,
       AMBUSH,

@@ -54,7 +54,7 @@
         {
           tile.flood.SpreadFlood();
         }
-        else if (tile.flood.CanBeFloodedByNearByTile() &&
+        else if (tile.flood != null && tile.flood.CanBeFloodedByNearByTile() &&
          (Cons.IsHeavyRain(tile.weatherGenerator.currentWeather) ? Cons.HighlyLikely() : Cons.MostLikely()))
         {
           tile.wildFire.PutOutFire();

@@ -134,12 +134,14 @@ namespace TextNS
       {"b_ownedCamp", "所部所筑营寨"},
 
       // event
-      {"event_wildFire_title", "山火侵袭"},
-      {"event_wildFire", @"{0}将军所部{1}突遭猛烈山火所袭，军中士卒疲于避险，已有{2}名士兵和{3}民夫丧命于火海，{4}人不同程度为烈火所伤，部队士气下降{5}点, 若天气干燥之时，将军务必带军避开山高林密之处，以免再为山火所伤！"},
       {"event_fireDestroyCamp_title", "火烧连营"},
       {"event_fireDestroyCamp", @"我军{0}突发火情，扑之不灭，营寨终遭烈火焚毁，营中{1}民夫丧命于火海，{2}石粮草付诸一炬, 营中守军亦全数丧生于火海，损失极为惨重，将军扎营下寨尽量避开山高地陡之处，此等地形易被山火覆盖！"},
       {"event_burningCampDestroyUnit_title", "军营大火"},
       {"event_burningCampDestroyUnit", @"{0}将军所部{1}遭遇军营大火，军中{2}官兵民夫全数丧生火海！"},
+      {"event_floodDestroyCamp_title", "水淹七军"},
+      {"event_floodDestroyCamp", @"我军{0}突发水情，营寨被洪水淹没，营中{1}民夫丧命于洪水，{2}石粮草被冲走, 营中守军亦全数溺亡，损失极为惨重！"},
+      {"event_floodDestroyUnit_title", "无人生还"},
+      {"event_floodDestroyUnit", @"{0}将军所部{1}突遇洪水，军中{2}官兵民夫全数殒命！"},
       {"event_enemyCaptureCamp_title", "军营失守"},
       {"event_enemyCaptureCamp", @"我军{0}已落入敌军之手！"},
       {"event_insufficientLabor_title", "转移失败"},
@@ -178,6 +180,10 @@ namespace TextNS
       {"event_generalKilled", @"{0}将军战死于军中"},
       {"event_unitRetreat_title", "撤兵"},
       {"event_unitRetreat", @"{0}撤出战场"},
+      {"event_epidemic_title", "爆发痢疾"},
+      {"event_epidemic", @"{0}所部{1}因久驻因暴雨过后而蚊虫滋生的密林，大量士卒染上痢疾"},
+      {"event_poision_title", "遭人投毒"},
+      {"event_poision", @"{0}所部{1}因饮用了上游遭歹人投毒的河水，大量士卒染病"},
       };
     }
   }

@@ -230,6 +230,21 @@ namespace UnitNS
       return epidemic.GetIllKillNum();
     }
 
+    public int GetPoisionTurns()
+    {
+      return unitPoisioned.GetIllTurns();
+    }
+
+    public int GetPoisionDisableNum()
+    {
+      return unitPoisioned.GetIllDisableNum();
+    }
+
+    public int GetPoisionKillNum()
+    {
+      return unitPoisioned.GetIllKillNum();
+    }
+
     public int GetStarvingDessertNum()
     {
       return (int)(rf.soldiers * Starving2EscapeRate);
@@ -393,7 +408,7 @@ namespace UnitNS
         concealCoolDownTurn--;
       } else {
         if (Concealable() && state == State.Stand) {
-          if (!hexMap.IsInEnemyScoutRange(this, tile)) SetState(State.Conceal);
+          if (!hexMap.IsInEnemyScoutRange(this.IsAI(), tile)) SetState(State.Conceal);
         }
       }
     }
@@ -440,7 +455,7 @@ namespace UnitNS
       } else if (type == DestroyType.ByWildFire) {
         hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.WildFireDestroyUnit, this, null, 0, 0, killed));
       } else if (type == DestroyType.ByFlood) {
-        hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.Flood, this, null, 0, 0, killed));
+        hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.FloodDestroyUnit, this, null, 0, 0, killed));
       } else {
         hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.Disbanded, this, null, 0, 0, killed));
       }
@@ -474,6 +489,7 @@ namespace UnitNS
       }
 
       epidemic.Apply();
+      unitPoisioned.Apply();
 
       if (rf.soldiers <= DisbandUnitUnder)
       {
@@ -501,16 +517,6 @@ namespace UnitNS
       rf.soldiers -= kiaNum;
       int killLabor = (int)(kiaNum * 0.8f);
       labor -= killLabor;
-
-      EventDialog.EventName eventType = EventDialog.EventName.Null;
-      if (type == DisasterType.WildFire) {
-        eventType = EventDialog.EventName.WildFire;
-      }
-      if (type == DisasterType.Flood) {
-        eventType = EventDialog.EventName.Flood;
-      }
-
-      hexMap.eventDialog.Show(new MonoNS.Event(eventType, this, null, reduceMorale, woundedNum, kiaNum, killLabor, 0));
     }
 
 
@@ -692,6 +698,7 @@ namespace UnitNS
 
     public void CaughtEpidemic()
     {
+      Discontent(1);
       epidemic.Worsen();
     }
 
@@ -818,7 +825,7 @@ namespace UnitNS
 
     bool MoveTo(Tile t, bool preMove = false) {
       bool continueMoving = true;
-      if (!preMove && IsConcealed() && hexMap.IsInEnemyScoutRange(this, t)) {
+      if (!preMove && IsConcealed() && hexMap.IsInEnemyScoutRange(this.IsAI(), t)) {
         DiscoveredByEnemy();
         continueMoving = false;
       }

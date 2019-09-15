@@ -60,6 +60,7 @@ namespace MonoNS
     public Text stamina;
     public Text state;
     public Text illness;
+    public Text poision;
 
     public void OnEndTurnClicked()
     {
@@ -138,6 +139,8 @@ namespace MonoNS
       state.text = stateStr;
       illness.text = unit.GetHeatSickTurns() > 0 ? "痢疾: 预计本轮致伤"+ unit.GetHeatSickDisableNum() + "人,致死"
       + unit.GetHeatSickKillNum() +"人,疫情还将持续" + unit.GetHeatSickTurns() + "回合" : "";
+      poision.text = unit.GetPoisionTurns() > 0 ? "中毒: 预计本轮致伤"+ unit.GetPoisionDisableNum() + "人,致死"
+      + unit.GetPoisionKillNum() +"人,病情还将持续" + unit.GetPoisionTurns() + "回合" : "";
 
       ToggleButtons(false);
       // TODO: AI test

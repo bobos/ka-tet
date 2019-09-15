@@ -53,22 +53,21 @@ namespace MonoNS
     public Sprite GeneralKilled;
     public Sprite Riot;
     public Sprite Retreat;
+    public Sprite Poisioned;
 
     public delegate void DialogEvent();
     public event DialogEvent eventDialogOn;
     public event DialogEvent eventDialogOff;
     public enum EventName {
-      Flood,
-      WildFire,
+      FloodDestroyCamp,
+      FloodDestroyUnit,
       WildFireDestroyUnit,
       WildFireDestroyCamp,
       BurningCampDestroyUnit,
       EnemyCaptureCamp,
       EnemyCaptureCity,
-      Drown,
-      Gale,
       Poision,
-      Dehydration,
+      Epidemic,
       Disbanded,
       SupplyReached,
       SupplyRouteBlocked,
@@ -157,13 +156,6 @@ namespace MonoNS
       // TODO: Queue Event
       if (eventDialogOn != null) eventDialogOn();
       self.SetActive(true);
-      if (name == EventName.WildFire) {
-        title.text = textLib.get("event_wildFire_title");
-        description.text = System.String.Format(textLib.get("event_wildFire"), unit.GeneralName(),
-          unit.Name(), argu3, argu4, argu2, argu1);
-        image.sprite = wildfire;
-      }
-
       if (name == EventName.WildFireDestroyCamp) {
         title.text = textLib.get("event_fireDestroyCamp_title");
         description.text = System.String.Format(textLib.get("event_fireDestroyCamp"), settlement.name,
@@ -175,7 +167,21 @@ namespace MonoNS
         title.text = textLib.get("event_burningCampDestroyUnit_title");
         description.text = System.String.Format(textLib.get("event_burningCampDestroyUnit"), unit.GeneralName(),
           unit.Name(), argu3);
-        image.sprite = UnitDestroyByBurningCamp;
+        image.sprite = wildfire;
+      }
+
+      if (name == EventName.FloodDestroyCamp) {
+        title.text = textLib.get("event_floodDestroyCamp_title");
+        description.text = System.String.Format(textLib.get("event_floodDestroyCamp"), settlement.name,
+          settlement.labor, settlement.supplyDeposit);
+        image.sprite = flood;
+      }
+
+      if (name == EventName.FloodDestroyUnit) {
+        title.text = textLib.get("event_floodDestroyUnit_title");
+        description.text = System.String.Format(textLib.get("event_floodDestroyUnit"), unit.GeneralName(),
+          unit.Name(), argu3);
+        image.sprite = flood;
       }
 
       if (name == EventName.EnemyCaptureCamp) {
@@ -287,6 +293,20 @@ namespace MonoNS
         description.text = System.String.Format(textLib.get("event_unitRetreat"),
           unit.Name());
         image.sprite = Retreat;
+      }
+
+      if (name == EventName.Epidemic) {
+        title.text = textLib.get("event_epidemic_title");
+        description.text = System.String.Format(textLib.get("event_epidemic"),
+          unit.GeneralName(), unit.Name());
+        image.sprite = Gale;
+      }
+
+      if (name == EventName.Poision) {
+        title.text = textLib.get("event_poision_title");
+        description.text = System.String.Format(textLib.get("event_poision"),
+          unit.GeneralName(), unit.Name());
+        image.sprite = Poisioned;
       }
 
       if (name == EventName.Disarmor) {

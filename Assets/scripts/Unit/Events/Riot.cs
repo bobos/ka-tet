@@ -12,6 +12,7 @@ namespace UnitNS
     }
 
     public bool Discontent(int point) {
+      MonoNS.MsgBox.ShowMsg("不满+" + point);
       discontent += point;
       if (discontent == Max) {
         discontent = 0;

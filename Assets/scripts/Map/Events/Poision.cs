@@ -33,13 +33,13 @@ namespace MapTileNS
       return tiles;
     }
 
-    public void SetPoision()
+    public void SetPoision(Unit initiator)
     {
       foreach(Tile tile in downStreams) {
         foreach (Tile t in tile.neighbours)
         {
           Unit unit = t.GetUnit();
-          if (unit != null) {
+          if (unit != null && !Util.eq<Unit>(unit, initiator)) {
             unit.Poisioned();   
           }
         }

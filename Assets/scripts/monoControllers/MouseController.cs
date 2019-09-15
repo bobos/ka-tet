@@ -106,6 +106,16 @@ namespace MonoNS
         Update_CurrentFunc = UpdateUnitCamp;
       }
 
+      if (action == ActionController.actionName.POISION && selectedUnit != null)
+      {
+        if (!selectedUnit.tile.waterBound) {
+          msgBox.Show("附近没有水源!");
+          return;
+        }
+        mouseMode = mode.sabotage;
+        Update_CurrentFunc = UpdateUnitPoision;
+      }
+
       if (action == ActionController.actionName.ENCAMP && selectedUnit != null)
       {
         bool encampable = false;
@@ -735,6 +745,21 @@ namespace MonoNS
       }
     }
 
+    void UpdateUnitPoision()
+    {
+      if (tileUnderMouse == null || tileUnderMouse.terrian != TerrianType.Water
+        || !selectedUnit.tile.neighbours.Contains(tileUnderMouse)) {
+          return;
+      }
+      hexMap.HighlightArea(tileUnderMouse.poision.downStreams.ToArray(), HexMap.RangeType.PoisionRange);
+      if (Input.GetMouseButtonUp(0))
+      {
+        msgBox.Show("上游投毒成功");
+        tileUnderMouse.Poision(selectedUnit);
+        Escape();
+      }
+    }
+
     void UpdateUnitSabotageDam()
     {
       if (Input.GetMouseButtonUp(0) && tileUnderMouse != null
@@ -752,8 +777,11 @@ namespace MonoNS
         }
         if (damTile != null)
         {
-          msgBox.Show("Dam is sabotaged!");
-          damTile.SabotageDam();
+          if (damTile.SabotageDam()) {
+            msgBox.Show("决堤!");
+          } else {
+            msgBox.Show("决堤失败, 需在雨天");
+          }
           Escape();
         }
       }

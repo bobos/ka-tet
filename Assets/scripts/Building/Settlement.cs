@@ -122,12 +122,17 @@ public abstract class Settlement
 
   public void Destroy(BuildingNS.DestroyType type)
   {
+    UnitNS.DestroyType desType = UnitNS.DestroyType.ByBurningCamp;
     if (type == BuildingNS.DestroyType.ByFire) {
       hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.WildFireDestroyCamp, null, this));
     }
+    if (type == BuildingNS.DestroyType.ByFlood) {
+      desType = UnitNS.DestroyType.ByFlood;
+      hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.FloodDestroyCamp, null, this));
+    }
     foreach (Unit unit in garrison)
     {
-      unit.Destroy(UnitNS.DestroyType.ByBurningCamp);
+      unit.Destroy(desType);
     }
   }
 

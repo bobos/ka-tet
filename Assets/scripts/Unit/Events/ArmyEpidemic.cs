@@ -32,7 +32,7 @@
     }
 
     public void Worsen() {
-      // TODO: emit event
+      unit.hexMap.eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.Epidemic, unit, null));
       disableRatio += GetDisableRatio();
       killRatio += GetKillRatio();
     }

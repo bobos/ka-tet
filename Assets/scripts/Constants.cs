@@ -29,7 +29,7 @@ public class Cons {
   }
 
   public static bool TinyChance() {
-    return Util.Rand(0f, 1f) < 0.05f;
+    return Util.Rand(0f, 1f) < 0.06f;
   }
 
   public static Season spring = new Spring();

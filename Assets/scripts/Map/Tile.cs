@@ -193,11 +193,11 @@ namespace MapTileNS
       return false;
     }
 
-    public bool Poision() {
+    public bool Poision(Unit unit) {
       if (poision == null) {
         return false;
       }
-      poision.SetPoision();
+      poision.SetPoision(unit);
       return true;
     }
 
@@ -404,7 +404,9 @@ namespace MapTileNS
     {
       if (field == FieldType.Settlement && settlement != null)
       {
-        settlementMgr.DestroyCamp(settlement, BuildingNS.DestroyType.ByFire, false);
+        settlementMgr.DestroyCamp(settlement,
+          type == DisasterType.Flood ? BuildingNS.DestroyType.ByFlood : BuildingNS.DestroyType.ByFire,
+          false);
       }
       Unit u = GetUnit();
       if (u != null)
@@ -420,7 +422,7 @@ namespace MapTileNS
         }
         if (retreatTile == null)
         {
-          u.Destroy(DestroyType.ByWildFire);
+          u.Destroy(type == DisasterType.Flood ? DestroyType.ByFlood : DestroyType.ByWildFire);
         }
         else
         {

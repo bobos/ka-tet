@@ -36,7 +36,7 @@
       if (poisioned) {
         return;
       }
-      // TODO: emit event
+      unit.hexMap.eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.Poision, unit, null));
       poisioned = true;
       disableRatio = GetDisableRatio();
       killRatio = GetKillRatio();
@@ -58,7 +58,7 @@
         disableRatio -= 0.005f;
       }
 
-      if (killRatio  > 0)
+      if (killRatio > 0)
       {
         unit.rf.morale -= 2;
         int kiaNum = GetIllKillNum();

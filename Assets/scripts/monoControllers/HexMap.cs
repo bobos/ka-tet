@@ -51,7 +51,8 @@ namespace MonoNS
       movement,
       attack,
       camp,
-      supplyRange
+      supplyRange,
+      PoisionRange
     }
     public int numRows = 20;
     public int numCols = 40;
@@ -67,6 +68,7 @@ namespace MonoNS
     public Material AttackRange;
     public Material CampRange;
     public Material SupplyRange;
+    public Material PoisionRange;
     public Material PlayerSkin;
     public Material GreySkin;
     public Material AISkin;
@@ -159,9 +161,9 @@ namespace MonoNS
       return wp.attackside ? 2 : 1;
     }
 
-    public bool IsInEnemyScoutRange(Unit unit, Tile tile, bool ignoreConcealed = false) {
+    public bool IsInEnemyScoutRange(bool isAI, Tile tile, bool ignoreConcealed = false) {
       HashSet<Tile> enemyScoutArea = new HashSet<Tile>();
-      WarParty party = unit.IsAI() ? GetPlayerParty() : GetAIParty();
+      WarParty party = isAI ? GetPlayerParty() : GetAIParty();
       foreach (Unit u in party.GetUnits())
       {
         foreach(Tile t in u.GetScoutArea()) {
@@ -521,12 +523,13 @@ namespace MonoNS
         if (type == RangeType.attack) mat = AttackRange;
         if (type == RangeType.movement) {
           mat = MovementRange;
-          if (unit != null && unit.IsConcealed() && IsInEnemyScoutRange(unit, tile, true)) {
+          if (unit != null && unit.IsConcealed() && IsInEnemyScoutRange(unit.IsAI(), tile, true)) {
             mat = WarningMat;
           }
         }
         if (type == RangeType.camp) mat = CampRange;
         if (type == RangeType.supplyRange) mat = SupplyRange;
+        if (type == RangeType.PoisionRange) mat = PoisionRange;
         Overlay(tile, mat);
       }
       highlightedArea = tiles;
