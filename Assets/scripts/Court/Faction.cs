@@ -9,9 +9,9 @@ namespace CourtNS {
     bool IsAI();
     void SetAs(bool AI);
 
-	  void AddUnit(Unit unit);
-	  void RemUnit(Unit unit);
-		HashSet<Unit> GetUnits();
+	  void AddGeneral(General general);
+	  void RemoveGeneral(General general);
+    General GetAvailableGeneral();
 
 		Faction OverLord();
 		HashSet<Faction> SubLords();
@@ -29,7 +29,7 @@ namespace CourtNS {
 	  protected bool isAI;
 		HashSet<Faction> subLords = new HashSet<Faction>();  
 		Faction overLord = null;
-	  HashSet<Unit> units = new HashSet<Unit>();
+	  HashSet<General> generals = new HashSet<General>();
     protected TextLib txtLib = Cons.GetTextLib();
 
 	  public _Faction(bool isAI, int population) {
@@ -52,20 +52,26 @@ namespace CourtNS {
     // TODO: population grow/decrease
 
     // ==============================================================
-    // ================= Units ======================================
+    // ================= General ====================================
     // ==============================================================
-	  public void AddUnit(Unit unit) {
-	  	units.Add(unit);
-	  }
+    public void AddGeneral(General general) {
+      generals.Add(general);
+    }
+	  
+    public void RemoveGeneral(General general) {
+      generals.Remove(general);
+    }
 
-	  public void RemUnit(Unit unit) {
-	  	units.Remove(unit);
-	  }
-
-	  public HashSet<Unit> GetUnits() {
-	  	return units;
-	  }
-
+    public General GetAvailableGeneral() {
+      foreach (General general in generals)
+      {
+        if (general.stat == GeneralStat.Idle) {
+          return general;
+        }
+      }
+      return null;
+    }
+	  
     public int MaxUnitSize(Type unitType) {
       int num = (int)(population * (unitType == Type.Cavalry ? MaxCavUnitSizeRatio : MaxInfanUnitSizeRatio));
       if (unitType == Type.Cavalry) {

@@ -52,11 +52,15 @@ namespace FieldNS
       Unit unit = general.commandUnit.onFieldUnit;
       units.Add(unit);
       unit.SpawnOnMap();
+      Join(general);
+    }
+
+    public void Join(General general) {
       foreach (FieldParty fieldParty in fieldParties)
       {
         if (Util.eq<Party>(general.party, fieldParty.party)) {
           FieldParty counterParty = fieldParty.counterFieldParty;
-          if (counterParty != null) counterParty.GeneralEnterCampaign(general);
+          if (counterParty != null) counterParty.TheirGeneralEnterCampaign(general);
         }
       }
     }

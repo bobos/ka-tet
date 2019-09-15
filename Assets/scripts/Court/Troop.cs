@@ -113,14 +113,11 @@ namespace CourtNS
       // TODO: return labor to faction
       state = TroopState.Rest;
       onFieldUnit = null;
-      general.LeaveCampaign();
     }
 
     public void Destroy() {
-      // called by onFieldUnit on destroy
       state = TroopState.Disbanded;
       onFieldUnit = null;
-      general.TroopDestroyed();
     }
 
   }

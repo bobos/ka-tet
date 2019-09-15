@@ -13,7 +13,7 @@ namespace MapTileNS
 
   public enum FieldType {
     Wild,
-    Farm,
+    Clearing,
     Settlement,
     Schorched,
     Flooded,
@@ -23,8 +23,6 @@ namespace MapTileNS
 
   public enum DisasterType {
     Flood,
-    WildFire,
-    EarthQuake,
-    LandSlide
+    WildFire
   }
 }

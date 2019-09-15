@@ -146,7 +146,7 @@ namespace MapTileNS
     // ==============================================================
 
     float Elevation;
-    protected readonly HexMap hexMap;
+    public readonly HexMap hexMap;
     static readonly float WIDTH_MULTIPLIER = Mathf.Sqrt(3) / 2;
     float radius = 1.05f; // model height is 1 unity unit
 

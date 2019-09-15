@@ -12,6 +12,8 @@ public class Starter : MonoBehaviour {
   public void OnGameStart() {
     // HexMap must be the first controller to initiate
     HexMap hexMap = GameObject.FindObjectOfType<HexMap>();
+    // Set War Region
+    hexMap.warRegion = Cons.huaiWest;
 
     // controllers only add callbacks on initialization, will not emit initial events
     List<BaseController> controllers = new List<BaseController>();
@@ -101,43 +103,33 @@ public class Starter : MonoBehaviour {
     General liubei = new General("g_liubei", "g_liubei_d", Cons.middleEarth, new Traits[0]); 
     General guanyu = new General("g_guanyu", "g_guanyu_d", Cons.middleEarth, new Traits[0]); 
     General zhangfei = new General("g_zhangfei", "g_zhangfei_d", Cons.middleEarth, new Traits[0]); 
-    General zhaoyun = new General("g_zhaoyun", "g_zhaoyun_d", Cons.moutainBeyond, new Traits[0]); 
-    General machao = new General("g_machao", "g_machao_d", Cons.moutainBeyond, new Traits[0]); 
-    liubei.faction = Cons.HeJian;
-    guanyu.faction = Cons.HeJian;
-    zhangfei.faction = Cons.HeJian;
-    zhaoyun.faction = Cons.HeJian;
-    machao.faction = Cons.HeJian;
+    General zhaoyun = new General("g_zhaoyun", "g_zhaoyun_d", Cons.riverRun, new Traits[0]); 
+    General machao = new General("g_machao", "g_machao_d", Cons.riverRun, new Traits[0]); 
+    liubei.JoinFaction(Cons.HeJian, Cons.Pigeon);
+    guanyu.JoinFaction(Cons.HeJian, Cons.Pigeon);
+    zhangfei.JoinFaction(Cons.HeJian, Cons.Pigeon);
+    zhaoyun.JoinFaction(Cons.HeJian, Cons.Eagle);
+    machao.JoinFaction(Cons.HeJian, Cons.Eagle);
 
-    General caocao = new General("g_caocao", "g_caocao_d", Cons.riverRun, new Traits[0]); 
-    General xuchu = new General("g_xuchu", "g_xuchu_d", Cons.riverRun, new Traits[0]); 
-    caocao.faction = Cons.Liang;
-    xuchu.faction = Cons.Liang;
+    General caocao = new General("g_caocao", "g_caocao_d", Cons.riverNorth, new Traits[0]); 
+    General xuchu = new General("g_xuchu", "g_xuchu_d", Cons.riverNorth, new Traits[0]); 
+    caocao.JoinFaction(Cons.Liang, Cons.Tiger);
+    xuchu.JoinFaction(Cons.Liang, Cons.Tiger);
 
-    // step 2, assign general to party
-    liubei.JoinParty(Cons.Pigeon);
-    guanyu.JoinParty(Cons.Pigeon);
-    zhangfei.JoinParty(Cons.Pigeon);
-    zhaoyun.JoinParty(Cons.Eagle);
-    machao.JoinParty(Cons.Eagle);
-
-    caocao.JoinParty(Cons.Tiger);
-    xuchu.JoinParty(Cons.Tiger);
     // step 3, assign general to units
     Troop troop = new Troop(2000, Cons.HeJian, Cons.riverRun, Type.Infantry);
-    liubei.Assign(troop);
+    liubei.Assign(hexMap, troop);
     troop = new Troop(500, Cons.HeJian, Cons.riverRun, Type.Cavalry);
-    zhaoyun.Assign(troop);
+    zhaoyun.Assign(hexMap, troop);
     troop = new Troop(800, Cons.HeJian, Cons.riverRun, Type.Infantry);
-    guanyu.Assign(troop);
-
-    troop = new Troop(7000, Cons.Liang, Cons.moutainBeyond, Type.Infantry);
-    caocao.Assign(troop);
-    troop = new Troop(400, Cons.Liang, Cons.middleEarth, Type.Cavalry);
-    xuchu.Assign(troop);
-
+    guanyu.Assign(hexMap, troop);
     troop = new Troop(1000, Cons.HeJian, Cons.middleEarth, Type.Cavalry);
-    zhangfei.Assign(troop);
+    zhangfei.Assign(hexMap, troop);
+
+    troop = new Troop(7000, Cons.Liang, Cons.riverNorth, Type.Infantry);
+    caocao.Assign(hexMap, troop);
+    troop = new Troop(400, Cons.Liang, Cons.riverNorth, Type.Cavalry);
+    xuchu.Assign(hexMap, troop);
 
     // step 4, on field assignment
     hexMap.SetWarParties(
@@ -157,43 +149,15 @@ public class Starter : MonoBehaviour {
       Util.Throw("Failed to build city at 29,12");}
 
     // after settlement created, general enters campaign
-    liubei.EnterCampaign(hexMap.GetPlayerParty(), hexMap.GetTile(27, 18), 0, 2000);
-    zhaoyun.EnterCampaign(hexMap.GetPlayerParty(), hexMap.GetTile(28, 18), 0);
-    guanyu.EnterCampaign(hexMap.GetPlayerParty(), hexMap.GetTile(27, 17), 0);
-    zhangfei.EnterCampaign(hexMap.GetPlayerParty(), hexMap.GetTile(28, 17), 0);
+    liubei.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(27, 18), 0, 2000);
+    zhaoyun.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(28, 18), 0);
+    guanyu.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(27, 17), 0);
+    zhangfei.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(28, 17), 0);
 
     // * AI *
-    caocao.EnterCampaign(hexMap.GetAIParty(), hexMap.GetTile(1, 1), 0, 6000);
-    xuchu.EnterCampaign(hexMap.GetAIParty(), hexMap.GetTile(2, 1), 0);
+    caocao.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(1, 1), 0, 6000);
+    xuchu.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(2, 1), 0);
     SettlementMgr.Ready4Refresh = true;
     FoW.Init(hexMap);
   }
-
-  List<FieldParty> CreateFieldParties(LinkedList<General> generals) {
-    Party party = generals.First.Value.party;
-    Party counterParty = party.counterParty;
-    FieldParty fieldParty = new FieldParty(party);
-    FieldParty counterFieldParty = null;
-    List<FieldParty> parties = new List<FieldParty>();
-
-    parties.Add(fieldParty);
-    if (counterParty != null) {
-      counterFieldParty = new FieldParty(counterParty);
-      counterFieldParty.counterFieldParty = fieldParty;
-      fieldParty.counterFieldParty = counterFieldParty;
-      parties.Add(counterFieldParty);
-    }
-
-    foreach (General general in generals)
-    {
-      if (Util.eq<Party>(general.party, fieldParty.party)) {
-        fieldParty.GeneralEnterCampaign(general);
-      } else if (Util.eq<Party>(general.party, counterFieldParty.party)) {
-        counterFieldParty.GeneralEnterCampaign(general);
-      }
-    }
-
-    return parties;
-  }
-
 }

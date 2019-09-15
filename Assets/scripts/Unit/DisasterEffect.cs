@@ -1,10 +1,4 @@
-﻿using System.Collections.Generic;
-using PathFind;
-using MapTileNS;
-using MonoNS;
-using UnityEngine;
-using CourtNS;
-using FieldNS;
+﻿using MapTileNS;
 
 namespace UnitNS
 {
@@ -19,9 +13,6 @@ namespace UnitNS
         unit.TakeEffect(type, 8, 1f, 0.05f, 0.025f);
       }
 
-      if (type == DisasterType.LandSlide) {
-        unit.TakeEffect(type, 30, 1f, 0f, 0.3f);
-      }
     }
   }
 }

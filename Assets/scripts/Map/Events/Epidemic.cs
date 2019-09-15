@@ -1,9 +1,9 @@
 ﻿namespace MapTileNS
 {
-  public class HeatSickness
+  public class Epidemic
   {
     Tile tile;
-    public HeatSickness(Tile tile) {
+    public Epidemic(Tile tile) {
       this.tile = tile;
       tile.ListenOnHeavyRain(onHeavyRain);
     }
@@ -18,7 +18,7 @@
           || (Cons.IsSummer(tile.weatherGenerator.season) && Cons.FairChance()))
           && tile.GetUnit() != null)
       {
-        tile.GetUnit().CaughtHeatSickness();
+        tile.GetUnit().CaughtEpidemic();
       }
     }
 

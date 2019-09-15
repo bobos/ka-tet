@@ -124,7 +124,8 @@ namespace MonoNS
       if (unit.clone) {
         return;
       }
-      string stateStr = unit.IsWarWeary() ? " 行将崩溃" : "";
+      string stateStr = unit.IsWarWeary() ? " 士气低落" : "";
+      stateStr += " " + unit.GetDiscontent();
       stateStr += unit.starving ? " 饥饿" : "";
       stateStr += unit.GetStateName();
       int desserter = unit.starving ? unit.GetStarvingDessertNum() : 0;

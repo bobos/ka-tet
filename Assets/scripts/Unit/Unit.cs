@@ -40,8 +40,10 @@ namespace UnitNS
     public HexMap hexMap;
     public bool clone = false;
     ArmorRemEvent armorRemEvent;
-    HeatSick heatSick;
+    ArmyEpidemic epidemic;
     UnitPoisioned unitPoisioned;
+    Riot riot;
+    MarchOnHeat marchOnHeat;
     WeatherGenerator weatherGenerator;
     TurnController turnController;
     public Unit(bool clone, Troop troop, Tile tile, State state,
@@ -72,9 +74,11 @@ namespace UnitNS
       if (clone) {
         return;
       }
-      heatSick = new HeatSick(this);
+      epidemic = new ArmyEpidemic(this);
       armorRemEvent = new ArmorRemEvent(this);
       unitPoisioned = new UnitPoisioned(this);
+      riot = new Riot(this);
+      marchOnHeat = new MarchOnHeat(this);
       hexMap.SpawnUnit(this);
       if (tile != null && tile.settlement != null && tile.settlement.owner.isAI == IsAI()) {
         // spawn unit in settlement
@@ -165,7 +169,7 @@ namespace UnitNS
 
     public string GeneralName()
     {
-      return rf.general.Name();
+      return rf.general != null ? rf.general.Name() : " ";
     }
 
     public string GetStateName()
@@ -213,17 +217,17 @@ namespace UnitNS
 
     public int GetHeatSickTurns()
     {
-      return heatSick.GetIllTurns();
+      return epidemic.GetIllTurns();
     }
 
     public int GetHeatSickDisableNum()
     {
-      return heatSick.GetIllDisableNum();
+      return epidemic.GetIllDisableNum();
     }
 
     public int GetHeatSickKillNum()
     {
-      return heatSick.GetIllKillNum();
+      return epidemic.GetIllKillNum();
     }
 
     public int GetStarvingDessertNum()
@@ -241,6 +245,11 @@ namespace UnitNS
       return (int)(rf.soldiers * DesertRate);
     }
 
+    public string GetDiscontent()
+    {
+      return riot.GetDescription();
+    }
+
     public bool IsAI()
     {
       return rf.faction.IsAI();
@@ -255,7 +264,7 @@ namespace UnitNS
     }
 
     public bool IsSicknessAffected() {
-      return heatSick.IsValid();
+      return epidemic.IsValid();
     }
 
     public bool IsStarving() {
@@ -401,21 +410,26 @@ namespace UnitNS
     }
 
     public void DestroyEvents() {
-      heatSick.Destroy();
+      epidemic.Destroy();
       armorRemEvent.Destroy();
       unitPoisioned.Destroy();
     }
 
     public void Retreat() {
-      rf.LeaveCampaign();
+      if (rf.general != null) {
+        rf.general.TroopRetreat();
+      }
       SetState(State.Retreated);
       tile.RemoveUnit(this);
       if (tile.settlement != null && tile.settlement.owner.isAI == this.IsAI()) {
         tile.settlement.RemoveUnit(this);
       }
-      rf.general.ReportFieldEvent(FieldEvent.Retreated);
       DestroyEvents();
-      MsgBox.ShowMsg("Unit " + Name() + " has left the campaign");
+      hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.Retreat, this, null));
+    }
+
+    public void Riot() {
+      rf.general.UnitRiot();
     }
 
     public void Destroy(DestroyType type)
@@ -432,13 +446,12 @@ namespace UnitNS
       }
       kia += killed;
       rf.soldiers = rf.wounded = labor = 0;
-      rf.Destroy();
+      rf.general.TroopDestroyed();
       SetState(State.Disbanded);
       tile.RemoveUnit(this);
       if (tile.settlement != null && tile.settlement.owner.isAI == this.IsAI()) {
         tile.settlement.RemoveUnit(this);
       }
-      rf.general.ReportFieldEvent(FieldEvent.Destroyed);
       DestroyEvents();
     }
 
@@ -460,7 +473,7 @@ namespace UnitNS
         labor -= miaNum;
       }
 
-      heatSick.Apply();
+      epidemic.Apply();
 
       if (rf.soldiers <= DisbandUnitUnder)
       {
@@ -496,9 +509,6 @@ namespace UnitNS
       if (type == DisasterType.Flood) {
         eventType = EventDialog.EventName.Flood;
       }
-      if (type == DisasterType.LandSlide) {
-        eventType = EventDialog.EventName.LandSlide;
-      }
 
       hexMap.eventDialog.Show(new MonoNS.Event(eventType, this, null, reduceMorale, woundedNum, kiaNum, killLabor, 0));
     }
@@ -513,7 +523,7 @@ namespace UnitNS
           rf.mov * GetMovementModifier() *
           (rf.morale >= Troop.MaxMorale ? 1.2f : 1f) *
           (1f + (IsStarving() ? -0.45f : 0f)) * 
-          (heatSick != null && heatSick.IsValid() ? 0.7f : 1f));
+          (epidemic != null && epidemic.IsValid() ? 0.7f : 1f));
     }
 
     public StaminaLvl GetStaminaLevel()
@@ -680,17 +690,17 @@ namespace UnitNS
       }
     }
 
-    public void CaughtHeatSickness()
+    public void CaughtEpidemic()
     {
-      heatSick.Worsen();
-    }
-
-    public void SoldiersDrown() {
-      UnitDrown.Drown(this);
+      epidemic.Worsen();
     }
 
     public void Poisioned() {
       unitPoisioned.Poision();
+    }
+
+    public bool Discontent(int point) {
+      return riot.Discontent(point);
     }
 
     float GetBuff()
@@ -868,6 +878,10 @@ namespace UnitNS
 
       movementRemaining -= takenMovement;
       SetTile(nxtTile);
+      if (Cons.IsHeat(weatherGenerator.currentWeather) && marchOnHeat.Occur()) {
+        // riot happens, stop moving
+        return false;
+      }
 
       bool continueMove = true;
       // discover nearby enemy

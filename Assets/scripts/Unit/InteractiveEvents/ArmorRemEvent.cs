@@ -1,6 +1,4 @@
-﻿using MonoNS;
-
-namespace UnitNS
+﻿namespace UnitNS
 {
   public class ArmorRemEvent
   {
@@ -11,10 +9,10 @@ namespace UnitNS
     }
 
     public void OnHeat() {
-      if (!unit.tile.waterBound && unit.IsOnField() && Cons.SlimChance()) {
+      if (!unit.tile.waterBound && unit.IsOnField() && Cons.TinyChance()) {
         // TODO: only affect player
         unit.hexMap.eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.Disarmor, unit,
-        null, DefReduce(), MoraleReduce()));
+        null, DefReduce(), Discontent()));
         unit.RemoveOnHeatListener(OnHeat);
         unit.hexMap.eventDialog.onDisarmorDecisionClick += OnDisamorDecisionClick;
       }
@@ -28,7 +26,7 @@ namespace UnitNS
       if (accepted) {
         unit.disarmorDefDebuf = DefReduce(); 
       } else {
-        unit.rf.morale -= MoraleReduce();
+        unit.Discontent(Discontent());
       }
     }
 
@@ -36,8 +34,8 @@ namespace UnitNS
       return (int)(unit.rf.def * 0.25f);
     } 
 
-    int MoraleReduce() {
-      return 10;
+    int Discontent() {
+      return 4;
     } 
 
     public void Destroy() {

@@ -4,6 +4,7 @@ using PathFind;
 using UnitNS;
 using MonoNS;
 using UnityEngine;
+using CourtNS;
 
 namespace MapTileNS
 {
@@ -19,12 +20,11 @@ namespace MapTileNS
     public const float HighGround = 0.312f;
     public Flood flood = null;
     public WildFire wildFire = null;
-    public LandSlide landSlide = null;
-    public HeatSickness heatSickness = null;
-    public Drowning drowning = null;
+    public Epidemic epidemic = null;
     public Poision poision = null;
     public bool waterBound = false;
     public bool burnable = false;
+    public bool village = false;
 
     public Tile(int q, int r, HexMap hexMap) : base(q, r, hexMap) { }
     public void PostCreation()
@@ -42,16 +42,17 @@ namespace MapTileNS
       if (terrian == TerrianType.Water) {
         poision = new Poision(this);
       }
-      if (field == FieldType.Wild) {
-        heatSickness = new HeatSickness(this);
-      }
-      if (terrian == TerrianType.Hill) {
-        landSlide = new LandSlide(this);
+      if (field == FieldType.Wild && (
+        Util.eq<Region>(hexMap.warRegion, Cons.huaiWest) ||
+        Util.eq<Region>(hexMap.warRegion, Cons.huaiNorth) ||
+        Util.eq<Region>(hexMap.warRegion, Cons.huaiSouth) ||
+        Util.eq<Region>(hexMap.warRegion, Cons.riverEast)
+      )) {
+        epidemic = new Epidemic(this);
       }
 
       foreach (Tile tile in neighbours) {
         if (tile.terrian == TerrianType.Water) {
-          drowning = new Drowning(this);
           waterBound = true;
           break;
         }
@@ -84,7 +85,7 @@ namespace MapTileNS
     {
       string prefix = "";
       if (field == FieldType.Wild) prefix = "Wild";
-      if (field == FieldType.Farm) prefix = "Farmed";
+      if (field == FieldType.Clearing) prefix = "Clearing";
       if (field == FieldType.Settlement) prefix = "Settelment On";
       if (field == FieldType.Schorched) prefix = "Schorched";
       if (field == FieldType.Burning) prefix = "Burning";
@@ -211,6 +212,9 @@ namespace MapTileNS
     public void SetFieldType(FieldType type)
     {
       field = type;
+      if (type == FieldType.Burning || type == FieldType.Flooding) {
+        village = false;
+      }
       if (type == FieldType.Burning) {
         burnable = false;
       }
@@ -343,7 +347,7 @@ namespace MapTileNS
     public int Work2BuildSettlement()
     {
       if ((terrian == TerrianType.Plain || terrian == TerrianType.Hill) &&
-        (field == FieldType.Wild || field == FieldType.Farm || field == FieldType.Flooded
+        (field == FieldType.Wild || field == FieldType.Clearing || field == FieldType.Flooded
          || field == FieldType.Schorched))
       {
         return Work2BuildCamp;

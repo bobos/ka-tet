@@ -77,11 +77,22 @@ namespace TextNS
       {"u_routing", "溃败中"},
       {"u_disbanded", "被歼灭"},
       {"u_standing", ""},
+      {"u_satisfied", @"士卒满意({0})"},
+      {"u_unsatisfied", @"士卒不满({0})"},
+      {"u_riot", @"士卒骚动{0}"},
 
       // region
-      {"r_riverRun", "河间地"},
-      {"r_middleEarth", "河南"},
-      {"r_mountainBeyond", "河外"},
+      {"r_riverRun", "河中"},
+      {"r_riverSouth", "河南"},
+      {"r_riverNorth", "河北"},
+      {"r_riverEast", "河东"},
+      {"r_riverWest", "河西"},
+      {"r_huaiWest", "淮西"},
+      {"r_huaiNorth", "淮北"},
+      {"r_huaiSouth", "淮南"},
+      {"r_middleEarth", "关中"},
+      {"r_farWest", "关外"},
+      {"r_farNorth", "漠北"},
 
 		//   legion names
       {"l_1", "第一"},
@@ -113,6 +124,7 @@ namespace TextNS
       {"g_zhangfei", "元行钦"},
       {"g_caocao", "朱温"},
       {"g_xuchu", "王彦章"},
+      {"g_machao", "夏鲁奇"},
 
       // party report
       {"pr_sloppyOnDrill", "疏于操练"},
@@ -151,7 +163,21 @@ namespace TextNS
       {"event_disarmor_title", "士卒抱怨"},
       {"event_disarmor", @"{0}将军，酷暑连日，将士终日顶盔贯甲日夜巡逻操练以致多人中暑晕厥，军中颇多不满，{1}将士恳请将军允许士卒平素只用着毡帽上身可免披铁甲以解暑热"},
       {"event_disarmor_approve_title", @"许!(部队防御-{0})"},
-      {"event_disarmor_disapprove_title", @"不许!(部队士气-{0})"},
+      {"event_disarmor_disapprove_title", @"不许!(士卒不满+{0})"},
+      {"event_riot_title", "部队哗变"},
+      {"event_riot", @"{0}将军所部{1}因军中积怨深厚，发生哗变，部队士气下降{2}！"},
+      {"event_generalExecuted_title", "死亡"},
+      {"event_generalExecuted", @"{0}将军被哗变士卒所杀！"},
+      {"event_newGeneral_title", "新帅上任"},
+      {"event_newGeneral", @"{0}将军任命为{1}新统帅"},
+      {"event_generalReturned_title", "回朝治罪"},
+      {"event_generalReturned", @"{0}将军因治军不力，已回朝治罪"},
+      {"event_generalResigned_title", "下野"},
+      {"event_generalResigned", @"{0}将军因治军不力，已被夺去官职下野"},
+      {"event_generalKilled_title", "战死"},
+      {"event_generalKilled", @"{0}将军战死于军中"},
+      {"event_unitRetreat_title", "撤兵"},
+      {"event_unitRetreat", @"{0}撤出战场"},
       };
     }
   }

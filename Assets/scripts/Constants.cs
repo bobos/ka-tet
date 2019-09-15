@@ -126,8 +126,16 @@ public class Cons {
 
   //* regions */
   public static Region riverRun = new RiverRun();
+  public static Region riverSouth = new RiverSouth();
+  public static Region riverNorth = new RiverNorth();
+  public static Region riverWest = new RiverWest();
+  public static Region riverEast = new RiverEast();
   public static Region middleEarth = new MiddleEarth();
-  public static Region moutainBeyond = new MountainBeyond();
+  public static Region farWest = new FarWest();
+  public static Region farNorth = new FarNorth();
+  public static Region huaiWest = new HuaiWest();
+  public static Region huaiNorth = new HuaiNorth();
+  public static Region huaiSouth = new HuaiSouth();
 
   //* factions */
   public static Faction Jin = new Jin(true, 2000000);

@@ -3,6 +3,7 @@ using UnitNS;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using CourtNS;
 
 namespace MonoNS
 {
@@ -46,12 +47,17 @@ namespace MonoNS
     public Sprite CampLost;
     public Sprite Defeated;
     public Sprite Disarmor;
+    public Sprite Resigned;
+    public Sprite GeneralExecuted;
+    public Sprite GeneralSwapped;
+    public Sprite GeneralKilled;
+    public Sprite Riot;
+    public Sprite Retreat;
 
     public delegate void DialogEvent();
     public event DialogEvent eventDialogOn;
     public event DialogEvent eventDialogOff;
     public enum EventName {
-      LandSlide,
       Flood,
       WildFire,
       WildFireDestroyUnit,
@@ -74,6 +80,13 @@ namespace MonoNS
       InsufficientLabor,
       InsufficientSupplyLabor,
       Disarmor,
+      Riot,
+      GeneralKilledInBattle,
+      GeneralReturned,
+      GeneralResigned,
+      NewGeneral,
+      GeneralExecuted,
+      Retreat,
       Null
     }
 
@@ -135,6 +148,7 @@ namespace MonoNS
       int argu2 = dialogEvent.wounded;
       int argu3 = dialogEvent.killed;
       int argu4 = dialogEvent.killedLabor;
+      General general = dialogEvent.general;
       if (name == EventName.Null) return; 
       isShowing = true;
       ToggleConfirm();
@@ -226,6 +240,55 @@ namespace MonoNS
         image.sprite = Defeated;
       }
 
+      if (name == EventName.Riot) {
+        title.text = textLib.get("event_riot_title");
+        description.text = System.String.Format(textLib.get("event_riot"),
+          unit.GeneralName(), unit.Name(), argu1);
+        image.sprite = Riot;
+      }
+
+      if (name == EventName.GeneralExecuted) {
+        title.text = textLib.get("event_generalExecuted_title");
+        description.text = System.String.Format(textLib.get("event_generalExecuted"),
+          general.Name());
+        image.sprite = GeneralExecuted;
+      }
+
+      if (name == EventName.NewGeneral) {
+        title.text = textLib.get("event_newGeneral_title");
+        description.text = System.String.Format(textLib.get("event_newGeneral"),
+          unit.GeneralName(), unit.Name());
+        image.sprite = GeneralSwapped;
+      }
+
+      if (name == EventName.GeneralReturned) {
+        title.text = textLib.get("event_generalReturned_title");
+        description.text = System.String.Format(textLib.get("event_generalReturned"),
+          general.Name());
+        image.sprite = GeneralSwapped;
+      }
+
+      if (name == EventName.GeneralResigned) {
+        title.text = textLib.get("event_generalResigned_title");
+        description.text = System.String.Format(textLib.get("event_generalResigned"),
+          general.Name());
+        image.sprite = Resigned;
+      }
+
+      if (name == EventName.GeneralKilledInBattle) {
+        title.text = textLib.get("event_generalKilled_title");
+        description.text = System.String.Format(textLib.get("event_generalKilled"),
+          general.Name());
+        image.sprite = drown;
+      }
+
+      if (name == EventName.Retreat) {
+        title.text = textLib.get("event_unitRetreat_title");
+        description.text = System.String.Format(textLib.get("event_unitRetreat"),
+          unit.Name());
+        image.sprite = Retreat;
+      }
+
       if (name == EventName.Disarmor) {
         ToggleDecision();
         title.text = textLib.get("event_disarmor_title");
@@ -261,9 +324,10 @@ namespace MonoNS
     public int killedLabor = 0;
     public int supply = 0; 
     public Settlement settlement1 = null;
+    public General general = null;
     public Event(EventDialog.EventName name, Unit unit, Settlement settlement,
       int moraleReduce = 0, int wounded = 0, int killed = 0, int killedLabor = 0, int supply = 0,
-      Settlement settlement1 = null) {
+      Settlement settlement1 = null, General general= null) {
         this.name = name;
         this.unit = unit;
         this.settlement = settlement;
@@ -273,6 +337,7 @@ namespace MonoNS
         this.killedLabor = killedLabor;
         this.supply = supply;
         this.settlement1 = settlement1;
+        this.general = general;
     }
   }
 }

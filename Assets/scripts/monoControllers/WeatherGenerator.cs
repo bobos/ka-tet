@@ -120,8 +120,6 @@ namespace MonoNS
         {
           return Cons.rain;
         } else if (luckNum < 7) {
-          return Cons.heavyRain;
-        } else if (luckNum < 8) {
           return Cons.heat;
         }
         else
@@ -155,11 +153,11 @@ namespace MonoNS
       }
       else if (Cons.IsHeavyRain(weather))
       {
-        return Util.Rand(1, 4);
+        return Util.Rand(1, 3);
       }
       else if (Cons.IsHeat(weather))
       {
-        return Util.Rand(3, 8);
+        return Util.Rand(1, 4);
       }
       else if (Cons.IsDry(weather))
       {

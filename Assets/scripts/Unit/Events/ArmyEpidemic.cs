@@ -1,6 +1,6 @@
 ﻿namespace UnitNS
 {
-  public class HeatSick
+  public class ArmyEpidemic
   {
     float __illDisableRate = 0f;
     float disableRatio
@@ -27,7 +27,7 @@
       }
     }
     Unit unit;
-    public HeatSick(Unit unit) {
+    public ArmyEpidemic(Unit unit) {
       this.unit = unit;
     }
 

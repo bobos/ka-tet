@@ -1,8 +1,8 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using TextNS;
 using FieldNS;
 using MapTileNS;
+using MonoNS;
 
 namespace CourtNS {
   public enum FieldEvent {
@@ -17,6 +17,14 @@ namespace CourtNS {
     Destroyed,
     Retreated,
     NoAction
+  }
+
+  public enum GeneralStat {
+    OnField,
+    Dead,
+    OnCourtTask,
+    Idle,
+    Rest
   }
 
   public class General {
@@ -35,7 +43,10 @@ namespace CourtNS {
     public FieldEvent[] fieldRecords;
     public LinkedList<General> nemesis = new LinkedList<General>();
     public bool knowSoldiers = true;
+    public GeneralStat stat = GeneralStat.Idle;
 
+    HexMap hexMap;
+    WarParty warParty;
     string name;
     string biography;
     TextLib txtLib = Cons.GetTextLib();
@@ -58,10 +69,10 @@ namespace CourtNS {
     }
 
     // At Court Actions
-    public void Assign(Troop troop) {
+    public void Assign(HexMap hexMap, Troop troop) {
       ResetFieldRecords();
+      this.hexMap = hexMap;
       commandUnit = troop;
-      if (troop.general != null) troop.general.commandUnit = null;
       troop.general = this;
     }
 
@@ -75,52 +86,104 @@ namespace CourtNS {
     }
 
     public void JoinFaction(Faction faction, Party party) {
+      faction.AddGeneral(this);
       this.faction = faction;
-      if (this.party != null) {
-        this.party.generals.Remove(this);
-        if (commandUnit != null) {
-          commandUnit.general = null;
-        }
-        commandUnit = null;
-      }
       JoinParty(party);
     }
 
-    public bool EnterCampaign(WarParty wp, Tile deploymentTile, int supply, int labor = 0) {
+    public void LeaveFaction() {
+      this.faction.RemoveGeneral(this);
+      this.faction = null;
+      if (this.party != null) {
+        this.party.generals.Remove(this);
+      }
+      stat = GeneralStat.Idle;
+    }
+
+    public bool EnterCampaign(HexMap hexMap, WarParty wp, Tile deploymentTile, int supply, int labor = 0) {
+      this.hexMap = hexMap;
+      warParty = wp;
       if (commandUnit == null) return false;
       bool ready = commandUnit.EnterCampaign(deploymentTile, supply, labor);
       if (!ready) return ready;
+      stat = GeneralStat.OnField;
       wp.JoinCampaign(this);
       return true;
     }
 
-    public void LeaveCampaign() {
-      if (onGeneralLeaveCampaign != null) onGeneralLeaveCampaign(this);
+    public void TroopRetreat() {
+      ReportFieldEvent(FieldEvent.Retreated);
+      HandOutTroop().LeaveCampaign();
+      LeaveCampaign();
     }
 
     public void TroopDestroyed() {
-      // TODO: chance to get killed
+      ReportFieldEvent(FieldEvent.Destroyed);
+      HandOutTroop().Destroy();
       LeaveCampaign();
-      commandUnit = null;
+      if (Cons.FairChance()) {
+        // Killed in battle
+        hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.GeneralKilledInBattle, null, null, 0, 0, 0, 0, 0, null, this));
+        Die();
+      }
     }
 
-    // On Field Actions and Events
-    public static void ReplaceOnField(General oldGen, General newGen, FieldParty targetParty) {
-      newGen.AssignOnField(oldGen.commandUnit);
-      oldGen.RemoveOnField();
-      targetParty.GeneralEnterCampaign(newGen);
+    public void GeneralKilledOnField() {
+      hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.GeneralKilledInBattle, null, null, 0, 0, 0, 0, 0, null, this));
+      Troop troop = HandOutTroop();
+      LeaveCampaign();
+      Die();
+      AssignOnField(troop);
     }
 
-    public void AssignOnField(Troop troop) {
-      ResetFieldRecords();
-      commandUnit = troop;
-      commandUnit.general = this;
+    public void UnitRiot() {
+      int rand = Util.Rand(1, 10);
+      party.influence -= 100;
+      AssignOnField(HandOutTroop());
+      if (rand < 6) {
+        // Returned
+        LeaveCampaign();
+        hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.GeneralReturned, null, null, 0, 0, 0, 0, 0, null, this));
+      } else if (rand < 9) {
+        // Resigned
+        LeaveFaction();
+        hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.GeneralResigned, null, null, 0, 0, 0, 0, 0, null, this));
+      } else {
+        // Executed
+        Die();
+        hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.GeneralExecuted, null, null, 0, 0, 0, 0, 0, null, this));
+      }
     }
 
-    public void RemoveOnField() {
-      ResetFieldRecords();
-      commandUnit = null;
+    void Die() {
+      LeaveFaction();
+      stat = GeneralStat.Dead;
+    }
+
+    void LeaveCampaign() {
       if (onGeneralLeaveCampaign != null) onGeneralLeaveCampaign(this);
+      stat = GeneralStat.Rest;
+    }
+
+    void AssignOnField(Troop troop) {
+      General newGen = faction.GetAvailableGeneral();
+      if (newGen == null) {
+        troop.onFieldUnit.Retreat();
+        return;
+      }
+      newGen.Assign(hexMap, troop);
+      newGen.stat = GeneralStat.OnField;
+      hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.NewGeneral, troop.onFieldUnit, null));
+      warParty.Join(newGen);
+    }
+
+    Troop HandOutTroop() {
+      Troop troop = commandUnit;
+      if (troop != null) {
+        troop.general = null;
+      }
+      commandUnit = null;
+      return troop;
     }
 
     public List<FieldEvent> GetFieldRecords() {

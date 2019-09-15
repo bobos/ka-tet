@@ -3,6 +3,7 @@ using UnityEngine;
 using UnitNS;
 using MapTileNS;
 using FieldNS;
+using CourtNS;
 
 namespace MonoNS
 {
@@ -27,6 +28,7 @@ namespace MonoNS
     public UnitActionBroker actionBroker;
     public InputField inputField;
     public EventDialog eventDialog;
+    public Region warRegion;
 
     // ==============================================================
     // ================= Interfaces required from hex map plugin ====
@@ -317,17 +319,23 @@ namespace MonoNS
       else if (elevation >= HeightHill)
       {
         prefab = HighGroundPrefab;
-        fieldType = Cons.MostLikely() ? FieldType.Wild : FieldType.Farm;
+        fieldType = Cons.MostLikely() ? FieldType.Wild : FieldType.Clearing;
         tile.SetTerrianType(TerrianType.Hill);
         if(fieldType == FieldType.Wild && Cons.SlimChance()) {
           tile.burnable = true;
+        }
+        if(fieldType == FieldType.Clearing && Cons.SlimChance()) {
+          tile.village = true;
         }
       }
       else if (elevation >= HeightFlat)
       {
         prefab = HexPrefab;
         tile.SetTerrianType(TerrianType.Plain);
-        fieldType = Cons.MostLikely() ? FieldType.Farm : FieldType.Wild;
+        fieldType = Cons.MostLikely() ? FieldType.Clearing : FieldType.Wild;
+        if(fieldType == FieldType.Clearing && Cons.SlimChance()) {
+          tile.village = true;
+        }
       }
       else
       {
@@ -372,7 +380,7 @@ namespace MonoNS
       {
         mat = MatMountain;
       }
-      else if (tile.field == FieldType.Farm)
+      else if (tile.field == FieldType.Clearing)
       {
         mat = MatGrassland;
       }
@@ -411,6 +419,9 @@ namespace MonoNS
         if (settlementMgr.IsCampable(tile)) {
           txt = txt + " Camp\n";
         }
+      }
+      if (tile.village) {
+        txt = txt + " Village";
       }
       Color fontColor;
       if (tile.field == FieldType.Burning || tile.field == FieldType.Schorched) {

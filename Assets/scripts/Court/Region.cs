@@ -40,6 +40,7 @@ namespace CourtNS
     }
   }
 
+  // HeZhong
   public class RiverRun : Region
   {
     private string name;
@@ -111,6 +112,7 @@ namespace CourtNS
     }
   }
 
+  // He Xi
   public class RiverWest : Region
   {
     private string name;
@@ -176,6 +178,7 @@ namespace CourtNS
 
   }
 
+  // He Dong
   public class RiverEast : Region
   {
     private string name;
@@ -237,6 +240,7 @@ namespace CourtNS
 
   }
 
+  // He Nan
   public class RiverSouth : Region
   {
     private string name;
@@ -298,12 +302,13 @@ namespace CourtNS
 
   }
 
-  public class RiverBeyond : Region
+  // He Bei
+  public class RiverNorth : Region
   {
     private string name;
     private string description;
 
-    public RiverBeyond()
+    public RiverNorth()
     {
       CavNameSeq = new Dictionary<string, int>() {
         {"l_longwei4", 0},
@@ -313,8 +318,8 @@ namespace CourtNS
         {"l_huben4", 0},
         {"l_qingshen4", 0}
       };
-      name = textLib.get("r_riverBeyond");
-      description = textLib.get("r_riverBeyond_d");
+      name = textLib.get("r_riverNorth");
+      description = textLib.get("r_riverNorth_d");
     }
 
     public override string Name()
@@ -367,12 +372,13 @@ namespace CourtNS
 
   }
 
-  public class MiddleEarth : Region
+  // Mo Bei
+  public class FarNorth : Region
   {
     private string name;
     private string description;
 
-    public MiddleEarth()
+    public FarNorth()
     {
       CavNameSeq = new Dictionary<string, int>() {
         {"l_longwei5", 0},
@@ -382,8 +388,8 @@ namespace CourtNS
         {"l_huben5", 0},
         {"l_qingshen5", 0}
       };
-      name = textLib.get("r_middleEarth");
-      description = textLib.get("r_middleEarth_d");
+      name = textLib.get("r_farNorth");
+      description = textLib.get("r_farNorth_d");
     }
 
     public override string Name()
@@ -428,12 +434,13 @@ namespace CourtNS
 
   }
 
-  public class MountainBeyond : Region
+  // Guan Wai
+  public class FarWest : Region
   {
     private string name;
     private string description;
 
-    public MountainBeyond()
+    public FarWest()
     {
       CavNameSeq = new Dictionary<string, int>() {
         {"l_longwei6", 0},
@@ -443,8 +450,256 @@ namespace CourtNS
         {"l_huben6", 0},
         {"l_qingshen6", 0}
       };
-      name = textLib.get("r_mountainBeyond");
-      description = textLib.get("r_mountainBeyond_d");
+      name = textLib.get("r_farWest");
+      description = textLib.get("r_farWest_d");
+    }
+
+    public override string Name()
+    {
+      return name;
+    }
+
+    public override string Description()
+    {
+      return description;
+    }
+
+    public override float AtkBuf(Type _unitType)
+    {
+      return -0.2f;
+    }
+
+    public override float DefBuf(Type _unitType)
+    {
+      return -0.1f;
+    }
+
+    public override float MovBuf(Type _unitType)
+    {
+      return -0.2f;
+    }
+
+    public override int MoraleBuf()
+    {
+      return 0;
+    }
+
+    public override int RetreatThreshold()
+    {
+      return 45;
+    }
+
+    public override int ExtraSupplySlot()
+    {
+      return 1;
+    }
+
+  }
+
+  // Guan Zhong
+  public class MiddleEarth : Region
+  {
+    private string name;
+    private string description;
+
+    public MiddleEarth()
+    {
+      CavNameSeq = new Dictionary<string, int>() {
+        {"l_longwei6", 0},
+        {"l_longshen6", 0}
+      };
+      InfNameSeq = new Dictionary<string, int>() {
+        {"l_huben6", 0},
+        {"l_qingshen6", 0}
+      };
+      name = textLib.get("r_middleEarth");
+      description = textLib.get("r_middleEarth_d");
+    }
+
+    public override string Name()
+    {
+      return name;
+    }
+
+    public override string Description()
+    {
+      return description;
+    }
+
+    public override float AtkBuf(Type _unitType)
+    {
+      return -0.2f;
+    }
+
+    public override float DefBuf(Type _unitType)
+    {
+      return -0.1f;
+    }
+
+    public override float MovBuf(Type _unitType)
+    {
+      return -0.2f;
+    }
+
+    public override int MoraleBuf()
+    {
+      return 0;
+    }
+
+    public override int RetreatThreshold()
+    {
+      return 45;
+    }
+
+    public override int ExtraSupplySlot()
+    {
+      return 1;
+    }
+
+  }
+
+  // Huai Xi 
+  public class HuaiWest : Region
+  {
+    private string name;
+    private string description;
+
+    public HuaiWest()
+    {
+      CavNameSeq = new Dictionary<string, int>() {
+        {"l_longwei6", 0},
+        {"l_longshen6", 0}
+      };
+      InfNameSeq = new Dictionary<string, int>() {
+        {"l_huben6", 0},
+        {"l_qingshen6", 0}
+      };
+      name = textLib.get("r_huaiWest");
+      description = textLib.get("r_huaiWest_d");
+    }
+
+    public override string Name()
+    {
+      return name;
+    }
+
+    public override string Description()
+    {
+      return description;
+    }
+
+    public override float AtkBuf(Type _unitType)
+    {
+      return -0.2f;
+    }
+
+    public override float DefBuf(Type _unitType)
+    {
+      return -0.1f;
+    }
+
+    public override float MovBuf(Type _unitType)
+    {
+      return -0.2f;
+    }
+
+    public override int MoraleBuf()
+    {
+      return 0;
+    }
+
+    public override int RetreatThreshold()
+    {
+      return 45;
+    }
+
+    public override int ExtraSupplySlot()
+    {
+      return 1;
+    }
+
+  }
+
+  // Huai Bei 
+  public class HuaiNorth : Region
+  {
+    private string name;
+    private string description;
+
+    public HuaiNorth()
+    {
+      CavNameSeq = new Dictionary<string, int>() {
+        {"l_longwei6", 0},
+        {"l_longshen6", 0}
+      };
+      InfNameSeq = new Dictionary<string, int>() {
+        {"l_huben6", 0},
+        {"l_qingshen6", 0}
+      };
+      name = textLib.get("r_huaiNorth");
+      description = textLib.get("r_huaiNorth_d");
+    }
+
+    public override string Name()
+    {
+      return name;
+    }
+
+    public override string Description()
+    {
+      return description;
+    }
+
+    public override float AtkBuf(Type _unitType)
+    {
+      return -0.2f;
+    }
+
+    public override float DefBuf(Type _unitType)
+    {
+      return -0.1f;
+    }
+
+    public override float MovBuf(Type _unitType)
+    {
+      return -0.2f;
+    }
+
+    public override int MoraleBuf()
+    {
+      return 0;
+    }
+
+    public override int RetreatThreshold()
+    {
+      return 45;
+    }
+
+    public override int ExtraSupplySlot()
+    {
+      return 1;
+    }
+
+  }
+
+  // Huai Nan
+  public class HuaiSouth : Region
+  {
+    private string name;
+    private string description;
+
+    public HuaiSouth()
+    {
+      CavNameSeq = new Dictionary<string, int>() {
+        {"l_longwei6", 0},
+        {"l_longshen6", 0}
+      };
+      InfNameSeq = new Dictionary<string, int>() {
+        {"l_huben6", 0},
+        {"l_qingshen6", 0}
+      };
+      name = textLib.get("r_huaiSouth");
+      description = textLib.get("r_huaiSouth_d");
     }
 
     public override string Name()

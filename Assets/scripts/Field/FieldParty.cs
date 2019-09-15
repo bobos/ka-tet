@@ -16,7 +16,7 @@ namespace FieldNS
       this.reports = reports;
     }
 
-    public void GeneralEnterCampaign(General general)
+    public void TheirGeneralEnterCampaign(General general)
     {
       generals.Add(general);
       general.onGeneralLeaveCampaign += OnGeneralLeaveCampaign;
