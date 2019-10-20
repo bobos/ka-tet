@@ -65,7 +65,6 @@ public abstract class Settlement
   SettlementMgr settlementMgr;
   Supply supply;
 
-
   public int buildTurns {
     get {
       if (buildWork <= 0) return 0;
@@ -79,7 +78,7 @@ public abstract class Settlement
   }
 
   public Tile[] GetVisibleArea() {
-      return baseTile.GetNeighboursWithinRange<Tile>(Visibility, (Tile _tile) => true);
+    return baseTile.GetNeighboursWithinRange<Tile>(Visibility, (Tile _tile) => true);
   }
 
   public class SupplySuggestion {
@@ -218,41 +217,16 @@ public abstract class Settlement
     }
   }
 
-  // Call Replenish before reduce
-  public void ReplenishSupply(int supply)
-  {
-    supplyDeposit += supply;
-  }
-
-  public bool InRangeUnitConsumeSupply(Unit unit)
-  {
-    int neededPerTurn = unit.SupplyNeededPerTurn();
-    if (neededPerTurn <= supplyDeposit)
-    {
-      supplyDeposit -= neededPerTurn;
-      return true;
-    }
-
-    if (unit.MinSupplyNeeded() <= supplyDeposit)
-    {
-      supplyDeposit = 0;
-      return true;
-    }
-
-    return false;
-  }
-
   public bool IsNormal() {
     return state == State.normal;
   }
 
-  public int MinSupplyNeeded(int labor = 0) {
-    return (int)((civillian + (labor == 0 ? this.labor : labor)) / 10) * hexMap.FoodPerTenMenPerTurn(owner.isAI);
-  }
-
-  public int SupplyLastingTurns() {
-    int remaining = supplyDeposit % MinSupplyNeeded();
-    return (supplyDeposit - remaining) / MinSupplyNeeded();
+  public int MinSupplyNeeded() {
+    int supplyNeeded = 0;
+    foreach (Unit unit in garrison) {
+      supplyNeeded += unit.MinSupplyNeeded();
+    }
+    return supplyNeeded;
   }
 
   public bool IsFunctional() {
@@ -341,35 +315,14 @@ public abstract class Settlement
       return;
     }
 
-    int residents = civillian + labor; 
     if (supplyDeposit == 0)
     {
-      if (residents == 0) return;
-      if (residents > 500) defensePrep -= DefensePrepDeductRate;
-      int death = (int)(civillian * Unit.Starving2DeathRate);
-      deathToll += death;
-      civillian -= death;
-      death = (int)(labor * Unit.Starving2DeathRate);
-      deathToll += death;
-      labor -= death;
-      return;
-    }
-    int sum = MinSupplyNeeded();
-    if (supplyDeposit < sum)
-    {
-      if (residents > 500) defensePrep -= DefensePrepDeductRate / 2;
-      supplyDeposit = 0;
+      defensePrep -= DefensePrepDeductRate;
       return;
     }
 
-    supplyDeposit -= sum;
     // recovering defense preparation
     defensePrep += DefensePrepDeductRate / 2;
-
-    if (supplyDeposit == 0)
-    {
-      return;
-    }
 
     foreach (Unit unit in garrison)
     {
@@ -380,19 +333,24 @@ public abstract class Settlement
     Unit[] nearbyUnits = GetReachableUnits();
     foreach (Unit unit in nearbyUnits)
     {
-      if (supplyDeposit == 0 || labor == 0) {
+      if (supplyDeposit == 0) {
         break;
       }
 
       int neededPerTurn = unit.SupplyNeededPerTurn();
       int neededLabor = CalcNeededLabor(neededPerTurn);
-      int supplyCanProvide = CalcSupplyCanProvide(labor);
-      supplyCanProvide = supplyCanProvide > supplyDeposit ? supplyDeposit : supplyCanProvide;
-
-      if (neededPerTurn > supplyDeposit || neededLabor > labor) {
-        MsgBox.ShowMsg(unit.GeneralName() + " failed to retrieve supply from camp due to insufficient labor or supply");
+      if (!unit.IsCavalry() && unit.labor < neededLabor) {
+        MsgBox.ShowMsg(unit.GeneralName() + "所部仅有" + unit.labor + "民夫可用，而从临近补给点转运一日补给需要至少" + neededLabor + "名民夫");
         continue;
       }
+
+      if (neededPerTurn > supplyDeposit) {
+        MsgBox.ShowMsg(name + "仅存" + supplyDeposit + "石粮草，无法满足" + unit.GeneralName() + "所部" + neededPerTurn + "石的补给请求");
+        continue;
+      }
+
+      /*
+      disable nearby supply route interception
 
       Unit ambusher = settlementMgr.IsSupplyRouteAmbushed(settlementMgr.GetRoute(this, unit.tile), unit.IsAI());
       if (ambusher != null) {
@@ -400,6 +358,7 @@ public abstract class Settlement
         SupplyIntercepted(ambusher, null, neededPerTurn, neededLabor, unit);
         continue;
       }
+      */
 
       unit.consumed = true;
       supplyDeposit -= neededPerTurn;
@@ -420,8 +379,7 @@ public abstract class Settlement
   }
 
   public int LaborCanTakeInForOneTurn() {
-    int maxLabor = (int)(supplyDeposit * 10 / hexMap.FoodPerTenMenPerTurn(owner.isAI));
-    int canTake = maxLabor - labor;
+    int canTake = MaxPopulation() - labor;
     return canTake > 0 ? canTake : 0;
   }
 
@@ -437,9 +395,8 @@ public abstract class Settlement
       int laborPerTurn = CalcNeededLabor(supplyPerTurn);
       int delta = labor - laborPerTurn;
       int laborNeeded = delta > 0 ? 0 : -delta;
-      int remaining = supplyDeposit - MinSupplyNeeded(labor + laborNeeded);
 
-      delta = remaining - supplyPerTurn;
+      delta = supplyDeposit - supplyPerTurn;
       int supplyNeeded = delta > 0 ? 0 : -delta;  
       if (supplyNeeded != 0 || laborNeeded != 0) {
         suggestion.Add(new SupplySuggestion(scale, laborNeeded, supplyNeeded));
@@ -449,27 +406,33 @@ public abstract class Settlement
     return suggestion.ToArray();
   } 
 
-  public Settlement[] GetReachableSettlements(bool link = false)
+  public Settlement[] GetReachableSettlements()
   {
     if (!IsFunctional()) return new Settlement[0];
     HashSet<Settlement> settlements = new HashSet<Settlement>();
+    bool isAI = owner.isAI;
     foreach(Tile tile in baseTile.linkedTilesForCamp) {
-      if (tile.settlement != null && tile.settlement.owner.isAI == owner.isAI && tile.settlement.IsFunctional()) {
-          Tile[] path = settlementMgr.GetRoute(this, tile);
-          if (path.Length > 0) {
-            settlements.Add(tile.settlement);
-            if (link) {
-              supply.RenderSupplyLine(path);
-            }
-          }
+      if (tile.settlement != null && tile.settlement.owner.isAI == owner.isAI
+        && tile.settlement.IsFunctional() && baseTile.roads.ContainsKey(tile)) {
+        Tile[] path = baseTile.roads[tile];
+        bool blocked = false;
+        foreach(Tile t in path) {
+          if (!t.Passable(isAI)) {
+            blocked = true;
+            break;
+           }
+        }
+        if (!blocked) {
+          settlements.Add(tile.settlement);
         }
       }
-      Settlement[] ret = new Settlement[settlements.Count];
-      settlements.CopyTo(ret);
-      return ret;
+    }
+    Settlement[] ret = new Settlement[settlements.Count];
+    settlements.CopyTo(ret);
+    return ret;
   }
 
-  public Unit[] GetReachableUnits(bool link = false) {
+  public Unit[] GetReachableUnits() {
     if (!IsFunctional()) return new Unit[0];
     HashSet<Unit> all = owner.GetUnits();
     List<Unit> units = new List<Unit>();
@@ -478,9 +441,6 @@ public abstract class Settlement
       if (unit.IsCamping()) continue;
       if (tiles.Contains(unit.tile)) {
         units.Add(unit);
-        if (link) {
-          supply.RenderSupplyLine(settlementMgr.GetRoute(this, unit.tile));
-        }
       }
     }
 
@@ -493,11 +453,16 @@ public abstract class Settlement
     return units.ToArray();
   }
 
-  public virtual int SupplyCanTakeIn() {
-    return int.MaxValue;
+  public int SupplyCanTakeIn() {
+    return MaxSupplyDeposit() - supplyDeposit;
   }
 
   public virtual int MaxSupplyDeposit() {
+    return int.MaxValue;
+  }
+
+  // TODO: set population for different level of settlement
+  public virtual int MaxPopulation() {
     return int.MaxValue;
   }
 }
@@ -555,16 +520,7 @@ public class Camp : Settlement
   }
 
   public override int MaxSupplyDeposit() {
-    int supplyTroop = MaxTroopSupply();
-    int extraForLabor = (int)(CalcNeededLabor(supplyTroop) / 10) * SupportTurns * hexMap.FoodPerTenMenPerTurn(owner.isAI);
-    return supplyTroop + extraForLabor;
-  }
-
-  public override int SupplyCanTakeIn() {
-    return MaxSupplyDeposit() - supplyDeposit;
-  }
-
-  private int MaxTroopSupply() {
     return (int)((Infantry.MaxTroopNum * 5 * SupportTurns) / 10 ) * hexMap.FoodPerTenMenPerTurn(owner.isAI);
   }
+
 }

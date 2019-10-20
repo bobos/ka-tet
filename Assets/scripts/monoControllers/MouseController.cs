@@ -604,7 +604,7 @@ namespace MonoNS
         }
         string suggestions = "MAx Labor take in for last one turn " + transferedSettlement.LaborCanTakeInForOneTurn() + "\n";
         if (transferedSettlement.MinSupplyNeeded() > 0) {
-          suggestions += "need " + transferedSettlement.MinSupplyNeeded() + " to support residents\n";
+          suggestions += "need " + transferedSettlement.MinSupplyNeeded() + " to support garrison\n";
         }
         foreach(Settlement.SupplySuggestion sug in transferedSettlement.GetSuggestion()) {
           suggestions += "to support " + sug.supportTroop + " infantry per turn, need labor "

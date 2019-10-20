@@ -10,8 +10,8 @@ namespace  UnitNS
     public const float DefaultMovementModifier = 1.4f;
     public const float MovementCostModifierOnHill = 1.2f;
     public const float MovementCostModifierOnPlain = 0.8f;
-    public const int MinTroopNum = 300;
-    public const int MaxTroopNum = 1000;
+    public const int MinTroopNum = 200;
+    public const int MaxTroopNum = 1500;
     public const int ExhaustLine = 10;
     public const float L1FireBuff = 0.25f;
     public const float L2FireBuff = 0.35f;
@@ -45,7 +45,7 @@ namespace  UnitNS
 
     protected override int GetBaseSupplySlots()
     {
-      return BaseSlots + (Concealable() ? 5 : 0);
+      return BaseSlots + (Concealable() ? 3 : 0);
     }
 
     protected override Unit Clone()

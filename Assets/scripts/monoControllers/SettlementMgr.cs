@@ -42,6 +42,20 @@ namespace MonoNS
       return campableTiles.Contains(tile);
     } 
 
+    // TODO: just for tmp test
+    public void BuildRoad(Tile from, Tile to) {
+      List<Tile> path = new List<Tile>(); 
+      foreach(Tile tile in ghostUnit.FindPath(from, to, true)) {
+        if (!Util.eq<Tile>(tile, from) && !Util.eq<Tile>(tile, to)) {
+          tile.BuildRoad();
+          path.Add(tile);
+        }
+      }
+      Tile[] road = path.ToArray();
+      from.roads[to] = road;
+      to.roads[from] = road;
+    }
+
     class DistJob {
       public Settlement from;
       public Settlement to;
@@ -93,11 +107,11 @@ namespace MonoNS
           continue;
         }
         // ambush supply caravans
-        Tile[] route = PickASupplyRoute(job.from, job.to);
-        if (route.Length == 0) {
+        if(!job.from.GetReachableSettlements().Contains(job.to)) {
           hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.SupplyRouteBlocked, null, job.from, 0, 0, 0, 0, 0, job.to));
           continue;
         }
+        Tile[] route = job.from.baseTile.roads[job.to.baseTile];
         Unit ambusher = IsSupplyRouteAmbushed(route, units.First().IsAI());
         if (ambusher != null) {
           // There is enemy unit ambushed on the supply route
@@ -140,20 +154,6 @@ namespace MonoNS
 
     public void OnBtnClick(ActionController.actionName name)
     {
-      if (name == ActionController.actionName.SHOWMINE || name == ActionController.actionName.SHOWENEMY)
-      {
-        if (hexMap.lineCache.Count > 0)
-        {
-          hexMap.CleanLines();
-        }
-        else
-        {
-          WarParty party = name == ActionController.actionName.SHOWMINE ? hexMap.GetPlayerParty() : hexMap.GetAIParty();
-          List<Settlement> settlements = party.attackside ? attackerRoots : defenderRoots;
-          ShowSupplyNetwork(settlements);
-        }
-      }
-
       if (name == ActionController.actionName.DECAMP)
       {
         Settlement settlement = mouseController.selectedSettlement;
@@ -267,27 +267,6 @@ namespace MonoNS
       camp.Destroy(type);
     }
 
-    public void ShowSupplyNetwork(List<Settlement> settlements) {
-      FoW.Get().Fog();
-      foreach(Settlement s in settlements) {
-        s.GetReachableSettlements(true);
-        s.GetReachableUnits(true);
-      }
-    }
-
-    public Tile[] PickASupplyRoute(Settlement source, Settlement target) {
-      if (Cons.FiftyFifty()) {
-        return GetRoute(source, target.baseTile);
-      }
-      return GetRoute(target, source.baseTile);
-    }
-
-    public Tile[] GetRoute(Settlement source, Tile target) {
-      SetGhostOwner(source);
-      ghostUnit.movementRemaining = GetGhostUnitRangeForSettlementLink();
-      return ghostUnit.FindPath(source.baseTile, target, true);
-    }
-
     public void GetVisibleArea(bool attackSide, HashSet<Tile> tiles) {
       foreach(Settlement settlement in attackSide ? attackerRoots : defenderRoots) {
         foreach(Tile tile in settlement.GetVisibleArea()) {
@@ -299,11 +278,6 @@ namespace MonoNS
     int GetGhostUnitRangeForSettlementSupply()
     {
       return (int)(ghostUnit.GetFullMovement() * 2);
-    }
-
-    int GetGhostUnitRangeForSettlementLink()
-    {
-      return (int)(ghostUnit.GetFullMovement() * 10000);
     }
 
     void SetGhostOwner(Settlement settlement) {

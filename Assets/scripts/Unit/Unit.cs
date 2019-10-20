@@ -31,8 +31,8 @@ namespace UnitNS
 
     public const int L1Visibility = 5; // under 4000 
     public const int L2Visibility = 8; // > 4000
-    public const int L1DiscoverRange = 1; // under 4000
-    public const int L2DiscoverRange = 2; // > 4000
+    public const int L1DiscoverRange = 1; // under 2000
+    public const int L2DiscoverRange = 3; // > 4000
     public const int ConcealCoolDownIn = 3;
 
     private TextNS.TextLib txtLib = Cons.GetTextLib();
@@ -331,7 +331,7 @@ namespace UnitNS
     }
 
     public Tile[] GetScoutArea() {
-      return tile.GetNeighboursWithinRange<Tile>(rf.soldiers > 4000 ? L2DiscoverRange : L1DiscoverRange,
+      return tile.GetNeighboursWithinRange<Tile>(rf.soldiers > 2000 ? L2DiscoverRange : L1DiscoverRange,
                                                  (Tile _tile) => true);
     }
 
@@ -660,7 +660,7 @@ namespace UnitNS
 
     public int SupplyNeededPerTurn()
     {
-      return (int)(((rf.soldiers + rf.wounded + labor) / 10 ) * hexMap.FoodPerTenMenPerTurn(IsAI()));
+      return (int)(((rf.soldiers + rf.wounded) / 10 ) * hexMap.FoodPerTenMenPerTurn(IsAI()));
     }
 
     public int MinSupplyNeeded() {

@@ -24,8 +24,9 @@ namespace MapTileNS
     public Poision poision = null;
     public bool waterBound = false;
     public bool burnable = false;
-    public bool village = false;
+    public bool road = false;
 
+    public Dictionary<Tile, Tile[]> roads = new Dictionary<Tile, Tile[]>();
     public Tile(int q, int r, HexMap hexMap) : base(q, r, hexMap) { }
     public void PostCreation()
     {
@@ -58,6 +59,23 @@ namespace MapTileNS
         }
       }
     }
+
+    public void BuildRoad() {
+      road = true;
+      SetFieldType(FieldType.Road);
+    }
+
+    public bool RepairRoad() {
+      if (!road) {
+        return false;
+      }
+      if (field == FieldType.Road) {
+        // no need to repair
+        return false;
+      }
+      // repair road
+      return true;
+    }
     
     public Vector3 GetSurfacePosition() {
       float y = 0f;
@@ -85,7 +103,8 @@ namespace MapTileNS
     {
       string prefix = "";
       if (field == FieldType.Wild) prefix = "Wild";
-      if (field == FieldType.Clearing) prefix = "Clearing";
+      if (field == FieldType.Village) prefix = "Village";
+      if (field == FieldType.Road) prefix = "Road";
       if (field == FieldType.Settlement) prefix = "Settelment On";
       if (field == FieldType.Schorched) prefix = "Schorched";
       if (field == FieldType.Burning) prefix = "Burning";
@@ -212,9 +231,6 @@ namespace MapTileNS
     public void SetFieldType(FieldType type)
     {
       field = type;
-      if (type == FieldType.Burning || type == FieldType.Flooding) {
-        village = false;
-      }
       if (type == FieldType.Burning) {
         burnable = false;
       }
@@ -235,6 +251,15 @@ namespace MapTileNS
       return terrian == TerrianType.Hill && field == FieldType.Wild;
     }
 
+    public bool Passable(bool isAI) {
+      Unit u = GetUnit();
+      bool deployable = u == null && movementCost != Unit.MovementCostOnUnaccesible;
+      if (!deployable && IsThereConcealedEnemy(isAI)) {
+        deployable = true;
+      }
+      return deployable;
+    }
+
      // TODO
     public int GetVantagePoint()
     {
@@ -253,7 +278,7 @@ namespace MapTileNS
       {
         movementCost = Unit.MovementcostOnHill;
       }
-      else if (terrian == TerrianType.Plain)
+      else if (terrian == TerrianType.Plain || field == FieldType.Road)
       {
         movementCost = Unit.MovementcostOnPlain;
       }
@@ -274,12 +299,7 @@ namespace MapTileNS
       Unit u = GetUnit();
       if (u != null)
       {
-        if (mode == Mode.Supply) {
-          // for supply routine, should ignore same side units and ignore enemy's side hidden units
-          if (u.IsAI() != unit.IsAI() && !u.IsConcealed()) {
-            return Unit.MovementCostOnUnaccesible;
-          }
-        } else {
+        if (mode != Mode.Supply) {
           // normal path find and access range
           if (u.IsAI() == unit.IsAI()) {
             return Unit.MovementCostOnUnaccesible;
@@ -308,12 +328,10 @@ namespace MapTileNS
 
     public bool Deployable(Unit unit)
     {
-      Unit u = GetUnit();
-      bool deployable = u == null && movementCost != Unit.MovementCostOnUnaccesible;
-      if (!deployable && IsThereConcealedEnemy(unit.IsAI())) {
-        u.DiscoveredByEnemy();
+      if (IsThereConcealedEnemy(unit.IsAI())) {
+        GetUnit().DiscoveredByEnemy();
       }
-      return deployable;
+      return Passable(unit.IsAI());
     }
 
     public bool DeployableForPathFind(Unit unit) {
@@ -347,7 +365,7 @@ namespace MapTileNS
     public int Work2BuildSettlement()
     {
       if ((terrian == TerrianType.Plain || terrian == TerrianType.Hill) &&
-        (field == FieldType.Wild || field == FieldType.Clearing || field == FieldType.Flooded
+        (field == FieldType.Wild || field == FieldType.Village || field == FieldType.Flooded
          || field == FieldType.Schorched))
       {
         return Work2BuildCamp;

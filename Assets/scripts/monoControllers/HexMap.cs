@@ -321,23 +321,17 @@ namespace MonoNS
       else if (elevation >= HeightHill)
       {
         prefab = HighGroundPrefab;
-        fieldType = Cons.MostLikely() ? FieldType.Wild : FieldType.Clearing;
+        fieldType = Cons.MostLikely() ? FieldType.Wild : (Cons.TinyChance() ? FieldType.Village : FieldType.Wild);
         tile.SetTerrianType(TerrianType.Hill);
         if(fieldType == FieldType.Wild && Cons.SlimChance()) {
           tile.burnable = true;
-        }
-        if(fieldType == FieldType.Clearing && Cons.SlimChance()) {
-          tile.village = true;
         }
       }
       else if (elevation >= HeightFlat)
       {
         prefab = HexPrefab;
         tile.SetTerrianType(TerrianType.Plain);
-        fieldType = Cons.MostLikely() ? FieldType.Clearing : FieldType.Wild;
-        if(fieldType == FieldType.Clearing && Cons.SlimChance()) {
-          tile.village = true;
-        }
+        fieldType = Cons.FairChance() ? FieldType.Wild : (Cons.TinyChance() ? FieldType.Village : FieldType.Wild);
       }
       else
       {
@@ -382,9 +376,13 @@ namespace MonoNS
       {
         mat = MatMountain;
       }
-      else if (tile.field == FieldType.Clearing)
+      else if (tile.field == FieldType.Village)
       {
         mat = MatGrassland;
+      }
+      else if (tile.field == FieldType.Road)
+      {
+        mat = MatLessPlain;
       }
       else if (tile.terrian != TerrianType.Water && tile.field == FieldType.Wild)
       {
@@ -422,7 +420,7 @@ namespace MonoNS
           txt = txt + " Camp\n";
         }
       }
-      if (tile.village) {
+      if (tile.field == FieldType.Village) {
         txt = txt + " Village";
       }
       Color fontColor;

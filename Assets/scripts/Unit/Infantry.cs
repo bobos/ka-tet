@@ -10,8 +10,8 @@ namespace  UnitNS
     public const float Under1K5MovementModifier = 1.2f;
     public const float Under4KMovementModifier = 1f;
     public const float MoreThan4KMovementModifier = 0.8f;
-    public const int MinTroopNum = 1000;
-    public const int MaxTroopNum = 8000;
+    public const int MinTroopNum = 500;
+    public const int MaxTroopNum = 10000;
     public const int ExhaustLine = 15;
     public const float L1FireBuff = 0.2f;
     public const float L2FireBuff = 0.25f;
@@ -79,15 +79,12 @@ namespace  UnitNS
       if (labors < (int)(rf.soldiers * 0.25f)) {
         return BaseSlots;
       }
-      if ( labors >= (int)(rf.soldiers * 0.25f) && labors < (int)(rf.soldiers * 0.5f)) {
+      if (labors < (int)(rf.soldiers * 0.5f)) {
         return BaseSlots + 1;
-      }
-      if ( labors >= (int)(rf.soldiers * 0.5f) && labors < (int)(rf.soldiers * 0.75f)) {
-        return BaseSlots + 2;
       }
       else
       {
-        return BaseSlots + 3; 
+        return BaseSlots + 2; 
       }
     }
 

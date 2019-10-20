@@ -77,8 +77,7 @@ public class Starter : MonoBehaviour {
     // * tactical phase starts *
     Tile strategyBase = hexMap.GetTile(1, 1);
     Tile camp1 = hexMap.GetTile(10, 17);
-    //Tile camp2 = hexMap.GetTile(19, 2);
-    Tile camp2 = hexMap.GetTile(27, 16);
+    Tile camp2 = hexMap.GetTile(19, 2);
     Tile city = hexMap.GetTile(29, 15);
     HashSet<Tile> tiles = new HashSet<Tile>();
     tiles.Add(camp1);
@@ -147,6 +146,10 @@ public class Starter : MonoBehaviour {
                     Settlement.Type.city,
                     hexMap.GetPlayerParty(), 250000, 5000, supply * 5 * 5)) {
       Util.Throw("Failed to build city at 29,12");}
+
+    settlementMgr.BuildRoad(strategyBase, camp1);
+    settlementMgr.BuildRoad(camp1, camp2);
+    settlementMgr.BuildRoad(camp2, city);
 
     // after settlement created, general enters campaign
     liubei.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(27, 18), 0, 2000);
