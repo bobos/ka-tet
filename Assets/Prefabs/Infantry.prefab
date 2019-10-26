@@ -267,7 +267,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4389394466369578}
-  - component: {fileID: 114968900575455546}
+  - component: {fileID: 114324027619674198}
   m_Layer: 0
   m_Name: Infantry
   m_TagString: Untagged
@@ -2964,7 +2964,7 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1617929055141712}
   m_Mesh: {fileID: 4300012, guid: 4623cd59581eb426cb20071956a7caef, type: 3}
---- !u!114 &114968900575455546
+--- !u!114 &114324027619674198
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2972,6 +2972,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1193126689161024}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ec85e5465939f4bd7942cc4555765130, type: 3}
+  m_Script: {fileID: 11500000, guid: 4b4802d7e9ca2444a9073bad16d763df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  nameGO: {fileID: 0}

@@ -136,7 +136,6 @@ namespace UnitNS
     }
     public Reaction attackReaction = Reaction.Stand;
     public Tile tile;
-    public event UnitMovedCallback onUnitMove;
     public int supply;
     public bool consumed = false;
     public int kia;
@@ -911,12 +910,9 @@ namespace UnitNS
       {
         // not encamp, do move
         h.AddUnit(this);
-        if (onUnitMove != null)
-        {
-          onUnitMove(h);
-          UnitActionBroker broker = UnitActionBroker.GetBroker();
-          broker.BrokeChange(this, ActionType.UnitMove, tile);
-        }
+        hexMap.MoveUnit(this, h);
+        UnitActionBroker broker = UnitActionBroker.GetBroker();
+        broker.BrokeChange(this, ActionType.UnitMove, tile);
       }
       tile = h;
     }

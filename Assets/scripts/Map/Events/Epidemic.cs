@@ -18,6 +18,7 @@
           || (Cons.IsSummer(tile.weatherGenerator.season) && Cons.FairChance()))
           && tile.GetUnit() != null)
       {
+        // TODO: check if the unit is from huai areas
         tile.GetUnit().CaughtEpidemic();
       }
     }

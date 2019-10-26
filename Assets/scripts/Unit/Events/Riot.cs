@@ -1,4 +1,5 @@
 ﻿using TextNS;
+using UnityEngine;
 
 namespace UnitNS
 {
@@ -12,7 +13,7 @@ namespace UnitNS
     }
 
     public bool Discontent(int point) {
-      MonoNS.MsgBox.ShowMsg("不满+" + point);
+      unit.hexMap.AddOnDonePop(System.String.Format(Cons.GetTextLib().get("pop_discontent"), point), Color.red, unit);
       discontent += point;
       if (discontent == Max) {
         discontent = 0;

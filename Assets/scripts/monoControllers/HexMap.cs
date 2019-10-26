@@ -87,6 +87,8 @@ namespace MonoNS
     public GameObject MountainPrefab;
     public GameObject TentPrefab;
     public GameObject CampPrefab;
+    public GameObject NameTextPrefab;
+    public GameObject PopTextPrefab;
     public WarParty[] warParties = new WarParty[2];
     public List<GameObject> lineCache = new List<GameObject>();
 
@@ -599,14 +601,50 @@ namespace MonoNS
       GameObject prefab = unit.IsCavalry() ? CavalryPrefab : InfantryPrefab;
       GameObject tileGO = tile2GO[tile];
       //NOTE: spawn as child gameobject of hex
+      Vector3 position = tile.GetSurfacePosition();
+      Vector3 namePosition = new Vector3(position.x - 0.5f, position.y, position.z);
       GameObject unitGO = (GameObject)Instantiate(prefab,
-          tile.GetSurfacePosition(),
+          position,
           Quaternion.identity, tileGO.transform);
+      GameObject nameGO = (GameObject)Instantiate(NameTextPrefab,
+          namePosition,
+          Quaternion.identity, tileGO.transform);
+      nameGO.GetComponent<UnitNameView>().SetName(unit.GeneralName());
       UnitView view = unitGO.GetComponent<UnitView>();
+      view.nameGO = nameGO;
       view.unit = unit;
       view.OnCreate();
       unit2GO[unit] = unitGO;
       SetUnitSkin(unit);
+    }
+
+    UnitView GetView(Unit unit) {
+      if (!unit2GO.ContainsKey(unit)) {
+        return null;
+      }
+      return unit2GO[unit].GetComponent<UnitView>();
+    }
+
+    public void AddOnDonePop(string msg, Color color, Unit unit) {
+      UnitView view = GetView(unit);
+      if (view == null) { return; }
+      view.PopOnActionDone(msg, color);
+    }
+
+    public PopTextView ShowPopText(UnitView view, string msg, Color color) {
+      Vector3 p = view.transform.position;
+      GameObject popGO = (GameObject)Instantiate(PopTextPrefab,
+          new Vector3(p.x - 0.5f, p.y, p.z),
+          Quaternion.identity, view.transform);
+      PopTextView textView = popGO.GetComponent<PopTextView>();
+      textView.Show(view, msg, color);
+      return textView;
+    }
+
+    public void MoveUnit(Unit unit, Tile tile) {
+      UnitView view = GetView(unit);
+      if (view == null) { return; }
+      view.Move(tile);
     }
 
     void GenerateMap()

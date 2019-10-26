@@ -10,6 +10,9 @@ namespace UnitNS
     Vector3 currentVelocity;
     HexMap hexMap;
     Unit _unit = null;
+    PopTextView textView = null;
+    string popMsg = null;
+    Color msgColor = Color.white;
     public Unit unit
     {
       get
@@ -18,15 +21,11 @@ namespace UnitNS
       }
       set
       {
-        if (_unit != null)
-        {
-          _unit.onUnitMove -= OnUnitMove;
-        }
         _unit = value;
-        _unit.onUnitMove += OnUnitMove;
       }
     }
-    public bool Animating { get; private set; }
+    public bool Animating = false;
+    public GameObject nameGO;
     ActionController actionController;
     MouseController mouseController;
     bool viewActivated = true;
@@ -47,10 +46,16 @@ namespace UnitNS
     }
 
     public void Deactivate() {
+      foreach(MeshRenderer mr in nameGO.GetComponentsInChildren<MeshRenderer>()) {
+        mr.enabled = false;
+      }
       viewActivated = false;
     }
 
     public void Activate() {
+      foreach(MeshRenderer mr in nameGO.GetComponentsInChildren<MeshRenderer>()) {
+        mr.enabled = true;
+      }
       transform.position = unit.tile.GetSurfacePosition();
       viewActivated = true;
     }
@@ -67,6 +72,7 @@ namespace UnitNS
       mouseController.onUnitSelect -= OnUnitSelect;
       mouseController.onModeQuit -= OnModeQuit;
       mouseController.onUnitDeselect -= OnUnitDeselect;
+      Destroy(nameGO);
     }
 
     public void ActionDone(Unit actionUnit, Unit[] units, ActionController.actionName actionName)
@@ -82,7 +88,12 @@ namespace UnitNS
       }
     }
 
-    public void OnUnitMove(Tile newTile)
+    public void PopOnActionDone(string msg, Color color) {
+      popMsg = msg;
+      msgColor = color;
+    }
+
+    public void Move(Tile newTile)
     {
       if (!viewActivated) return;
       hexMap.HighlightPath(unit.GetPath());
@@ -131,16 +142,23 @@ namespace UnitNS
     /// </summary>
     void Update()
     {
+      if (textView != null) return; // means animation is done, text showing
+      if (!Animating || !viewActivated) { return; }
+      Vector3 originPosition = this.transform.position;
       // NOTE: this point to the gameobject not the component
-      if (!Animating || !viewActivated)
-      {
-        return;
-      }
-      this.transform.position = Vector3.SmoothDamp(this.transform.position,
-      newPosition, ref currentVelocity, 0.2f);
+      this.transform.position = Vector3.SmoothDamp(originPosition, newPosition, ref currentVelocity, 0.2f);
+      nameGO.transform.position = Vector3.SmoothDamp(originPosition, newPosition, ref currentVelocity, 0.2f);
       if (Vector3.Distance(this.transform.position, newPosition) < 0.1f)
       {
-        Animating = false;
+        Vector3 p = nameGO.transform.position;
+        nameGO.transform.position = new Vector3(p.x - 0.5f, p.y, p.z);
+        if (popMsg != null) {
+          textView = hexMap.ShowPopText(this, popMsg, msgColor);
+          popMsg = null;
+          msgColor = Color.white;
+        } else {
+          Animating = false;
+        }
       }
     }
 

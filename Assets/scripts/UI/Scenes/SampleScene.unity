@@ -3935,6 +3935,10 @@ MonoBehaviour:
     type: 2}
   TentPrefab: {fileID: 1765841391525092, guid: 26c53a1f39c9a48179f77b3e61d7072f, type: 2}
   CampPrefab: {fileID: 1002255177878198, guid: 4fa66f97eb3aa495c93a35d125d7d2f6, type: 2}
+  NameTextPrefab: {fileID: 1494587712262224, guid: d238914f316e84712b8eab4d0ab3fdf2,
+    type: 2}
+  PopTextPrefab: {fileID: 1494587712262224, guid: 5c837f8051153411188e4957638b549a,
+    type: 2}
   lineCache: []
 --- !u!1 &975998141
 GameObject:

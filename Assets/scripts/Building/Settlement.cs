@@ -20,15 +20,35 @@ public abstract class Settlement
   public Tile baseTile;
   public WarParty owner;
   public int deathToll = 0;
-  private int _civillian;
+  private int _civillian_male;
+  private int _civillian_female;
+  private int _civillian_child;
   private int _labor;
-  public int civillian {
+  public int civillian_male {
     get {
-      return _civillian;
+      return _civillian_male;
     }
 
     set {
-      _civillian = value < 0 ? 0 : value;
+      _civillian_male = value < 0 ? 0 : value;
+    }
+  }
+  public int civillian_female {
+    get {
+      return _civillian_female;
+    }
+
+    set {
+      _civillian_female = value < 0 ? 0 : value;
+    }
+  }
+  public int civillian_child {
+    get {
+      return _civillian_child;
+    }
+
+    set {
+      _civillian_child = value < 0 ? 0 : value;
     }
   }
   public int labor {
@@ -476,11 +496,14 @@ public class City : Settlement
     Huge
   }
 
+  // TODO: pass male, female, child
   public City(string name, Tile tile, WarParty warParty, int supply, int civillian, int labor, Scale scale = Scale.Large) :
     base(name, tile, warParty, supply, GetSlots(scale))
   {
     this.labor = labor;
-    this.civillian = civillian;
+    this.civillian_male = civillian;
+    this.civillian_female = civillian;
+    this.civillian_child = civillian;
     type = Settlement.Type.city;
     state = State.normal;
     buildWork = 0;
@@ -498,7 +521,7 @@ public class StrategyBase : Settlement
   public StrategyBase(string name, Tile tile, WarParty warParty, int supply, int labor) :
   base(name, tile, warParty, supply, MaxGarrisonPerBase)
   {
-    this.civillian = 0;
+    this.civillian_male = civillian_female = civillian_child = 0;
     this.labor = labor;
     type = Settlement.Type.strategyBase;
     state = State.normal;
@@ -513,7 +536,7 @@ public class Camp : Settlement
   public Camp(string name, Tile tile, WarParty warParty, int supply, int labor) :
   base(name, tile, warParty, supply, MaxGarrisonPerCamp)
   {
-    this.civillian = 0;
+    this.civillian_male = civillian_female = civillian_child = 0;
     this.labor = labor;
     type = Settlement.Type.camp;
     state = State.constructing;

@@ -184,6 +184,9 @@ namespace TextNS
       {"event_epidemic", @"{0}所部{1}因久驻因暴雨过后而蚊虫滋生的密林，大量士卒染上痢疾"},
       {"event_poision_title", "遭人投毒"},
       {"event_poision", @"{0}所部{1}因饮用了上游遭歹人投毒的河水，大量士卒染病"},
+
+      // pop out msg
+      {"pop_discontent", @"不满+{0}"},
       };
     }
   }

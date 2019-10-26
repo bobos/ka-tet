@@ -84,7 +84,7 @@ namespace MonoNS
         type = "大本营";
       }
       title.text = s.name + " (" + type + ")";
-      population.text = "人口: 平民" + s.civillian + " 兵役" + s.labor;
+      population.text = "人口: 平民" + (s.civillian_male + s.civillian_child + s.civillian_female) + " 兵役" + s.labor;
       supply.text = "粮草: " + s.supplyDeposit + "石" + " 每回合消耗" + s.MinSupplyNeeded() + "石";
       Unit[] garrison = s.garrison.ToArray();
       garrison1.text = "";

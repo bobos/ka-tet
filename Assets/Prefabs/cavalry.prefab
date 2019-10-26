@@ -703,7 +703,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4505090374346390}
-  - component: {fileID: 114423957245416592}
+  - component: {fileID: 114896352131727658}
   m_Layer: 0
   m_Name: cavalry
   m_TagString: Untagged
@@ -2433,7 +2433,7 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1770345197620756}
   m_Mesh: {fileID: 4300002, guid: 0655d05efe84f48d69b7653e75747acc, type: 3}
---- !u!114 &114423957245416592
+--- !u!114 &114896352131727658
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2441,6 +2441,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1684031216514598}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ec85e5465939f4bd7942cc4555765130, type: 3}
+  m_Script: {fileID: 11500000, guid: 4b4802d7e9ca2444a9073bad16d763df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  nameGO: {fileID: 0}
