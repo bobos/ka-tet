@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnitNS;
 using FieldNS;
+using TextNS;
 
 namespace MonoNS
 {
@@ -10,11 +11,11 @@ namespace MonoNS
     public override void PreGameInit(HexMap hexMap, BaseController me)
     {
       base.PreGameInit(hexMap, me);
-      hexMap.settlementMgr.onJobDone += OnSettlementJobDone;
       actionController = hexMap.actionController;
       turnIndicator = hexMap.turnIndicator;
       title = hexMap.turnPhaseTitle;
       settlementMgr = hexMap.settlementMgr;
+      cc = hexMap.cameraKeyboardController;
       endingTurn = false;
       if (onNewTurn != null) { onNewTurn(); }
       TurnChange();
@@ -53,7 +54,6 @@ namespace MonoNS
     public event OnEndTurnClicked onEndTurnClicked;
     public delegate void OnNewTurn();
     public event OnNewTurn onNewTurn;
-    private bool settlementMgrDone = true;
 
     public void onEndTurnClick()
     {
@@ -62,13 +62,10 @@ namespace MonoNS
       StartCoroutine(endTurn());
     }
 
-    public void OnSettlementJobDone()
-    {
-      settlementMgrDone = true;
-    }
-
     public bool player = true;
     int cnt = 0;
+    TextLib textLib = Cons.GetTextLib();
+    CameraKeyboardController cc;
     IEnumerator endTurn()
     {
       WarParty playerParty = hexMap.GetPlayerParty();
@@ -86,6 +83,10 @@ namespace MonoNS
       {
         if (!unit.waitingForOrders())
         {
+          if (!unit.IsCamping()) {
+            cc.FixCameraAt(hexMap.GetUnitView(unit).transform.position);
+          }
+          while (cc.fixingCamera) { yield return null; }
           while (!actionController.move(unit))
           {
             yield return null;
@@ -104,25 +105,54 @@ namespace MonoNS
       // TODO
       FoW.Get().Fog();
       foreach(Unit u in playerParty.GetUnits()) {
-        if (u.state != State.Camping) {
+        if (!u.IsCamping()) {
           u.SetState(u.state);
         }
       }
       foreach(Unit u in aiParty.GetUnits()) {
-        if (u.state != State.Camping) {
+        if (!u.IsCamping()) {
           u.SetState(u.state);
         }
       }
 
-      while (showingTitle) { yield return null; }
+      // fix camera on next party
+      Unit fixedAt = null;
+      foreach(Unit u in otherP.GetUnits()) {
+        fixedAt = u;
+      }
+      Vector3 cameraPosition;
+      if (fixedAt.IsCamping()) {
+        cameraPosition = settlementMgr.GetView(fixedAt.tile.settlement).transform.position;
+      } else {
+        cameraPosition = hexMap.GetUnitView(fixedAt).transform.position;
+      }
+      cc.FixCameraAt(cameraPosition);
+
+      while (showingTitle || cc.fixingCamera) { yield return null; }
       // refresh AI
-      settlementMgrDone = false;
       settlementMgr.TurnEnd(otherP);
-      while (!settlementMgrDone) { yield return null; }
+      while (settlementMgr.turnEndOngoing) { yield return null; }
       foreach (Unit unit in otherP.GetUnits())
       {
         if (!unit.consumed) {
           unit.ConsumeSupply();
+        }
+        if (unit.starving) {
+          View view;
+          if (unit.IsCamping()) {
+            view = settlementMgr.GetView(unit.tile.settlement);
+          } else {
+            view = hexMap.GetUnitView(unit);
+          }
+          cc.FixCameraAt(view.transform.position);
+          while (cc.fixingCamera) { yield return null; }
+
+          view.Animating = true;
+          view.textView = hexMap.ShowPopText(view, textLib.get("pop_starving"), Color.red);
+          while (view.Animating)
+          {
+            yield return null;
+          }
         }
         unit.consumed = false;
         unit.RefreshUnit();
@@ -169,6 +199,7 @@ namespace MonoNS
       if (cnt == 0) {
         if (onNewTurn != null) onNewTurn();
       }
+
       // TurnChange();
       // while (showingTitle) { yield return null; }
     }

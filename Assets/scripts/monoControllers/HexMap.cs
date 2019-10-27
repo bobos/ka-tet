@@ -631,7 +631,7 @@ namespace MonoNS
       view.PopOnActionDone(msg, color);
     }
 
-    public PopTextView ShowPopText(UnitView view, string msg, Color color) {
+    public PopTextView ShowPopText(View view, string msg, Color color) {
       Vector3 p = view.transform.position;
       GameObject popGO = (GameObject)Instantiate(PopTextPrefab,
           new Vector3(p.x - 0.5f, p.y, p.z),

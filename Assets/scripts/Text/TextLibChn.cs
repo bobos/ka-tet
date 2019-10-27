@@ -187,6 +187,13 @@ namespace TextNS
 
       // pop out msg
       {"pop_discontent", @"不满+{0}"},
+      {"pop_builded", "建造完成!"},
+      {"pop_failedToSupplyUnitInSettlement", @"无法补给{0}所部"},
+      {"pop_failedToSupplyUnitNearby", "据点补给失败"},
+      {"pop_failedToDistSupply", "无法转运粮草"},
+      {"pop_failedToDistLabor", "无法转移民夫"},
+      {"pop_starving", "部队饥饿!"},
+
       };
     }
   }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MonoNS
 {
-  public class SettlementView : MonoBehaviour
+  public class SettlementView : View
   {
 
     // Use this for initialization

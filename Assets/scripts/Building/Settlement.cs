@@ -222,7 +222,7 @@ public abstract class Settlement
     }
   }
 
-  public void TurnEnd()
+  public bool TurnEnd()
   {
     if (state == State.constructing) {
       buildWork -= HowMuchBuildWorkToFinish();
@@ -233,8 +233,9 @@ public abstract class Settlement
       buildWork = 0;
       state = State.normal;
       onSettlementReady(this);
-      return;
+      return true;
     }
+    return false;
   }
 
   public bool IsNormal() {
@@ -329,16 +330,22 @@ public abstract class Settlement
     this.labor += labor;
   }
 
-  public void ReduceSupply()
+  public List<List<Unit>> ReduceSupply()
   {
-    if (state == State.constructing) {
-      return;
-    }
+    List<List<Unit>> units = new List<List<Unit>>();
+
+    units.Add(new List<Unit>());
+    units.Add(new List<Unit>());
+    Unit[] nearbyUnits = GetReachableUnits();
 
     if (supplyDeposit == 0)
     {
       defensePrep -= DefensePrepDeductRate;
-      return;
+      units[0] = garrison;
+      foreach(Unit u in nearbyUnits) {
+        units[1].Add(u);
+      }
+      return units;
     }
 
     // recovering defense preparation
@@ -346,26 +353,32 @@ public abstract class Settlement
 
     foreach (Unit unit in garrison)
     {
-      if (supplyDeposit == 0) break;
+      if (supplyDeposit == 0) {
+        units[0].Add(unit);
+        continue;
+      };
       supplyDeposit = unit.ReplenishSupply(supplyDeposit);
+      if (!unit.consumed) {
+        units[0].Add(unit);
+      }
     }
 
-    Unit[] nearbyUnits = GetReachableUnits();
     foreach (Unit unit in nearbyUnits)
     {
       if (supplyDeposit == 0) {
-        break;
+        units[1].Add(unit);
+        continue;
       }
 
       int neededPerTurn = unit.SupplyNeededPerTurn();
       int neededLabor = CalcNeededLabor(neededPerTurn);
       if (!unit.IsCavalry() && unit.labor < neededLabor) {
-        MsgBox.ShowMsg(unit.GeneralName() + "所部仅有" + unit.labor + "民夫可用，而从临近补给点转运一日补给需要至少" + neededLabor + "名民夫");
+        units[1].Add(unit);
         continue;
       }
 
       if (neededPerTurn > supplyDeposit) {
-        MsgBox.ShowMsg(name + "仅存" + supplyDeposit + "石粮草，无法满足" + unit.GeneralName() + "所部" + neededPerTurn + "石的补给请求");
+        units[1].Add(unit);
         continue;
       }
 
@@ -383,6 +396,7 @@ public abstract class Settlement
       unit.consumed = true;
       supplyDeposit -= neededPerTurn;
     }
+    return units;
   }
 
   public int CalcNeededLabor(int supply) {

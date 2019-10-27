@@ -24,15 +24,30 @@ namespace MonoNS
       updateReady = false;
     }
 
+    Vector3 fixedPosition;
+    public bool fixingCamera = false;
+    public void FixCameraAt(Vector3 p) {
+      fixedPosition = new Vector3(p.x, 10, p.z);
+      fixingCamera = true;
+    }
+
     public override void UpdateChild()
     {
-      if (turnController.showingTitle) return;
-      Vector3 translate = new Vector3(
-        Input.GetAxis("Horizontal"),
-        0,
-        Input.GetAxis("Vertical")
-      );
-      this.transform.Translate(translate * moveSpeed * Time.deltaTime, Space.World);
+      if (fixingCamera) {
+        if (Vector3.Distance(this.transform.position, fixedPosition) < 0.1f) {
+          fixingCamera = false;
+        } else {
+          transform.position = Vector3.Lerp(transform.position, fixedPosition, 4 * Time.deltaTime);
+        }
+      } else {
+        if (turnController.showingTitle) return;
+        Vector3 translate = new Vector3(
+          Input.GetAxis("Horizontal"),
+          0,
+          Input.GetAxis("Vertical")
+        );
+        this.transform.Translate(translate * moveSpeed * Time.deltaTime, Space.World);
+      }
     }
   }
 

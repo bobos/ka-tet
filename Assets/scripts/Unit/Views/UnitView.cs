@@ -4,13 +4,12 @@ using MonoNS;
 
 namespace UnitNS
 {
-  public class UnitView : MonoBehaviour
+  public class UnitView : View
   {
     Vector3 newPosition;
     Vector3 currentVelocity;
     HexMap hexMap;
     Unit _unit = null;
-    PopTextView textView = null;
     string popMsg = null;
     Color msgColor = Color.white;
     public Unit unit
@@ -24,7 +23,6 @@ namespace UnitNS
         _unit = value;
       }
     }
-    public bool Animating = false;
     public GameObject nameGO;
     ActionController actionController;
     MouseController mouseController;

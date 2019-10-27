@@ -311,12 +311,12 @@ namespace CourtNS
     public RiverNorth()
     {
       CavNameSeq = new Dictionary<string, int>() {
-        {"l_longwei4", 0},
-        {"l_longshen4", 0}
+        {"l_longwei", 0},
+        {"l_longshen", 0}
       };
       InfNameSeq = new Dictionary<string, int>() {
-        {"l_huben4", 0},
-        {"l_qingshen4", 0}
+        {"l_huben", 0},
+        {"l_qingshen", 0}
       };
       name = textLib.get("r_riverNorth");
       description = textLib.get("r_riverNorth_d");

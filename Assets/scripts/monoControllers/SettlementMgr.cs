@@ -4,6 +4,8 @@ using System.Linq;
 using UnitNS;
 using MapTileNS;
 using FieldNS;
+using System.Collections;
+using TextNS;
 
 namespace MonoNS
 {
@@ -24,13 +26,12 @@ namespace MonoNS
       mouseController = hexMap.mouseController;
       actionController = hexMap.actionController;
       actionController.onBtnClick += OnBtnClick;
+      cc = hexMap.cameraKeyboardController;
       ghostUnit = GhostUnit.createGhostUnit();
     }
 
     public override void UpdateChild() {}
 
-    public delegate void JobDone();
-    public event JobDone onJobDone;
     HashSet<Tile> campableTiles;
 
     public void SetCampableField(HashSet<Tile> tiles) {
@@ -81,13 +82,36 @@ namespace MonoNS
       }
     }
 
-    public void TurnEnd(WarParty warParty)
+    public bool turnEndOngoing = false;
+    public void TurnEnd(WarParty warParty) {
+      turnEndOngoing = true;
+      StartCoroutine(PerformTurnEnd(warParty));
+    }
+
+    public SettlementView GetView(Settlement settlement) {
+      if (!settlement2GO.ContainsKey(settlement)) return null;
+      return settlement2GO[settlement].GetComponent<SettlementView>();
+    }
+
+    TextLib textLib = Cons.GetTextLib();
+    CameraKeyboardController cc;
+    IEnumerator PerformTurnEnd(WarParty warParty)
     {
       foreach (Settlement settlement in buildingQueue.ToArray())
       {
         if (Util.eq<WarParty>(warParty, settlement.owner))
         {
-          settlement.TurnEnd();
+          if (settlement.TurnEnd()) {
+            SettlementView view = GetView(settlement);
+            cc.FixCameraAt(view.transform.position);
+            while (cc.fixingCamera) { yield return null; }
+            view.Animating = true;
+            hexMap.ShowPopText(view, textLib.get("pop_builded"), Color.green);
+            while (view.Animating)
+            {
+              yield return null;
+            }
+          }
         }
       }
 
@@ -96,14 +120,57 @@ namespace MonoNS
       foreach (Settlement root in roots)
       {
         if (root.state != Settlement.State.constructing) {
-          root.ReduceSupply();
+          SettlementView view = GetView(root);
+          List<List<Unit>> failedUnits = root.ReduceSupply();
+          foreach(Unit u in failedUnits[0]) {
+            cc.FixCameraAt(view.transform.position);
+            while (cc.fixingCamera) { yield return null; }
+
+            view.Animating = true;
+            hexMap.ShowPopText(view, 
+              System.String.Format(textLib.get("pop_failedToSupplyUnitInSettlement"), u.GeneralName()),
+              Color.yellow);
+            while (view.Animating)
+            {
+              yield return null;
+            }
+          }
+
+          foreach(Unit u in failedUnits[1]) {
+            View unitView = hexMap.GetUnitView(u);
+            cc.FixCameraAt(unitView.transform.position);
+            while (cc.fixingCamera) { yield return null; }
+
+            unitView.Animating = true;
+            unitView.textView = hexMap.ShowPopText(unitView, 
+              textLib.get("pop_failedToSupplyUnitNearby"),
+              Color.yellow);
+            while (unitView.Animating)
+            {
+              yield return null;
+            }
+          }
         }
         root.availableLabor = root.labor;
       }
 
       List<DistJob> jobs = warParty.attackside ? attackerDistJobs : defenderDistJobs;
       foreach(DistJob job in jobs) {
+        View view = GetView(job.from);
         if (!job.from.IsFunctional() || !job.to.IsFunctional()) {
+          cc.FixCameraAt(view.transform.position);
+          while (cc.fixingCamera) { yield return null; }
+
+          view.Animating = true;
+          hexMap.ShowPopText(view,
+            textLib.get(
+              job.type == QueueJobType.DistSupply ?
+              "pop_failedToDistSupply" : "pop_failedToDistLabor"),
+            Color.red);
+          while (view.Animating)
+          {
+            yield return null;
+          }
           continue;
         }
         // ambush supply caravans
@@ -136,11 +203,7 @@ namespace MonoNS
         defenderDistJobs = new List<DistJob>();
       }
 
-      if (onJobDone != null)
-      {
-        // notice Unit to value its slots and set morale punishment etc.
-        onJobDone();
-      }
+      turnEndOngoing = false;
     }
 
     public Unit IsSupplyRouteAmbushed(Tile[] route, bool isAI) {

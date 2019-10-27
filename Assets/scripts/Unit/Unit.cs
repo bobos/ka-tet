@@ -149,7 +149,7 @@ namespace UnitNS
       }
       set
       {
-        __labor = value < 200 ? 0 : value;
+        __labor = value < 0 ? 0 : value;
       }
     }
     public Troop rf;
