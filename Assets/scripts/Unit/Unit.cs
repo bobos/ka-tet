@@ -361,6 +361,7 @@ namespace UnitNS
       if (consumed >= neededHalf) {
         remaining -= consumed;
         this.consumed = true;
+        this.starving = false;
       }
       return remaining < 0 ? 0 : remaining;
     }

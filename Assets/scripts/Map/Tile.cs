@@ -251,11 +251,17 @@ namespace MapTileNS
       return terrian == TerrianType.Hill && field == FieldType.Wild;
     }
 
-    public bool Passable(bool isAI) {
+    public bool Passable(bool isAI, bool forDeploy = false) {
       Unit u = GetUnit();
       bool deployable = u == null && movementCost != Unit.MovementCostOnUnaccesible;
-      if (!deployable && IsThereConcealedEnemy(isAI)) {
-        deployable = true;
+      if (!deployable && u != null) {
+        if (u.IsAI() == isAI) {
+          if (!forDeploy) {
+            deployable = true;
+          }
+        } else if(IsThereConcealedEnemy(isAI)) {
+          deployable = true;
+        }
       }
       return deployable;
     }
@@ -331,7 +337,7 @@ namespace MapTileNS
       if (IsThereConcealedEnemy(unit.IsAI())) {
         GetUnit().DiscoveredByEnemy();
       }
-      return Passable(unit.IsAI());
+      return Passable(unit.IsAI(), true);
     }
 
     public bool DeployableForPathFind(Unit unit) {

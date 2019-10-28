@@ -11,7 +11,7 @@ namespace  UnitNS
     public const float Under4KMovementModifier = 1f;
     public const float MoreThan4KMovementModifier = 0.8f;
     public const int MinTroopNum = 500;
-    public const int MaxTroopNum = 10000;
+    public const int MaxTroopNum = 8000;
     public const int ExhaustLine = 15;
     public const float L1FireBuff = 0.2f;
     public const float L2FireBuff = 0.25f;
