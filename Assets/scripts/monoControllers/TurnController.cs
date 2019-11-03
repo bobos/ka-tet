@@ -3,6 +3,8 @@ using UnityEngine;
 using UnitNS;
 using FieldNS;
 using TextNS;
+using NatureNS;
+using MapTileNS;
 
 namespace MonoNS
 {
@@ -17,7 +19,6 @@ namespace MonoNS
       settlementMgr = hexMap.settlementMgr;
       cc = hexMap.cameraKeyboardController;
       endingTurn = false;
-      if (onNewTurn != null) { onNewTurn(); }
       TurnChange();
     }
 
@@ -49,6 +50,22 @@ namespace MonoNS
     TurnIndicator turnIndicator;
     ActionController actionController;
     SettlementMgr settlementMgr;
+    WeatherGenerator weatherGenerator {
+      get {
+        return hexMap.weatherGenerator;
+      }
+    }
+    UnitAnimationController unitAniController {
+      get {
+        return hexMap.unitAniController;
+      }
+    }
+    TileAnimationController tileAniController {
+      get {
+        return hexMap.tileAniController;
+      }
+    }
+
     public bool endingTurn { get; private set; }
     public delegate void OnEndTurnClicked();
     public event OnEndTurnClicked onEndTurnClicked;
@@ -93,7 +110,13 @@ namespace MonoNS
           }
           while (actionController.ActionOngoing) { yield return null; };
         }
-        unit.PostAction();
+        unitAniController.PostTurnAction(unit);
+        while (unitAniController.PostAnimating) { yield return null; };
+        if (unit.rf.soldiers <= Unit.DisbandUnitUnder)
+        {
+          unitAniController.DestroyUnit(unit, DestroyType.ByDisband);
+          while (unitAniController.DestroyAnimating) { yield return null; };
+        }
       }
 
       //TODO
@@ -144,18 +167,15 @@ namespace MonoNS
           } else {
             view = hexMap.GetUnitView(unit);
           }
-          cc.FixCameraAt(view.transform.position);
-          while (cc.fixingCamera) { yield return null; }
-
-          view.Animating = true;
-          view.textView = hexMap.ShowPopText(view, textLib.get("pop_starving"), Color.red);
-          while (view.Animating)
+          hexMap.popAniController.Show(view, textLib.get("pop_starving"), Color.red);
+          while (hexMap.popAniController.Animating)
           {
             yield return null;
           }
         }
         unit.consumed = false;
-        unit.RefreshUnit();
+        unitAniController.RefreshUnit(unit);
+        while (unitAniController.RefreshAnimating) { yield return null; }
         hexMap.SetUnitSkin(unit);
       }
 
@@ -197,7 +217,12 @@ namespace MonoNS
       */
       endingTurn = false;
       if (cnt == 0) {
-        if (onNewTurn != null) onNewTurn();
+        if (onNewTurn != null) { onNewTurn(); }
+        Weather weather = weatherGenerator.NextDay();
+        foreach(Tile tile in weatherGenerator.tileCB) {
+          tileAniController.WeatherChange(tile, weather);
+          while (tileAniController.WeatherAnimating) { yield return null; }
+        }
       }
 
       // TurnChange();

@@ -8,7 +8,7 @@ using CourtNS;
 
 namespace MapTileNS
 {
-  public class Tile : Hex, PFTile
+  public class Tile : Hex, PFTile, DataModel
   {
     public const float PlainHeightStart = 0f;
     public const float PlainHeightEnd = 0.75f;
@@ -34,6 +34,8 @@ namespace MapTileNS
       turnController = hexMap.turnController;
       windGenerator = hexMap.windGenerator;
       settlementMgr = hexMap.settlementMgr;
+      eventDialog = hexMap.eventDialog;
+      settlementAniController = hexMap.settlementAniController;
       if (terrian != TerrianType.Mountain) {
         flood = new Flood(this);
       }
@@ -52,6 +54,10 @@ namespace MapTileNS
         epidemic = new Epidemic(this);
       }
 
+      if (flood != null || wildFire != null || epidemic != null) {
+        hexMap.weatherGenerator.tileCB.Add(this);
+      }
+
       foreach (Tile tile in neighbours) {
         if (tile.terrian == TerrianType.Water) {
           waterBound = true;
@@ -63,6 +69,7 @@ namespace MapTileNS
     public void BuildRoad() {
       road = true;
       SetFieldType(FieldType.Road);
+      // TODO: view animation
     }
 
     public bool RepairRoad() {
@@ -127,60 +134,6 @@ namespace MapTileNS
     public WeatherGenerator weatherGenerator;
     public TurnController turnController;
 
-    public void ListenOnHeavyRain(WeatherGenerator.OnWeather onHeavyRain)
-    {
-      weatherGenerator.onHeavyRain -= onHeavyRain;
-      weatherGenerator.onHeavyRain += onHeavyRain;
-    }
-
-    public void RemoveOnHeavyRainListener(WeatherGenerator.OnWeather onHeavyRain)
-    {
-      weatherGenerator.onHeavyRain -= onHeavyRain;
-    }
-
-    public void ListenOnRain(WeatherGenerator.OnWeather onRain)
-    {
-      weatherGenerator.onRain -= onRain;
-      weatherGenerator.onRain += onRain;
-    }
-
-    public void RemoveOnRainListener(WeatherGenerator.OnWeather onRain)
-    {
-      weatherGenerator.onRain -= onRain;
-    }
-
-    public void ListenOnHeat(WeatherGenerator.OnWeather onHeat)
-    {
-      weatherGenerator.onHeat -= onHeat;
-      weatherGenerator.onHeat += onHeat;
-    }
-
-    public void RemoveOnHeatListener(WeatherGenerator.OnWeather onHeat)
-    {
-      weatherGenerator.onHeat -= onHeat;
-    }
-
-    public void ListenOnDry(WeatherGenerator.OnWeather onDry)
-    {
-      weatherGenerator.onDry -= onDry;
-      weatherGenerator.onDry += onDry;
-    }
-
-    public void RemoveOnDryListener(WeatherGenerator.OnWeather onDry)
-    {
-      weatherGenerator.onDry -= onDry;
-    }
-
-    public void ListenOnSeason(WeatherGenerator.OnSeasonChange onSeasonChange)
-    {
-      weatherGenerator.onSeasonChange -= onSeasonChange;
-      weatherGenerator.onSeasonChange += onSeasonChange;
-    }
-
-    public void RemoveOnSeasonListener(WeatherGenerator.OnSeasonChange onSeasonChange)
-    {
-      weatherGenerator.onSeasonChange -= onSeasonChange;
-    }
 
     public void ListenOnTurnEnd(TurnController.OnNewTurn onNewTurn)
     {
@@ -196,20 +149,46 @@ namespace MapTileNS
     // ==============================================================
     // ================= Disasters ==================================
     // ==============================================================
-    public bool SetFire()
+    public List<Tile> SetFire()
     {
       if (wildFire != null) {
         return wildFire.Start();
       }
+      return new List<Tile>();
+    }
+
+    public void Burn() {
+      if (wildFire != null) {
+        wildFire.BurnTile();
+      }
+    }
+
+    public bool IsFloodable() {
+      if (flood != null) {
+        return isDam && flood.Floodable();
+      }
       return false;
     }
 
-    public bool SabotageDam()
+    public bool IsBurnable() {
+      if (wildFire != null) {
+        return wildFire.Burnable();
+      }
+      return false;
+    }
+
+    public List<Tile> CreateFlood()
     {
       if (flood != null) {
         return flood.Start();
       }
-      return false;
+      return new List<Tile>();
+    }
+
+    public void Flood() {
+      if (flood != null) {
+        flood.FloodTile();
+      }
     }
 
     public bool Poision(Unit unit) {
@@ -242,8 +221,8 @@ namespace MapTileNS
       {
         UpdateMovementcost();
       }
-
-      hexMap.UpdateTileTextAndSkin(this);
+      // TODO remove this
+      hexMap.GetTileView(this).RefreshVisual();
     }
 
     public bool Ambushable()
@@ -363,11 +342,15 @@ namespace MapTileNS
       set
       {
         _settlement = value;
-        SetFieldType(FieldType.Settlement);
+        if (value != null) {
+          SetFieldType(FieldType.Settlement);
+        }
       }
     }
     Settlement _settlement;
     SettlementMgr settlementMgr;
+    EventDialog eventDialog;
+    SettlementAnimationController settlementAniController;
     public int Work2BuildSettlement()
     {
       if ((terrian == TerrianType.Plain || terrian == TerrianType.Hill) &&
@@ -379,18 +362,11 @@ namespace MapTileNS
       return -1;
     }
 
-    public void RemoveCamp(bool setFire)
-    {
-      _settlement = null;
-      if (setFire) SetFire();
-    }
-    
     public void BuildDam()
     {
       SetTerrianType(TerrianType.Water);
       SetFieldType(FieldType.Wild);
       isDam = true;
-      flood.BuildDam();
     }
     
     // ==============================================================
@@ -424,36 +400,16 @@ namespace MapTileNS
       return units.First();
     }
 
-    public void DisasterAffectUnit(DisasterType type)
-    {
-      if (field == FieldType.Settlement && settlement != null)
+    public Tile Escape() {
+      Unit unit = GetUnit();
+      foreach (Tile tile in Neighbours<Tile>())
       {
-        settlementMgr.DestroyCamp(settlement,
-          type == DisasterType.Flood ? BuildingNS.DestroyType.ByFlood : BuildingNS.DestroyType.ByFire,
-          false);
-      }
-      Unit u = GetUnit();
-      if (u != null)
-      {
-        Tile retreatTile = null;
-        foreach (Tile tile in Neighbours<Tile>())
+        if (tile.Deployable(unit))
         {
-          if (tile.Deployable(u))
-          {
-            retreatTile = tile;
-            break;
-          }
-        }
-        if (retreatTile == null)
-        {
-          u.Destroy(type == DisasterType.Flood ? DestroyType.ByFlood : DestroyType.ByWildFire);
-        }
-        else
-        {
-          DisasterEffect.Apply(type, u);
-          u.SetTile(retreatTile);
+          return tile;
         }
       }
+      return null;
     }
 
     // * PathFind interfaces *

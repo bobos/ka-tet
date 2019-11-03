@@ -50,6 +50,14 @@ public class Starter : MonoBehaviour {
     controllers.Add(turnPhaseTitle);
     InputField inputField = GameObject.FindObjectOfType<InputField>();
     controllers.Add(inputField);
+    PopTextAnimationController popAniController = GameObject.FindObjectOfType<PopTextAnimationController>();
+    controllers.Add(popAniController);
+    SettlementAnimationController settlementAniController = GameObject.FindObjectOfType<SettlementAnimationController>();
+    controllers.Add(settlementAniController);
+    UnitAnimationController unitAniController = GameObject.FindObjectOfType<UnitAnimationController>();
+    controllers.Add(unitAniController);
+    TileAnimationController tileAniController = GameObject.FindObjectOfType<TileAnimationController>();
+    controllers.Add(tileAniController);
 
     // controllers that will emit event on initialization, initiate it at last, as order matters
     TurnController turnController = GameObject.FindObjectOfType<TurnController>();

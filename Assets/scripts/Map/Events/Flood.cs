@@ -1,4 +1,7 @@
-﻿namespace MapTileNS
+﻿using System.Collections.Generic;
+using NatureNS;
+
+namespace MapTileNS
 {
   public class Flood
   {
@@ -12,17 +15,15 @@
       this.tile = tile;
     }
 
-    public void BuildDam() {
-      tile.ListenOnHeavyRain(OnHeavyRain);
-    }
-
-    public void OnHeavyRain()
+    public List<Tile> OnWeatherChange(Weather weather)
     {
+      List<Tile> tiles = new List<Tile>();
+      if (!tile.isDam || !Cons.IsHeavyRain(weather)) { return tiles; }
       if (Cons.FairChance())
       {
-        Start();
-        tile.RemoveOnHeavyRainListener(OnHeavyRain);
+        return Start();
       }
+      return tiles;
     }
 
     public void OnTurnEnd() {
@@ -33,37 +34,45 @@
       }
     }
 
-    public bool Start()
-    {
-      if (!flooded && (Cons.IsSpring(tile.weatherGenerator.season) || Cons.IsSummer(tile.weatherGenerator.season))
-          && (Cons.IsRain(tile.weatherGenerator.currentWeather) || Cons.IsHeavyRain(tile.weatherGenerator.currentWeather))) 
-      {
-        SpreadFlood();
-        return true;
-      }
-      return false;
+    public bool Floodable() {
+      return !flooded && (Cons.IsSpring(tile.weatherGenerator.season) || Cons.IsSummer(tile.weatherGenerator.season))
+          && (Cons.IsRain(tile.weatherGenerator.currentWeather) || Cons.IsHeavyRain(tile.weatherGenerator.currentWeather));
     }
 
-    public void SpreadFlood()
+    public List<Tile> Start() {
+      List<Tile> affectedTiles = new List<Tile>();
+      if (Floodable()) 
+      {
+        tile.isDam = false;
+        GetTile2Flood(affectedTiles);
+      }
+      return affectedTiles;
+    }
+
+    public void GetTile2Flood(List<Tile> tiles)
     {
-      flooded = true;
-      tile.DisasterAffectUnit(DisasterType.Flood);
       foreach (Tile tile in this.tile.DownstreamTiles<Tile>())
       {
         if (tile.terrian == TerrianType.Water || tile.field == FieldType.Flooding)
         {
-          tile.flood.SpreadFlood();
+          if(!tiles.Contains(tile)) tiles.Add(tile);
+          tile.flood.GetTile2Flood(tiles);
         }
         else if (tile.flood != null && tile.flood.CanBeFloodedByNearByTile() &&
          (Cons.IsHeavyRain(tile.weatherGenerator.currentWeather) ? Cons.HighlyLikely() : Cons.MostLikely()))
         {
-          tile.wildFire.PutOutFire();
-          tile.flood.floodingCntDown = Util.Rand(2, FloodingLasts);
-          tile.SetFieldType(FieldType.Flooding);
-          tile.ListenOnTurnEnd(OnTurnEnd);
-          tile.flood.SpreadFlood();
+          if(!tiles.Contains(tile)) tiles.Add(tile);
+          tile.flood.GetTile2Flood(tiles);
         }
       }
+    }
+
+    public void FloodTile() {
+      if (tile.terrian == TerrianType.Water || tile.field == FieldType.Flooding) { return; }
+      tile.wildFire.PutOutFire();
+      tile.flood.floodingCntDown = Util.Rand(2, FloodingLasts);
+      tile.SetFieldType(FieldType.Flooding);
+      tile.ListenOnTurnEnd(OnTurnEnd);
     }
 
     public bool CanBeFloodedByNearByTile()

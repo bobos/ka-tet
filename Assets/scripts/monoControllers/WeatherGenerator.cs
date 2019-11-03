@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using NatureNS;
+using UnitNS;
+using MapTileNS;
 
 namespace MonoNS
 {
@@ -13,40 +15,30 @@ namespace MonoNS
     {
       base.PreGameInit(hexMap, me);
       turnController = hexMap.turnController;
-      turnController.onNewTurn += OnNewTurn;
       currentWeather = GenerateWeather();
       weatherLastingTurns = DecideLastingDays(currentWeather);
     }
 
     public override void UpdateChild() {}
 
+    public HashSet<Tile> tileCB = new HashSet<Tile>();
     public Weather currentWeather;
     Weather tomorrowWeather;
     public int weatherLastingTurns = 0;
     // TODO: OnSeasonChange Event
     Season _season;
-    public delegate void OnSeasonChange(Season season);
-    public delegate void OnWeather();
-    public event OnWeather onRain;
-    public event OnWeather onHeavyRain;
-    public event OnWeather onDry;
-    public event OnWeather onHeat;
-    public event OnWeather onSnow;
-    public event OnWeather onBlizard;
-    public event OnSeasonChange onSeasonChange;
     public Season season
     {
       get { return _season; }
       set
       {
         _season = value;
-        if (onSeasonChange != null) onSeasonChange(value);
       }
     }
 
     TurnController turnController;
 
-    public void OnNewTurn()
+    public Weather NextDay()
     {
       if (weatherLastingTurns == 0)
       {
@@ -63,12 +55,7 @@ namespace MonoNS
         // generate future weather
         tomorrowWeather = GenerateWeather();
       }
-      if (Cons.IsRain(currentWeather) && onRain != null) onRain();
-      if (Cons.IsHeavyRain(currentWeather) && onHeavyRain != null) onHeavyRain();
-      if (Cons.IsHeat(currentWeather) && onHeat != null) onHeat();
-      if (Cons.IsDry(currentWeather) && onDry != null) onDry();
-      if (Cons.IsSnow(currentWeather) && onSnow != null) onSnow();
-      if (Cons.IsBlizard(currentWeather) && onBlizard != null) onBlizard();
+      return currentWeather;
     }
 
     public Weather Forecast()

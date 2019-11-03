@@ -2,7 +2,6 @@
 using UnitNS;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections.Generic;
 using CourtNS;
 
 namespace MonoNS
@@ -19,6 +18,7 @@ namespace MonoNS
       hexMap.actionController.onBtnClick += OnBtnClick;
     }
 
+    public bool Animating = false;
     TextLib textLib = Cons.GetTextLib();
     GameObject self;
     public GameObject configrmBtn;
@@ -95,17 +95,14 @@ namespace MonoNS
 
     public override void UpdateChild() {}
 
+    public bool accepted = false;
     public void OnAcceptClick() {
-      if (currentEvent == EventName.Disarmor && onDisarmorDecisionClick != null) {
-        onDisarmorDecisionClick(true, currentUnit);
-      }
+      accepted = true;
       Continue();
     }
 
     public void OnRejectClick() {
-      if (currentEvent == EventName.Disarmor && onDisarmorDecisionClick != null) {
-        onDisarmorDecisionClick(false, currentUnit);
-      }
+      accepted= false;
       Continue();
     }
 
@@ -119,25 +116,17 @@ namespace MonoNS
     }
 
     void Continue() {
+      Animating = false;
       self.SetActive(false);
       if (eventDialogOff != null) eventDialogOff();
-      isShowing = false;
       currentEvent = EventName.Null;
       currentSettlement = null;
       currentUnit = null;
-      if (events.Count > 0) {
-        Show(events.Dequeue());
-      }
     }
 
-    bool isShowing = false;
-    Queue<Event> events = new Queue<Event>();
     // TODO: only for player
     public void Show(Event dialogEvent) {
-      if (isShowing) {
-        events.Enqueue(dialogEvent);
-        return;
-      }
+      Animating = true;
       EventName name = currentEvent = dialogEvent.name;
       Unit unit = currentUnit = dialogEvent.unit;
       Settlement settlement = currentSettlement = dialogEvent.settlement;
@@ -148,8 +137,10 @@ namespace MonoNS
       int argu3 = dialogEvent.killed;
       int argu4 = dialogEvent.killedLabor;
       General general = dialogEvent.general;
-      if (name == EventName.Null) return; 
-      isShowing = true;
+      if (name == EventName.Null) {
+        Animating = false;
+        return; 
+      }
       ToggleConfirm();
 
       // TODO: AI Test

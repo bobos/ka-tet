@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using MapTileNS;
 using MonoNS;
+using System.Collections;
 
 namespace UnitNS
 {
@@ -9,28 +10,16 @@ namespace UnitNS
     Vector3 newPosition;
     Vector3 currentVelocity;
     HexMap hexMap;
-    Unit _unit = null;
-    string popMsg = null;
-    Color msgColor = Color.white;
-    public Unit unit
-    {
-      get
-      {
-        return _unit;
-      }
-      set
-      {
-        _unit = value;
-      }
-    }
+    public Unit unit;
     public GameObject nameGO;
     ActionController actionController;
     MouseController mouseController;
     bool viewActivated = true;
 
     // Call Start by next frame is too late, need to call this init on create
-    public void OnCreate()
+    public override void OnCreate(DataModel unit)
     {
+      this.unit = (Unit)unit;
       Animating = false;
       newPosition = this.transform.position;
       hexMap = GameObject.FindObjectOfType<HexMap>();
@@ -86,9 +75,26 @@ namespace UnitNS
       }
     }
 
-    public void PopOnActionDone(string msg, Color color) {
-      popMsg = msg;
-      msgColor = color;
+    public void DestroyAnimation(DestroyType type)
+    {
+      Animating = true;
+      StartCoroutine(CoDestroyAnimation(type));
+    }
+
+    IEnumerator CoDestroyAnimation(DestroyType type) {
+      yield return new WaitForSeconds(1);
+      Animating = false;
+    }
+
+    public void RoutAnimation()
+    {
+      Animating = true;
+      StartCoroutine(CoRoutAnimation());
+    }
+
+    IEnumerator CoRoutAnimation() {
+      yield return new WaitForSeconds(1);
+      Animating = false;
     }
 
     public void Move(Tile newTile)
@@ -140,7 +146,6 @@ namespace UnitNS
     /// </summary>
     void Update()
     {
-      if (textView != null) return; // means animation is done, text showing
       if (!Animating || !viewActivated) { return; }
       Vector3 originPosition = this.transform.position;
       // NOTE: this point to the gameobject not the component
@@ -150,13 +155,7 @@ namespace UnitNS
       {
         Vector3 p = nameGO.transform.position;
         nameGO.transform.position = new Vector3(p.x - 0.5f, p.y, p.z);
-        if (popMsg != null) {
-          textView = hexMap.ShowPopText(this, popMsg, msgColor);
-          popMsg = null;
-          msgColor = Color.white;
-        } else {
-          Animating = false;
-        }
+        Animating = false;
       }
     }
 

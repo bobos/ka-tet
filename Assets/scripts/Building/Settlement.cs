@@ -6,7 +6,7 @@ using MonoNS;
 using FieldNS;
 using BuildingNS;
 
-public abstract class Settlement
+public abstract class Settlement: DataModel
 {
   public const int MaxGarrisonPerCamp = 4;
   public const int MaxGarrisonPerBase = 20;
@@ -139,20 +139,12 @@ public abstract class Settlement
     this.supply = new Supply(hexMap);
   }
 
-  public void Destroy(BuildingNS.DestroyType type)
+  public List<Unit> Destroy()
   {
-    UnitNS.DestroyType desType = UnitNS.DestroyType.ByBurningCamp;
-    if (type == BuildingNS.DestroyType.ByFire) {
-      hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.WildFireDestroyCamp, null, this));
-    }
-    if (type == BuildingNS.DestroyType.ByFlood) {
-      desType = UnitNS.DestroyType.ByFlood;
-      hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.FloodDestroyCamp, null, this));
-    }
-    foreach (Unit unit in garrison)
-    {
-      unit.Destroy(desType);
-    }
+    settlementMgr.DestroySettlement(this);
+    baseTile.settlement = null;
+    // return the garrsion to be destroyed
+    return garrison;
   }
 
   public void Capture() {

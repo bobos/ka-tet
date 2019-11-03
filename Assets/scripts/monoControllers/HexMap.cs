@@ -28,6 +28,10 @@ namespace MonoNS
     public UnitActionBroker actionBroker;
     public InputField inputField;
     public EventDialog eventDialog;
+    public SettlementAnimationController settlementAniController;
+    public UnitAnimationController unitAniController;
+    public TileAnimationController tileAniController;
+    public PopTextAnimationController popAniController;
     public Region warRegion;
 
     // ==============================================================
@@ -98,7 +102,6 @@ namespace MonoNS
     Tile[] highlightedArea;
     LineRenderer lineRenderer;
     Dictionary<Tile, GameObject> tile2GO;
-    Dictionary<GameObject, Tile> GO2Tile;
     Dictionary<Unit, GameObject> unit2GO = new Dictionary<Unit, GameObject>();
 
     public Tile GetTile(int x, int y)
@@ -126,6 +129,10 @@ namespace MonoNS
       turnPhaseTitle = GameObject.FindObjectOfType<TurnPhaseTitle>();
       inputField = GameObject.FindObjectOfType<InputField>();
       eventDialog = GameObject.FindObjectOfType<EventDialog>();
+      settlementAniController = GameObject.FindObjectOfType<SettlementAnimationController>();
+      unitAniController = GameObject.FindObjectOfType<UnitAnimationController>();
+      tileAniController = GameObject.FindObjectOfType<TileAnimationController>();
+      popAniController = GameObject.FindObjectOfType<PopTextAnimationController>();
       // init actionBroker
       actionBroker = UnitActionBroker.GetBroker();
       actionBroker.onUnitAction += OnUnitAction;
@@ -233,7 +240,7 @@ namespace MonoNS
         for (int y = 0; y < numRows; y++)
         {
           Tile tile = tiles[x, y];
-          SetTileVisual(tile);
+          CreateTileGO(tile);
         }
       }
       StaticBatchingUtility.Combine(this.gameObject);
@@ -245,7 +252,7 @@ namespace MonoNS
         for (int y = 0; y < numRows; y++)
         {
           Tile tile = tiles[x, y];
-          UpdateTileTextAndSkin(tile);
+          GetTileView(tile).RefreshVisual();
         }
       }
     }
@@ -300,7 +307,7 @@ namespace MonoNS
       SetTroopSkin(unit2GO[unit], UnitHightlight);
     }
 
-    void SetTileVisual(Tile tile)
+    void CreateTileGO(Tile tile)
     {
       GameObject prefab = null;
       FieldType fieldType = FieldType.Wild;
@@ -342,101 +349,19 @@ namespace MonoNS
         fieldType = FieldType.Wild;
       }
       GameObject tileGO = (GameObject)Instantiate(prefab, tile.Position(), Quaternion.identity, this.transform);
+      View view = tileGO.GetComponentInChildren<TileView>();
+      view.OnCreate(tile);
       tile2GO[tile] = tileGO;
       tileGO.name = tile.GetCoord().x + "," + tile.GetCoord().y;
-      GO2Tile[tileGO] = tile;
       tile.SetFieldType(fieldType);
-      UpdateTileTextAndSkin(tile);
     }
 
-    void SetTileMat(Tile tile)
-    {
-      Material mat = null;
-      // MeshFilter points to the model
-      //MeshFilter mf = tileGO.GetComponentInChildren<MeshFilter>();
-      //mf.mesh = MeshFlat;
-      if (tile.field == FieldType.Burning)
+    public TileView GetTileView(Tile tile) {
+      if (tile == null || tile2GO == null || !tile2GO.ContainsKey(tile))
       {
-        mat = MatBurning;
-      } else if (tile.field == FieldType.Settlement)
-      {
-        mat = MatGrassland;
+        return null;
       }
-      else if (tile.field == FieldType.Schorched)
-      {
-        mat = MatSchorched;
-      }
-      else if (tile.field == FieldType.Flooding)
-      {
-        mat = MatOcean;
-      }
-      else if (tile.field == FieldType.Flooded)
-      {
-        mat = MatFlooded;
-      }
-      else if (tile.terrian == TerrianType.Mountain)
-      {
-        mat = MatMountain;
-      }
-      else if (tile.field == FieldType.Village)
-      {
-        mat = MatGrassland;
-      }
-      else if (tile.field == FieldType.Road)
-      {
-        mat = MatLessPlain;
-      }
-      else if (tile.terrian != TerrianType.Water && tile.field == FieldType.Wild)
-      {
-        mat = MatPlain;
-      }
-      else
-      {
-        mat = MatOcean;
-      }
-      GameObject tileGO = tile2GO[tile];
-      MeshRenderer[] mrs = tileGO.GetComponentsInChildren<MeshRenderer>();
-      foreach(MeshRenderer mr in mrs) {
-        if (mr.name == "HexCoordLabel" || mr.name == "overlay") {
-          continue;
-        }
-        mr.material = mat;
-      }
-    }
-
-    public void UpdateTileTextAndSkin(Tile tile)
-    {
-      GameObject tileGO = tile2GO[tile];
-      //string txt = tile.Q + "," + tile.R + "\n";
-      //txt = txt + (tile.isHighGround ? "High Ground" : "Flat Ground") + "\n";
-      //txt = txt + tile.GetFieldType() + "\n";
-      string txt = "";
-      if (tile.terrian == TerrianType.Water) {
-        if (tile.isDam)
-        {
-          txt = txt + "Dam\n";
-        }
-      } else if (tile.terrian != TerrianType.Mountain) {
-        txt = txt + (tile.burnable ? " Fire" : "");
-        if (settlementMgr.IsCampable(tile)) {
-          txt = txt + " Camp\n";
-        }
-      }
-      if (tile.field == FieldType.Village) {
-        txt = txt + " Village";
-      }
-      Color fontColor;
-      if (tile.field == FieldType.Burning || tile.field == FieldType.Schorched) {
-        fontColor = Color.white;
-      } else if (tile.field == FieldType.Flooded) {
-        fontColor = Color.black;
-      } else {
-        fontColor = Color.white;
-      }
-      tileGO.GetComponentInChildren<TextMesh>().fontSize = 10;
-      tileGO.GetComponentInChildren<TextMesh>().color = fontColor;
-      tileGO.GetComponentInChildren<TextMesh>().text = txt;
-      SetTileMat(tile);
+      return tile2GO[tile].GetComponent<TileView>();
     }
 
     public void SpawnUnit(Unit unit)
@@ -535,24 +460,6 @@ namespace MonoNS
       highlightedArea = tiles;
     }
 
-    public Tile GetTileFromGO(GameObject GO)
-    {
-      if (GO2Tile == null || !GO2Tile.ContainsKey(GO))
-      {
-        return null;
-      }
-      return GO2Tile[GO];
-    }
-
-    public GameObject GetTileGO(Tile tile)
-    {
-      if (tile2GO == null || !tile2GO.ContainsKey(tile))
-      {
-        return null;
-      }
-      return tile2GO[tile];
-    }
-
     public void DestroyUnitView(Unit unit)
     {
       if (unit2GO.ContainsKey(unit))
@@ -612,8 +519,7 @@ namespace MonoNS
       nameGO.GetComponent<UnitNameView>().SetName(unit.GeneralName());
       UnitView view = unitGO.GetComponent<UnitView>();
       view.nameGO = nameGO;
-      view.unit = unit;
-      view.OnCreate();
+      view.OnCreate(unit);
       unit2GO[unit] = unitGO;
       SetUnitSkin(unit);
     }
@@ -623,12 +529,6 @@ namespace MonoNS
         return null;
       }
       return unit2GO[unit].GetComponent<UnitView>();
-    }
-
-    public void AddOnDonePop(string msg, Color color, Unit unit) {
-      UnitView view = GetView(unit);
-      if (view == null) { return; }
-      view.PopOnActionDone(msg, color);
     }
 
     public PopTextView ShowPopText(View view, string msg, Color color) {
@@ -641,17 +541,10 @@ namespace MonoNS
       return textView;
     }
 
-    public void MoveUnit(Unit unit, Tile tile) {
-      UnitView view = GetView(unit);
-      if (view == null) { return; }
-      view.Move(tile);
-    }
-
     void GenerateMap()
     {
       tiles = new Tile[numCols, numRows];
       tile2GO = new Dictionary<Tile, GameObject>();
-      GO2Tile = new Dictionary<GameObject, Tile>();
 
       for (int x = 0; x < numCols; x++)
       {

@@ -19,7 +19,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4094946468845796}
-  - component: {fileID: 114969397558511790}
+  - component: {fileID: 114069282816786206}
   m_Layer: 0
   m_Name: camp
   m_TagString: Untagged
@@ -661,7 +661,7 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1735224434900790}
   m_Mesh: {fileID: 4300004, guid: fb27c7a575a0447f287452a088c648f4, type: 3}
---- !u!114 &114969397558511790
+--- !u!114 &114069282816786206
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -669,6 +669,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1002255177878198}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6fe6d7485862e44dda563d5d818f795d, type: 3}
+  m_Script: {fileID: 11500000, guid: daa534d3e5e224419ac8627b841e0d27, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Animating: 0

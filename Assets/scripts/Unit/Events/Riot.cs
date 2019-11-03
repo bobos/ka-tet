@@ -12,18 +12,15 @@ namespace UnitNS
       this.unit = unit;
     }
 
-    public bool Discontent(int point) {
-      unit.hexMap.AddOnDonePop(System.String.Format(Cons.GetTextLib().get("pop_discontent"), point), Color.red, unit);
+    public int Discontent(int point) {
       discontent += point;
       if (discontent == Max) {
         discontent = 0;
-        int moraleReduce = 20;
-        unit.rf.morale -= 20;
-        unit.hexMap.eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.Riot, unit, null, moraleReduce));
-        unit.Riot();
-        return true;
+        int moraleReduce = -30;
+        unit.rf.morale += moraleReduce;
+        return moraleReduce;
       }
-      return false;
+      return 0;
     }
 
     public string GetDescription() {

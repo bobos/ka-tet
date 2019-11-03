@@ -14,22 +14,17 @@ namespace MapTileNS
     public WildFire(Tile tile, bool burnable) {
       this.tile = tile;
       this.burnable = burnable;
-      if (CanSetFire()) {
-        tile.ListenOnDry(OnDry);
-      }
     }
 
-    public void OnRain()
+    public List<Tile> OnWeatherChange(Weather weather)
     {
-      PutOutFire();
-    }
-
-    public void OnSeasonChange(Season season)
-    {
-      if (Cons.IsWinter(season))
-      {
+      List<Tile> tiles = new List<Tile>();
+      if (burningCntDown > 0 && (Cons.IsRain(weather) || Cons.IsHeavyRain(weather))) {
         PutOutFire();
+        return tiles;
       }
+      if (tile.IsBurnable() && Cons.IsDry(weather) && Cons.SlimChance()) { return Start(); }
+      return tiles;
     }
 
     public void OnTurnEnd() {
@@ -40,16 +35,17 @@ namespace MapTileNS
       }
     }
 
-    public void OnDry()
-    {
-      if (Cons.SlimChance()) {
-        SpreadFire();
-        tile.RemoveOnDryListener(OnDry);
+    public List<Tile> Start() {
+      List<Tile> affectedTiles = new List<Tile>();
+      if (Burnable()) 
+      {
+        tile.isDam = false;
+        GetTile2Burn(affectedTiles);
       }
+      return affectedTiles;
     }
 
-    public bool Start()
-    {
+    public bool Burnable() {
       if (Cons.IsSpring(tile.weatherGenerator.season) || Cons.IsWinter(tile.weatherGenerator.season))
       {
         return false;
@@ -60,28 +56,15 @@ namespace MapTileNS
         return false;
       }
 
-      if (!burnable)
-      {
-        return false;
-      }
-      
-      SpreadFire();
-      return true;
+      return burnable;
     }
 
-    public void SpreadFire()
+    public void GetTile2Burn(List<Tile> affectedTiles)
     {
-      burnable = false;
-      tile.DisasterAffectUnit(DisasterType.WildFire);
-      tile.SetFieldType(FieldType.Burning);
-      burningCntDown = Util.Rand(2, BurningLasts);
+      if (!affectedTiles.Contains(tile)) { affectedTiles.Add(tile); }
       tile.ListenOnTurnEnd(OnTurnEnd);
-      tile.ListenOnSeason(OnSeasonChange);
-      tile.ListenOnRain(OnRain);
-      tile.ListenOnHeavyRain(OnRain);
       // spread to neighbours depends on season and wind and directions
       Cons.Direction windDirection = tile.windGenerator.direction;
-      List<Tile> affectedTiles = new List<Tile>();
       bool chance1 = Cons.FairChance();
       bool chance2 = Cons.SlimChance();
       bool chance3 = Cons.SlimChance();
@@ -139,18 +122,23 @@ namespace MapTileNS
         if ((tile.wildFire != null && tile.wildFire.CanSetFire())
           || (tile.terrian == TerrianType.Plain && tile.wildFire.CanPlainCatchFire()))
         {
-          tile.wildFire.SpreadFire();
+          tile.wildFire.GetTile2Burn(affectedTiles);
         }
       }
+    }
+
+    public void BurnTile() {
+      burnable = false;
+      burningCntDown = Util.Rand(2, BurningLasts);
+      tile.SetFieldType(FieldType.Burning);
+      tile.ListenOnTurnEnd(OnTurnEnd);
     }
     
     public void PutOutFire()
     {
+      burningCntDown = 0;
       tile.SetFieldType(FieldType.Schorched);
       tile.RemoveTurnEndListener(OnTurnEnd);
-      tile.RemoveOnHeavyRainListener(OnRain);
-      tile.RemoveOnRainListener(OnRain);
-      tile.RemoveOnSeasonListener(OnSeasonChange);
     }
 
     public bool CanSetFire()
@@ -174,9 +162,9 @@ namespace MapTileNS
 
     void PickTile2Burn(List<Tile> tiles, Tile tile1, Tile tile2, Tile tile3, bool chance1, bool chance2, bool chance3)
     {
-      if (tile1 != null && chance1) tiles.Add(tile1);
-      if (tile2 != null && chance2) tiles.Add(tile2);
-      if (tile3 != null && chance3) tiles.Add(tile3);
+      if (tile1 != null && chance1 && !tiles.Contains(tile1)) tiles.Add(tile1);
+      if (tile2 != null && chance2 && !tiles.Contains(tile2)) tiles.Add(tile2);
+      if (tile3 != null && chance3 && !tiles.Contains(tile3)) tiles.Add(tile3);
     }
   }
 

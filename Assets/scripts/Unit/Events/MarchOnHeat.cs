@@ -7,11 +7,12 @@
       this.unit = unit;
     }
 
-    public bool Occur() {
-      if (unit.tile.waterBound || unit.tile.settlement != null) {
-        return false;
+    public int Occur() {
+      if (!Cons.IsHeat(unit.hexMap.weatherGenerator.currentWeather)
+      || unit.tile.waterBound || unit.IsCamping()) {
+        return 0;
       }
-      return unit.Discontent(1);
+      return 1;
     }
 
   }

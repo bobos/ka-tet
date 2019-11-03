@@ -48,25 +48,33 @@
       return disableRatio > 0f;;
     }
 
-    public void Apply() {
-       if (disableRatio > 0)
+    public int[] Apply() {
+      int[] effects = new int[8]{0,0,0,0,0,0,0,0};
+      if (disableRatio > 0)
       {
         int woundedNum = GetIllDisableNum();
         unit.rf.wounded += woundedNum;
         unit.rf.soldiers -= woundedNum;
-        unit.labor -= (int)(woundedNum / 4);
+        effects[2] = woundedNum;
         disableRatio -= 0.005f;
       }
 
       if (killRatio > 0)
       {
-        unit.rf.morale -= 2;
+        int morale = -2;
+        unit.rf.morale += morale;
+        effects[0] = morale;
         int kiaNum = GetIllKillNum();
         unit.kia += kiaNum;
         unit.rf.soldiers -= kiaNum;
-        unit.labor -= kiaNum;
+        effects[3] = kiaNum;
+        int laborKilled = (int)(kiaNum / 5);
+        unit.labor -= laborKilled;
+        effects[4] = laborKilled;
         killRatio -= 0.005f;
       }
+
+      return effects;
     }
 
     public int GetIllTurns()

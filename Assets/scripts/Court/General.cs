@@ -68,6 +68,18 @@ namespace CourtNS {
       return txtLib.get(biography);
     }
 
+    public bool IsDead() {
+      return stat == GeneralStat.Dead;
+    }
+
+    public bool IsIdle() {
+      return stat == GeneralStat.Idle;
+    }
+
+    public bool IsRest() {
+      return stat == GeneralStat.Rest;
+    }
+
     // At Court Actions
     public void Assign(HexMap hexMap, Troop troop) {
       ResetFieldRecords();
@@ -123,7 +135,6 @@ namespace CourtNS {
       LeaveCampaign();
       if (Cons.FairChance()) {
         // Killed in battle
-        hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.GeneralKilledInBattle, null, null, 0, 0, 0, 0, 0, null, this));
         Die();
       }
     }
@@ -143,15 +154,12 @@ namespace CourtNS {
       if (rand < 6) {
         // Returned
         LeaveCampaign();
-        hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.GeneralReturned, null, null, 0, 0, 0, 0, 0, null, this));
       } else if (rand < 9) {
         // Resigned
         LeaveFaction();
-        hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.GeneralResigned, null, null, 0, 0, 0, 0, 0, null, this));
       } else {
         // Executed
         Die();
-        hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.GeneralExecuted, null, null, 0, 0, 0, 0, 0, null, this));
       }
     }
 
@@ -173,7 +181,6 @@ namespace CourtNS {
       }
       newGen.Assign(hexMap, troop);
       newGen.stat = GeneralStat.OnField;
-      hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.NewGeneral, troop.onFieldUnit, null));
       warParty.Join(newGen);
     }
 

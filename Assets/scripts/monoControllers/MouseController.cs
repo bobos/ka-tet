@@ -765,23 +765,18 @@ namespace MonoNS
       if (Input.GetMouseButtonUp(0) && tileUnderMouse != null
         && !Util.eq<Tile>(tileUnderMouse, selectedUnit.tile))
       {
-        msgBox.Show("To sabotage the dam");
         Tile damTile = null;
         foreach (Tile h in selectedUnit.tile.neighbours)
         {
           if (Util.eq<Tile>(tileUnderMouse, h)
-            && h.terrian == TerrianType.Water && h.isDam)
+            && h.IsFloodable())
           {
             damTile = h;
           }
         }
         if (damTile != null)
         {
-          if (damTile.SabotageDam()) {
-            msgBox.Show("决堤!");
-          } else {
-            msgBox.Show("决堤失败, 需在雨天");
-          }
+          actionController.sabotage(damTile);
           Escape();
         }
       }
@@ -792,16 +787,21 @@ namespace MonoNS
       if (Input.GetMouseButtonUp(0) && tileUnderMouse != null
         && !Util.eq<Tile>(tileUnderMouse, selectedUnit.tile))
       {
-        msgBox.Show("To set wild fire");
-        if (tileUnderMouse.SetFire())
+
+        Tile burnTile = null;
+        foreach (Tile h in selectedUnit.tile.neighbours)
         {
-          msgBox.Show("Let It Burn!");
+          if (Util.eq<Tile>(tileUnderMouse, h)
+            && h.IsBurnable())
+          {
+            burnTile = h;
+          }
         }
-        else
+        if (burnTile != null)
         {
-          msgBox.Show("Failed to set fire!");
+          actionController.burn(burnTile);
+          Escape();
         }
-        Escape();
       }
     }
 
@@ -812,7 +812,7 @@ namespace MonoNS
       {
         if (tileUnderMouse.settlement != null)
         {
-          settlementMgr.DestroyCamp(tileUnderMouse.settlement, BuildingNS.DestroyType.ByFire);
+          //settlementMgr.DestroyCamp(tileUnderMouse.settlement, BuildingNS.DestroyType.ByFire);
           Escape();
         }
       }
@@ -824,7 +824,7 @@ namespace MonoNS
       RaycastHit hitInfo;
       if (Physics.Raycast(mouseRay, out hitInfo, Mathf.Infinity, hexTileLayerMask.value)) // only hit 9th layer which is 2^8
       {
-        return hexMap.GetTileFromGO(hitInfo.transform.parent.gameObject);
+        return hitInfo.transform.parent.gameObject.GetComponentInChildren<TileView>().tile;
       }
       return null;
     }

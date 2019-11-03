@@ -73,6 +73,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4379770749035406}
   - component: {fileID: 23063485267174766}
+  - component: {fileID: 114350364876913312}
   m_Layer: 9
   m_Name: HexMountainRootPrefab
   m_TagString: Untagged
@@ -866,3 +867,15 @@ TextMesh:
   m_Color:
     serializedVersion: 2
     rgba: 4278716647
+--- !u!114 &114350364876913312
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1147184265965496}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3fe03bb303c64b4ebcbff8fcf545f7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Animating: 0

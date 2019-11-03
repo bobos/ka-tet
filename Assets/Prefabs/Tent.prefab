@@ -307,7 +307,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4587117807209862}
-  - component: {fileID: 114194216691948578}
+  - component: {fileID: 114803013245605882}
   m_Layer: 0
   m_Name: Tent
   m_TagString: Untagged
@@ -1182,7 +1182,7 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1413936617437730}
   m_Mesh: {fileID: 4300012, guid: 7b4080f9e94bb4d5e834dcf10b0c1d7a, type: 3}
---- !u!114 &114194216691948578
+--- !u!114 &114803013245605882
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1190,6 +1190,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1765841391525092}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6fe6d7485862e44dda563d5d818f795d, type: 3}
+  m_Script: {fileID: 11500000, guid: daa534d3e5e224419ac8627b841e0d27, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Animating: 0

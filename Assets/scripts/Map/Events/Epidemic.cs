@@ -1,26 +1,24 @@
-﻿namespace MapTileNS
+﻿using NatureNS;
+
+namespace MapTileNS
 {
   public class Epidemic
   {
     Tile tile;
     public Epidemic(Tile tile) {
       this.tile = tile;
-      tile.ListenOnHeavyRain(onHeavyRain);
     }
 
-    public void onHeavyRain()
+    public bool OnWeatherChange(Weather weather)
     {
-      if (tile.field != FieldType.Wild) {
-        tile.RemoveOnHeatListener(onHeavyRain);
-        return;
-      }
+      if (tile.field != FieldType.Wild || !Cons.IsHeavyRain(weather)) { return false; }
       if (((Cons.IsSpring(tile.weatherGenerator.season) && Cons.SlimChance())
           || (Cons.IsSummer(tile.weatherGenerator.season) && Cons.FairChance()))
           && tile.GetUnit() != null)
       {
-        // TODO: check if the unit is from huai areas
-        tile.GetUnit().CaughtEpidemic();
+        return true;
       }
+      return false;
     }
 
   }

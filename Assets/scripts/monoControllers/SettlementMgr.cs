@@ -24,6 +24,7 @@ namespace MonoNS
       defenderRoots = new List<Settlement>();
       buildingQueue = new List<Settlement>();
       mouseController = hexMap.mouseController;
+      popAniController = hexMap.popAniController;
       actionController = hexMap.actionController;
       actionController.onBtnClick += OnBtnClick;
       cc = hexMap.cameraKeyboardController;
@@ -95,6 +96,7 @@ namespace MonoNS
 
     TextLib textLib = Cons.GetTextLib();
     CameraKeyboardController cc;
+    PopTextAnimationController popAniController;
     IEnumerator PerformTurnEnd(WarParty warParty)
     {
       foreach (Settlement settlement in buildingQueue.ToArray())
@@ -102,15 +104,8 @@ namespace MonoNS
         if (Util.eq<WarParty>(warParty, settlement.owner))
         {
           if (settlement.TurnEnd()) {
-            SettlementView view = GetView(settlement);
-            cc.FixCameraAt(view.transform.position);
-            while (cc.fixingCamera) { yield return null; }
-            view.Animating = true;
-            hexMap.ShowPopText(view, textLib.get("pop_builded"), Color.green);
-            while (view.Animating)
-            {
-              yield return null;
-            }
+            popAniController.Show(GetView(settlement), textLib.get("pop_builded"), Color.green);
+            while (popAniController.Animating) { yield return null; }
           }
         }
       }
@@ -123,32 +118,17 @@ namespace MonoNS
           SettlementView view = GetView(root);
           List<List<Unit>> failedUnits = root.ReduceSupply();
           foreach(Unit u in failedUnits[0]) {
-            cc.FixCameraAt(view.transform.position);
-            while (cc.fixingCamera) { yield return null; }
-
-            view.Animating = true;
-            hexMap.ShowPopText(view, 
+            popAniController.Show(view, 
               System.String.Format(textLib.get("pop_failedToSupplyUnitInSettlement"), u.GeneralName()),
               Color.yellow);
-            while (view.Animating)
-            {
-              yield return null;
-            }
+            while (popAniController.Animating) { yield return null; }
           }
 
           foreach(Unit u in failedUnits[1]) {
-            View unitView = hexMap.GetUnitView(u);
-            cc.FixCameraAt(unitView.transform.position);
-            while (cc.fixingCamera) { yield return null; }
-
-            unitView.Animating = true;
-            unitView.textView = hexMap.ShowPopText(unitView, 
+            popAniController.Show(hexMap.GetUnitView(u), 
               textLib.get("pop_failedToSupplyUnitNearby"),
               Color.yellow);
-            while (unitView.Animating)
-            {
-              yield return null;
-            }
+            while (popAniController.Animating) { yield return null; }
           }
         }
         root.availableLabor = root.labor;
@@ -156,26 +136,19 @@ namespace MonoNS
 
       List<DistJob> jobs = warParty.attackside ? attackerDistJobs : defenderDistJobs;
       foreach(DistJob job in jobs) {
-        View view = GetView(job.from);
         if (!job.from.IsFunctional() || !job.to.IsFunctional()) {
-          cc.FixCameraAt(view.transform.position);
-          while (cc.fixingCamera) { yield return null; }
-
-          view.Animating = true;
-          hexMap.ShowPopText(view,
+          popAniController.Show(GetView(job.from),
             textLib.get(
               job.type == QueueJobType.DistSupply ?
               "pop_failedToDistSupply" : "pop_failedToDistLabor"),
             Color.red);
-          while (view.Animating)
-          {
-            yield return null;
-          }
+          while (popAniController.Animating) { yield return null; }
           continue;
         }
         // ambush supply caravans
         if(!job.from.GetReachableSettlements().Contains(job.to)) {
           hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.SupplyRouteBlocked, null, job.from, 0, 0, 0, 0, 0, job.to));
+          while (hexMap.eventDialog.Animating) { yield return null; }
           continue;
         }
         Tile[] route = job.from.baseTile.roads[job.to.baseTile];
@@ -273,13 +246,11 @@ namespace MonoNS
     Dictionary<Settlement, GameObject> settlement2GO = new Dictionary<Settlement, GameObject>();
     public void CreateSettlement(Settlement settlement)
     {
-      GameObject tileGO = hexMap.GetTileGO(settlement.baseTile);
-      if (tileGO == null) Util.Throw("CreateSettlement: Tile doesn't exist!");
       GameObject GO = (GameObject)Instantiate(settlement.type == Settlement.Type.camp ? hexMap.CampPrefab : hexMap.TentPrefab,
         settlement.baseTile.GetSurfacePosition(),
         Quaternion.identity,
-        tileGO.transform);
-      GO.GetComponent<SettlementView>().settlement = settlement;
+        hexMap.GetTileView(settlement.baseTile).transform);
+      GO.GetComponent<SettlementView>().OnCreate(settlement);
       settlement2GO[settlement] = GO;
     }
 
@@ -312,7 +283,7 @@ namespace MonoNS
       return tiles.ToArray();
     }
 
-    public void DestroyCamp(Settlement camp, BuildingNS.DestroyType type, bool setFire = true)
+    public void DestroySettlement(Settlement camp)
     {
       buildingQueue.Remove(camp);
       if (camp.owner.attackside)
@@ -323,11 +294,6 @@ namespace MonoNS
       {
         defenderRoots.Remove(camp);
       }
-      GameObject view = settlement2GO[camp];
-      view.GetComponent<SettlementView>().Destroy();
-      GameObject.Destroy(view);
-      camp.baseTile.RemoveCamp(setFire);
-      camp.Destroy(type);
     }
 
     public void GetVisibleArea(bool attackSide, HashSet<Tile> tiles) {

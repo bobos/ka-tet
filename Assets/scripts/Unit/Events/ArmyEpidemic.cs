@@ -31,10 +31,10 @@
       this.unit = unit;
     }
 
-    public void Worsen() {
-      unit.hexMap.eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.Epidemic, unit, null));
+    public int Occur() {
       disableRatio += GetDisableRatio();
       killRatio += GetKillRatio();
+      return 1;
     }
 
     public void Destroy() {}
@@ -43,25 +43,33 @@
       return disableRatio > 0f;
     }
 
-    public void Apply() {
+    public int[] Apply() {
+      int[] effects = new int[8]{0,0,0,0,0,0,0,0};
       if (disableRatio > 0)
       {
         int woundedNum = GetIllDisableNum();
         unit.rf.wounded += woundedNum;
         unit.rf.soldiers -= woundedNum;
-        unit.labor -= (int)(woundedNum / 4);
         disableRatio -= 0.005f;
+        effects[2] = woundedNum;
       }
 
       if (killRatio > 0)
       {
-        unit.rf.morale -= 2;
+        int morale = -2;
+        effects[0] = morale;
+        unit.rf.morale += morale;
         int kiaNum = GetIllKillNum();
         unit.kia += kiaNum;
         unit.rf.soldiers -= kiaNum;
-        unit.labor -= kiaNum;
+        effects[3] = kiaNum;
+        int killedLabor = (int)(kiaNum / 5);
+        unit.labor -= killedLabor; 
+        effects[4] = killedLabor;
         killRatio -= 0.005f;
       }
+
+      return effects;
     }
 
     public int GetIllTurns()

@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using UnityEngine;
 using UnitNS;
+using MapTileNS;
+using System.Collections.Generic;
 
 namespace MonoNS
 {
@@ -19,6 +21,16 @@ namespace MonoNS
     public event BtnClicked onBtnClick;
     public delegate void ActionDone(Unit unit, Unit[] units, actionName btn);
     public event ActionDone actionDone;
+    TileAnimationController tileAniController {
+      get {
+        return hexMap.tileAniController;
+      }
+    }
+    UnitAnimationController unitAniController {
+      get {
+        return hexMap.unitAniController;
+      }
+    }
 
     public bool ActionOngoing { get; private set; }
 
@@ -206,10 +218,20 @@ namespace MonoNS
     // Make sure this is sequential
     public bool move(Unit unit)
     {
-      return DoAction(unit, null, actionName.MOVE);
+      return DoAction(unit, null, null, actionName.MOVE);
     }
 
-    public bool DoAction(Unit unit, Unit[] units, actionName name)
+    public bool sabotage(Tile tile)
+    {
+      return DoAction(null, null, tile, actionName.SABOTAGE);
+    }
+
+    public bool burn(Tile tile)
+    {
+      return DoAction(null, null, tile, actionName.FIRE);
+    }
+
+    public bool DoAction(Unit unit, Unit[] units, Tile tile, actionName name)
     {
       if (ActionOngoing) return false;
       ActionOngoing = true;
@@ -221,22 +243,52 @@ namespace MonoNS
       {
         StartCoroutine(DoAttack(unit, units));
       }
+      if (name == actionName.SABOTAGE)
+      {
+        StartCoroutine(Flood(tile));
+      }
+      if (name == actionName.FIRE)
+      {
+        StartCoroutine(Burn(tile));
+      }
       return true;
     }
 
     IEnumerator DoMove(Unit unit)
     {
+      List<Unit> ambusher = new List<Unit>();
       UnitView view = hexMap.GetUnitView(unit);
-      while (view && unit.DoMove())
+      while (view && unitAniController.MoveUnit(unit, ambusher))
       {
-        while (view.Animating)
-        {
-          yield return null;
-        }
-        // wait one frame 
+        while (unitAniController.MoveAnimating) { yield return null; }
+      }
+      while (unitAniController.MoveAnimating) { yield return null; }
+      if (ambusher.Count > 0) {
+        // TODO: trigger ambush
       }
       ActionOngoing = false;
+      // ???
       if (actionDone != null) actionDone(unit, null, actionName.MOVE);
+    }
+
+    IEnumerator Flood(Tile tile)
+    {
+      tileAniController.Flood(tile);
+      while (tileAniController.FloodAnimating)
+      {
+        yield return null;
+      }
+      ActionOngoing = false;
+    }
+
+    IEnumerator Burn(Tile tile)
+    {
+      tileAniController.Burn(tile);
+      while (tileAniController.BurnAnimating)
+      {
+        yield return null;
+      }
+      ActionOngoing = false;
     }
 
     IEnumerator DoAttack(Unit receiver, Unit[] punchers)

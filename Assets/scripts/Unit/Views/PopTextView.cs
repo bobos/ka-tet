@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace UnitNS
 {
@@ -9,12 +7,12 @@ namespace UnitNS
     // Use this for initialization
     float timer = 0.0f;
     float textSpeed = 2.5f;
-    View view = null;
     void Start () { 
     }
 
+    public bool Animating = false;
     public void Show(View view, string msg, Color color) {
-      this.view = view;
+      Animating = true;
       TextMesh textMesh = this.transform.GetComponent<TextMesh>();
       textMesh.text = msg;
       textMesh.color = color;
@@ -27,8 +25,7 @@ namespace UnitNS
       transform.Translate(new Vector3(0, textSpeed * Time.deltaTime, 0));
       // last 1 sec
       if (timer > 0.7f) {
-        view.Animating = false;
-        Destroy(gameObject);
+        Animating = false;
       }
     }
   }

@@ -193,6 +193,20 @@ namespace TextNS
       {"pop_failedToDistSupply", "无法转运粮草"},
       {"pop_failedToDistLabor", "无法转移民夫"},
       {"pop_starving", "部队饥饿!"},
+      {"pop_damBroken", "决堤!"},
+      {"pop_morale", "士气"},
+      {"pop_movement", "移动力"},
+      {"pop_wounded", "负伤"},
+      {"pop_killed", "阵亡"},
+      {"pop_laborKilled", "民夫死亡"},
+      {"pop_desserter", "逃亡"},
+      {"pop_atk", "战斗力"},
+      {"pop_def", "防御力"},
+      {"pop_routing", "溃败"},
+      {"pop_warWeary", "厌战"},
+      {"pop_sickness", "痢疾"},
+      {"pop_poisioned", "中毒"},
+      {"pop_setFire", "引燃"},
 
       };
     }

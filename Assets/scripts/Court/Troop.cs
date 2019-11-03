@@ -52,6 +52,10 @@ namespace CourtNS
       return type == Type.Cavalry;
     }
 
+    public bool IsRest() {
+      return state == TroopState.Rest;
+    }
+
     public int morale {
       get {
         return _morale;

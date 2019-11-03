@@ -29,12 +29,12 @@ namespace MonoNS
       {
         if (unitUnderAttack.attackReaction == Reaction.Disband)
         {
-          unitUnderAttack.Destroy(DestroyType.ByDisband);
+          //unitUnderAttack.Destroy(DestroyType.ByDisband);
           return;
         }
         if (attackers[0].attackReaction == Reaction.Disband)
         {
-          attackers[0].Destroy(DestroyType.ByDisband);
+          //attackers[0].Destroy(DestroyType.ByDisband);
           return;
         }
       }
@@ -98,7 +98,7 @@ namespace MonoNS
           }
         }
       }
-      if (!actionController.DoAction(receiver, punchers, ActionController.actionName.ATTACK))
+      if (!actionController.DoAction(receiver, punchers, null, ActionController.actionName.ATTACK))
       {
         Debug.LogError("Failed to perform attack, try again!");
         return;

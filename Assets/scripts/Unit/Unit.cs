@@ -8,7 +8,7 @@ using FieldNS;
 
 namespace UnitNS
 {
-  public abstract class Unit : PFUnit
+  public abstract class Unit : PFUnit, DataModel
   {
     public delegate void UnitMovedCallback(Tile newTile);
     public abstract bool IsCavalry();
@@ -27,7 +27,7 @@ namespace UnitNS
     public const float SnowDisableRate = 0.005f;
     public const float BlizardKillRate = 0.0125f;
     public const float BlizardDisableRate = 0.025f;
-    public const int DisbandUnitUnder = 10;
+    public const int DisbandUnitUnder = 20;
 
     public const int L1Visibility = 5; // under 4000 
     public const int L2Visibility = 8; // > 4000
@@ -39,11 +39,11 @@ namespace UnitNS
 
     public HexMap hexMap;
     public bool clone = false;
-    ArmorRemEvent armorRemEvent;
-    ArmyEpidemic epidemic;
-    UnitPoisioned unitPoisioned;
-    Riot riot;
-    MarchOnHeat marchOnHeat;
+    public ArmorRemEvent armorRemEvent;
+    public ArmyEpidemic epidemic;
+    public UnitPoisioned unitPoisioned;
+    public Riot riot;
+    public MarchOnHeat marchOnHeat;
     WeatherGenerator weatherGenerator;
     TurnController turnController;
     public Unit(bool clone, Troop troop, Tile tile, State state,
@@ -281,6 +281,10 @@ namespace UnitNS
       return epidemic.IsValid();
     }
 
+    public bool IsPoisioned() {
+      return unitPoisioned.IsValid();
+    }
+
     public bool IsStarving() {
       return starving;
     }
@@ -367,43 +371,8 @@ namespace UnitNS
     }
 
     // Before new turn starts
-    public void RefreshUnit()
+    public int[] RefreshUnit()
     {
-      movementRemaining = GetFullMovement();
-      turnDone = false;
-      // recalculate supply based on labor
-      int canCarry = GetMaxSupplySlots() * SupplyNeededPerTurn();
-      supply = supply > canCarry ? canCarry : supply;
-      if (Cons.IsHeavyRain(hexMap.weatherGenerator.currentWeather)) {
-        if (state == State.Camping) return;
-        rf.morale -= 1;
-        movementRemaining = (int)(movementRemaining / 2);
-      }
-      if (Cons.IsSnow(hexMap.weatherGenerator.currentWeather)) {
-        if (state == State.Camping) return;
-        rf.morale -= 5;
-        movementRemaining = (int)(movementRemaining / 2);
-        int woundedNum = (int)(rf.soldiers * SnowDisableRate);
-        rf.wounded += woundedNum;
-        rf.soldiers -= woundedNum;
-        int kiaNum = (int)(rf.soldiers * SnowKillRate);
-        kia += kiaNum;
-        rf.soldiers -= kiaNum;
-        labor -= kiaNum;
-      }
-      if (Cons.IsBlizard(hexMap.weatherGenerator.currentWeather)) {
-        if (state == State.Camping) return;
-        rf.morale -= 10;
-        movementRemaining = (int)(movementRemaining / 4);
-        int woundedNum = (int)(rf.soldiers * BlizardDisableRate);
-        rf.wounded += woundedNum;
-        rf.soldiers -= woundedNum;
-        int kiaNum = (int)(rf.soldiers * BlizardKillRate);
-        kia += kiaNum;
-        rf.soldiers -= kiaNum;
-        labor -= kiaNum;
-      }
-
       if (concealCoolDownTurn > 0) {
         concealCoolDownTurn--;
       } else {
@@ -411,6 +380,61 @@ namespace UnitNS
           if (!hexMap.IsInEnemyScoutRange(this.IsAI(), tile)) SetState(State.Conceal);
         }
       }
+
+      movementRemaining = GetFullMovement();
+      turnDone = false;
+      int[] effects = new int[8]{0,0,0,0,0,0,0,0};
+      // recalculate supply based on labor
+      int canCarry = GetMaxSupplySlots() * SupplyNeededPerTurn();
+      supply = supply > canCarry ? canCarry : supply;
+      if (Cons.IsHeavyRain(hexMap.weatherGenerator.currentWeather)) {
+        if (state == State.Camping) return effects;
+        int morale = -1;
+        int movement = (int)(movementRemaining / (-2));
+        rf.morale += morale;
+        movementRemaining += movement;
+        effects[0] = morale;
+        effects[1] = movement;
+      } else if (Cons.IsSnow(hexMap.weatherGenerator.currentWeather)) {
+        if (state == State.Camping) return effects;
+        int morale = -5;
+        int movement = (int)(movementRemaining / (-2));
+        rf.morale += morale;
+        movementRemaining += movement;
+        int woundedNum = (int)(rf.soldiers * SnowDisableRate);
+        rf.wounded += woundedNum;
+        rf.soldiers -= woundedNum;
+        int kiaNum = (int)(rf.soldiers * SnowKillRate);
+        kia += kiaNum;
+        rf.soldiers -= kiaNum;
+        int laborKilled = (int)(kiaNum / 5);
+        labor -= laborKilled;
+        effects[0] = morale;
+        effects[1] = movement;
+        effects[2] = woundedNum;
+        effects[3] = kiaNum;
+        effects[4] = laborKilled;
+      } else if (Cons.IsBlizard(hexMap.weatherGenerator.currentWeather)) {
+        if (state == State.Camping) return effects;
+        int morale = -10;
+        rf.morale += morale;
+        int movement = (int)(movementRemaining / (-4)) * 3;
+        movementRemaining += movement;
+        int woundedNum = (int)(rf.soldiers * BlizardDisableRate);
+        rf.wounded += woundedNum;
+        rf.soldiers -= woundedNum;
+        int kiaNum = (int)(rf.soldiers * BlizardKillRate);
+        kia += kiaNum;
+        rf.soldiers -= kiaNum;
+        int laborKilled = (int)(kiaNum / 5);
+        labor -= laborKilled;
+        effects[0] = morale;
+        effects[1] = movement;
+        effects[2] = woundedNum;
+        effects[3] = kiaNum;
+        effects[4] = laborKilled;
+      }
+      return effects;
     }
 
     bool turnDone = false;
@@ -443,58 +467,18 @@ namespace UnitNS
       hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.Retreat, this, null));
     }
 
-    public void Riot() {
-      rf.general.UnitRiot();
-    }
-
-    public void Destroy(DestroyType type)
+    public int Destroy()
     {
       int killed = rf.soldiers + rf.wounded;
-      if (type == DestroyType.ByBurningCamp) {
-        hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.BurningCampDestroyUnit, this, null, 0, 0, killed));
-      } else if (type == DestroyType.ByWildFire) {
-        hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.WildFireDestroyUnit, this, null, 0, 0, killed));
-      } else if (type == DestroyType.ByFlood) {
-        hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.FloodDestroyUnit, this, null, 0, 0, killed));
-      } else {
-        hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.Disbanded, this, null, 0, 0, killed));
-      }
       kia += killed;
       rf.soldiers = rf.wounded = labor = 0;
-      rf.general.TroopDestroyed();
       SetState(State.Disbanded);
       tile.RemoveUnit(this);
       if (tile.settlement != null && tile.settlement.owner.isAI == this.IsAI()) {
         tile.settlement.RemoveUnit(this);
       }
       DestroyEvents();
-    }
-
-    // After an unit finishes its turn
-    public void PostAction()
-    {
-      if (rf.morale == 0)
-      {
-        if (state != State.Camping) SetState(State.Routing);
-        labor = 0;
-        // TODO start routing
-      }
-      else if (IsWarWeary())
-      {
-        rf.morale -= 1;
-        int miaNum = GetWarWearyDissertNum();
-        mia += miaNum;
-        rf.soldiers -= miaNum;
-        labor -= miaNum;
-      }
-
-      epidemic.Apply();
-      unitPoisioned.Apply();
-
-      if (rf.soldiers <= DisbandUnitUnder)
-      {
-        Destroy(DestroyType.ByDisband);
-      }
+      return killed;
     }
 
     public bool waitingForOrders()
@@ -505,18 +489,29 @@ namespace UnitNS
       return true;
     }
 
-    public void TakeEffect(DisasterType type, int reduceMorale, float movementDropRatio = 0f,
+    public int[] TakeEffect(int reduceMorale, float movementDropRatio = 0f,
       float disableRatio = 0f, float killRatio = 0f) {
+      int[] reduced = new int[8]; // morale, movement, wounded, killed, laborKilled, disserter, attack, def
       rf.morale -= reduceMorale;
-      movementRemaining = movementRemaining - (int)(movementRemaining * movementDropRatio);
+      reduced[0] = -reduceMorale;
+      int moveReduce = (int)(movementRemaining * movementDropRatio);
+      movementRemaining = movementRemaining - moveReduce; 
+      reduced[1] = -moveReduce;
       int woundedNum = (int)(rf.soldiers * disableRatio);
       rf.wounded += woundedNum;
       rf.soldiers -= woundedNum;
+      reduced[2] = woundedNum;
       int kiaNum = (int)(rf.soldiers * killRatio);
       kia += kiaNum;
       rf.soldiers -= kiaNum;
+      reduced[3] = kiaNum;
       int killLabor = (int)(kiaNum * 0.8f);
       labor -= killLabor;
+      reduced[4] = killLabor;
+      reduced[5] = 0;
+      reduced[6] = 0;
+      reduced[7] = 0;
+      return reduced;
     }
 
 
@@ -696,18 +691,8 @@ namespace UnitNS
       }
     }
 
-    public void CaughtEpidemic()
-    {
-      Discontent(1);
-      epidemic.Worsen();
-    }
-
     public void Poisioned() {
       unitPoisioned.Poision();
-    }
-
-    public bool Discontent(int point) {
-      return riot.Discontent(point);
     }
 
     float GetBuff()
@@ -823,50 +808,57 @@ namespace UnitNS
       SetState(State.Stand);
     }
 
-    bool MoveTo(Tile t, bool preMove = false) {
+    bool AfterMoveUpdate(List<Unit> ambusher) {
       bool continueMoving = true;
-      if (!preMove && IsConcealed() && hexMap.IsInEnemyScoutRange(this.IsAI(), t)) {
+      if (IsConcealed() && hexMap.IsInEnemyScoutRange(this.IsAI(), tile)) {
         DiscoveredByEnemy();
         continueMoving = false;
       }
 
-      if (t.IsThereConcealedEnemy(IsAI())) {
-        Unit u = t.GetUnit();
-        u.DiscoveredByEnemy();
-        if(u.IsAmbushing()) {
-          bool triggerAmbush = false;
-          HashSet<Unit> ambushers = new HashSet<Unit>();
-          foreach(Tile tt in tile.neighbours) {
-            Unit candidate = tt.GetUnit();
-            if (candidate != null && candidate.IsAI() != IsAI()) {
-              ambushers.Add(candidate);
-              if (Util.eq<Unit>(candidate, u)) {
-                triggerAmbush = true;
-              }
-            }
-          }
-
-          if (triggerAmbush) {
-            // TODO: trigger ambush event
+      List<Unit> candidates = new List<Unit>();
+      bool ambushed = false;
+      foreach(Tile t in tile.neighbours) {
+        Unit candidate = t.GetUnit();
+        if (candidate != null && candidate.IsAI() != IsAI()) {
+          candidates.Add(candidate);
+          if (candidate.IsAmbushing()) {
+            ambushed = true;
           }
         }
+      }
+      if (ambushed) {
+        ambusher = candidates;
         continueMoving = false;
       }
+
+      // discover nearby enemies
+      foreach(Tile t in GetScoutArea()) {
+        Unit candidate = t.GetUnit();
+        if (candidate != null && candidate.IsAI() != IsAI() && candidate.IsConcealed()) {
+          candidate.DiscoveredByEnemy();
+        }
+      }
+
       return continueMoving;
     }
 
-    public bool DoMove()
+    public bool DoMove(List<Unit> ambusher, Tile toTile = null)
     {
-      if (path == null || path.Count == 0 || movementRemaining <= 0)
-      {
+      if (movementRemaining <= 0) {
         return false;
       }
-      Tile next = path.Peek();
-      if(!MoveTo(next)) {
-        return false;
-      }
-      int takenMovement = CostToEnterTile(next, PathFind.Mode.Normal);
 
+      Tile next = null;
+      if (toTile != null) {
+        path = null;
+        next = toTile;
+      } else if (path != null && path.Count > 0) {
+        next = path.Peek();
+      } else {
+        return false;
+      }
+
+      int takenMovement = CostToEnterTile(next, PathFind.Mode.Normal);
       if (takenMovement < 0)
       {
         // path blocked, empty path and set idle
@@ -877,28 +869,17 @@ namespace UnitNS
       {
         return false;
       }
-      Tile nxtTile = path.Dequeue();
-      if (!nxtTile.Deployable(this))
+      if (toTile == null) {
+        next = path.Dequeue();
+      }
+      if (!next.Deployable(this))
       {
         return false;
       }
 
       movementRemaining -= takenMovement;
-      SetTile(nxtTile);
-      if (Cons.IsHeat(weatherGenerator.currentWeather) && marchOnHeat.Occur()) {
-        // riot happens, stop moving
-        return false;
-      }
-
-      bool continueMove = true;
-      // discover nearby enemy
-      foreach(Tile t in GetScoutArea()) {
-        if(!MoveTo(t, true)) {
-          continueMove = false;
-        }
-      }
-
-      return continueMove;
+      SetTile(next);
+      return AfterMoveUpdate(ambusher);
     }
 
     public void SetTile(Tile h, bool dontAddToNewTile = false)
@@ -911,7 +892,6 @@ namespace UnitNS
       {
         // not encamp, do move
         h.AddUnit(this);
-        hexMap.MoveUnit(this, h);
         UnitActionBroker broker = UnitActionBroker.GetBroker();
         broker.BrokeChange(this, ActionType.UnitMove, tile);
       }
@@ -1015,17 +995,6 @@ namespace UnitNS
       // if tile takes 3 turns to enter, we can still enter it with 1 full turn
       cost = cost > GetFullMovement() ? GetFullMovement() : cost;
       return cost;
-    }
-
-    public void ListenOnHeat(WeatherGenerator.OnWeather onHeat)
-    {
-      weatherGenerator.onHeat -= onHeat;
-      weatherGenerator.onHeat += onHeat;
-    }
-
-    public void RemoveOnHeatListener(WeatherGenerator.OnWeather onHeat)
-    {
-      weatherGenerator.onHeat -= onHeat;
     }
   }
 }
