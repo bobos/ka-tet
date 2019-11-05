@@ -77,6 +77,7 @@ namespace MonoNS
       if (tile == null) {
         discontent = unit.marchOnHeat.Occur();
       }
+      hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(unit.tile).transform.position);
       StartCoroutine(CoMoveUnit(unit, discontent));
       return continuing;
     }
@@ -180,19 +181,22 @@ namespace MonoNS
         int laborDisserter = (int) (miaNum / 4);
         unit.labor -= laborDisserter;
         effects[4] = laborDisserter;
-        CoShowEffects(unit, effects);
+        ShowEffects(unit, effects);
+        while (ShowAnimating) { yield return null; }
       }
 
       if (unit.IsSicknessAffected()) {
         popAniController.Show(view, textLib.get("pop_sickness"), Color.yellow);
         while (popAniController.Animating) { yield return null; }
-        CoShowEffects(unit, unit.epidemic.Apply());
+        ShowEffects(unit, unit.epidemic.Apply());
+        while (ShowAnimating) { yield return null; }
       }
 
       if (unit.IsPoisioned()) {
         popAniController.Show(view, textLib.get("pop_poisioned"), Color.yellow);
         while (popAniController.Animating) { yield return null; }
-        CoShowEffects(unit, unit.unitPoisioned.Apply());
+        ShowEffects(unit, unit.unitPoisioned.Apply());
+        while (ShowAnimating) { yield return null; }
       }
 
       PostAnimating = false;
@@ -206,6 +210,7 @@ namespace MonoNS
 
     IEnumerator CoRefreshUnit(Unit unit) {
       ShowEffects(unit, unit.RefreshUnit());
+      while (ShowAnimating) { yield return null; }
       if (Cons.IsHeat(hexMap.weatherGenerator.currentWeather)) {
         if(unit.armorRemEvent.Occur()) {
           int defReduce = unit.armorRemEvent.DefReduce();
@@ -216,6 +221,7 @@ namespace MonoNS
           if (eventDialog.accepted) {
             unit.disarmorDefDebuf = defReduce; 
             ShowEffects(unit, new int[8]{0,0,0,0,0,0,0,defReduce});
+            while (ShowAnimating) { yield return null; }
           } else {
             Riot(unit, discontent);
             while (riotAnimating) { yield return null; }

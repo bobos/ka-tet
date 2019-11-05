@@ -28,10 +28,10 @@ namespace MonoNS
     public override void UpdateChild() {}
 
     public bool FloodAnimating = false;
-    public void Flood(Tile tile)
+    public void Flood(Tile tile, List<Tile> tiles = null)
     {
       FloodAnimating = true;
-      StartCoroutine(CoFlood(tile, tile.CreateFlood()));
+      StartCoroutine(CoFlood(tile, tiles == null ? tile.CreateFlood() : tiles));
     }
 
     IEnumerator CoFlood(Tile t, List<Tile> tiles)
@@ -39,6 +39,7 @@ namespace MonoNS
       popAniController.Show(hexMap.GetTileView(t), textLib.get("pop_damBroken"), Color.red);
       while (popAniController.Animating) { yield return null; }
       foreach(Tile tile in tiles) {
+        hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(tile).transform.position);
         Settlement settlement = tile.settlement;
         Unit unit = tile.GetUnit();
         tile.Flood();
@@ -71,10 +72,10 @@ namespace MonoNS
     }
 
     public bool BurnAnimating = false;
-    public void Burn(Tile tile)
+    public void Burn(Tile tile, List<Tile> tiles = null)
     {
       BurnAnimating = true;
-      StartCoroutine(CoBurn(tile, tile.SetFire()));
+      StartCoroutine(CoBurn(tile, tiles == null ? tile.SetFire() : tiles));
     }
 
     IEnumerator CoBurn(Tile t, List<Tile> tiles)
@@ -82,6 +83,7 @@ namespace MonoNS
       popAniController.Show(hexMap.GetTileView(t), textLib.get("pop_setFire"), Color.yellow);
       while (popAniController.Animating) { yield return null; }
       foreach(Tile tile in tiles) {
+        hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(tile).transform.position);
         Settlement settlement = tile.settlement;
         Unit unit = tile.GetUnit();
         tile.Burn();
@@ -121,7 +123,7 @@ namespace MonoNS
     }
 
     IEnumerator CoWeatherChange(Tile tile, Weather weather) {
-      if(tile.epidemic.OnWeatherChange(weather)) {
+      if(tile.epidemic != null && tile.epidemic.OnWeatherChange(weather)) {
         // epidemic triggered
         Unit unit = tile.GetUnit();
         eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.Epidemic, unit, null));
@@ -132,14 +134,20 @@ namespace MonoNS
         while (unitAniController.riotAnimating) { yield return null; }
       }
 
-      List<Tile> tiles = tile.flood.OnWeatherChange(weather);
-      if (tiles.Count > 0) {
-        CoFlood(tile, tiles);
+      if (tile.flood != null) {
+        List<Tile> tiles = tile.flood.OnWeatherChange(weather);
+        if (tiles.Count > 0) {
+          Flood(tile, tiles);
+          while (FloodAnimating) { yield return null; }
+        }
       }
 
-      tiles = tile.wildFire.OnWeatherChange(weather);
-      if (tiles.Count > 0) {
-        CoBurn(tile, tiles);
+      if (tile.wildFire != null) {
+        List<Tile> tiles = tile.wildFire.OnWeatherChange(weather);
+        if (tiles.Count > 0) {
+          Burn(tile, tiles);
+          while (BurnAnimating) { yield return null; }
+        }
       }
 
       WeatherAnimating = false;

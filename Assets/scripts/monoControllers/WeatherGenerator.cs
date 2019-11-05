@@ -17,6 +17,7 @@ namespace MonoNS
       turnController = hexMap.turnController;
       currentWeather = GenerateWeather();
       weatherLastingTurns = DecideLastingDays(currentWeather);
+      NextDay();
     }
 
     public override void UpdateChild() {}

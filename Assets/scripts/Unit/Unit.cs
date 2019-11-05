@@ -389,15 +389,12 @@ namespace UnitNS
       supply = supply > canCarry ? canCarry : supply;
       if (Cons.IsHeavyRain(hexMap.weatherGenerator.currentWeather)) {
         if (state == State.Camping) return effects;
-        int morale = -1;
         int movement = (int)(movementRemaining / (-2));
-        rf.morale += morale;
         movementRemaining += movement;
-        effects[0] = morale;
         effects[1] = movement;
       } else if (Cons.IsSnow(hexMap.weatherGenerator.currentWeather)) {
         if (state == State.Camping) return effects;
-        int morale = -5;
+        int morale = -1;
         int movement = (int)(movementRemaining / (-2));
         rf.morale += morale;
         movementRemaining += movement;
@@ -416,7 +413,7 @@ namespace UnitNS
         effects[4] = laborKilled;
       } else if (Cons.IsBlizard(hexMap.weatherGenerator.currentWeather)) {
         if (state == State.Camping) return effects;
-        int morale = -10;
+        int morale = -5;
         rf.morale += morale;
         int movement = (int)(movementRemaining / (-4)) * 3;
         movementRemaining += movement;

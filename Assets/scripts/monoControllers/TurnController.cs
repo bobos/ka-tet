@@ -34,6 +34,7 @@ namespace MonoNS
       turnIndicator.Set(turnNum, faction);
       showingTitle = true;
       title.Set(faction);
+      if (onNewTurn != null) { onNewTurn(); }
       StartCoroutine(KeepShowingTitle());
     }
 
@@ -217,8 +218,8 @@ namespace MonoNS
       */
       endingTurn = false;
       if (cnt == 0) {
-        if (onNewTurn != null) { onNewTurn(); }
         Weather weather = weatherGenerator.NextDay();
+        if (onNewTurn != null) { onNewTurn(); }
         foreach(Tile tile in weatherGenerator.tileCB) {
           tileAniController.WeatherChange(tile, weather);
           while (tileAniController.WeatherAnimating) { yield return null; }
