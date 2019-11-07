@@ -404,6 +404,10 @@ namespace MonoNS
     }
 
     public void OverlayFoW(Tile tile) {
+      Unit unit = tile.GetUnit();
+      if (unit != null && !unit.IsConcealed()) {
+        DeactivateUnitView(unit);
+      }
       Overlay(tile, OverLayMat);
     }
 
@@ -426,6 +430,10 @@ namespace MonoNS
     }
 
     public void OverlayDisable(Tile tile) {
+      Unit unit = tile.GetUnit();
+      if (unit != null && !unit.IsConcealed()) {
+        ActivateUnitView(unit);
+      }
       Overlay(tile, TransMat);
     }
 

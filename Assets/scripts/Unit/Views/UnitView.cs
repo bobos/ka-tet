@@ -14,7 +14,6 @@ namespace UnitNS
     public GameObject nameGO;
     ActionController actionController;
     MouseController mouseController;
-    bool viewActivated = true;
 
     // Call Start by next frame is too late, need to call this init on create
     public override void OnCreate(DataModel unit)

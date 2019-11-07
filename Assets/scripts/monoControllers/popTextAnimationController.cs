@@ -19,6 +19,7 @@ namespace MonoNS
 
     public void Show(View view, string msg, Color color)
     {
+      if (view == null || !view.viewActivated) { return; }
       Animating = true;
       StartCoroutine(CoShow(view, msg, color));
     }

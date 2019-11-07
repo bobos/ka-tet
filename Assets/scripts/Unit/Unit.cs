@@ -102,6 +102,10 @@ namespace UnitNS
         broker.BrokeChange(this, ActionType.UnitLeft, tile);
         return;
       }
+      if (state == State.Routing) {
+        broker.BrokeChange(this, ActionType.UnitVisible, tile);
+        return;
+      }
       // TODO: AI test
       bool myTurn = !turnController.playerTurn == IsAI();
       FoW fow = FoW.Get();
@@ -331,6 +335,13 @@ namespace UnitNS
     {
       // TODO: add more
       return new WarPoint();
+    }
+
+    public bool IsShowingAnimation() {
+      View view = hexMap.GetUnitView(this);
+      // TODO: uncomment me
+      // return !IsAI() || (IsAI() && view != null && view.viewActivated);
+      return true;
     }
 
     public Tile[] GetScoutArea() {

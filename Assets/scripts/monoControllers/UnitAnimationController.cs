@@ -5,7 +5,6 @@ using TextNS;
 using UnityEngine;
 using MapTileNS;
 using System.Collections.Generic;
-using NatureNS;
 
 namespace MonoNS
 {
@@ -19,7 +18,6 @@ namespace MonoNS
       popAniController = hexMap.popAniController;
     }
 
-    public bool Animating = false;
     SettlementMgr settlementMgr;
     EventDialog eventDialog;
     PopTextAnimationController popAniController;
@@ -77,7 +75,9 @@ namespace MonoNS
       if (tile == null) {
         discontent = unit.marchOnHeat.Occur();
       }
-      hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(unit.tile).transform.position);
+      if (unit.IsShowingAnimation()) {
+        hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(unit.tile).transform.position);
+      }
       StartCoroutine(CoMoveUnit(unit, discontent));
       return continuing;
     }
@@ -103,10 +103,12 @@ namespace MonoNS
     IEnumerator CoRiot(Unit unit, int discontent) {
       int moraleReduce = unit.riot.Discontent(discontent);
       UnitView view = hexMap.GetUnitView(unit);
-      popAniController.Show(view, 
-        System.String.Format(textLib.get("pop_discontent"), discontent),
-        Color.yellow);
-      while (popAniController.Animating) { yield return null; }
+      if (unit.IsShowingAnimation()) {
+        popAniController.Show(view, 
+          System.String.Format(textLib.get("pop_discontent"), discontent),
+          Color.yellow);
+        while (popAniController.Animating) { yield return null; }
+      }
       
       if (moraleReduce != 0) {
         // Riot
@@ -157,18 +159,23 @@ namespace MonoNS
       if (unit.rf.morale == 0)
       {
         if (!unit.IsCamping()) {
+          // TODO: routing state should not go to any settlement, leave the campaign instead
           unit.SetState(State.Routing);
           unit.labor = 0;
-          popAniController.Show(view, textLib.get("pop_routing"), Color.red);
-          while (popAniController.Animating) { yield return null; }
-          view.RoutAnimation();
-          while (view.Animating) { yield return null; }
+          if (unit.IsShowingAnimation()) {
+            popAniController.Show(view, textLib.get("pop_routing"), Color.red);
+            while (popAniController.Animating) { yield return null; }
+            view.RoutAnimation();
+            while (view.Animating) { yield return null; }
+          }
         }
       }
       else if (unit.IsWarWeary())
       {
-        popAniController.Show(view, textLib.get("pop_warWeary"), Color.yellow);
-        while (popAniController.Animating) { yield return null; }
+        if (unit.IsShowingAnimation()) {
+          popAniController.Show(view, textLib.get("pop_warWeary"), Color.yellow);
+          while (popAniController.Animating) { yield return null; }
+        }
         int[] effects = new int[8]{0,0,0,0,0,0,0,0};
         int morale = -1;
         effects[0] = morale;
@@ -186,15 +193,19 @@ namespace MonoNS
       }
 
       if (unit.IsSicknessAffected()) {
-        popAniController.Show(view, textLib.get("pop_sickness"), Color.yellow);
-        while (popAniController.Animating) { yield return null; }
+        if (unit.IsShowingAnimation()) {
+          popAniController.Show(view, textLib.get("pop_sickness"), Color.yellow);
+          while (popAniController.Animating) { yield return null; }
+        }
         ShowEffects(unit, unit.epidemic.Apply());
         while (ShowAnimating) { yield return null; }
       }
 
       if (unit.IsPoisioned()) {
-        popAniController.Show(view, textLib.get("pop_poisioned"), Color.yellow);
-        while (popAniController.Animating) { yield return null; }
+        if (unit.IsShowingAnimation()) {
+          popAniController.Show(view, textLib.get("pop_poisioned"), Color.yellow);
+          while (popAniController.Animating) { yield return null; }
+        }
         ShowEffects(unit, unit.unitPoisioned.Apply());
         while (ShowAnimating) { yield return null; }
       }
@@ -233,6 +244,7 @@ namespace MonoNS
 
     public bool ShowAnimating = false;
     public void ShowEffects(Unit unit, int[] effects) {
+      if (!unit.IsShowingAnimation()) { return; }
       ShowAnimating = true;
       StartCoroutine(CoShowEffects(unit, effects));
     }
