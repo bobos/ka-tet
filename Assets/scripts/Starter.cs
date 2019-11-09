@@ -12,8 +12,9 @@ public class Starter : MonoBehaviour {
   public void OnGameStart() {
     // HexMap must be the first controller to initiate
     HexMap hexMap = GameObject.FindObjectOfType<HexMap>();
-    // Set War Region
-    hexMap.warRegion = Cons.huaiWest;
+    Cons.InitRegion();
+    // Set War Province
+    hexMap.warProvince = Cons.huaiWest;
 
     // controllers only add callbacks on initialization, will not emit initial events
     List<BaseController> controllers = new List<BaseController>();
@@ -124,18 +125,18 @@ public class Starter : MonoBehaviour {
     xuchu.JoinFaction(Cons.Liang, Cons.Tiger);
 
     // step 3, assign general to units
-    Troop troop = new Troop(2000, Cons.HeJian, Cons.riverRun, Type.Infantry);
+    Troop troop = new Troop(2000, Cons.HeJian, Cons.riverRun, Type.Infantry, Cons.elite);
     liubei.Assign(hexMap, troop);
-    troop = new Troop(500, Cons.HeJian, Cons.riverRun, Type.Cavalry);
+    troop = new Troop(500, Cons.HeJian, Cons.riverRun, Type.Cavalry, Cons.veteran);
     zhaoyun.Assign(hexMap, troop);
-    troop = new Troop(800, Cons.HeJian, Cons.riverRun, Type.Infantry);
+    troop = new Troop(800, Cons.HeJian, Cons.riverRun, Type.Infantry, Cons.rookie);
     guanyu.Assign(hexMap, troop);
-    troop = new Troop(1000, Cons.HeJian, Cons.middleEarth, Type.Cavalry);
+    troop = new Troop(1000, Cons.HeJian, Cons.middleEarth, Type.Cavalry, Cons.rookie);
     zhangfei.Assign(hexMap, troop);
 
-    troop = new Troop(7000, Cons.Liang, Cons.riverNorth, Type.Infantry);
+    troop = new Troop(7000, Cons.Liang, Cons.riverNorth, Type.Infantry, Cons.elite);
     caocao.Assign(hexMap, troop);
-    troop = new Troop(400, Cons.Liang, Cons.riverNorth, Type.Cavalry);
+    troop = new Troop(400, Cons.Liang, Cons.riverNorth, Type.Cavalry, Cons.elite);
     xuchu.Assign(hexMap, troop);
 
     // step 4, on field assignment

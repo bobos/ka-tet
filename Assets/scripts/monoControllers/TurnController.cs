@@ -158,8 +158,9 @@ namespace MonoNS
       while (settlementMgr.turnEndOngoing) { yield return null; }
       foreach (Unit unit in otherP.GetUnits())
       {
+        int[] effects = new int[8]{0,0,0,0,0,0,0,0};
         if (!unit.consumed) {
-          unit.ConsumeSupply();
+          effects = unit.ConsumeSupply();
         }
         if (unit.starving) {
           View view;
@@ -173,6 +174,8 @@ namespace MonoNS
           {
             yield return null;
           }
+          unitAniController.ShowEffects(unit, effects);
+          while (unitAniController.ShowAnimating) { yield return null; }
         }
         unit.consumed = false;
         unitAniController.RefreshUnit(unit);

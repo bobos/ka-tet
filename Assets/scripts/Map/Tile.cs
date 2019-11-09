@@ -45,12 +45,7 @@ namespace MapTileNS
       if (terrian == TerrianType.Water) {
         poision = new Poision(this);
       }
-      if (field == FieldType.Wild && (
-        Util.eq<Region>(hexMap.warRegion, Cons.huaiWest) ||
-        Util.eq<Region>(hexMap.warRegion, Cons.huaiNorth) ||
-        Util.eq<Region>(hexMap.warRegion, Cons.huaiSouth) ||
-        Util.eq<Region>(hexMap.warRegion, Cons.riverEast)
-      )) {
+      if (field == FieldType.Wild && Util.eq<Region>(hexMap.warProvince.region, Cons.lowLand)) {
         epidemic = new Epidemic(this);
       }
 

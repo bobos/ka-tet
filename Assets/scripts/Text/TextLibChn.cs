@@ -80,6 +80,9 @@ namespace TextNS
       {"u_satisfied", @"士卒满意({0})"},
       {"u_unsatisfied", @"士卒不满({0})"},
       {"u_riot", @"士卒骚动{0}"},
+      {"rank_rookie", "厢兵"},
+      {"rank_veteran", "牙兵"},
+      {"rank_elite", "禁军"},
 
       // region
       {"r_riverRun", "河中"},

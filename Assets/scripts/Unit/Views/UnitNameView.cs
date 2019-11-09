@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using CourtNS;
 using UnityEngine;
 
 namespace UnitNS
@@ -10,10 +9,11 @@ namespace UnitNS
     void Start () {
     }
   
-    public void SetName(string name) {
+    public void SetName(General general) {
       TextMesh textMesh = this.transform.GetComponent<TextMesh>();
-      textMesh.text = name;
-      textMesh.color = Color.white;
+      textMesh.text = general.Name();
+      textMesh.color = Color.yellow;
+      transform.rotation = Camera.main.transform.rotation;
     }
     
     // Update is called once per frame

@@ -124,18 +124,40 @@ public class Cons {
     return textLib;
   }
 
-  //* regions */
-  public static Region riverRun = new RiverRun();
-  public static Region riverSouth = new RiverSouth();
-  public static Region riverNorth = new RiverNorth();
-  public static Region riverWest = new RiverWest();
-  public static Region riverEast = new RiverEast();
-  public static Region middleEarth = new MiddleEarth();
-  public static Region farWest = new FarWest();
-  public static Region farNorth = new FarNorth();
-  public static Region huaiWest = new HuaiWest();
-  public static Region huaiNorth = new HuaiNorth();
-  public static Region huaiSouth = new HuaiSouth();
+  public static UnitNS.Rank rookie = new UnitNS.Rookie();
+  public static UnitNS.Rank veteran = new UnitNS.Veteran();
+  public static UnitNS.Rank elite = new UnitNS.Elite();
+
+  public static Region upLand = new Upland();
+  public static Region lowLand = new Lowland();
+  public static Region plain = new Plain();
+  public static Region hillLand = new Hillland();
+  public static Region grassLand = new Grassland();
+
+  public static Province riverRun = new RiverRun(hillLand);
+  public static Province riverSouth = new RiverSouth(plain);
+  public static Province riverNorth = new RiverNorth(plain);
+  public static Province riverWest = new RiverWest(upLand);
+  public static Province riverEast = new RiverEast(plain);
+  public static Province middleEarth = new MiddleEarth(plain);
+  public static Province farWest = new FarWest(upLand);
+  public static Province farNorth = new FarNorth(grassLand);
+  public static Province huaiWest = new HuaiWest(lowLand);
+  public static Province huaiNorth = new HuaiNorth(lowLand);
+  public static Province huaiSouth = new HuaiSouth(lowLand);
+
+  public static void InitRegion() {
+    Cons.upLand.UncomfortableRegions.Add(plain);
+    Cons.upLand.UncomfortableRegions.Add(lowLand);
+
+    Cons.plain.UncomfortableRegions.Add(upLand);
+    Cons.plain.UncomfortableRegions.Add(lowLand);
+
+    Cons.grassLand.UncomfortableRegions.Add(lowLand);
+    Cons.grassLand.UncomfortableRegions.Add(upLand);
+
+    Cons.lowLand.UncomfortableRegions.Add(upLand);
+  }
 
   //* factions */
   public static Faction Jin = new Jin(true, 2000000);

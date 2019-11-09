@@ -18,7 +18,7 @@ namespace CourtNS
 
     public string name;
     public Faction faction;
-    public Region region;
+    public Province province;
     public General general;
     public int wounded = 0;
     public Unit onFieldUnit;
@@ -28,23 +28,25 @@ namespace CourtNS
     int atkCore;
     int defCore;
     int movCore;
-    SkillTree skillTree = new SkillTree();
+    public Rank rank;
+    public Level level = new Level();
     TroopState state;
 
     public static int MaxNum(Type type) {
       return type == Type.Cavalry ? Cavalry.MaxTroopNum : Infantry.MaxTroopNum;
     }
 
-    public Troop(int soldiers, Faction faction, Region region, Type type) {
+    public Troop(int soldiers, Faction faction, Province province, Type type, Rank rank) {
+      this.rank = rank;
       this.type = type;
       this.soldiers = soldiers;
       this.faction = faction;
-      name = region.AssignLegionName(type);
-      atkCore = Util.Rand(AbilityMin, AbilityMax);
-      defCore = Util.Rand(AbilityMin, AbilityMax);
-      movCore = Util.Rand(AbilityMin + 60, AbilityMax + 60);
-      morale = 60;
-      this.region = region;
+      name = province.AssignLegionName(type);
+      atkCore = province.region.Atk(type);
+      defCore = province.region.Def(type);
+      movCore = province.region.Mov(type);
+      morale = province.region.Will();
+      this.province = province;
       state = TroopState.Idle;
     }
 
@@ -76,19 +78,19 @@ namespace CourtNS
 
     public int atk {
       get {
-        return (int)(atkCore + (atkCore * (region.AtkBuf(type) + skillTree.GetAttackBuff(type))));
+        return (int)(atkCore + (atkCore * rank.AtkBuf()));
       }
     }
 
     public int def {
       get {
-        return (int)(defCore + (defCore * (region.DefBuf(type) + skillTree.GetDefenseBuff(type))));
+        return (int)(defCore + (defCore * rank.DefBuf()));
       }
     }
 
     public int mov {
       get {
-        return (int)(movCore + (movCore * region.MovBuf(type)));
+        return movCore;
       }
     }
 

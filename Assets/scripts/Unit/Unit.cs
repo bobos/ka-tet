@@ -366,7 +366,7 @@ namespace UnitNS
     public int ReplenishSupply(int supply)
     {
       int remaining = TakeInSupply(supply);
-      rf.morale = IsWarWeary() ? (GetRetreatThreshold() + rf.region.MoraleBuf()) : rf.morale;
+      rf.morale = IsWarWeary() ? (GetRetreatThreshold() + 1) : rf.morale;
       if (state == State.Routing) {
         SetState(State.Stand);
       }
@@ -625,7 +625,7 @@ namespace UnitNS
 
     public int GetMaxSupplySlots()
     {
-      return rf.region.ExtraSupplySlot() + GetBaseSupplySlots() - (IsWarWeary() ? 1 : 0);
+      return rf.province.region.ExtraSupplySlot() + GetBaseSupplySlots() - (IsWarWeary() ? 1 : 0);
     }
 
     public int GetNeededSupply()
@@ -634,31 +634,38 @@ namespace UnitNS
       return needed < 0 ? 0 : needed;
     }
 
-    public void ConsumeSupply()
+    public int[] ConsumeSupply()
     {
       int needed = SupplyNeededPerTurn();
       int neededHalf = MinSupplyNeeded();
       starving = false;
+      int[] effects = new int[8]{0,0,0,0,0,0,0,0};
       if (supply < neededHalf) {
         starving = true;
         supply = 0;
-        rf.morale -= 10;
+        int moraleReduce = -10;
+        rf.morale += moraleReduce;
         int miaNum = GetStarvingDessertNum();
         mia += miaNum;
         rf.soldiers -= miaNum;
         int deathNum = GetStarvingKillNum();
         kia += deathNum;
         rf.soldiers -= deathNum;
-        labor -= deathNum;
-        return;
+        int laborDead = (int)(deathNum / 5);
+        labor -= laborDead;
+        effects[0] = moraleReduce;
+        effects[3] = deathNum;
+        effects[4] = laborDead;
+        effects[5] = miaNum;
+        return effects;
       }
 
       if (supply < needed) {
         supply = 0;
-        return;
+      } else {
+        supply -= needed;
       }
-
-      supply -= needed;
+      return effects;
     }
 
     public int SupplyNeededPerTurn()
@@ -675,7 +682,7 @@ namespace UnitNS
     // ==============================================================
     int GetRetreatThreshold()
     {
-      return rf.region.RetreatThreshold();
+      return rf.province.region.RetreatThreshold();
     }
 
     // ==============================================================
@@ -728,7 +735,7 @@ namespace UnitNS
 
     float GetMoraleBuf()
     {
-      float buff = (rf.morale - rf.region.RetreatThreshold() * 2) * 0.008f;
+      float buff = (rf.morale - rf.province.region.RetreatThreshold() * 2) * 0.008f;
       return buff > 0 ? buff : (IsWarWeary() ? -0.5f : 0f);
     }
 

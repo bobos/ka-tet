@@ -32,7 +32,7 @@ namespace MonoNS
     public UnitAnimationController unitAniController;
     public TileAnimationController tileAniController;
     public PopTextAnimationController popAniController;
-    public Region warRegion;
+    public Province warProvince;
 
     // ==============================================================
     // ================= Interfaces required from hex map plugin ====
@@ -92,6 +92,7 @@ namespace MonoNS
     public GameObject TentPrefab;
     public GameObject CampPrefab;
     public GameObject NameTextPrefab;
+    public GameObject UnitInfoPrefab;
     public GameObject PopTextPrefab;
     public WarParty[] warParties = new WarParty[2];
     public List<GameObject> lineCache = new List<GameObject>();
@@ -517,16 +518,24 @@ namespace MonoNS
       GameObject tileGO = tile2GO[tile];
       //NOTE: spawn as child gameobject of hex
       Vector3 position = tile.GetSurfacePosition();
-      Vector3 namePosition = new Vector3(position.x - 0.5f, position.y, position.z);
+      Vector3 namePosition = UnitView.NamePosition(position);
+      Vector3 unitInfoPosition = UnitView.UnitInfoPosition(position);
       GameObject unitGO = (GameObject)Instantiate(prefab,
           position,
           Quaternion.identity, tileGO.transform);
       GameObject nameGO = (GameObject)Instantiate(NameTextPrefab,
           namePosition,
           Quaternion.identity, tileGO.transform);
-      nameGO.GetComponent<UnitNameView>().SetName(unit.GeneralName());
+      nameGO.GetComponent<UnitNameView>().SetName(unit.rf.general);
       UnitView view = unitGO.GetComponent<UnitView>();
       view.nameGO = nameGO;
+
+      GameObject unitInfoGO = (GameObject)Instantiate(UnitInfoPrefab,
+          unitInfoPosition,
+          Quaternion.identity, tileGO.transform);
+      unitInfoGO.GetComponent<UnitInfoView>().SetName(unit.rf);
+      view.unitInfoGO = unitInfoGO;
+
       view.OnCreate(unit);
       unit2GO[unit] = unitGO;
       SetUnitSkin(unit);

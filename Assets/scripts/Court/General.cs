@@ -36,7 +36,7 @@ namespace CourtNS {
     public Traits[] bornTraits;
     public List<Traits> developedTraits;
     public int age;
-    public Region region;
+    public Province province;
     public Troop commandUnit;
     public event OnGeneralLeaveCampaign onGeneralLeaveCampaign;
     public event OnFieldEvent onFieldEvent;
@@ -51,10 +51,10 @@ namespace CourtNS {
     string biography;
     TextLib txtLib = Cons.GetTextLib();
 
-    public General(string name, string biography, Region region, Traits[] traits) {
+    public General(string name, string biography, Province province, Traits[] traits) {
       this.name = name;
       this.biography = biography;
-      this.region = region;
+      this.province = province;
       this.bornTraits = traits;
       developedTraits = new List<Traits>();
     }

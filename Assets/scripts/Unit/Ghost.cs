@@ -14,7 +14,7 @@ namespace UnitNS
     }
 
     public static GhostUnit createGhostUnit() {
-      Troop troop = new Troop(3800, Cons.GF, Cons.middleEarth, Type.Infantry);
+      Troop troop = new Troop(3800, Cons.GF, Cons.middleEarth, Type.Infantry, Cons.elite);
       return new GhostUnit(troop);
 
     }
