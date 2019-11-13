@@ -30,6 +30,7 @@ namespace MonoNS
     {
       DestroyAnimating = true;
       int killed = unit.Destroy();
+      hexMap.cameraKeyboardController.DisableCamera();
       StartCoroutine(CoDestroy(unit, type, killed));
     }
 
@@ -58,6 +59,7 @@ namespace MonoNS
         eventDialog.Show(new MonoNS.Event(EventDialog.EventName.GeneralKilledInBattle, null, null, 0, 0, 0, 0, 0, null, general));
         while (eventDialog.Animating) { yield return null; }
       }
+      hexMap.cameraKeyboardController.EnableCamera();
       DestroyAnimating = false;
     }
 
@@ -78,6 +80,7 @@ namespace MonoNS
       if (unit.IsShowingAnimation()) {
         hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(unit.tile).transform.position);
       }
+      hexMap.cameraKeyboardController.DisableCamera();
       StartCoroutine(CoMoveUnit(unit, discontent));
       return continuing;
     }
@@ -88,6 +91,7 @@ namespace MonoNS
       while (view.Animating) { yield return null; }
       Riot(unit, discontent);
       while (riotAnimating) { yield return null; }
+      hexMap.cameraKeyboardController.EnableCamera();
       MoveAnimating = false;
     }
 
@@ -97,6 +101,7 @@ namespace MonoNS
         return;
       }
       riotAnimating = true;
+      hexMap.cameraKeyboardController.DisableCamera();
       StartCoroutine(CoRiot(unit, discontent));
     }
 
@@ -144,6 +149,7 @@ namespace MonoNS
           while (eventDialog.Animating) { yield return null; }
         }
       }
+      hexMap.cameraKeyboardController.EnableCamera();
       riotAnimating = false;
     }
 
@@ -151,6 +157,7 @@ namespace MonoNS
     public void PostTurnAction(Unit unit)
     {
       PostAnimating = true;
+      hexMap.cameraKeyboardController.DisableCamera();
       StartCoroutine(CoPostTurnAction(unit));
     }
 
@@ -210,12 +217,14 @@ namespace MonoNS
         while (ShowAnimating) { yield return null; }
       }
 
+      hexMap.cameraKeyboardController.EnableCamera();
       PostAnimating = false;
     }
 
     public bool RefreshAnimating = false;
     public void RefreshUnit(Unit unit) {
       RefreshAnimating = true;
+      hexMap.cameraKeyboardController.DisableCamera();
       StartCoroutine(CoRefreshUnit(unit));
     }
 
@@ -239,6 +248,7 @@ namespace MonoNS
           }
         }
       }
+      hexMap.cameraKeyboardController.EnableCamera();
       RefreshAnimating = false;
     }
 
@@ -246,6 +256,7 @@ namespace MonoNS
     public void ShowEffects(Unit unit, int[] effects) {
       if (!unit.IsShowingAnimation()) { return; }
       ShowAnimating = true;
+      hexMap.cameraKeyboardController.DisableCamera();
       StartCoroutine(CoShowEffects(unit, effects));
     }
 
@@ -316,6 +327,7 @@ namespace MonoNS
         while (popAniController.Animating) { yield return null; }
       }
 
+      hexMap.cameraKeyboardController.EnableCamera();
       ShowAnimating = false;
     }
   }

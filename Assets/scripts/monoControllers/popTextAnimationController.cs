@@ -21,6 +21,7 @@ namespace MonoNS
     {
       if (view == null || !view.viewActivated) { return; }
       Animating = true;
+      hexMap.cameraKeyboardController.DisableCamera();
       StartCoroutine(CoShow(view, msg, color));
     }
 
@@ -31,6 +32,7 @@ namespace MonoNS
       PopTextView textView = hexMap.ShowPopText(view, msg, color);
       while (textView.Animating) { yield return null; }
       Destroy(textView.gameObject);
+      hexMap.cameraKeyboardController.EnableCamera();
       Animating = false;
     }
   }

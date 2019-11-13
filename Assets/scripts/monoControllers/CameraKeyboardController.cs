@@ -8,20 +8,19 @@ namespace MonoNS
     public override void PreGameInit(HexMap hexMap, BaseController me)
     {
       base.PreGameInit(hexMap, me);
-      turnController = hexMap.turnController;
-      hexMap.eventDialog.eventDialogOn += EventDialogOn;
-      hexMap.eventDialog.eventDialogOff += EventDialogOff;
+      hexMap.eventDialog.eventDialogOn += EnableCamera;
+      hexMap.eventDialog.eventDialogOff += DisableCamera;
     }
 
     float moveSpeed = 20;
-    TurnController turnController;
+    bool allowUserCtrl = true;
 
-    public void EventDialogOff() {
-      updateReady = true;
+    public void DisableCamera() {
+      allowUserCtrl = false;
     }
 
-    public void EventDialogOn() {
-      updateReady = false;
+    public void EnableCamera() {
+      allowUserCtrl = true;
     }
 
     Vector3 fixedPosition;
@@ -40,7 +39,7 @@ namespace MonoNS
           transform.position = Vector3.Lerp(transform.position, fixedPosition, 4 * Time.deltaTime);
         }
       } else {
-        if (turnController.showingTitle) return;
+        if (!allowUserCtrl) return;
         Vector3 translate = new Vector3(
           Input.GetAxis("Horizontal"),
           0,

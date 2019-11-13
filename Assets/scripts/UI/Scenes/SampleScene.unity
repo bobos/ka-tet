@@ -3986,6 +3986,8 @@ MonoBehaviour:
   CampPrefab: {fileID: 1002255177878198, guid: 4fa66f97eb3aa495c93a35d125d7d2f6, type: 2}
   NameTextPrefab: {fileID: 1494587712262224, guid: d238914f316e84712b8eab4d0ab3fdf2,
     type: 2}
+  UnitInfoPrefab: {fileID: 1678439610897408, guid: 3db0ca0ef863445099c17a9d94015fb7,
+    type: 2}
   PopTextPrefab: {fileID: 1494587712262224, guid: 5c837f8051153411188e4957638b549a,
     type: 2}
   lineCache: []
@@ -7932,7 +7934,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 17e18299458564e808bcaf4a8d3bc25d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Animating: 0
   DestroyAnimating: 0
   MoveAnimating: 0
   riotAnimating: 0

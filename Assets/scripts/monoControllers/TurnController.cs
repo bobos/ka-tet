@@ -86,6 +86,7 @@ namespace MonoNS
     CameraKeyboardController cc;
     IEnumerator endTurn()
     {
+      hexMap.cameraKeyboardController.DisableCamera();
       WarParty playerParty = hexMap.GetPlayerParty();
       WarParty aiParty = hexMap.GetAIParty();
       WarParty p = player ? playerParty : aiParty;
@@ -229,6 +230,7 @@ namespace MonoNS
         }
       }
 
+      hexMap.cameraKeyboardController.EnableCamera();
       // TurnChange();
       // while (showingTitle) { yield return null; }
     }

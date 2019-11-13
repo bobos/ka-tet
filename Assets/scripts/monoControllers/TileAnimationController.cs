@@ -31,6 +31,7 @@ namespace MonoNS
     public void Flood(Tile tile, List<Tile> tiles = null)
     {
       FloodAnimating = true;
+      hexMap.cameraKeyboardController.DisableCamera();
       StartCoroutine(CoFlood(tile, tiles == null ? tile.CreateFlood() : tiles));
     }
 
@@ -68,6 +69,7 @@ namespace MonoNS
           }
         }
       }
+      hexMap.cameraKeyboardController.EnableCamera();
       FloodAnimating = false;
     }
 
@@ -75,6 +77,7 @@ namespace MonoNS
     public void Burn(Tile tile, List<Tile> tiles = null)
     {
       BurnAnimating = true;
+      hexMap.cameraKeyboardController.DisableCamera();
       StartCoroutine(CoBurn(tile, tiles == null ? tile.SetFire() : tiles));
     }
 
@@ -112,6 +115,7 @@ namespace MonoNS
           }
         }
       }
+      hexMap.cameraKeyboardController.EnableCamera();
       BurnAnimating = false;
     }
 
@@ -119,6 +123,7 @@ namespace MonoNS
     public void WeatherChange(Tile tile, Weather weather)
     {
       WeatherAnimating = true;
+      hexMap.cameraKeyboardController.DisableCamera();
       StartCoroutine(CoWeatherChange(tile, weather));
     }
 
@@ -150,6 +155,7 @@ namespace MonoNS
         }
       }
 
+      hexMap.cameraKeyboardController.EnableCamera();
       WeatherAnimating = false;
     }
   }

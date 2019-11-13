@@ -23,6 +23,7 @@ namespace MonoNS
     {
       Animating = true;
       List<Unit> garrison = settlement.Destroy();
+      hexMap.cameraKeyboardController.DisableCamera();
       StartCoroutine(CoDestroy(settlement, type));
       return garrison;
     }
@@ -38,6 +39,7 @@ namespace MonoNS
           EventDialog.EventName.FloodDestroyCamp :
           EventDialog.EventName.WildFireDestroyCamp, null, settlement));
       while (eventDialog.Animating) { yield return null; }
+      hexMap.cameraKeyboardController.EnableCamera();
       Animating = false;
     }
   }
