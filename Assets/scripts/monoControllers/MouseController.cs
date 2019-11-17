@@ -245,13 +245,13 @@ namespace MonoNS
         if (mouseMode == mode.transfer) {
           try {
             int supply = hexMap.inputField.GetInput();
-            if (supply == 0 || supply > selectedUnit.supply) {
+            if (supply == 0 || supply > selectedUnit.supply.supply) {
               msgBox.Show("invalid input");
               return;
             }
-            selectedUnit.supply -= supply;
+            selectedUnit.supply.supply -= supply;
             if (transferedUnit != null) {
-              selectedUnit.supply += transferedUnit.TakeInSupply(supply);
+              selectedUnit.supply.supply += transferedUnit.supply.TakeTransferSupply(supply);
             } else {
               transferedSettlement.TakeInSupply(supply);
             }
@@ -579,9 +579,9 @@ namespace MonoNS
         if (transferedUnit == null && transferedSettlement == null) {
           return;
         }
-        string needed = "" + (transferedUnit != null ? transferedUnit.SupplyNeededPerTurn()
+        string needed = "" + (transferedUnit != null ? transferedUnit.supply.SupplyNeededPerTurn()
           : transferedSettlement.MinSupplyNeeded());
-        int minNeeded = transferedUnit != null ? transferedUnit.MinSupplyNeeded() : transferedSettlement.MinSupplyNeeded(); 
+        int minNeeded = transferedUnit != null ? transferedUnit.supply.MinSupplyNeeded() : transferedSettlement.MinSupplyNeeded(); 
         string suggestions = "needed " + needed + " supply for last one turn, at least " + minNeeded + " supply to support one turn\n";
         if (transferedSettlement != null) {
           foreach(Settlement.SupplySuggestion sug in transferedSettlement.GetSuggestion()) {

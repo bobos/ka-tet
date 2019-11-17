@@ -90,7 +90,7 @@ namespace  UnitNS
 
     protected override Unit Clone()
     {
-      return new Infantry(true, rf, tile, supply, labor, state, kia, mia, movementRemaining);
+      return new Infantry(true, rf, tile, supply.supply, labor, state, kia, mia, movementRemaining);
     }
 
     protected override bool Concealable() {

@@ -83,7 +83,7 @@ public abstract class Settlement: DataModel
   protected int buildWork = 0;
   protected HexMap hexMap;
   SettlementMgr settlementMgr;
-  Supply supply;
+  BuildingNS.Supply supply;
 
   public int buildTurns {
     get {
@@ -136,7 +136,7 @@ public abstract class Settlement: DataModel
     supplyDeposit = supply > SupplyCanTakeIn() ? SupplyCanTakeIn() : supply;
     parkSlots = room;
     this.name = name;
-    this.supply = new Supply(hexMap);
+    this.supply = new BuildingNS.Supply(hexMap);
   }
 
   public List<Unit> Destroy()
@@ -237,7 +237,7 @@ public abstract class Settlement: DataModel
   public int MinSupplyNeeded() {
     int supplyNeeded = 0;
     foreach (Unit unit in garrison) {
-      supplyNeeded += unit.MinSupplyNeeded();
+      supplyNeeded += unit.supply.MinSupplyNeeded();
     }
     return supplyNeeded;
   }
@@ -294,9 +294,9 @@ public abstract class Settlement: DataModel
     int killedLaborEscort = (int)(Util.Rand(0.008f, 0.04f) * adjustedLabor);
     labor -= killedLaborEscort;
     supplyDeposit -= adjustedAmount;
-    int needed = enemy.GetNeededSupply();
+    int needed = enemy.supply.GetNeededSupply();
     int supplyTaken = needed > adjustedAmount ? adjustedAmount : needed;
-    enemy.TakeInSupply(supplyTaken);
+    enemy.supply.TakeTransferSupply(supplyTaken);
     if (to != null) {
       hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.SupplyIntercepted, null, to, adjustedAmount, killedLaborEscort));
     }
@@ -349,8 +349,8 @@ public abstract class Settlement: DataModel
         units[0].Add(unit);
         continue;
       };
-      supplyDeposit = unit.ReplenishSupply(supplyDeposit);
-      if (!unit.consumed) {
+      supplyDeposit = unit.EndedInSettlement(supplyDeposit);
+      if (!unit.supply.consumed) {
         units[0].Add(unit);
       }
     }
@@ -362,7 +362,7 @@ public abstract class Settlement: DataModel
         continue;
       }
 
-      int neededPerTurn = unit.SupplyNeededPerTurn();
+      int neededPerTurn = unit.supply.SupplyNeededPerTurn();
       int neededLabor = CalcNeededLabor(neededPerTurn);
       if (!unit.IsCavalry() && unit.labor < neededLabor) {
         units[1].Add(unit);
@@ -385,7 +385,7 @@ public abstract class Settlement: DataModel
       }
       */
 
-      unit.consumed = true;
+      unit.supply.Consume(true);
       supplyDeposit -= neededPerTurn;
     }
     return units;

@@ -50,7 +50,7 @@ namespace  UnitNS
 
     protected override Unit Clone()
     {
-      return new Cavalry(true, rf, tile, supply,  state, kia, mia, movementRemaining);
+      return new Cavalry(true, rf, tile, supply.supply,  state, kia, mia, movementRemaining);
     }
 
     protected override bool Concealable() {

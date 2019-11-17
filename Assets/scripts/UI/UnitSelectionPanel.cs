@@ -116,21 +116,21 @@ namespace MonoNS
       self.SetActive(true);
       title.text = unit.GeneralName();
       movement.text = "移动力:" + unit.movementRemaining + "/" + unit.GetFullMovement();
-      slots.text = "粮草: " + unit.supply + "石" + " 可维持" + unit.slots + "/" + unit.GetMaxSupplySlots() + "回合" + " 每回合消耗:" + unit.SupplyNeededPerTurn() + "石";
-      num.text = unit.Name() + "[兵:" + unit.rf.soldiers + "/伤:" + unit.rf.wounded + "/亡:" + unit.kia + "/逃:" + unit.mia + "/役:" + unit.labor + "]";
-      morale.text = "士气: " + unit.rf.morale;
-      offense.text = "攻击: " + unit.atk;
-      defense.text = "防御: " + unit.def;
       stamina.text = "体力: " + unit.GetStaminaLvlName();
       if (unit.clone) {
         return;
       }
+      slots.text = "粮草: " + unit.supply.supply + "石" + " 可维持" + unit.slots + "/" + unit.GetMaxSupplySlots() + "回合" + " 每回合消耗:" + unit.supply.SupplyNeededPerTurn() + "石";
+      num.text = unit.Name() + "[兵:" + unit.rf.soldiers + "/伤:" + unit.rf.wounded + "/亡:" + unit.kia + "/逃:" + unit.mia + "/役:" + unit.labor + "]";
+      morale.text = "士气: " + unit.rf.morale;
+      offense.text = "攻击: " + unit.atk;
+      defense.text = "防御: " + unit.def;
       string stateStr = unit.IsWarWeary() ? " 士气低落" : "";
       stateStr += " " + unit.GetDiscontent();
-      stateStr += unit.starving ? " 饥饿" : "";
+      stateStr += unit.IsStarving() ? " 饥饿" : "";
       stateStr += unit.GetStateName();
-      int desserter = unit.starving ? unit.GetStarvingDessertNum() : 0;
-      int killed = unit.starving ? unit.GetStarvingKillNum() : 0;
+      int desserter = unit.IsStarving() ? unit.GetStarvingDessertNum() : 0;
+      int killed = unit.IsStarving() ? unit.GetStarvingKillNum() : 0;
       desserter += unit.IsWarWeary() ? unit.GetWarWearyDissertNum() : 0;
       state.text = "";
       if (desserter != 0) {

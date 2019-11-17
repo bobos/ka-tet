@@ -160,10 +160,10 @@ namespace MonoNS
       foreach (Unit unit in otherP.GetUnits())
       {
         int[] effects = new int[8]{0,0,0,0,0,0,0,0};
-        if (!unit.consumed) {
-          effects = unit.ConsumeSupply();
+        if (!unit.supply.consumed) {
+          effects = unit.supply.Consume();
         }
-        if (unit.starving) {
+        if (!unit.supply.consumed) {
           View view;
           if (unit.IsCamping()) {
             view = settlementMgr.GetView(unit.tile.settlement);
@@ -178,7 +178,6 @@ namespace MonoNS
           unitAniController.ShowEffects(unit, effects);
           while (unitAniController.ShowAnimating) { yield return null; }
         }
-        unit.consumed = false;
         unitAniController.RefreshUnit(unit);
         while (unitAniController.RefreshAnimating) { yield return null; }
         hexMap.SetUnitSkin(unit);

@@ -81,9 +81,9 @@ namespace MonoNS
       }
       else if (Cons.IsSummer(season))
       {
-        if (luckNum < 11)
+        if (luckNum < 3)
         {
-          return Cons.heavyRain;
+          return Cons.cloudy;
         }
         else if (luckNum < 5)
         {

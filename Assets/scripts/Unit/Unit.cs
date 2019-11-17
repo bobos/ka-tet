@@ -10,7 +10,6 @@ namespace UnitNS
 {
   public abstract class Unit : PFUnit, DataModel
   {
-    public delegate void UnitMovedCallback(Tile newTile);
     public abstract bool IsCavalry();
     protected abstract float GetMovementModifier();
     protected abstract int GetBaseSupplySlots();
@@ -20,8 +19,6 @@ namespace UnitNS
     public const int MovementcostOnHill = 50;
     public const int MovementcostOnPlain = 30;
     public const int MovementCostOnUnaccesible = -1;
-    public const float Starving2DeathRate = 0.005f;
-    public const float Starving2EscapeRate = 0.01f;
     public const float DesertRate = 0.01f;
     public const float SnowKillRate = 0.0025f;
     public const float SnowDisableRate = 0.005f;
@@ -44,8 +41,10 @@ namespace UnitNS
     public UnitPoisioned unitPoisioned;
     public Riot riot;
     public MarchOnHeat marchOnHeat;
+    public Supply supply;
     WeatherGenerator weatherGenerator;
     TurnController turnController;
+    int initSupply = 0;
     public Unit(bool clone, Troop troop, Tile tile, State state,
                 int supply, int labor, int kia, int mia, int movement = -1)
     {
@@ -53,7 +52,7 @@ namespace UnitNS
       this.clone = clone;
       // must be after num is set
       TakeInLabor(labor);
-      this.supply = supply;
+      this.initSupply = supply;
       this.kia = kia;
       this.mia = mia;
       hexMap = GameObject.FindObjectOfType<HexMap>();
@@ -79,6 +78,7 @@ namespace UnitNS
       unitPoisioned = new UnitPoisioned(this);
       riot = new Riot(this);
       marchOnHeat = new MarchOnHeat(this);
+      supply = new Supply(this, initSupply);
       hexMap.SpawnUnit(this);
       if (tile != null && tile.settlement != null && tile.settlement.owner.isAI == IsAI()) {
         // spawn unit in settlement
@@ -140,8 +140,6 @@ namespace UnitNS
     }
     public Reaction attackReaction = Reaction.Stand;
     public Tile tile;
-    public int supply;
-    public bool consumed = false;
     public int kia;
     public int mia;
     public int kills;
@@ -250,12 +248,12 @@ namespace UnitNS
 
     public int GetStarvingDessertNum()
     {
-      return (int)(rf.soldiers * Starving2EscapeRate);
+      return supply.GetStarvingDessertNum();
     }
 
     public int GetStarvingKillNum()
     {
-      return (int)(rf.soldiers * Starving2DeathRate);
+      return supply.GetStarvingKillNum();
     }
 
     public int GetWarWearyDissertNum()
@@ -290,7 +288,7 @@ namespace UnitNS
     }
 
     public bool IsStarving() {
-      return starving;
+      return (supply != null && supply.isStarving) || false;
     }
 
     public bool IsWarWeary() {
@@ -363,22 +361,13 @@ namespace UnitNS
     // ==============================================================
 
     // When unit ends in settlement
-    public int ReplenishSupply(int supply)
+    public int EndedInSettlement(int supply)
     {
-      int remaining = TakeInSupply(supply);
       rf.morale = IsWarWeary() ? (GetRetreatThreshold() + 1) : rf.morale;
       if (state == State.Routing) {
         SetState(State.Stand);
       }
-      int needed = SupplyNeededPerTurn();
-      int neededHalf = MinSupplyNeeded();
-      int consumed = remaining >= needed ? needed : (remaining >= neededHalf ? neededHalf : remaining);
-      if (consumed >= neededHalf) {
-        remaining -= consumed;
-        this.consumed = true;
-        this.starving = false;
-      }
-      return remaining < 0 ? 0 : remaining;
+      return this.supply.ReplenishSupply(supply);
     }
 
     // Before new turn starts
@@ -393,11 +382,10 @@ namespace UnitNS
       }
 
       movementRemaining = GetFullMovement();
+      supply.RefreshSupply();
       turnDone = false;
+
       int[] effects = new int[8]{0,0,0,0,0,0,0,0};
-      // recalculate supply based on labor
-      int canCarry = GetMaxSupplySlots() * SupplyNeededPerTurn();
-      supply = supply > canCarry ? canCarry : supply;
       if (Cons.IsHeavyRain(hexMap.weatherGenerator.currentWeather)) {
         if (state == State.Camping) return effects;
         int movement = (int)(movementRemaining / (-2));
@@ -572,7 +560,7 @@ namespace UnitNS
     }
 
     // ==============================================================
-    // ================= supply mangement ===========================
+    // ================= slots mangement ===========================
     // ==============================================================
 
     public virtual Dictionary<int, int> GetLaborSuggestion() {
@@ -583,98 +571,13 @@ namespace UnitNS
     {
       get
       {
-        return GetLastingTurns();
+        return supply.GetLastingTurns();
       }
-    }
-
-    public bool starving = false;
-
-    public int GetLastingTurns() {
-      int needed = SupplyNeededPerTurn();
-      int neededHalf = MinSupplyNeeded();
-
-      int remaining = supply % needed;
-      int turns = supply / needed;
-      if (supply < neededHalf) {
-        return 0;
-      }
-      if (supply < needed) {
-        return 1;
-      }
-      return turns + (remaining < neededHalf ? 0 : 1);
-    }
-
-    public int TakeInSupply(int inSupply) {
-      if (inSupply == 0) return 0;
-      int needed = GetNeededSupply();
-      if (needed <= 0)
-      {
-        return inSupply;
-      }
-
-      int minNeeded = MinSupplyNeeded();
-      if (inSupply >= minNeeded) {
-        minNeeded = inSupply >= needed ? needed : minNeeded;
-        inSupply -= minNeeded;
-        supply += minNeeded;
-        starving = false;
-        return inSupply;
-      }
-      return inSupply;
     }
 
     public int GetMaxSupplySlots()
     {
       return rf.province.region.ExtraSupplySlot() + GetBaseSupplySlots() - (IsWarWeary() ? 1 : 0);
-    }
-
-    public int GetNeededSupply()
-    {
-      int needed = GetMaxSupplySlots() * SupplyNeededPerTurn() - supply;
-      return needed < 0 ? 0 : needed;
-    }
-
-    public int[] ConsumeSupply()
-    {
-      int needed = SupplyNeededPerTurn();
-      int neededHalf = MinSupplyNeeded();
-      starving = false;
-      int[] effects = new int[8]{0,0,0,0,0,0,0,0};
-      if (supply < neededHalf) {
-        starving = true;
-        supply = 0;
-        int moraleReduce = -8;
-        rf.morale += moraleReduce;
-        int miaNum = GetStarvingDessertNum();
-        mia += miaNum;
-        rf.soldiers -= miaNum;
-        int deathNum = GetStarvingKillNum();
-        kia += deathNum;
-        rf.soldiers -= deathNum;
-        int laborDead = (int)(deathNum / 5);
-        labor -= laborDead;
-        effects[0] = moraleReduce;
-        effects[3] = deathNum;
-        effects[4] = laborDead;
-        effects[5] = miaNum;
-        return effects;
-      }
-
-      if (supply < needed) {
-        supply = 0;
-      } else {
-        supply -= needed;
-      }
-      return effects;
-    }
-
-    public int SupplyNeededPerTurn()
-    {
-      return (int)(((rf.soldiers + rf.wounded) / 10 ) * hexMap.FoodPerTenMenPerTurn(IsAI()));
-    }
-
-    public int MinSupplyNeeded() {
-      return (int)(SupplyNeededPerTurn() / 2);
     }
 
     // ==============================================================
