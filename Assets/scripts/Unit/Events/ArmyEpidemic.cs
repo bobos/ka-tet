@@ -56,7 +56,7 @@
 
       if (killRatio > 0)
       {
-        int morale = -2;
+        int morale = -1;
         effects[0] = morale;
         unit.rf.morale += morale;
         int kiaNum = GetIllKillNum();

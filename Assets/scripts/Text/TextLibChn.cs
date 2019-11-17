@@ -79,7 +79,7 @@ namespace TextNS
       {"u_standing", ""},
       {"u_satisfied", @"士卒满意({0})"},
       {"u_unsatisfied", @"士卒不满({0})"},
-      {"u_riot", @"士卒哗变{0}"},
+      {"u_riot", @"士卒躁动{0}"},
       {"rank_rookie", "厢兵"},
       {"rank_veteran", "牙兵"},
       {"rank_elite", "禁军"},

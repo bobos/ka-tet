@@ -15,9 +15,9 @@ namespace MapTileNS
       this.tile = tile;
     }
 
-    public List<Tile> OnWeatherChange(Weather weather)
+    public HashSet<Tile> OnWeatherChange(Weather weather)
     {
-      List<Tile> tiles = new List<Tile>();
+      HashSet<Tile> tiles = new HashSet<Tile>();
       if (!tile.isDam || !Cons.IsHeavyRain(weather)) { return tiles; }
       if (Cons.FairChance())
       {
@@ -39,8 +39,8 @@ namespace MapTileNS
           && (Cons.IsRain(tile.weatherGenerator.currentWeather) || Cons.IsHeavyRain(tile.weatherGenerator.currentWeather));
     }
 
-    public List<Tile> Start() {
-      List<Tile> affectedTiles = new List<Tile>();
+    public HashSet<Tile> Start() {
+      HashSet<Tile> affectedTiles = new HashSet<Tile>();
       if (Floodable()) 
       {
         tile.isDam = false;
@@ -49,19 +49,19 @@ namespace MapTileNS
       return affectedTiles;
     }
 
-    public void GetTile2Flood(List<Tile> tiles)
+    public void GetTile2Flood(HashSet<Tile> tiles)
     {
       foreach (Tile tile in this.tile.DownstreamTiles<Tile>())
       {
-        if (tile.terrian == TerrianType.Water || tile.field == FieldType.Flooding)
+        if ((tile.terrian == TerrianType.Water || tile.field == FieldType.Flooding) && Cons.FairChance())
         {
-          if(!tiles.Contains(tile)) tiles.Add(tile);
+          tiles.Add(tile);
           tile.flood.GetTile2Flood(tiles);
         }
         else if (tile.flood != null && tile.flood.CanBeFloodedByNearByTile() &&
          (Cons.IsHeavyRain(tile.weatherGenerator.currentWeather) ? Cons.HighlyLikely() : Cons.MostLikely()))
         {
-          if(!tiles.Contains(tile)) tiles.Add(tile);
+          tiles.Add(tile);
           tile.flood.GetTile2Flood(tiles);
         }
       }

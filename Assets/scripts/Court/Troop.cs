@@ -126,5 +126,12 @@ namespace CourtNS
       onFieldUnit = null;
     }
 
+    public void AssignGeneral(General general) {
+      this.general = general;
+      if (onFieldUnit != null) {
+        onFieldUnit.UpdateGeneralName();
+      }
+    }
+
   }
 }

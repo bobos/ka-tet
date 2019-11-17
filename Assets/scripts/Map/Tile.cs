@@ -144,12 +144,12 @@ namespace MapTileNS
     // ==============================================================
     // ================= Disasters ==================================
     // ==============================================================
-    public List<Tile> SetFire()
+    public HashSet<Tile> SetFire()
     {
       if (wildFire != null) {
         return wildFire.Start();
       }
-      return new List<Tile>();
+      return new HashSet<Tile>();
     }
 
     public void Burn() {
@@ -172,12 +172,12 @@ namespace MapTileNS
       return false;
     }
 
-    public List<Tile> CreateFlood()
+    public HashSet<Tile> CreateFlood()
     {
       if (flood != null) {
         return flood.Start();
       }
-      return new List<Tile>();
+      return new HashSet<Tile>();
     }
 
     public void Flood() {

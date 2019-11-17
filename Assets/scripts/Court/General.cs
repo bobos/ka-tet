@@ -85,7 +85,7 @@ namespace CourtNS {
       ResetFieldRecords();
       this.hexMap = hexMap;
       commandUnit = troop;
-      troop.general = this;
+      troop.AssignGeneral(this);
     }
 
     public void JoinParty(Party party) {

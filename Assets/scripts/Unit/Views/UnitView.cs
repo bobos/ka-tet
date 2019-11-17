@@ -2,6 +2,7 @@
 using MapTileNS;
 using MonoNS;
 using System.Collections;
+using CourtNS;
 
 namespace UnitNS
 {
@@ -38,6 +39,10 @@ namespace UnitNS
 
     public static Vector3 NamePosition(Vector3 unitPosition) {
       return new Vector3(unitPosition.x - 0.5f, unitPosition.y, unitPosition.z);
+    }
+
+    public void UpdateGeneralName() {
+      nameGO.GetComponent<UnitNameView>().SetName(unit.rf.general);
     }
 
     void ToggleUnitInfo(bool on) {

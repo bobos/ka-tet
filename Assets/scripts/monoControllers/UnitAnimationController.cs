@@ -39,7 +39,7 @@ namespace MonoNS
       UnitView view = hexMap.GetUnitView(unit);
       view.DestroyAnimation(type);
       while (view.Animating) { yield return null; }
-      view.Destroy();
+      hexMap.DestroyUnitView(unit);
 
       if (type == DestroyType.ByBurningCamp) {
         eventDialog.Show(new MonoNS.Event(EventDialog.EventName.BurningCampDestroyUnit, unit, null, 0, 0, killed));

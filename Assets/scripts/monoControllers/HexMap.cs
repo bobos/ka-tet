@@ -221,6 +221,7 @@ namespace MonoNS
     {
       lineRenderer.enabled = false;
     }
+
     public void HighlightPath(Tile[] tiles)
     {
       lineRenderer.enabled = true;
@@ -526,7 +527,6 @@ namespace MonoNS
       GameObject nameGO = (GameObject)Instantiate(NameTextPrefab,
           namePosition,
           Quaternion.identity, tileGO.transform);
-      nameGO.GetComponent<UnitNameView>().SetName(unit.rf.general);
       UnitView view = unitGO.GetComponent<UnitView>();
       view.nameGO = nameGO;
 
@@ -538,6 +538,7 @@ namespace MonoNS
 
       view.OnCreate(unit);
       unit2GO[unit] = unitGO;
+      unit.UpdateGeneralName();
       SetUnitSkin(unit);
     }
 

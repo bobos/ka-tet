@@ -28,14 +28,14 @@ namespace MonoNS
     public override void UpdateChild() {}
 
     public bool FloodAnimating = false;
-    public void Flood(Tile tile, List<Tile> tiles = null)
+    public void Flood(Tile tile, HashSet<Tile> tiles = null)
     {
       FloodAnimating = true;
       hexMap.cameraKeyboardController.DisableCamera();
       StartCoroutine(CoFlood(tile, tiles == null ? tile.CreateFlood() : tiles));
     }
 
-    IEnumerator CoFlood(Tile t, List<Tile> tiles)
+    IEnumerator CoFlood(Tile t, HashSet<Tile> tiles)
     {
       popAniController.Show(hexMap.GetTileView(t), textLib.get("pop_damBroken"), Color.red);
       while (popAniController.Animating) { yield return null; }
@@ -66,6 +66,11 @@ namespace MonoNS
             while(unitAniController.ShowAnimating) { yield return null; }
             unitAniController.MoveUnit(unit, new List<Unit>(), newTile);
             while (unitAniController.MoveAnimating) { yield return null; }
+            if (!Util.eq<Tile>(newTile, unit.tile)) {
+              // Failed to move, destroy unit
+              unitAniController.DestroyUnit(unit, DestroyType.ByFlood);
+              while (unitAniController.DestroyAnimating) { yield return null; }
+            }
           }
         }
       }
@@ -74,14 +79,14 @@ namespace MonoNS
     }
 
     public bool BurnAnimating = false;
-    public void Burn(Tile tile, List<Tile> tiles = null)
+    public void Burn(Tile tile, HashSet<Tile> tiles = null)
     {
       BurnAnimating = true;
       hexMap.cameraKeyboardController.DisableCamera();
       StartCoroutine(CoBurn(tile, tiles == null ? tile.SetFire() : tiles));
     }
 
-    IEnumerator CoBurn(Tile t, List<Tile> tiles)
+    IEnumerator CoBurn(Tile t, HashSet<Tile> tiles)
     {
       popAniController.Show(hexMap.GetTileView(t), textLib.get("pop_setFire"), Color.yellow);
       while (popAniController.Animating) { yield return null; }
@@ -112,6 +117,11 @@ namespace MonoNS
             while(unitAniController.ShowAnimating) { yield return null; }
             unitAniController.MoveUnit(unit, new List<Unit>(), newTile);
             while (unitAniController.MoveAnimating) { yield return null; }
+            if (!Util.eq<Tile>(newTile, unit.tile)) {
+              // Failed to move, destroy unit
+              unitAniController.DestroyUnit(unit, DestroyType.ByWildFire);
+              while (unitAniController.DestroyAnimating) { yield return null; }
+            }
           }
         }
       }
@@ -140,7 +150,7 @@ namespace MonoNS
       }
 
       if (tile.flood != null) {
-        List<Tile> tiles = tile.flood.OnWeatherChange(weather);
+        HashSet<Tile> tiles = tile.flood.OnWeatherChange(weather);
         if (tiles.Count > 0) {
           Flood(tile, tiles);
           while (FloodAnimating) { yield return null; }
@@ -148,7 +158,7 @@ namespace MonoNS
       }
 
       if (tile.wildFire != null) {
-        List<Tile> tiles = tile.wildFire.OnWeatherChange(weather);
+        HashSet<Tile> tiles = tile.wildFire.OnWeatherChange(weather);
         if (tiles.Count > 0) {
           Burn(tile, tiles);
           while (BurnAnimating) { yield return null; }

@@ -12,7 +12,10 @@
       || unit.tile.waterBound || unit.IsCamping()) {
         return 0;
       }
-      return 1;
+      if (Cons.EvenChance()) {
+        return 1;
+      }
+      return 0;
     }
 
   }

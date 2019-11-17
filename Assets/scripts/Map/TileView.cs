@@ -111,7 +111,7 @@ public class TileView : View
   }
 
   IEnumerator CoFloodAnimation() {
-    yield return new WaitForSeconds(1);
+    yield return new WaitForSeconds(0.2f);
     Animating = false;
   }
 
@@ -122,7 +122,7 @@ public class TileView : View
   }
 
   IEnumerator CoBurnAnimation() {
-    yield return new WaitForSeconds(1);
+    yield return new WaitForSeconds(0.2f);
     Animating = false;
   }
 }

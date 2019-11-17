@@ -160,6 +160,7 @@ namespace MonoNS
           } else {
             job.from.LaborIntercepted(ambusher, job.to, job.amount);
           }
+          while (hexMap.eventDialog.Animating) { yield return null; }
           continue;
         }
 
@@ -168,6 +169,7 @@ namespace MonoNS
         } else {
           job.from.DistLabor(job.amount, job.to);
         }
+        while (hexMap.eventDialog.Animating) { yield return null; }
       }
 
       if (warParty.attackside) {

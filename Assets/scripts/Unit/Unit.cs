@@ -32,7 +32,7 @@ namespace UnitNS
     public const int L1Visibility = 5; // under 4000 
     public const int L2Visibility = 8; // > 4000
     public const int L1DiscoverRange = 1; // under 2000
-    public const int L2DiscoverRange = 3; // > 4000
+    public const int L2DiscoverRange = 2; // > 4000
     public const int ConcealCoolDownIn = 3;
 
     private TextNS.TextLib txtLib = Cons.GetTextLib();
@@ -94,7 +94,7 @@ namespace UnitNS
         state = State.Conceal;
       }
       this.state = state;
-      if (state == State.Disbanded || state == State.Retreated) {
+      if (state == State.Retreated) {
         broker.BrokeChange(this, ActionType.UnitDestroyed, tile);
         return;
       }
@@ -643,7 +643,7 @@ namespace UnitNS
       if (supply < neededHalf) {
         starving = true;
         supply = 0;
-        int moraleReduce = -10;
+        int moraleReduce = -8;
         rf.morale += moraleReduce;
         int miaNum = GetStarvingDessertNum();
         mia += miaNum;
@@ -799,6 +799,10 @@ namespace UnitNS
     // ==============================================================
     // ================= unit actions ===============================
     // ==============================================================
+    public void UpdateGeneralName() {
+      hexMap.GetUnitView(this).UpdateGeneralName();
+    }
+
     public void Encamp(Tile tile)
     {
       SetTile(tile, true);

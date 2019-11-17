@@ -16,9 +16,9 @@ namespace MapTileNS
       this.burnable = burnable;
     }
 
-    public List<Tile> OnWeatherChange(Weather weather)
+    public HashSet<Tile> OnWeatherChange(Weather weather)
     {
-      List<Tile> tiles = new List<Tile>();
+      HashSet<Tile> tiles = new HashSet<Tile>();
       if (burningCntDown > 0 && (Cons.IsRain(weather) || Cons.IsHeavyRain(weather))) {
         PutOutFire();
         return tiles;
@@ -35,11 +35,12 @@ namespace MapTileNS
       }
     }
 
-    public List<Tile> Start() {
-      List<Tile> affectedTiles = new List<Tile>();
+    public HashSet<Tile> Start() {
+      HashSet<Tile> affectedTiles = new HashSet<Tile>();
       if (Burnable()) 
       {
         tile.isDam = false;
+        affectedTiles.Add(tile);
         GetTile2Burn(affectedTiles);
       }
       return affectedTiles;
@@ -59,10 +60,10 @@ namespace MapTileNS
       return burnable;
     }
 
-    public void GetTile2Burn(List<Tile> affectedTiles)
+    public void GetTile2Burn(HashSet<Tile> affectedTiles)
     {
-      if (!affectedTiles.Contains(tile)) { affectedTiles.Add(tile); }
       tile.ListenOnTurnEnd(OnTurnEnd);
+      HashSet<Tile> affectedTiles1 = new HashSet<Tile>();
       // spread to neighbours depends on season and wind and directions
       Cons.Direction windDirection = tile.windGenerator.direction;
       bool chance1 = Cons.FairChance();
@@ -70,60 +71,57 @@ namespace MapTileNS
       bool chance3 = Cons.SlimChance();
       if (Cons.IsGale(tile.windGenerator.current))
       {
+        chance1 = Cons.HighlyLikely();
+        chance2 = Cons.HighlyLikely();
+        chance3 = Cons.MostLikely();
+      }
+      else if (Cons.IsWind(tile.windGenerator.current))
+      {
         chance1 = Cons.MostLikely();
         chance2 = Cons.EvenChance();
         chance3 = Cons.EvenChance();
       }
-      else if (Cons.IsWind(tile.windGenerator.current))
-      {
-        chance1 = Cons.EvenChance();
-        chance2 = Cons.FairChance();
-        chance3 = Cons.FairChance();
-      }
 
       if (windDirection == Cons.Direction.dueNorth)
       {
-        PickTile2Burn(affectedTiles, tile.NorthTile<Tile>(), tile.NorthEastTile<Tile>(),
+        PickTile2Burn(affectedTiles1, tile.NorthTile<Tile>(), tile.NorthEastTile<Tile>(),
                       tile.NorthWestTile<Tile>(), chance1, chance2, chance3);
       }
 
       if (windDirection == Cons.Direction.dueSouth)
       {
-        PickTile2Burn(affectedTiles, tile.SouthTile<Tile>(), tile.SouthEastTile<Tile>(),
+        PickTile2Burn(affectedTiles1, tile.SouthTile<Tile>(), tile.SouthEastTile<Tile>(),
                       tile.SouthWestTile<Tile>(), chance1, chance2, chance3);
       }
 
       if (windDirection == Cons.Direction.northEast)
       {
-        PickTile2Burn(affectedTiles, tile.NorthEastTile<Tile>(), tile.NorthTile<Tile>(),
+        PickTile2Burn(affectedTiles1, tile.NorthEastTile<Tile>(), tile.NorthTile<Tile>(),
                       tile.SouthEastTile<Tile>(), chance1, chance2, chance3);
       }
 
       if (windDirection == Cons.Direction.northWest)
       {
-        PickTile2Burn(affectedTiles, tile.NorthWestTile<Tile>(), tile.NorthTile<Tile>(),
+        PickTile2Burn(affectedTiles1, tile.NorthWestTile<Tile>(), tile.NorthTile<Tile>(),
                       tile.SouthWestTile<Tile>(), chance1, chance2, chance3);
       }
 
       if (windDirection == Cons.Direction.southWest)
       {
-        PickTile2Burn(affectedTiles, tile.SouthWestTile<Tile>(), tile.SouthTile<Tile>(),
+        PickTile2Burn(affectedTiles1, tile.SouthWestTile<Tile>(), tile.SouthTile<Tile>(),
                       tile.NorthWestTile<Tile>(), chance1, chance2, chance3);
       }
 
       if (windDirection == Cons.Direction.southEast)
       {
-        PickTile2Burn(affectedTiles, tile.SouthEastTile<Tile>(), tile.SouthTile<Tile>(),
+        PickTile2Burn(affectedTiles1, tile.SouthEastTile<Tile>(), tile.SouthTile<Tile>(),
                       tile.NorthEastTile<Tile>(), chance1, chance2, chance3);
       }
 
-      foreach (Tile tile in affectedTiles)
+      foreach (Tile tile in affectedTiles1)
       {
-        if ((tile.wildFire != null && tile.wildFire.CanSetFire())
-          || (tile.terrian == TerrianType.Plain && tile.wildFire.CanPlainCatchFire()))
-        {
-          tile.wildFire.GetTile2Burn(affectedTiles);
-        }
+        affectedTiles.Add(tile);
+        tile.wildFire.GetTile2Burn(affectedTiles);
       }
     }
 
@@ -141,7 +139,7 @@ namespace MapTileNS
       tile.RemoveTurnEndListener(OnTurnEnd);
     }
 
-    public bool CanSetFire()
+    public bool CanCatchFire()
     {
       if (tile.terrian == TerrianType.Hill || tile.terrian == TerrianType.Mountain)
       {
@@ -160,11 +158,20 @@ namespace MapTileNS
       return false;
     }
 
-    void PickTile2Burn(List<Tile> tiles, Tile tile1, Tile tile2, Tile tile3, bool chance1, bool chance2, bool chance3)
+    void PickTile2Burn(HashSet<Tile> tiles, Tile tile1, Tile tile2, Tile tile3, bool chance1, bool chance2, bool chance3)
     {
-      if (tile1 != null && chance1 && !tiles.Contains(tile1)) tiles.Add(tile1);
-      if (tile2 != null && chance2 && !tiles.Contains(tile2)) tiles.Add(tile2);
-      if (tile3 != null && chance3 && !tiles.Contains(tile3)) tiles.Add(tile3);
+      if (tile1 != null && chance1 &&
+          ((tile1.wildFire != null && tile1.wildFire.CanCatchFire())
+           || (tile1.terrian == TerrianType.Plain && tile1.wildFire.CanPlainCatchFire()))
+          ) tiles.Add(tile1);
+      if (tile2 != null && chance2 &&
+          ((tile2.wildFire != null && tile2.wildFire.CanCatchFire())
+           || (tile2.terrian == TerrianType.Plain && tile2.wildFire.CanPlainCatchFire()))
+      ) tiles.Add(tile2);
+      if (tile3 != null && chance3 &&
+          ((tile3.wildFire != null && tile3.wildFire.CanCatchFire())
+           || (tile3.terrian == TerrianType.Plain && tile3.wildFire.CanPlainCatchFire()))
+      ) tiles.Add(tile3);
     }
   }
 
