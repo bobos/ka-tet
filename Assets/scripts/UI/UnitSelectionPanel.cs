@@ -131,7 +131,7 @@ namespace MonoNS
       stateStr += unit.GetStateName();
       int desserter = unit.IsStarving() ? unit.GetStarvingDessertNum() : 0;
       int killed = unit.IsStarving() ? unit.GetStarvingKillNum() : 0;
-      desserter += unit.IsWarWeary() ? unit.GetWarWearyDissertNum() : 0;
+      desserter += unit.IsWarWeary() ? unit.warWeary.GetWarWearyDissertNum() : 0;
       state.text = "";
       if (desserter != 0) {
         stateStr += "[本轮" + desserter + "人逃亡" + (killed > 0 ? (killed + "人亡") : "") + "]";

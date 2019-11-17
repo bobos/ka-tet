@@ -73,6 +73,9 @@ namespace CourtNS
       }
       set {
         _soldiers = value < 0 ? 0 : (value > Troop.MaxNum(type) ? Troop.MaxNum(type) : value);
+        if (onFieldUnit != null) {
+          onFieldUnit.UpdateUnitInfo();
+        }
       }
     }
 

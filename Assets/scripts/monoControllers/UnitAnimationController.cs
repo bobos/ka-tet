@@ -183,19 +183,7 @@ namespace MonoNS
           popAniController.Show(view, textLib.get("pop_warWeary"), Color.yellow);
           while (popAniController.Animating) { yield return null; }
         }
-        int[] effects = new int[8]{0,0,0,0,0,0,0,0};
-        int morale = -1;
-        effects[0] = morale;
-        unit.rf.morale += morale;
-
-        int miaNum = unit.GetWarWearyDissertNum();
-        effects[5] = miaNum;
-        unit.mia += miaNum;
-        unit.rf.soldiers -= miaNum;
-        int laborDisserter = (int) (miaNum / 4);
-        unit.labor -= laborDisserter;
-        effects[4] = laborDisserter;
-        ShowEffects(unit, effects);
+        ShowEffects(unit, unit.warWeary.Apply());
         while (ShowAnimating) { yield return null; }
       }
 

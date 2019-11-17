@@ -19,11 +19,6 @@ namespace UnitNS
     public const int MovementcostOnHill = 50;
     public const int MovementcostOnPlain = 30;
     public const int MovementCostOnUnaccesible = -1;
-    public const float DesertRate = 0.01f;
-    public const float SnowKillRate = 0.0025f;
-    public const float SnowDisableRate = 0.005f;
-    public const float BlizardKillRate = 0.0125f;
-    public const float BlizardDisableRate = 0.025f;
     public const int DisbandUnitUnder = 20;
 
     public const int L1Visibility = 5; // under 4000 
@@ -42,6 +37,8 @@ namespace UnitNS
     public Riot riot;
     public MarchOnHeat marchOnHeat;
     public Supply supply;
+    public WeatherEffect weatherEffect;
+    public WarWeary warWeary;
     WeatherGenerator weatherGenerator;
     TurnController turnController;
     int initSupply = 0;
@@ -79,6 +76,8 @@ namespace UnitNS
       riot = new Riot(this);
       marchOnHeat = new MarchOnHeat(this);
       supply = new Supply(this, initSupply);
+      weatherEffect = new WeatherEffect(this);
+      warWeary = new WarWeary(this);
       hexMap.SpawnUnit(this);
       if (tile != null && tile.settlement != null && tile.settlement.owner.isAI == IsAI()) {
         // spawn unit in settlement
@@ -256,11 +255,6 @@ namespace UnitNS
       return supply.GetStarvingKillNum();
     }
 
-    public int GetWarWearyDissertNum()
-    {
-      return (int)(rf.soldiers * DesertRate);
-    }
-
     public string GetDiscontent()
     {
       return riot.GetDescription();
@@ -292,7 +286,7 @@ namespace UnitNS
     }
 
     public bool IsWarWeary() {
-      return rf.morale <= GetRetreatThreshold();
+      return warWeary.IsWarWeary();
     }
 
     public bool IsConcealed() {
@@ -384,53 +378,7 @@ namespace UnitNS
       movementRemaining = GetFullMovement();
       supply.RefreshSupply();
       turnDone = false;
-
-      int[] effects = new int[8]{0,0,0,0,0,0,0,0};
-      if (Cons.IsHeavyRain(hexMap.weatherGenerator.currentWeather)) {
-        if (state == State.Camping) return effects;
-        int movement = (int)(movementRemaining / (-2));
-        movementRemaining += movement;
-        effects[1] = movement;
-      } else if (Cons.IsSnow(hexMap.weatherGenerator.currentWeather)) {
-        if (state == State.Camping) return effects;
-        int morale = -1;
-        int movement = (int)(movementRemaining / (-2));
-        rf.morale += morale;
-        movementRemaining += movement;
-        int woundedNum = (int)(rf.soldiers * SnowDisableRate);
-        rf.wounded += woundedNum;
-        rf.soldiers -= woundedNum;
-        int kiaNum = (int)(rf.soldiers * SnowKillRate);
-        kia += kiaNum;
-        rf.soldiers -= kiaNum;
-        int laborKilled = (int)(kiaNum / 5);
-        labor -= laborKilled;
-        effects[0] = morale;
-        effects[1] = movement;
-        effects[2] = woundedNum;
-        effects[3] = kiaNum;
-        effects[4] = laborKilled;
-      } else if (Cons.IsBlizard(hexMap.weatherGenerator.currentWeather)) {
-        if (state == State.Camping) return effects;
-        int morale = -5;
-        rf.morale += morale;
-        int movement = (int)(movementRemaining / (-4)) * 3;
-        movementRemaining += movement;
-        int woundedNum = (int)(rf.soldiers * BlizardDisableRate);
-        rf.wounded += woundedNum;
-        rf.soldiers -= woundedNum;
-        int kiaNum = (int)(rf.soldiers * BlizardKillRate);
-        kia += kiaNum;
-        rf.soldiers -= kiaNum;
-        int laborKilled = (int)(kiaNum / 5);
-        labor -= laborKilled;
-        effects[0] = morale;
-        effects[1] = movement;
-        effects[2] = woundedNum;
-        effects[3] = kiaNum;
-        effects[4] = laborKilled;
-      }
-      return effects;
+      return weatherEffect.Apply();
     }
 
     bool turnDone = false;
@@ -583,7 +531,7 @@ namespace UnitNS
     // ==============================================================
     // ================= morale mangement ===========================
     // ==============================================================
-    int GetRetreatThreshold()
+    public int GetRetreatThreshold()
     {
       return rf.province.region.RetreatThreshold();
     }
@@ -703,7 +651,17 @@ namespace UnitNS
     // ================= unit actions ===============================
     // ==============================================================
     public void UpdateGeneralName() {
-      hexMap.GetUnitView(this).UpdateGeneralName();
+      UnitView view = hexMap.GetUnitView(this);
+      if (view != null) {
+        view.UpdateGeneralName();
+      }
+    }
+
+    public void UpdateUnitInfo() {
+      UnitView view = hexMap.GetUnitView(this);
+      if (view != null) {
+        view.UpdateUnitInfo();
+      }
     }
 
     public void Encamp(Tile tile)

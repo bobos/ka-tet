@@ -45,6 +45,10 @@ namespace UnitNS
       nameGO.GetComponent<UnitNameView>().SetName(unit.rf.general);
     }
 
+    public void UpdateUnitInfo() {
+      unitInfoGO.GetComponent<UnitInfoView>().SetName(unit.rf);
+    }
+
     void ToggleUnitInfo(bool on) {
       foreach(MeshRenderer mr in unitInfoGO.GetComponentsInChildren<MeshRenderer>()) {
         mr.enabled = on;
