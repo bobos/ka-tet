@@ -126,10 +126,16 @@ namespace UnitNS
 
     public void Move(Tile newTile)
     {
-      if (!viewActivated) return;
+      newPosition = newTile.GetSurfacePosition();
+      if (!viewActivated) {
+        transform.position = newPosition; 
+        nameGO.transform.position = NamePosition(newPosition);
+        unitInfoGO.transform.position = UnitInfoPosition(newPosition);
+        Animating = false;
+        return;
+      }
       hexMap.HighlightPath(unit.GetPath());
       Animating = true;
-      newPosition = newTile.GetSurfacePosition();
       ToggleUnitInfo(false);
 
       currentVelocity = Vector3.zero;

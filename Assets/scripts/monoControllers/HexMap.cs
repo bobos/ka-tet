@@ -167,8 +167,12 @@ namespace MonoNS
     }
 
     public int FoodPerTenMenPerTurn(bool isAI) {
+      return IsAttackSide(isAI) ? 2 : 1;
+    }
+
+    public bool IsAttackSide(bool isAI) {
       WarParty wp = isAI ? GetAIParty() : GetPlayerParty();
-      return wp.attackside ? 2 : 1;
+      return wp.attackside;
     }
 
     public bool IsInEnemyScoutRange(bool isAI, Tile tile, bool ignoreConcealed = false) {

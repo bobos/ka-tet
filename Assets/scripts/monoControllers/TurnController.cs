@@ -177,6 +177,8 @@ namespace MonoNS
           }
           unitAniController.ShowEffects(unit, effects);
           while (unitAniController.ShowAnimating) { yield return null; }
+          unitAniController.Riot(unit, 2);
+          while (unitAniController.riotAnimating) { yield return null; }
         }
         unitAniController.RefreshUnit(unit);
         while (unitAniController.RefreshAnimating) { yield return null; }

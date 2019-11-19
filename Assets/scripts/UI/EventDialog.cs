@@ -54,6 +54,7 @@ namespace MonoNS
     public Sprite Riot;
     public Sprite Retreat;
     public Sprite Poisioned;
+    public Sprite Decision;
 
     public delegate void DialogEvent();
     public event DialogEvent eventDialogOn;
@@ -86,6 +87,7 @@ namespace MonoNS
       NewGeneral,
       GeneralExecuted,
       Retreat,
+      FarmDestroyed,
       Null
     }
 
@@ -308,6 +310,16 @@ namespace MonoNS
         image.sprite = Disarmor;
         approveText.text = System.String.Format(textLib.get("event_disarmor_approve_title"), argu1);
         disapproveText.text = System.String.Format(textLib.get("event_disarmor_disapprove_title"), argu2);
+      }
+
+      if (name == EventName.FarmDestroyed) {
+        ToggleDecision();
+        title.text = textLib.get("event_farmDestroyed_title");
+        description.text = System.String.Format(textLib.get("event_farmDestroyed"),
+          unit.GeneralName());
+        image.sprite = Decision;
+        approveText.text = System.String.Format(textLib.get("event_farmDestroyed_approve_title"), argu1);
+        disapproveText.text = textLib.get("event_farmDestroyed_disapprove_title");
       }
     }
 

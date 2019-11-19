@@ -4,6 +4,7 @@ using UnityEngine.EventSystems;
 using System.Linq;
 using UnitNS;
 using MapTileNS;
+using TextNS;
 
 namespace MonoNS
 {
@@ -88,6 +89,16 @@ namespace MonoNS
     }
 
     Tile[] tmpTiles;
+    PopTextAnimationController popAniController {
+      get {
+        return hexMap.popAniController;
+      }
+    }
+    TextLib textLib {
+      get {
+        return Cons.GetTextLib();
+      }
+    }
     public void OnBtnClick(ActionController.actionName action)
     {
       if (action == ActionController.actionName.MOVE)
@@ -109,7 +120,7 @@ namespace MonoNS
       if (action == ActionController.actionName.POISION && selectedUnit != null)
       {
         if (!selectedUnit.tile.waterBound) {
-          msgBox.Show("附近没有水源!");
+          popAniController.Show(hexMap.GetUnitView(selectedUnit), textLib.get("pop_notWaterbound"), Color.yellow);
           return;
         }
         mouseMode = mode.sabotage;
@@ -135,7 +146,7 @@ namespace MonoNS
         }
         if (!encampable)
         {
-          msgBox.Show("No available camp nearby!");
+          popAniController.Show(hexMap.GetUnitView(selectedUnit), textLib.get("pop_noCampNearby"), Color.yellow);
           return;
         }
         mouseMode = mode.detect;
@@ -151,7 +162,7 @@ namespace MonoNS
         }
         if (!dambound)
         {
-          msgBox.Show("No dam nearby!");
+          popAniController.Show(hexMap.GetUnitView(selectedUnit), textLib.get("pop_noDamNearby"), Color.yellow);
           return;
         }
         mouseMode = mode.sabotage;
@@ -198,7 +209,7 @@ namespace MonoNS
         }
         if (!allyNearBy)
         {
-          msgBox.Show("No ally nearby!");
+          popAniController.Show(hexMap.GetUnitView(selectedUnit), textLib.get("pop_noAllyNearby"), Color.yellow);
           return;
         }
         mouseMode = action == ActionController.actionName.TRANSFERLABOR ? mode.transferLabor : mode.transfer;
@@ -214,7 +225,7 @@ namespace MonoNS
       if (action == ActionController.actionName.DISTSUPPLY || action == ActionController.actionName.DISTLABOR)
       {
         if (selectedSettlement.GetReachableSettlements().Length <= 0) {
-          msgBox.Show("No routable settlement!");
+          popAniController.Show(settlementMgr.GetView(selectedSettlement), textLib.get("pop_noSettlementNearby"), Color.yellow);
           return;
         }
         transferedSettlement = null;
@@ -232,7 +243,7 @@ namespace MonoNS
               u.IsAI() == selectedSettlement.owner.isAI) allyNearBy = true;
         }
         if (!allyNearBy) {
-          msgBox.Show("No nearby ally!");
+          popAniController.Show(settlementMgr.GetView(selectedSettlement), textLib.get("pop_noAllyNearby"), Color.yellow);
           return;
         }
         transferedUnit = null;
@@ -252,10 +263,11 @@ namespace MonoNS
             selectedUnit.supply.supply -= supply;
             if (transferedUnit != null) {
               selectedUnit.supply.supply += transferedUnit.supply.TakeTransferSupply(supply);
+              popAniController.Show(hexMap.GetUnitView(transferedUnit), textLib.get("pop_transferDone"), Color.green);
             } else {
               transferedSettlement.TakeInSupply(supply);
+              popAniController.Show(settlementMgr.GetView(transferedSettlement), textLib.get("pop_transferDone"), Color.green);
             }
-            msgBox.Show("transfer done");
             Escape();
           } catch (System.Exception exception) {
             msgBox.Show(exception.Message);
@@ -275,10 +287,11 @@ namespace MonoNS
             if (transferedUnit != null) {
               int remain = transferedUnit.TakeInLabor(labor);
               selectedUnit.labor += remain;
+              popAniController.Show(hexMap.GetUnitView(transferedUnit), textLib.get("pop_transferDone"), Color.green);
             } else {
               transferedSettlement.TakeInLabor(labor);
+              popAniController.Show(settlementMgr.GetView(transferedSettlement), textLib.get("pop_transferDone"), Color.green);
             }
-            msgBox.Show("transfer done");
             Escape();
           } catch (System.Exception exception) {
             msgBox.Show(exception.Message);
@@ -296,7 +309,7 @@ namespace MonoNS
               return;
             }
             settlementMgr.AddDistJob(selectedSettlement, transferedSettlement, supply, SettlementMgr.QueueJobType.DistSupply);
-            msgBox.Show("transfer submitted");
+            popAniController.Show(settlementMgr.GetView(selectedSettlement), textLib.get("pop_transferIssued"), Color.green);
             Escape();
           } catch (System.Exception exception) {
             msgBox.Show(exception.Message);
@@ -317,7 +330,7 @@ namespace MonoNS
               msgBox.Show("too many labor taken in " + canTakeIn + " no sufficient food for them, there might be starving");
             }
             settlementMgr.AddDistJob(selectedSettlement, transferedSettlement, supply, SettlementMgr.QueueJobType.DistLabor);
-            msgBox.Show("transfer submitted");
+            popAniController.Show(settlementMgr.GetView(selectedSettlement), textLib.get("pop_transferIssued"), Color.green);
             Escape();
           } catch (System.Exception exception) {
             msgBox.Show(exception.Message);
@@ -334,7 +347,7 @@ namespace MonoNS
             }
             int remain = transferedUnit.TakeInLabor(supply);
             selectedSettlement.labor -= supply - remain;
-            msgBox.Show("transfer done");
+            popAniController.Show(hexMap.GetUnitView(transferedUnit), textLib.get("pop_transferDone"), Color.green);
             Escape();
           } catch (System.Exception exception) {
             msgBox.Show(exception.Message);
@@ -720,12 +733,13 @@ namespace MonoNS
         if (settlementMgr.BuildSettlement("", tileUnderMouse, Settlement.Type.camp,
             selectedUnit.IsAI() ? hexMap.warParties[1] : hexMap.warParties[0], 0, 0, 0, selectedUnit))
         {
-          msgBox.Show("Building Camp"); //TODO: build camp next the unit and consume 1 food
+          //TODO: build camp next the unit and consume 1 food
+          popAniController.Show(hexMap.GetUnitView(selectedUnit), textLib.get("pop_buildingStarted"), Color.green);
           Escape();
         }
         else
         {
-          msgBox.Show("Failed to build camp");
+          popAniController.Show(hexMap.GetUnitView(selectedUnit), textLib.get("pop_buildingFailed"), Color.red);
         }
       }
     }
@@ -754,7 +768,7 @@ namespace MonoNS
       hexMap.HighlightArea(tileUnderMouse.poision.downStreams.ToArray(), HexMap.RangeType.PoisionRange);
       if (Input.GetMouseButtonUp(0))
       {
-        msgBox.Show("上游投毒成功");
+        popAniController.Show(hexMap.GetUnitView(selectedUnit), textLib.get("pop_poisionDone"), Color.green);
         tileUnderMouse.Poision(selectedUnit);
         Escape();
       }

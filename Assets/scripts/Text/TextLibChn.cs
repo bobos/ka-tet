@@ -187,6 +187,10 @@ namespace TextNS
       {"event_epidemic", @"{0}所部{1}因久驻因暴雨过后而蚊虫滋生的密林，大量士卒染上痢疾"},
       {"event_poision_title", "遭人投毒"},
       {"event_poision", @"{0}所部{1}因饮用了上游遭歹人投毒的河水，大量士卒染病"},
+      {"event_farmDestroyed_title", "毁坏稻田"},
+      {"event_farmDestroyed", @"{0}将军, 有大批民众赶至我军军营状告我部兵士毁伤其稻田，群情激奋，望将军定夺！"},
+      {"event_farmDestroyed_approve_title", @"处罚兵士(不满+{0})"},
+      {"event_farmDestroyed_disapprove_title", "兵威弹压"},
 
       // pop out msg
       {"pop_discontent", @"不满+{0}"},
@@ -210,6 +214,17 @@ namespace TextNS
       {"pop_sickness", "痢疾"},
       {"pop_poisioned", "中毒"},
       {"pop_setFire", "引燃"},
+      {"pop_discovered", "被敌军发现!"},
+      {"pop_noDamNearby", "需要靠近河堤"},
+      {"pop_noCampNearby", "需要靠近城寨"},
+      {"pop_notWaterbound", "需要靠近水源"},
+      {"pop_noAllyNearby", "需要靠近友军"},
+      {"pop_noSettlementNearby", "附近没有己方城寨"},
+      {"pop_transferDone", "转运完成!"},
+      {"pop_transferIssued", "转运命令已下发!"},
+      {"pop_buildingStarted", "开始筑营!"},
+      {"pop_buildingFailed", "无法筑营!"},
+      {"pop_poisionDone", "投毒成功!"},
 
       };
     }

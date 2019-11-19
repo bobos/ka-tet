@@ -67,7 +67,9 @@ namespace MonoNS
     public bool MoveUnit(Unit unit, List<Unit> ambusher, Tile tile = null) {
       MoveAnimating = true;
       Tile old = unit.tile;
+      bool hiddenB4 = unit.IsConcealed();
       bool continuing = unit.DoMove(ambusher, tile);
+      bool discovered = hiddenB4 && !unit.IsConcealed();
       int discontent = 0;
       if (Util.eq<Tile>(old, unit.tile)) {
         MoveAnimating = false;
@@ -81,16 +83,44 @@ namespace MonoNS
         hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(unit.tile).transform.position);
       }
       hexMap.cameraKeyboardController.DisableCamera();
-      StartCoroutine(CoMoveUnit(unit, discontent));
+      StartCoroutine(CoMoveUnit(unit, discontent, discovered));
       return continuing;
     }
 
-    IEnumerator CoMoveUnit(Unit unit, int discontent) {
+    IEnumerator CoMoveUnit(Unit unit, int discontent, bool discovered) {
       UnitView view = hexMap.GetUnitView(unit);
       view.Move(unit.tile);
       while (view.Animating) { yield return null; }
       Riot(unit, discontent);
       while (riotAnimating) { yield return null; }
+      if (!unit.IsAI() && discovered) {
+        popAniController.Show(view, textLib.get("pop_discovered"), Color.yellow);
+        while(popAniController.Animating) { yield return null; }
+      }
+      if (unit.tile.field == FieldType.Village && !hexMap.IsAttackSide(unit.IsAI())) {
+        if ((Cons.IsSpring(hexMap.weatherGenerator.season) && Cons.MostLikely())
+          || (Cons.IsSummer(hexMap.weatherGenerator.season) && Cons.EvenChance())) {
+          unit.tile.SetFieldType(FieldType.Wild);
+          int disc = 2;
+          eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.FarmDestroyed, unit,
+            null, disc));
+          while (eventDialog.Animating) { yield return null; }
+          if (eventDialog.accepted) {
+            Riot(unit, disc);
+            while (riotAnimating) { yield return null; }
+          } else {
+
+            //if ((unit.rf.general.party.GetRelation() == Party.Relation.tense && Cons.MostLikely())
+            //  || (unit.rf.general.party.GetRelation() == Party.Relation.xTense)) {
+            //  eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.FarmDestroyedReported, unit,
+            //    null, disc));
+            //  while (eventDialog.Animating) { yield return null; }
+            //  
+            //}
+          }
+
+        }
+      }
       hexMap.cameraKeyboardController.EnableCamera();
       MoveAnimating = false;
     }

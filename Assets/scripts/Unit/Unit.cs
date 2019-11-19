@@ -17,7 +17,9 @@ namespace UnitNS
 
     public const int BasicMovementCost = 30; // For actions like: attack
     public const int MovementcostOnHill = 50;
+    public const int MovementcostOnHillRoad = 30;
     public const int MovementcostOnPlain = 30;
+    public const int MovementcostOnPlainRoad = 25;
     public const int MovementCostOnUnaccesible = -1;
     public const int DisbandUnitUnder = 20;
 
@@ -39,6 +41,7 @@ namespace UnitNS
     public Supply supply;
     public WeatherEffect weatherEffect;
     public WarWeary warWeary;
+    public Vantage vantage;
     WeatherGenerator weatherGenerator;
     TurnController turnController;
     int initSupply = 0;
@@ -78,6 +81,7 @@ namespace UnitNS
       supply = new Supply(this, initSupply);
       weatherEffect = new WeatherEffect(this);
       warWeary = new WarWeary(this);
+      vantage = new Vantage(this);
       hexMap.SpawnUnit(this);
       if (tile != null && tile.settlement != null && tile.settlement.owner.isAI == IsAI()) {
         // spawn unit in settlement
@@ -544,7 +548,9 @@ namespace UnitNS
     {
       get
       {
-        int defence = (int)(rf.def + (rf.def * GetBuff()) - disarmorDefDebuf);
+        int defence = (int)(rf.def + (rf.def *
+        (GetBuff() + vantage.DefBuf())
+        ) - disarmorDefDebuf);
         return defence <= 0 ? 1 : defence;
       }
     }
@@ -552,7 +558,9 @@ namespace UnitNS
     {
       get
       {
-        int attack = (int)(rf.atk + (rf.atk * GetBuff()));
+        int attack = (int)(rf.atk + (rf.atk * 
+        (GetBuff() + vantage.AtkBuf() + weatherEffect.AtkBuf())
+        ));
         return attack <= 0 ? 1 : attack;
       }
     }
@@ -563,7 +571,17 @@ namespace UnitNS
 
     float GetBuff()
     {
-      return GetStarvingBuf() + GetStaminaBuf() + GetMoraleBuf() + GetStateBuf();
+      return GetStarvingBuf() + GetStaminaBuf() + GetMoraleBuf() + GetStateBuf() + GetNewGeneralBuf();
+    }
+
+    float newGeneralDebuf = 0f;
+    public void SetNewGeneralBuf() {
+      newGeneralDebuf = -0.3f;
+      rf.morale -= 5;
+    }
+
+    public float GetNewGeneralBuf() {
+      return newGeneralDebuf;
     }
 
     float GetStarvingBuf()
@@ -683,13 +701,17 @@ namespace UnitNS
     }
 
     public void DiscoveredByEnemy() {
-      MsgBox.ShowMsg(GeneralName() + "所部被敌军发现");
       concealCoolDownTurn = ConcealCoolDownIn;
       SetState(State.Stand);
     }
 
     bool AfterMoveUpdate(List<Unit> ambusher) {
       bool continueMoving = true;
+      if (this.IsAI()) {
+        // TODO: use an efficient way
+        FoW.Get().Fog();
+      }
+
       if (IsConcealed() && hexMap.IsInEnemyScoutRange(this.IsAI(), tile)) {
         DiscoveredByEnemy();
         continueMoving = false;

@@ -60,5 +60,16 @@
       return effects;
     }
 
+    public float AtkBuf() {
+      if (Cons.IsHeavyRain(unit.hexMap.weatherGenerator.currentWeather)) {
+        return -0.5f;
+      }
+      if (Cons.IsRain(unit.hexMap.weatherGenerator.currentWeather)) {
+        return -0.2f;
+      }
+      return 0f;
+
+    }
+
   }
 }

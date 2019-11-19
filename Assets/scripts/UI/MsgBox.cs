@@ -15,9 +15,6 @@ namespace MonoNS
     {
       this.msg.text = msg;
     }
-    public static void ShowMsg(string msg) {
-      GameObject.FindObjectOfType<MsgBox>().Show(msg);
-    }
 
     public override void UpdateChild() {}
 

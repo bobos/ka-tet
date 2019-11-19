@@ -257,10 +257,16 @@ namespace MapTileNS
       if (terrian == TerrianType.Hill)
       {
         movementCost = Unit.MovementcostOnHill;
+        if (field == FieldType.Road) {
+          movementCost = Unit.MovementcostOnHillRoad;
+        }
       }
-      else if (terrian == TerrianType.Plain || field == FieldType.Road)
+      else if (terrian == TerrianType.Plain)
       {
         movementCost = Unit.MovementcostOnPlain;
+        if (field == FieldType.Road) {
+          movementCost = Unit.MovementcostOnPlainRoad;
+        }
       }
       else
       {

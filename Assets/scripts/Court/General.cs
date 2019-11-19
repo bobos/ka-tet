@@ -182,6 +182,7 @@ namespace CourtNS {
       newGen.Assign(hexMap, troop);
       newGen.stat = GeneralStat.OnField;
       warParty.Join(newGen);
+      troop.onFieldUnit.SetNewGeneralBuf();
     }
 
     Troop HandOutTroop() {
