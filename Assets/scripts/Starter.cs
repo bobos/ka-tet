@@ -29,6 +29,8 @@ public class Starter : MonoBehaviour {
     controllers.Add(weatherGenerator);
     WindGenerator windGenerator = GameObject.FindObjectOfType<WindGenerator>();
     controllers.Add(windGenerator);
+    EventStasher eventStasher = GameObject.FindObjectOfType<EventStasher>();
+    controllers.Add(eventStasher);
     CombatController combatController = GameObject.FindObjectOfType<CombatController>();
     controllers.Add(combatController);
     CameraKeyboardController cameraKeyboardController = GameObject.FindObjectOfType<CameraKeyboardController>();
@@ -106,6 +108,7 @@ public class Starter : MonoBehaviour {
     // for HeJian
     Cons.Pigeon.counterParty = Cons.Eagle;
     Cons.Eagle.counterParty = Cons.Pigeon;
+    Cons.Pigeon.influence = 100;
 
     // init generals
     General liubei = new General("g_liubei", "g_liubei_d", Cons.middleEarth, new Traits[0]); 

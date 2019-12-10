@@ -1,5 +1,4 @@
 ﻿using TextNS;
-using UnityEngine;
 
 namespace UnitNS
 {

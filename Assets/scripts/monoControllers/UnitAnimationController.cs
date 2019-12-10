@@ -97,9 +97,9 @@ namespace MonoNS
         popAniController.Show(view, textLib.get("pop_discovered"), Color.yellow);
         while(popAniController.Animating) { yield return null; }
       }
-      if (unit.tile.field == FieldType.Village && !hexMap.IsAttackSide(unit.IsAI())) {
-        if ((Cons.IsSpring(hexMap.weatherGenerator.season) && Cons.MostLikely())
-          || (Cons.IsSummer(hexMap.weatherGenerator.season) && Cons.EvenChance())) {
+      if (!unit.IsAI() && unit.tile.field == FieldType.Village && !hexMap.IsAttackSide(unit.IsAI())) {
+        if ((Cons.IsSpring(hexMap.weatherGenerator.season) && Cons.EvenChance())
+          || (Cons.IsSummer(hexMap.weatherGenerator.season) && Cons.FairChance())) {
           unit.tile.SetFieldType(FieldType.Wild);
           int disc = 2;
           eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.FarmDestroyed, unit,
@@ -109,16 +109,8 @@ namespace MonoNS
             Riot(unit, disc);
             while (riotAnimating) { yield return null; }
           } else {
-
-            //if ((unit.rf.general.party.GetRelation() == Party.Relation.tense && Cons.MostLikely())
-            //  || (unit.rf.general.party.GetRelation() == Party.Relation.xTense)) {
-            //  eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.FarmDestroyedReported, unit,
-            //    null, disc));
-            //  while (eventDialog.Animating) { yield return null; }
-            //  
-            //}
+            hexMap.eventStasher.Add(unit.rf.general, MonoNS.EventDialog.EventName.FarmDestroyed);
           }
-
         }
       }
       hexMap.cameraKeyboardController.EnableCamera();

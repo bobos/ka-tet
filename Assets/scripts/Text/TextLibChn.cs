@@ -120,6 +120,10 @@ namespace TextNS
       {"f_liang", "梁"},
       {"f_hejian", "河间"},
 
+      // party
+      {"p_eagleParty", "猪党"},
+      {"p_pigeonParty", "狗党"},
+
       // generals
       {"g_liubei", "李存勖"},
       {"g_guanyu", "李存审"},
@@ -191,6 +195,10 @@ namespace TextNS
       {"event_farmDestroyed", @"{0}将军, 有大批民众赶至我军军营状告我部兵士毁伤其稻田，群情激奋，望将军定夺！"},
       {"event_farmDestroyed_approve_title", @"处罚兵士(不满+{0})"},
       {"event_farmDestroyed_disapprove_title", "兵威弹压"},
+      {"event_farmDestroyedReported_title", "龙颜不悦"},
+      {"event_farmDestroyedReported", @"{0}将军所部兵士毁伤稻田且殴伤百姓企图掩盖恶行为，事情败露为监察御史所发，圣上颇为不悦！{1}朝廷影响力-{2}!"},
+      {"event_generalReplaced_title", "勒令还朝"},
+      {"event_generalReplaced", @"{0}将军治军不力，已被勒令换朝!"},
 
       // pop out msg
       {"pop_discontent", @"不满+{0}"},

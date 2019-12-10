@@ -9,7 +9,7 @@
     }
 
     public bool Occur() {
-      if (!fired && !unit.tile.waterBound && unit.IsOnField() && Cons.TinyChance()) {
+      if (!unit.IsAI() && !fired && !unit.tile.waterBound && unit.IsOnField() && Cons.TinyChance()) {
         fired = true;
         // TODO: only affect player
       }

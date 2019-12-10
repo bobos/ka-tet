@@ -67,6 +67,12 @@ namespace MonoNS
       }
     }
 
+    EventStasher eventStasher {
+      get {
+        return hexMap.eventStasher;
+      }
+    }
+
     public bool endingTurn { get; private set; }
     public delegate void OnEndTurnClicked();
     public event OnEndTurnClicked onEndTurnClicked;
@@ -224,7 +230,12 @@ namespace MonoNS
       endingTurn = false;
       if (cnt == 0) {
         Weather weather = weatherGenerator.NextDay();
-        if (onNewTurn != null) { onNewTurn(); }
+        if (onNewTurn != null) { 
+          onNewTurn();
+          eventStasher.Step();
+          while (eventStasher.stepAnimating) { yield return null; }
+        }
+
         foreach(Tile tile in weatherGenerator.tileCB) {
           tileAniController.WeatherChange(tile, weather);
           while (tileAniController.WeatherAnimating) { yield return null; }

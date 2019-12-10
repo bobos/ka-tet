@@ -21,8 +21,7 @@ namespace CourtNS {
       }
 
       set {
-        _influence += value;
-        _influence = _influence < 0 ? 0 : _influence;
+        _influence = value < 0 ? 0 : value;
       }
     }
   

@@ -32,6 +32,7 @@ namespace MonoNS
     public UnitAnimationController unitAniController;
     public TileAnimationController tileAniController;
     public PopTextAnimationController popAniController;
+    public EventStasher eventStasher;
     public Province warProvince;
 
     // ==============================================================
@@ -134,6 +135,7 @@ namespace MonoNS
       unitAniController = GameObject.FindObjectOfType<UnitAnimationController>();
       tileAniController = GameObject.FindObjectOfType<TileAnimationController>();
       popAniController = GameObject.FindObjectOfType<PopTextAnimationController>();
+      eventStasher = GameObject.FindObjectOfType<EventStasher>();
       // init actionBroker
       actionBroker = UnitActionBroker.GetBroker();
       actionBroker.onUnitAction += OnUnitAction;

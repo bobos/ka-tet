@@ -80,6 +80,10 @@ namespace CourtNS {
       return stat == GeneralStat.Rest;
     }
 
+    public bool IsOnField() {
+      return stat == GeneralStat.OnField;
+    }
+
     // At Court Actions
     public void Assign(HexMap hexMap, Troop troop) {
       ResetFieldRecords();
@@ -147,6 +151,12 @@ namespace CourtNS {
       AssignOnField(troop);
     }
 
+    public bool GeneralReplacedOnField() {
+      Troop troop = HandOutTroop();
+      LeaveCampaign();
+      return AssignOnField(troop);
+    }
+
     public void UnitRiot() {
       int rand = Util.Rand(1, 10);
       party.influence -= 100;
@@ -173,16 +183,17 @@ namespace CourtNS {
       stat = GeneralStat.Rest;
     }
 
-    void AssignOnField(Troop troop) {
+    bool AssignOnField(Troop troop) {
       General newGen = faction.GetAvailableGeneral();
       if (newGen == null) {
         troop.onFieldUnit.Retreat();
-        return;
+        return false;
       }
       newGen.Assign(hexMap, troop);
       newGen.stat = GeneralStat.OnField;
       warParty.Join(newGen);
       troop.onFieldUnit.SetNewGeneralBuf();
+      return true;
     }
 
     Troop HandOutTroop() {

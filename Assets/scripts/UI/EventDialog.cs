@@ -88,6 +88,8 @@ namespace MonoNS
       GeneralExecuted,
       Retreat,
       FarmDestroyed,
+      FarmDestroyedReported,
+      GeneralReplaced,
       Null
     }
 
@@ -133,11 +135,11 @@ namespace MonoNS
       Unit unit = currentUnit = dialogEvent.unit;
       Settlement settlement = currentSettlement = dialogEvent.settlement;
       Settlement settlement1 = dialogEvent.settlement1;
-      int argu5 = dialogEvent.supply;
       int argu1 = dialogEvent.moraleReduce;
       int argu2 = dialogEvent.wounded;
       int argu3 = dialogEvent.killed;
       int argu4 = dialogEvent.killedLabor;
+      int argu5 = dialogEvent.supply;
       General general = dialogEvent.general;
       if (name == EventName.Null) {
         Animating = false;
@@ -301,6 +303,20 @@ namespace MonoNS
           unit.GeneralName(), unit.Name());
         image.sprite = Poisioned;
       }
+      
+      if (name == EventName.FarmDestroyedReported) {
+        title.text = textLib.get("event_farmDestroyedReported_title");
+        description.text = System.String.Format(textLib.get("event_farmDestroyedReported"),
+          unit.GeneralName(), unit.rf.general.party.Name(), argu1);
+        image.sprite = GeneralSwapped;
+      }
+
+      if (name == EventName.GeneralReplaced) {
+        title.text = textLib.get("event_generalReplaced_title");
+        description.text = System.String.Format(textLib.get("event_generalReplaced"),
+          unit.GeneralName());
+        image.sprite = Decision;
+      }
 
       if (name == EventName.Disarmor) {
         ToggleDecision();
@@ -321,6 +337,7 @@ namespace MonoNS
         approveText.text = System.String.Format(textLib.get("event_farmDestroyed_approve_title"), argu1);
         disapproveText.text = textLib.get("event_farmDestroyed_disapprove_title");
       }
+
     }
 
     void ToggleConfirm() {
