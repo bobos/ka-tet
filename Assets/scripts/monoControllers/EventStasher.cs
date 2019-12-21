@@ -48,7 +48,7 @@ namespace MonoNS {
 
           if (s.eventName == EventDialog.EventName.FarmDestroyed) {
             if ((s.general.party.GetRelation() == Party.Relation.tense && Cons.MostLikely())
-              || (s.general.party.GetRelation() == Party.Relation.xTense)) {
+              || (s.general.party.GetRelation() == Party.Relation.xTense) && Cons.FiftyFifty()) {
               UnitNS.Unit unit = s.general.commandUnit.onFieldUnit;
               int influence = 50;
               s.general.party.influence -= influence;
@@ -57,17 +57,11 @@ namespace MonoNS {
                 null, influence));
               while (eventDialog.Animating) { yield return null; }
 
-              if (Cons.FiftyFifty()) {
-                eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.GeneralReplaced,
+              if(s.general.GeneralReplacedOnField()) {
+                eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.NewGeneral,
                   unit,
                   null));
                 while (eventDialog.Animating) { yield return null; }
-                if(s.general.GeneralReplacedOnField()) {
-                  eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.NewGeneral,
-                    unit,
-                    null));
-                  while (eventDialog.Animating) { yield return null; }
-                }
               }
             }
           }

@@ -128,18 +128,18 @@ public class Starter : MonoBehaviour {
     xuchu.JoinFaction(Cons.Liang, Cons.Tiger);
 
     // step 3, assign general to units
-    Troop troop = new Troop(2000, Cons.HeJian, Cons.riverRun, Type.Infantry, Cons.elite);
+    Troop troop = new Troop(5000, Cons.HeJian, Cons.riverRun, Type.Infantry, Cons.elite);
     liubei.Assign(hexMap, troop);
-    troop = new Troop(500, Cons.HeJian, Cons.riverRun, Type.Cavalry, Cons.veteran);
+    troop = new Troop(250, Cons.HeJian, Cons.riverRun, Type.Scout, Cons.veteran);
     zhaoyun.Assign(hexMap, troop);
-    troop = new Troop(800, Cons.HeJian, Cons.riverRun, Type.Infantry, Cons.rookie);
+    troop = new Troop(2000, Cons.HeJian, Cons.riverRun, Type.Infantry, Cons.rookie);
     guanyu.Assign(hexMap, troop);
-    troop = new Troop(1000, Cons.HeJian, Cons.middleEarth, Type.Cavalry, Cons.rookie);
+    troop = new Troop(1500, Cons.HeJian, Cons.middleEarth, Type.Cavalry, Cons.rookie);
     zhangfei.Assign(hexMap, troop);
 
     troop = new Troop(7000, Cons.Liang, Cons.riverNorth, Type.Infantry, Cons.elite);
     caocao.Assign(hexMap, troop);
-    troop = new Troop(400, Cons.Liang, Cons.riverNorth, Type.Cavalry, Cons.elite);
+    troop = new Troop(3000, Cons.Liang, Cons.riverNorth, Type.Cavalry, Cons.elite);
     xuchu.Assign(hexMap, troop);
 
     // step 4, on field assignment

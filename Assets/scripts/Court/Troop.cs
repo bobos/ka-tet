@@ -33,7 +33,7 @@ namespace CourtNS
     TroopState state;
 
     public static int MaxNum(Type type) {
-      return type == Type.Cavalry ? Cavalry.MaxTroopNum : Infantry.MaxTroopNum;
+      return type == Type.Cavalry ? Cavalry.MaxTroopNum : (type == Type.Infantry ? Infantry.MaxTroopNum : Scout.MaxTroopNum);
     }
 
     public Troop(int soldiers, Faction faction, Province province, Type type, Rank rank) {
@@ -48,10 +48,6 @@ namespace CourtNS
       morale = province.region.Will();
       this.province = province;
       state = TroopState.Idle;
-    }
-
-    public bool IsCavalry() {
-      return type == Type.Cavalry;
     }
 
     public bool IsRest() {
@@ -110,10 +106,12 @@ namespace CourtNS
         return false;
       }
       state = TroopState.OnField;
-      if(IsCavalry()) {
+      if(type == Type.Cavalry) {
         onFieldUnit = new Cavalry(false, this, deploymentTile, supply);
-      } else {
+      } else if (type == Type.Infantry) {
         onFieldUnit = new Infantry(false, this, deploymentTile, supply, labor);
+      } else {
+        onFieldUnit = new Scout(false, this, deploymentTile, supply);
       }
       return true;
     }

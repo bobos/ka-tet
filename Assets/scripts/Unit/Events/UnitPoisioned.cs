@@ -33,7 +33,7 @@
     }
 
     public void Poision() {
-      if (poisioned) {
+      if (unit.type == Type.Scout || poisioned) {
         return;
       }
       unit.hexMap.eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.Poision, unit, null));

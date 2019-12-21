@@ -8,11 +8,13 @@
     }
 
     public int Occur() {
-      if (!Cons.IsHeat(unit.hexMap.weatherGenerator.currentWeather)
+      if (unit.type == Type.Scout
+      || Cons.IsWind(unit.hexMap.windGenerator.current) || Cons.IsGale(unit.hexMap.windGenerator.current)
+      ||!Cons.IsHeat(unit.hexMap.weatherGenerator.currentWeather)
       || unit.tile.waterBound || unit.IsCamping()) {
         return 0;
       }
-      if (Cons.EvenChance()) {
+      if (Cons.FairChance()) {
         return 1;
       }
       return 0;

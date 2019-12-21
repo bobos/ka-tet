@@ -97,20 +97,18 @@ namespace MonoNS
         popAniController.Show(view, textLib.get("pop_discovered"), Color.yellow);
         while(popAniController.Animating) { yield return null; }
       }
-      if (!unit.IsAI() && unit.tile.field == FieldType.Village && !hexMap.IsAttackSide(unit.IsAI())) {
-        if ((Cons.IsSpring(hexMap.weatherGenerator.season) && Cons.EvenChance())
-          || (Cons.IsSummer(hexMap.weatherGenerator.season) && Cons.FairChance())) {
-          unit.tile.SetFieldType(FieldType.Wild);
-          int disc = 2;
+      int ret = unit.farmDestroy.Occur();
+      if (ret != -1) {
+        // occured
+        if (ret == 0) {
+          // stash event
+          hexMap.eventStasher.Add(unit.rf.general, MonoNS.EventDialog.EventName.FarmDestroyed);
+        } else {
           eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.FarmDestroyed, unit,
-            null, disc));
+            null, ret));
           while (eventDialog.Animating) { yield return null; }
-          if (eventDialog.accepted) {
-            Riot(unit, disc);
-            while (riotAnimating) { yield return null; }
-          } else {
-            hexMap.eventStasher.Add(unit.rf.general, MonoNS.EventDialog.EventName.FarmDestroyed);
-          }
+          Riot(unit, ret);
+          while (riotAnimating) { yield return null; }
         }
       }
       hexMap.cameraKeyboardController.EnableCamera();
@@ -242,19 +240,25 @@ namespace MonoNS
       ShowEffects(unit, unit.RefreshUnit());
       while (ShowAnimating) { yield return null; }
       if (Cons.IsHeat(hexMap.weatherGenerator.currentWeather)) {
-        if(unit.armorRemEvent.Occur()) {
-          int defReduce = unit.armorRemEvent.DefReduce();
-          int discontent = unit.armorRemEvent.Discontent();
-          eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.Disarmor, unit,
-            null, defReduce, discontent));
-          while (eventDialog.Animating) { yield return null; }
-          if (eventDialog.accepted) {
-            unit.disarmorDefDebuf = defReduce; 
-            ShowEffects(unit, new int[8]{0,0,0,0,0,0,0,defReduce});
-            while (ShowAnimating) { yield return null; }
-          } else {
+        int ret = unit.armorRemEvent.Occur();
+        if(ret != 0) {
+          if (ret < 0) {
+            int discontent = -ret;
+            // Not allowed
+            eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.Disarmor, unit,
+              null, discontent));
+            while (eventDialog.Animating) { yield return null; }
             Riot(unit, discontent);
             while (riotAnimating) { yield return null; }
+          } else {
+            // Allowed
+            int defReduce = ret;
+            eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.Disarmor1, unit,
+              null, defReduce));
+            while (eventDialog.Animating) { yield return null; }
+            unit.disarmorDefDebuf = defReduce; 
+            ShowEffects(unit, new int[8]{0,0,0,0,0,0,0,-defReduce});
+            while (ShowAnimating) { yield return null; }
           }
         }
       }

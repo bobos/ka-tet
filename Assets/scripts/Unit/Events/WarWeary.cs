@@ -9,7 +9,7 @@
     }
 
     public bool IsWarWeary() {
-      return unit.rf.morale <= unit.GetRetreatThreshold();
+      return unit.type != Type.Scout && unit.rf.morale <= unit.GetRetreatThreshold();
     }
 
     public int GetWarWearyDissertNum()

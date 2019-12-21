@@ -10,22 +10,16 @@ namespace  UnitNS
     public const float Under1K5MovementModifier = 1.2f;
     public const float Under4KMovementModifier = 1f;
     public const float MoreThan4KMovementModifier = 0.8f;
-    public const int MinTroopNum = 500;
-    public const int MaxTroopNum = 8000;
+    public const int MinTroopNum = 1500;
+    public const int MaxTroopNum = 15000;
     public const int ExhaustLine = 15;
-    public const float L1FireBuff = 0.2f;
-    public const float L2FireBuff = 0.25f;
-    public const float L3FireBuff = 0.3f;
-    public const float L4FireBuff = 0.35f;
-    public const float L1ForestBuff = 0.2f;
-    public const float L2ForestBuff = 0.3f;
-    public const float L3ForestBuff = 0.4f;
-    public const float L4ForestBuff = 0.5f;
 
     public Infantry(bool clone, Troop troop, Tile tile, int supply, int labor, State state = State.Stand, 
                     int kia = 0, int mia = 0, int movement = -1):
           base(clone, troop, tile, state, supply, labor, kia, mia, movement)
-    {}
+    {
+      this.type = Type.Infantry;
+    }
 
     public override bool IsCavalry()
     {
@@ -94,7 +88,7 @@ namespace  UnitNS
     }
 
     protected override bool Concealable() {
-      return labor == 0 && rf.soldiers + rf.wounded <= 800;
+      return false;
     }
 
 

@@ -28,6 +28,7 @@ namespace UnitNS
     public const int L1DiscoverRange = 1; // under 2000
     public const int L2DiscoverRange = 2; // > 4000
     public const int ConcealCoolDownIn = 3;
+    public Type type;
 
     private TextNS.TextLib txtLib = Cons.GetTextLib();
 
@@ -38,6 +39,7 @@ namespace UnitNS
     public UnitPoisioned unitPoisioned;
     public Riot riot;
     public MarchOnHeat marchOnHeat;
+    public FarmDestroy farmDestroy;
     public Supply supply;
     public WeatherEffect weatherEffect;
     public WarWeary warWeary;
@@ -82,6 +84,7 @@ namespace UnitNS
       weatherEffect = new WeatherEffect(this);
       warWeary = new WarWeary(this);
       vantage = new Vantage(this);
+      farmDestroy = new FarmDestroy(this);
       hexMap.SpawnUnit(this);
       if (tile != null && tile.settlement != null && tile.settlement.owner.isAI == IsAI()) {
         // spawn unit in settlement
@@ -489,7 +492,7 @@ namespace UnitNS
       {
         return StaminaLvl.Fresh;
       }
-      if (movementRemaining > (rf.IsCavalry() ? Cavalry.ExhaustLine : Infantry.ExhaustLine))
+      if (movementRemaining > ((this.type == Type.Infantry) ? Infantry.ExhaustLine : Cavalry.ExhaustLine))
       {
         return StaminaLvl.Tired;
       }
