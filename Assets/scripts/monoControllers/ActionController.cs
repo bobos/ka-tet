@@ -3,6 +3,7 @@ using UnityEngine;
 using UnitNS;
 using MapTileNS;
 using System.Collections.Generic;
+using FieldNS;
 
 namespace MonoNS
 {
@@ -256,18 +257,13 @@ namespace MonoNS
 
     IEnumerator DoMove(Unit unit)
     {
-      List<Unit> ambusher = new List<Unit>();
       UnitView view = hexMap.GetUnitView(unit);
-      while (view && unitAniController.MoveUnit(unit, ambusher))
+      while (view && unitAniController.MoveUnit(unit))
       {
         while (unitAniController.MoveAnimating) { yield return null; }
       }
       while (unitAniController.MoveAnimating) { yield return null; }
-      if (ambusher.Count > 0) {
-        // TODO: trigger ambush
-      }
       ActionOngoing = false;
-      // ???
       if (actionDone != null) actionDone(unit, null, actionName.MOVE);
     }
 

@@ -64,7 +64,7 @@ namespace MonoNS
           } else {
             unitAniController.ShowEffects(unit, DisasterEffect.Apply(DisasterType.Flood, unit));
             while(unitAniController.ShowAnimating) { yield return null; }
-            unitAniController.MoveUnit(unit, new List<Unit>(), newTile);
+            unitAniController.MoveUnit(unit, newTile);
             while (unitAniController.MoveAnimating) { yield return null; }
             if (!Util.eq<Tile>(newTile, unit.tile)) {
               // Failed to move, destroy unit
@@ -115,7 +115,7 @@ namespace MonoNS
           } else {
             unitAniController.ShowEffects(unit, DisasterEffect.Apply(DisasterType.WildFire, unit));
             while(unitAniController.ShowAnimating) { yield return null; }
-            unitAniController.MoveUnit(unit, new List<Unit>(), newTile);
+            unitAniController.MoveUnit(unit, newTile);
             while (unitAniController.MoveAnimating) { yield return null; }
             if (!Util.eq<Tile>(newTile, unit.tile)) {
               // Failed to move, destroy unit

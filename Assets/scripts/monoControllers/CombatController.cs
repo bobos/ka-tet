@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnitNS;
+using FieldNS;
+using MapTileNS;
 
 namespace MonoNS
 {
@@ -38,6 +40,18 @@ namespace MonoNS
           return;
         }
       }
+    }
+
+    public List<Unit> GetKnownEnemies() {
+      List<Unit> known = new List<Unit>();
+      bool isPlayer = hexMap.turnController.playerTurn;
+      foreach(Tile tile in FoW.Get().GetVisibleArea()) {
+        Unit unit = tile.GetUnit();
+        if (unit != null && isPlayer == unit.IsAI() && unit.IsVisible()) {
+          known.Add(unit);
+        }
+      }
+      return known;
     }
 
     public void OnUnitAttack(Unit[] punchers, Unit receiver)

@@ -2,7 +2,6 @@
 using MapTileNS;
 using MonoNS;
 using System.Collections;
-using CourtNS;
 
 namespace UnitNS
 {
@@ -127,17 +126,11 @@ namespace UnitNS
     public void Move(Tile newTile)
     {
       newPosition = newTile.GetSurfacePosition();
-      if (!viewActivated) {
-        transform.position = newPosition; 
-        nameGO.transform.position = NamePosition(newPosition);
-        unitInfoGO.transform.position = UnitInfoPosition(newPosition);
-        Animating = false;
-        return;
+      if (viewActivated) {
+        hexMap.HighlightPath(unit.GetPath());
+        Animating = true;
+        ToggleUnitInfo(false);
       }
-      hexMap.HighlightPath(unit.GetPath());
-      Animating = true;
-      ToggleUnitInfo(false);
-
       currentVelocity = Vector3.zero;
     }
 
@@ -181,14 +174,16 @@ namespace UnitNS
     /// </summary>
     void Update()
     {
-      if (!Animating || !viewActivated) { return; }
+      if (!Animating) { return; }
       Vector3 originPosition = this.transform.position;
       // NOTE: this point to the gameobject not the component
-      this.transform.position = Vector3.SmoothDamp(originPosition, newPosition, ref currentVelocity, 0.2f);
-      nameGO.transform.position = Vector3.SmoothDamp(originPosition, newPosition, ref currentVelocity, 0.2f);
+      this.transform.position = Vector3.SmoothDamp(originPosition, newPosition, ref currentVelocity, 0.1f);
+      nameGO.transform.position = Vector3.SmoothDamp(originPosition, newPosition, ref currentVelocity, 0.1f);
       if (Vector3.Distance(this.transform.position, newPosition) < 0.1f)
       {
-        ToggleUnitInfo(true);
+        if (viewActivated) {
+          ToggleUnitInfo(true);
+        }
         nameGO.transform.position = NamePosition(newPosition);
         unitInfoGO.transform.position = UnitInfoPosition(newPosition);
         Animating = false;

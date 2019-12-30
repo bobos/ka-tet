@@ -304,10 +304,6 @@ namespace UnitNS
       return state == State.Conceal || state == State.Stand;
     }
 
-    public bool IsAmbushing() {
-      return tile.Ambushable() && IsConcealed();
-    }
-
     public bool IsVisible() {
       return _IsVisible(this.state);
     }
@@ -708,31 +704,11 @@ namespace UnitNS
       SetState(State.Stand);
     }
 
-    bool AfterMoveUpdate(List<Unit> ambusher) {
+    bool AfterMoveUpdate(List<Unit> knownUnit) {
       bool continueMoving = true;
-      if (this.IsAI()) {
-        // TODO: use an efficient way
-        FoW.Get().Fog();
-      }
 
       if (IsConcealed() && hexMap.IsInEnemyScoutRange(this.IsAI(), tile)) {
         DiscoveredByEnemy();
-        continueMoving = false;
-      }
-
-      List<Unit> candidates = new List<Unit>();
-      bool ambushed = false;
-      foreach(Tile t in tile.neighbours) {
-        Unit candidate = t.GetUnit();
-        if (candidate != null && candidate.IsAI() != IsAI()) {
-          candidates.Add(candidate);
-          if (candidate.IsAmbushing()) {
-            ambushed = true;
-          }
-        }
-      }
-      if (ambushed) {
-        ambusher = candidates;
         continueMoving = false;
       }
 
@@ -744,10 +720,18 @@ namespace UnitNS
         }
       }
 
+      // Unit should stop once spots new enemy
+      foreach(Tile t in GetVisibleArea()) {
+        Unit u = t.GetUnit();
+        if (u != null && u.IsAI() != IsAI() && u.IsVisible() && !knownUnit.Contains(u)) {
+          continueMoving = false;
+        }
+      }
+
       return continueMoving;
     }
 
-    public bool DoMove(List<Unit> ambusher, Tile toTile = null)
+    public bool DoMove(Tile toTile = null)
     {
       if (movementRemaining <= 0) {
         return false;
@@ -782,9 +766,10 @@ namespace UnitNS
         return false;
       }
 
+      List<Unit> knownUnits = hexMap.combatController.GetKnownEnemies();
       movementRemaining -= takenMovement;
       SetTile(next);
-      return AfterMoveUpdate(ambusher);
+      return AfterMoveUpdate(knownUnits);
     }
 
     public void SetTile(Tile h, bool dontAddToNewTile = false)

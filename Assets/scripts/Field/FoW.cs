@@ -11,18 +11,11 @@ namespace FieldNS
     public static FoW instance;
     FoW(HexMap hexMap) {
       this.hexMap = hexMap;
-      hexMap.actionBroker.onUnitAction += OnUnitAction;
       // init fow for player at game start
       Fog();
     }
 
-    public void OnUnitAction(Unit _unit, ActionType action, Tile _tile) {
-      if (action == ActionType.UnitMove) {
-        Fog();
-      }
-    }
-
-    public HashSet<Tile> GetEnemyVisibleArea() {
+    public HashSet<Tile> GetVisibleArea() {
       HashSet<Tile> tiles = new HashSet<Tile>();
       // TODO: AI test
       WarParty party = hexMap.turnController.playerTurn ? hexMap.GetPlayerParty() : hexMap.GetAIParty();
@@ -32,7 +25,7 @@ namespace FieldNS
     }
 
     public void Fog() {
-      HashSet<Tile> tiles = GetEnemyVisibleArea();
+      HashSet<Tile> tiles = GetVisibleArea();
       foreach (Tile tile in hexMap.tiles)
       {
         if (tiles.Contains(tile)) {

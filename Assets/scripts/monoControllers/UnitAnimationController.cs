@@ -4,7 +4,7 @@ using CourtNS;
 using TextNS;
 using UnityEngine;
 using MapTileNS;
-using System.Collections.Generic;
+using FieldNS;
 
 namespace MonoNS
 {
@@ -64,11 +64,11 @@ namespace MonoNS
     }
 
     public bool MoveAnimating = false;
-    public bool MoveUnit(Unit unit, List<Unit> ambusher, Tile tile = null) {
+    public bool MoveUnit(Unit unit, Tile tile = null) {
       MoveAnimating = true;
       Tile old = unit.tile;
       bool hiddenB4 = unit.IsConcealed();
-      bool continuing = unit.DoMove(ambusher, tile);
+      bool continuing = unit.DoMove(tile);
       bool discovered = hiddenB4 && !unit.IsConcealed();
       int discontent = 0;
       if (Util.eq<Tile>(old, unit.tile)) {
@@ -112,6 +112,8 @@ namespace MonoNS
         }
       }
       hexMap.cameraKeyboardController.EnableCamera();
+      // after each step, recalculate fog
+      FoW.Get().Fog();
       MoveAnimating = false;
     }
 
