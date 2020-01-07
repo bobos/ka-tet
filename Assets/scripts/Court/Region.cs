@@ -34,15 +34,15 @@ namespace CourtNS
     public override int Atk(Type unitType)
     {
       if (unitType == Type.Infantry)
-        return 80;
-      return 200;
+        return 4;
+      return 10;
     }
 
     public override int Def(Type unitType)
     {
       if (unitType == Type.Infantry)
-        return 100;
-      return 50;
+        return 5;
+      return 2;
     }
 
     public override int Mov(Type unitType)
@@ -84,15 +84,15 @@ namespace CourtNS
     public override int Atk(Type unitType)
     {
       if (unitType == Type.Infantry)
-        return 100;
-      return 150;
+        return 5;
+      return 8;
     }
 
     public override int Def(Type unitType)
     {
       if (unitType == Type.Infantry)
-        return 150;
-      return 50;
+        return 8;
+      return 3;
     }
 
     public override int Mov(Type unitType)
@@ -134,15 +134,15 @@ namespace CourtNS
     public override int Atk(Type unitType)
     {
       if (unitType == Type.Infantry)
-        return 90;
-      return 130;
+        return 4;
+      return 7;
     }
 
     public override int Def(Type unitType)
     {
       if (unitType == Type.Infantry)
-        return 100;
-      return 50;
+        return 5;
+      return 3;
     }
 
     public override int Mov(Type unitType)
@@ -184,15 +184,15 @@ namespace CourtNS
     public override int Atk(Type unitType)
     {
       if (unitType == Type.Infantry)
-        return 120;
-      return 160;
+        return 6;
+      return 8;
     }
 
     public override int Def(Type unitType)
     {
       if (unitType == Type.Infantry)
-        return 180;
-      return 50;
+        return 9;
+      return 3;
     }
 
     public override int Mov(Type unitType)
@@ -234,15 +234,15 @@ namespace CourtNS
     public override int Atk(Type unitType)
     {
       if (unitType == Type.Infantry)
-        return 80;
-      return 200;
+        return 4;
+      return 10;
     }
 
     public override int Def(Type unitType)
     {
       if (unitType == Type.Infantry)
-        return 80;
-      return 80;
+        return 4;
+      return 4;
     }
 
     public override int Mov(Type unitType)

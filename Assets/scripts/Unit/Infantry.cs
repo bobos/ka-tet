@@ -7,10 +7,6 @@ namespace  UnitNS
   public class Infantry : Unit
   {
     public const int BaseSlots = 3;
-    public const float Under1K5MovementModifier = 1.2f;
-    public const float Under4KMovementModifier = 1f;
-    public const float MoreThan4KMovementModifier = 0.8f;
-    public const int MinTroopNum = 1500;
     public const int MaxTroopNum = 15000;
     public const int ExhaustLine = 15;
 
@@ -52,19 +48,7 @@ namespace  UnitNS
 
     protected override float GetMovementModifier()
     {
-      int num = rf.soldiers + rf.wounded + labor;
-      if (num <= 1500)
-      {
-        return Under1K5MovementModifier;
-      }
-      else if (num <= 4000)
-      {
-        return Under4KMovementModifier;
-      }
-      else
-      {
-        return MoreThan4KMovementModifier;
-      }
+      return 1f;
     }
 
     protected override int GetBaseSupplySlots()

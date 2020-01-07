@@ -302,7 +302,7 @@ namespace MapTileNS
       {
         // apply movement modifier for calvary unit
         ret = (int)(movementCost * (terrian == TerrianType.Plain ?
-                    Cavalry.MovementCostModifierOnPlain : Cavalry.MovementCostModifierOnHill));
+                    1f : Cavalry.MovementCostModifierOnHill));
       }
       else
       {

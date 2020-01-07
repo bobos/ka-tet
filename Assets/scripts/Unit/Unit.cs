@@ -15,11 +15,11 @@ namespace UnitNS
     protected abstract int GetBaseSupplySlots();
     protected abstract Unit Clone();
 
-    public const int BasicMovementCost = 30; // For actions like: attack
-    public const int MovementcostOnHill = 50;
-    public const int MovementcostOnHillRoad = 30;
-    public const int MovementcostOnPlain = 30;
-    public const int MovementcostOnPlainRoad = 25;
+    public const int BasicMovementCost = 20; // For actions like: attack
+    public const int MovementcostOnHill = 30;
+    public const int MovementcostOnHillRoad = 20;
+    public const int MovementcostOnPlain = 20;
+    public const int MovementcostOnPlainRoad = 15;
     public const int MovementCostOnUnaccesible = -1;
     public const int DisbandUnitUnder = 20;
 
@@ -68,7 +68,7 @@ namespace UnitNS
         SetTile(tile);
         SetState(rf.morale == 0 ? State.Routing : state);
       }
-      movementRemaining = movement < 0 ? GetFullMovement() : movement;
+      movementRemaining = movement;
     }
 
     public void SpawnOnMap() {
@@ -91,6 +91,7 @@ namespace UnitNS
         // ghost unit will have null tile
         tile.settlement.Encamp(this);
       }
+      movementRemaining = GetFullMovement();
     }
 
     State[] visibleStates = {State.Routing, State.Stand};
@@ -265,6 +266,10 @@ namespace UnitNS
     public string GetDiscontent()
     {
       return riot.GetDescription();
+    }
+
+    public int GetTotalNum() {
+      return rf.soldiers + rf.wounded + labor;
     }
 
     public bool IsAI()
@@ -467,11 +472,13 @@ namespace UnitNS
     // ==============================================================
     public int GetFullMovement()
     {
-      return (int)(
+      int point = (int)(
           rf.mov * GetMovementModifier() *
           (rf.morale >= Troop.MaxMorale ? 1.2f : 1f) *
           (1f + (IsStarving() ? -0.45f : 0f)) * 
           (epidemic != null && epidemic.IsValid() ? 0.7f : 1f));
+      // ghost unit doesnt have vantage
+      return vantage != null ? vantage.MovementPoint(point) : point;
     }
 
     public StaminaLvl GetStaminaLevel()
@@ -561,6 +568,18 @@ namespace UnitNS
         (GetBuff() + vantage.AtkBuf() + weatherEffect.AtkBuf())
         ));
         return attack <= 0 ? 1 : attack;
+      }
+    }
+
+    public int unitAttack {
+      get {
+        return vantage.TotalPoints(atk);
+      }
+    }
+
+    public int unitDefence {
+      get {
+        return vantage.TotalPoints(def);
       }
     }
 
