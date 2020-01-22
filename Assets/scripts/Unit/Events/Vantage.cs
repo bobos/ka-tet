@@ -55,7 +55,7 @@
       }
       int point = effective * pointPerSoldier;
       int step = 100;
-      while(step > 0 || exceeded > 0) {
+      while(step > 0) {
         step -= 2;
         int remaining = exceeded - 100;
         if (remaining > 0) {
@@ -65,6 +65,7 @@
         } else {
           int addedPoint = (int)(exceeded * step * pointPerSoldier * 0.01f);
           point += addedPoint < 0 ? 0 : addedPoint;
+          break;
         }
       }
       return point;
