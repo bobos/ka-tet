@@ -10,6 +10,7 @@ namespace CourtNS
     public abstract string Name();
     public abstract string Description();
     public List<Region> UncomfortableRegions = new List<Region>();
+    // Min atk or def point must be x * 0.05f = 1 --> 20
     public abstract int Atk(Type unitType);
     public abstract int Def(Type unitType);
     public abstract int Mov(Type unitType);
@@ -34,15 +35,15 @@ namespace CourtNS
     public override int Atk(Type unitType)
     {
       if (unitType == Type.Infantry)
-        return 4;
-      return 10;
+        return 40;
+      return 100;
     }
 
     public override int Def(Type unitType)
     {
       if (unitType == Type.Infantry)
-        return 5;
-      return 2;
+        return 50;
+      return 20;
     }
 
     public override int Mov(Type unitType)
@@ -54,7 +55,7 @@ namespace CourtNS
 
     public override int Will()
     {
-      return 65;
+      return 85;
     }
 
     public override int RetreatThreshold()
@@ -84,15 +85,15 @@ namespace CourtNS
     public override int Atk(Type unitType)
     {
       if (unitType == Type.Infantry)
-        return 5;
-      return 8;
+        return 50;
+      return 80;
     }
 
     public override int Def(Type unitType)
     {
       if (unitType == Type.Infantry)
-        return 8;
-      return 3;
+        return 80;
+      return 30;
     }
 
     public override int Mov(Type unitType)
@@ -104,7 +105,7 @@ namespace CourtNS
 
     public override int Will()
     {
-      return 60;
+      return 80;
     }
 
     public override int RetreatThreshold()
@@ -134,15 +135,15 @@ namespace CourtNS
     public override int Atk(Type unitType)
     {
       if (unitType == Type.Infantry)
-        return 4;
-      return 7;
+        return 40;
+      return 70;
     }
 
     public override int Def(Type unitType)
     {
       if (unitType == Type.Infantry)
-        return 5;
-      return 3;
+        return 50;
+      return 30;
     }
 
     public override int Mov(Type unitType)
@@ -154,7 +155,7 @@ namespace CourtNS
 
     public override int Will()
     {
-      return 60;
+      return 80;
     }
 
     public override int RetreatThreshold()
@@ -184,15 +185,15 @@ namespace CourtNS
     public override int Atk(Type unitType)
     {
       if (unitType == Type.Infantry)
-        return 6;
-      return 8;
+        return 60;
+      return 80;
     }
 
     public override int Def(Type unitType)
     {
       if (unitType == Type.Infantry)
-        return 9;
-      return 3;
+        return 90;
+      return 30;
     }
 
     public override int Mov(Type unitType)
@@ -204,7 +205,7 @@ namespace CourtNS
 
     public override int Will()
     {
-      return 75;
+      return 90;
     }
 
     public override int RetreatThreshold()
@@ -234,15 +235,15 @@ namespace CourtNS
     public override int Atk(Type unitType)
     {
       if (unitType == Type.Infantry)
-        return 4;
-      return 10;
+        return 40;
+      return 100;
     }
 
     public override int Def(Type unitType)
     {
       if (unitType == Type.Infantry)
-        return 4;
-      return 4;
+        return 40;
+      return 40;
     }
 
     public override int Mov(Type unitType)
@@ -254,7 +255,7 @@ namespace CourtNS
 
     public override int Will()
     {
-      return 65;
+      return 85;
     }
 
     public override int RetreatThreshold()

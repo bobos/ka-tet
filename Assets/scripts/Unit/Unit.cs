@@ -71,10 +71,7 @@ namespace UnitNS
       movementRemaining = movement;
     }
 
-    public void SpawnOnMap() {
-      if (clone) {
-        return;
-      }
+    public void Init() {
       epidemic = new ArmyEpidemic(this);
       armorRemEvent = new ArmorRemEvent(this);
       unitPoisioned = new UnitPoisioned(this);
@@ -85,6 +82,12 @@ namespace UnitNS
       warWeary = new WarWeary(this);
       vantage = new Vantage(this);
       farmDestroy = new FarmDestroy(this);
+    }
+
+    public void SpawnOnMap() {
+      if (clone) {
+        return;
+      }
       hexMap.SpawnUnit(this);
       if (tile != null && tile.settlement != null && tile.settlement.owner.isAI == IsAI()) {
         // spawn unit in settlement
@@ -573,13 +576,13 @@ namespace UnitNS
 
     public int unitAttack {
       get {
-        return vantage.TotalPoints(atk);
+        return (int)(vantage.TotalPoints(atk) * 0.01f);
       }
     }
 
     public int unitDefence {
       get {
-        return vantage.TotalPoints(def);
+        return (int)(vantage.TotalPoints(def) * 0.01f);
       }
     }
 
@@ -589,7 +592,7 @@ namespace UnitNS
 
     float GetBuff()
     {
-      return GetStarvingBuf() + GetStaminaBuf() + GetMoraleBuf() + GetStateBuf() + GetNewGeneralBuf();
+      return GetStarvingBuf() + GetStaminaBuf() + GetNewGeneralBuf();
     }
 
     float newGeneralDebuf = 0f;
@@ -602,36 +605,12 @@ namespace UnitNS
       return newGeneralDebuf;
     }
 
-    float GetStarvingBuf()
+    public float GetStarvingBuf()
     {
       return IsStarving() ? -0.3f : 0f;
     }
 
-    float GetStateBuf()
-    {
-      if (state == State.Conceal)
-      {
-        return 0.2f;
-      }
-      if (state == State.Camping)
-      {
-        return 0.1f;
-      }
-      return 0f;
-    }
-
-    float GetMoraleBuf()
-    {
-      float buff = (rf.morale - rf.province.region.RetreatThreshold() * 2) * 0.008f;
-      return buff > 0 ? buff : (IsWarWeary() ? -0.5f : 0f);
-    }
-
-    float GetSicknessBuf()
-    {
-      return IsSicknessAffected() ? -0.2f : 0f; 
-    }
-
-    float GetStaminaBuf()
+    public float GetStaminaBuf()
     {
       if (GetStaminaLevel() == StaminaLvl.Vigorous)
       {

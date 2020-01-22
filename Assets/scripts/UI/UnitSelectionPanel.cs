@@ -114,6 +114,32 @@ namespace MonoNS
     public void OnUnitSelect(Unit unit)
     {
       self.SetActive(true);
+
+      // set attack, defense details
+      string details = 
+      "基本加成\n"
+      + "精力加成:" + unit.GetStaminaBuf() * 100
+      + "% 饥饿惩罚:" + unit.GetStarvingBuf() * 100
+      + "% 整合度惩罚:" + unit.GetNewGeneralBuf() * 100
+
+      + "%\n单兵攻击:" + unit.atk + "\n[基本攻击:" + unit.rf.atkCore
+      + " 等级加成:" + unit.rf.atkLvlBuf * 100
+      + "% 地形加成:" + unit.vantage.AtkBuf() * 100
+      + "% 气候加成:" + unit.weatherEffect.AtkBuf() * 100
+      + "% 总计:" +
+      (unit.GetStaminaBuf() + unit.GetStarvingBuf() + unit.GetNewGeneralBuf()
+       + unit.rf.atkLvlBuf + unit.vantage.AtkBuf() + unit.weatherEffect.AtkBuf())*100
+      + "%]\n"
+
+      + "单兵防御:" + unit.def + "\n[基本防御:" + unit.rf.defCore
+      + " 等级加成:" + unit.rf.defLvlBuf * 100
+      + "% 地形加成:" + unit.vantage.DefBuf() * 100
+      + "% 总计:" +
+      (unit.GetStaminaBuf() + unit.GetStarvingBuf() + unit.GetNewGeneralBuf() + unit.rf.defLvlBuf + unit.vantage.DefBuf())*100
+      + "%]\n"
+      + "有效兵力:" + unit.vantage.GetEffective();
+      hexMap.hoverInfo.Show(details);
+
       title.text = unit.GeneralName();
       movement.text = "移动力:" + unit.movementRemaining + "/" + unit.GetFullMovement();
       stamina.text = "体力: " + unit.GetStaminaLvlName();
@@ -123,8 +149,8 @@ namespace MonoNS
       slots.text = "粮草: " + unit.supply.supply + "石" + " 可维持" + unit.slots + "/" + unit.GetMaxSupplySlots() + "回合" + " 每回合消耗:" + unit.supply.SupplyNeededPerTurn() + "石";
       num.text = unit.Name() + "[兵:" + unit.rf.soldiers + "/伤:" + unit.rf.wounded + "/亡:" + unit.kia + "/逃:" + unit.mia + "/役:" + unit.labor + "]";
       morale.text = "士气: " + unit.rf.morale;
-      offense.text = "攻击: " + unit.atk;
-      defense.text = "防御: " + unit.def;
+      offense.text = "攻击: " + unit.unitAttack;
+      defense.text = "防御: " + unit.unitDefence;
       string stateStr = unit.IsWarWeary() ? " 士气低落" : "";
       stateStr += " " + unit.GetDiscontent();
       stateStr += unit.IsStarving() ? " 饥饿" : "";

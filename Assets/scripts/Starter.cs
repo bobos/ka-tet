@@ -128,19 +128,25 @@ public class Starter : MonoBehaviour {
     xuchu.JoinFaction(Cons.Liang, Cons.Tiger);
 
     // step 3, assign general to units
-    Troop troop = new Troop(5000, Cons.HeJian, Cons.riverRun, Type.Infantry, Cons.elite);
-    liubei.Assign(hexMap, troop);
-    troop = new Troop(250, Cons.HeJian, Cons.riverRun, Type.Scout, Cons.veteran);
-    zhaoyun.Assign(hexMap, troop);
-    troop = new Troop(2000, Cons.HeJian, Cons.riverRun, Type.Infantry, Cons.rookie);
-    guanyu.Assign(hexMap, troop);
-    troop = new Troop(1500, Cons.HeJian, Cons.middleEarth, Type.Cavalry, Cons.rookie);
-    zhangfei.Assign(hexMap, troop);
+    liubei.Assign(hexMap,
+      new Troop(5000, Cons.HeJian, Cons.riverRun, Type.Infantry, Cons.elite)
+    );
+    zhaoyun.Assign(hexMap,
+      new Troop(250, Cons.HeJian, Cons.riverRun, Type.Scout, Cons.veteran)
+    );
+    guanyu.Assign(hexMap,
+      new Troop(2000, Cons.HeJian, Cons.riverRun, Type.Infantry, Cons.rookie)
+    );
+    zhangfei.Assign(hexMap,
+      new Troop(1500, Cons.HeJian, Cons.middleEarth, Type.Cavalry, Cons.rookie)
+    );
 
-    troop = new Troop(7000, Cons.Liang, Cons.riverNorth, Type.Infantry, Cons.elite);
-    caocao.Assign(hexMap, troop);
-    troop = new Troop(3000, Cons.Liang, Cons.riverNorth, Type.Cavalry, Cons.elite);
-    xuchu.Assign(hexMap, troop);
+    caocao.Assign(hexMap,
+      new Troop(7000, Cons.Liang, Cons.riverNorth, Type.Infantry, Cons.elite)
+    );
+    xuchu.Assign(hexMap,
+      new Troop(3000, Cons.Liang, Cons.riverNorth, Type.Cavalry, Cons.elite)
+    );
 
     // step 4, on field assignment
     hexMap.SetWarParties(

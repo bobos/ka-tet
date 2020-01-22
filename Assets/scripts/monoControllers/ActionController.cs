@@ -2,8 +2,6 @@
 using UnityEngine;
 using UnitNS;
 using MapTileNS;
-using System.Collections.Generic;
-using FieldNS;
 
 namespace MonoNS
 {

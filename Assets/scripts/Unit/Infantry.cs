@@ -10,7 +10,14 @@ namespace  UnitNS
     public const int MaxTroopNum = 15000;
     public const int ExhaustLine = 15;
 
-    public Infantry(bool clone, Troop troop, Tile tile, int supply, int labor, State state = State.Stand, 
+    public static Unit Create(bool clone, Troop troop, Tile tile, int supply, int labor, State state = State.Stand, 
+                    int kia = 0, int mia = 0, int movement = -1) {
+      Unit unit = new Infantry(clone, troop, tile, supply, labor, state, kia, mia, movement);
+      unit.Init();
+      return unit;
+    }
+
+    protected Infantry(bool clone, Troop troop, Tile tile, int supply, int labor, State state = State.Stand, 
                     int kia = 0, int mia = 0, int movement = -1):
           base(clone, troop, tile, state, supply, labor, kia, mia, movement)
     {
@@ -68,7 +75,7 @@ namespace  UnitNS
 
     protected override Unit Clone()
     {
-      return new Infantry(true, rf, tile, supply.supply, labor, state, kia, mia, movementRemaining);
+      return Create(true, rf, tile, supply.supply, labor, state, kia, mia, movementRemaining);
     }
 
     protected override bool Concealable() {

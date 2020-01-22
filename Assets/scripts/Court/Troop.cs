@@ -25,9 +25,9 @@ namespace CourtNS
     Type type;
     int _morale;
     int _soldiers;
-    int atkCore;
-    int defCore;
-    int movCore;
+    public int atkCore;
+    public int defCore;
+    public int movCore;
     public Rank rank;
     public Level level = new Level();
     TroopState state;
@@ -77,13 +77,25 @@ namespace CourtNS
 
     public int atk {
       get {
-        return (int)(atkCore + (atkCore * rank.AtkBuf()));
+        return (int)(atkCore + (atkCore * atkLvlBuf));
+      }
+    }
+
+    public float atkLvlBuf {
+      get {
+        return rank.AtkBuf(morale);
+      }
+    }
+
+    public float defLvlBuf {
+      get {
+        return rank.DefBuf(morale);
       }
     }
 
     public int def {
       get {
-        return (int)(defCore + (defCore * rank.DefBuf()));
+        return (int)(defCore + (defCore * defLvlBuf));
       }
     }
 
@@ -107,11 +119,11 @@ namespace CourtNS
       }
       state = TroopState.OnField;
       if(type == Type.Cavalry) {
-        onFieldUnit = new Cavalry(false, this, deploymentTile, supply);
+        onFieldUnit = Cavalry.Create(false, this, deploymentTile, supply);
       } else if (type == Type.Infantry) {
-        onFieldUnit = new Infantry(false, this, deploymentTile, supply, labor);
+        onFieldUnit = Infantry.Create(false, this, deploymentTile, supply, labor);
       } else {
-        onFieldUnit = new Scout(false, this, deploymentTile, supply);
+        onFieldUnit = Scout.Create(false, this, deploymentTile, supply);
       }
       return true;
     }

@@ -1,90 +1,98 @@
-using System.Collections.Generic;
-
 namespace UnitNS
 {
-  public interface Rank {
-    string Name();
-    string Description();
-    float AtkBuf();
-    float DefBuf();
-    int RecoverPerTurn();
-    int Level();
+  abstract public class Rank {
+    public static float GetMoralePunish(int morale) {
+      const int dropStarts = 70;
+      if (morale >= dropStarts || morale < 50) {
+        return 0f;
+      }
+
+      return (dropStarts - morale) * 0.05f;
+    }
+
+    abstract public string Name();
+    abstract public string Description();
+    abstract public float AtkBuf(int morale);
+    abstract public float DefBuf(int morale);
+    abstract public int RecoverPerTurn();
+    abstract public int Level();
   }
 
   public class Rookie: Rank {
-    public int Level() {
+
+    public override int Level() {
       return 1;
     }
 
-    public string Name() {
+    public override string Name() {
       return Cons.GetTextLib().get("rank_rookie");
     }
 
-    public string Description() {
+    public override string Description() {
       return Cons.GetTextLib().get("rank_rookie_description");
     }
 
-    public float AtkBuf() {
+    public override float AtkBuf(int _morale) {
       return 0;
     }
 
-    public float DefBuf() {
+    public override float DefBuf(int _morale) {
       return 0;
     }
 
-    public int RecoverPerTurn() {
+    public override int RecoverPerTurn() {
       return 500;
     }
   }
 
   public class Veteran: Rank {
-    public int Level() {
+    public override int Level() {
       return 2;
     }
 
-    public string Name() {
+    public override string Name() {
       return Cons.GetTextLib().get("rank_veteran");
     }
 
-    public string Description() {
+    public override string Description() {
       return Cons.GetTextLib().get("rank_veteran_description");
     }
 
-    public float AtkBuf() {
-      return 0.5f;
+    public override float AtkBuf(int morale) {
+      return 0.5f * (1 - Rank.GetMoralePunish(morale));
     }
 
-    public float DefBuf() {
-      return 0.5f;
+    public override float DefBuf(int morale) {
+      return 0.5f * (1 - Rank.GetMoralePunish(morale));
     }
 
-    public int RecoverPerTurn() {
+    public override int RecoverPerTurn() {
       return 200;
     }
   }
 
   public class Elite: Rank {
-    public int Level() {
+    public override int Level() {
       return 3;
     }
 
-    public string Name() {
+    public override string Name() {
       return Cons.GetTextLib().get("rank_elite");
     }
 
-    public string Description() {
+    public override string Description() {
       return Cons.GetTextLib().get("rank_elite_description");
     }
 
-    public float AtkBuf() {
-      return 1f;
+    public override float AtkBuf(int morale) {
+      return 1f * (1 - Rank.GetMoralePunish(morale));
     }
 
-    public float DefBuf() {
-      return 1f;
+    public override float DefBuf(int morale) {
+      return 1f * (1 - Rank.GetMoralePunish(morale));
     }
 
-    public int RecoverPerTurn() {
+    public override int RecoverPerTurn() {
       return 100;
     }
   }

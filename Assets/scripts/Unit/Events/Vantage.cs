@@ -5,6 +5,7 @@
     Unit unit;
     const int MaxEffectiveNumOnPlain = 10000;
     const int MaxEffectiveNumOnHill = 5000;
+    const int LeastEffectiveNum = 2000;
     const int MaxEffectiveNum4Move = 11000;
     public Vantage(Unit unit) {
       this.unit = unit;
@@ -53,16 +54,16 @@
         return unit.rf.soldiers * pointPerSoldier; 
       }
       int point = effective * pointPerSoldier;
-      float step = 1f;
+      int step = 100;
       while(step > 0 || exceeded > 0) {
-        step -= 0.02f;
+        step -= 2;
         int remaining = exceeded - 100;
         if (remaining > 0) {
-          int addedPoint = (int)(100 * step * pointPerSoldier);
+          int addedPoint = (int)(100 * step * pointPerSoldier * 0.01f);
           point += addedPoint < 0 ? 0 : addedPoint;
           exceeded = remaining;
         } else {
-          int addedPoint = (int)(exceeded * step * pointPerSoldier);
+          int addedPoint = (int)(exceeded * step * pointPerSoldier * 0.01f);
           point += addedPoint < 0 ? 0 : addedPoint;
         }
       }
@@ -81,10 +82,18 @@
     }
 
     int GetEffectiveNum() {
+      int normalEffectiveNum = 0;
       if (unit.IsCamping() || unit.tile.terrian == MapTileNS.TerrianType.Hill) {
-        return MaxEffectiveNumOnHill;
+        normalEffectiveNum = MaxEffectiveNumOnHill;
+      } else {
+        normalEffectiveNum = MaxEffectiveNumOnPlain;
       }
-      return MaxEffectiveNumOnPlain;
+      return normalEffectiveNum - (int)((normalEffectiveNum - LeastEffectiveNum) * Rank.GetMoralePunish(unit.rf.morale));
+    }
+
+    public int GetEffective() {
+      int eff = GetEffectiveNum();
+      return unit.rf.soldiers > eff ?  eff : unit.rf.soldiers;
     }
 
   }
