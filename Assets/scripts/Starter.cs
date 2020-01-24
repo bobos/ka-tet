@@ -129,13 +129,13 @@ public class Starter : MonoBehaviour {
 
     // step 3, assign general to units
     liubei.Assign(hexMap,
-      new Troop(5000, Cons.HeJian, Cons.riverRun, Type.Infantry, Cons.elite)
+      new Troop(3000, Cons.HeJian, Cons.riverRun, Type.Infantry, Cons.elite)
     );
     zhaoyun.Assign(hexMap,
       new Troop(250, Cons.HeJian, Cons.riverRun, Type.Scout, Cons.veteran)
     );
     guanyu.Assign(hexMap,
-      new Troop(2000, Cons.HeJian, Cons.riverRun, Type.Infantry, Cons.rookie)
+      new Troop(15000, Cons.HeJian, Cons.riverRun, Type.Infantry, Cons.rookie)
     );
     zhangfei.Assign(hexMap,
       new Troop(1500, Cons.HeJian, Cons.middleEarth, Type.Cavalry, Cons.rookie)
@@ -160,7 +160,7 @@ public class Starter : MonoBehaviour {
                     Settlement.Type.strategyBase,
                     hexMap.GetAIParty(), 0, 10000, supply * 5 * 5)) {
       Util.Throw("Failed to build base at 1,1");}
-    if (!settlementMgr.BuildSettlement("河间府", hexMap.GetTile(29, 15),
+    if (!settlementMgr.BuildSettlement("河间府", hexMap.GetTile(27, 17),
                     Settlement.Type.city,
                     hexMap.GetPlayerParty(), 250000, 5000, supply * 5 * 5)) {
       Util.Throw("Failed to build city at 29,12");}
@@ -170,9 +170,9 @@ public class Starter : MonoBehaviour {
     settlementMgr.BuildRoad(camp2, city);
 
     // after settlement created, general enters campaign
-    liubei.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(27, 18), 0, 2000);
+    liubei.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(27, 18), 0, 0);
     zhaoyun.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(28, 18), 0);
-    guanyu.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(27, 17), 0);
+    guanyu.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(27, 17), 0, 1500);
     zhangfei.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(28, 17), 0);
 
     // * AI *

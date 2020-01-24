@@ -14,6 +14,10 @@ namespace  UnitNS
                     int kia = 0, int mia = 0, int movement = -1) {
       Unit unit = new Infantry(clone, troop, tile, supply, labor, state, kia, mia, movement);
       unit.Init();
+      if (clone) {
+        unit.CloneInit(unit.disarmorDefDebuf, unit.GetNewGeneralBuf(), unit.epidemic, unit.unitPoisioned,
+          unit.supply, unit.weatherEffect, unit.vantage);
+      }
       return unit;
     }
 

@@ -209,7 +209,7 @@ namespace MonoNS
         while (ShowAnimating) { yield return null; }
       }
 
-      if (unit.IsSicknessAffected()) {
+      if (unit.IsHeatSicknessAffected()) {
         if (unit.IsShowingAnimation()) {
           popAniController.Show(view, textLib.get("pop_sickness"), Color.yellow);
           while (popAniController.Animating) { yield return null; }

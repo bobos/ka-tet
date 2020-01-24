@@ -84,6 +84,18 @@ namespace UnitNS
       farmDestroy = new FarmDestroy(this);
     }
 
+    public void CloneInit(int disarmorDefDebuf, float newGeneralDebuf,
+    ArmyEpidemic epidemic, UnitPoisioned poisioned, Supply supply, WeatherEffect weatherEffect,
+    Vantage vantage) {
+      this.disarmorDefDebuf = disarmorDefDebuf;
+      this.newGeneralDebuf = newGeneralDebuf;
+      this.epidemic = epidemic;
+      this.unitPoisioned = poisioned;
+      this.weatherEffect = weatherEffect;
+      this.vantage = vantage;
+      this.supply = supply;
+    }
+
     public void SpawnOnMap() {
       if (clone) {
         return;
@@ -231,14 +243,9 @@ namespace UnitNS
       return epidemic.GetIllTurns();
     }
 
-    public int GetHeatSickDisableNum()
+    public int GetHeatSickEffectNum()
     {
-      return epidemic.GetIllDisableNum();
-    }
-
-    public int GetHeatSickKillNum()
-    {
-      return epidemic.GetIllKillNum();
+      return epidemic.GetEffectNum();
     }
 
     public int GetPoisionTurns()
@@ -246,14 +253,9 @@ namespace UnitNS
       return unitPoisioned.GetIllTurns();
     }
 
-    public int GetPoisionDisableNum()
+    public int GetPoisionEffectNum()
     {
-      return unitPoisioned.GetIllDisableNum();
-    }
-
-    public int GetPoisionKillNum()
-    {
-      return unitPoisioned.GetIllKillNum();
+      return unitPoisioned.GetEffectNum();
     }
 
     public int GetStarvingDessertNum()
@@ -288,8 +290,13 @@ namespace UnitNS
       return honorMeter > 0;
     }
 
-    public bool IsSicknessAffected() {
+    public bool IsHeatSicknessAffected() {
       return epidemic.IsValid();
+    }
+
+    public bool IsSick() {
+      return ((epidemic != null && epidemic.IsValid())
+        || (unitPoisioned != null && unitPoisioned.IsValid()));
     }
 
     public bool IsPoisioned() {
@@ -479,7 +486,7 @@ namespace UnitNS
           rf.mov * GetMovementModifier() *
           (rf.morale >= Troop.MaxMorale ? 1.2f : 1f) *
           (1f + (IsStarving() ? -0.45f : 0f)) * 
-          (epidemic != null && epidemic.IsValid() ? 0.7f : 1f));
+          (IsSick() ? 0.7f : 1f));
       // ghost unit doesnt have vantage
       return vantage != null ? vantage.MovementPoint(point) : point;
     }

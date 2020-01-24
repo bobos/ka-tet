@@ -235,7 +235,7 @@ namespace MonoNS
       for (int i = 0; i < tiles.Length; i++)
       {
         GameObject GO = tile2GO[tiles[i]];
-        ps[i] = GO.transform.position + (Vector3.up * 0.5f);
+        ps[i] = new Vector3(GO.transform.position.x, Tile.VantageGround, GO.transform.position.z);
       }
       lineRenderer.positionCount = tiles.Length;
       lineRenderer.SetPositions(ps);
@@ -324,10 +324,8 @@ namespace MonoNS
       {
         if (Cons.SlimChance()) {
           prefab = MountainPeakPrefab;
-        } else if (Cons.FairChance()) {
-          prefab = MountainPrefab;
         } else {
-          prefab = MountainRootPrefab;
+          prefab = MountainPrefab;
         }
         fieldType = FieldType.Wild;
         tile.SetTerrianType(TerrianType.Mountain);
@@ -337,11 +335,20 @@ namespace MonoNS
       }
       else if (elevation >= HeightHill)
       {
-        prefab = HighGroundPrefab;
-        fieldType = Cons.MostLikely() ? FieldType.Wild : (Cons.TinyChance() ? FieldType.Village : FieldType.Wild);
-        tile.SetTerrianType(TerrianType.Hill);
-        if(fieldType == FieldType.Wild && Cons.SlimChance()) {
+        if (!Cons.HighlyLikely()) {
+          // vantage point
+          prefab = MountainRootPrefab;
           tile.burnable = true;
+          tile.SetTerrianType(TerrianType.Hill);
+          fieldType = FieldType.Wild;
+          tile.vantagePoint = true;
+        } else {
+          prefab = HighGroundPrefab;
+          fieldType = Cons.MostLikely() ? FieldType.Wild : (Cons.TinyChance() ? FieldType.Village : FieldType.Wild);
+          tile.SetTerrianType(TerrianType.Hill);
+          if(fieldType == FieldType.Wild && Cons.SlimChance()) {
+            tile.burnable = true;
+          }
         }
       }
       else if (elevation >= HeightFlat)

@@ -18,6 +18,7 @@ namespace MapTileNS
     //public const int Work2BuildCamp = 34;
     public const int Work2BuildCamp = 10;
     public const float HighGround = 0.312f;
+    public const float VantageGround = 0.8f;
     public Flood flood = null;
     public WildFire wildFire = null;
     public Epidemic epidemic = null;
@@ -25,6 +26,7 @@ namespace MapTileNS
     public bool waterBound = false;
     public bool burnable = false;
     public bool road = false;
+    public bool vantagePoint = false;
 
     public Dictionary<Tile, Tile[]> roads = new Dictionary<Tile, Tile[]>();
     public Tile(int q, int r, HexMap hexMap) : base(q, r, hexMap) { }
@@ -83,6 +85,9 @@ namespace MapTileNS
       float y = 0f;
       if (terrian == TerrianType.Hill || terrian == TerrianType.Mountain) {
         y = HighGround;
+      }
+      if (vantagePoint) {
+        y = VantageGround;
       }
       return new Vector3(Position().x, y, Position().z);
     }
@@ -309,6 +314,10 @@ namespace MapTileNS
         ret = movementCost;
       }
 
+      if (vantagePoint) {
+        ret = (int)(ret * 1.2f);
+      }
+
       return ret > 0 ? ret : Unit.MovementCostOnUnaccesible;
     }
 
@@ -354,7 +363,7 @@ namespace MapTileNS
     SettlementAnimationController settlementAniController;
     public int Work2BuildSettlement()
     {
-      if ((terrian == TerrianType.Plain || terrian == TerrianType.Hill) &&
+      if ((!vantagePoint) && (terrian == TerrianType.Plain || terrian == TerrianType.Hill) &&
         (field == FieldType.Wild || field == FieldType.Village || field == FieldType.Flooded
          || field == FieldType.Schorched))
       {

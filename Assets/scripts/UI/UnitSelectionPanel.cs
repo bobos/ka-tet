@@ -143,9 +143,6 @@ namespace MonoNS
       title.text = unit.GeneralName();
       movement.text = "移动力:" + unit.movementRemaining + "/" + unit.GetFullMovement();
       stamina.text = "体力: " + unit.GetStaminaLvlName();
-      if (unit.clone) {
-        return;
-      }
       slots.text = "粮草: " + unit.supply.supply + "石" + " 可维持" + unit.slots + "/" + unit.GetMaxSupplySlots() + "回合" + " 每回合消耗:" + unit.supply.SupplyNeededPerTurn() + "石";
       num.text = unit.Name() + "[兵:" + unit.rf.soldiers + "/伤:" + unit.rf.wounded + "/亡:" + unit.kia + "/逃:" + unit.mia + "/役:" + unit.labor + "]";
       morale.text = "士气: " + unit.rf.morale;
@@ -163,10 +160,13 @@ namespace MonoNS
         stateStr += "[本轮" + desserter + "人逃亡" + (killed > 0 ? (killed + "人亡") : "") + "]";
       }
       state.text = stateStr;
-      illness.text = unit.GetHeatSickTurns() > 0 ? "痢疾: 预计本轮致伤"+ unit.GetHeatSickDisableNum() + "人,致死"
-      + unit.GetHeatSickKillNum() +"人,疫情还将持续" + unit.GetHeatSickTurns() + "回合" : "";
-      poision.text = unit.GetPoisionTurns() > 0 ? "中毒: 预计本轮致伤"+ unit.GetPoisionDisableNum() + "人,致死"
-      + unit.GetPoisionKillNum() +"人,病情还将持续" + unit.GetPoisionTurns() + "回合" : "";
+      illness.text = unit.GetHeatSickTurns() > 0 ? "痢疾: 预计本轮至少伤亡"+ unit.GetHeatSickEffectNum()
+      + "人,疫情还将持续" + unit.GetHeatSickTurns() + "回合" : "";
+      poision.text = unit.GetPoisionTurns() > 0 ? "中毒: 预计本轮伤亡"+ unit.GetPoisionEffectNum()
+      + "人,病情还将持续" + unit.GetPoisionTurns() + "回合" : "";
+      if (unit.clone) {
+        return;
+      }
 
       ToggleButtons(false);
       // TODO: AI test

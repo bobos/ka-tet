@@ -20,6 +20,10 @@
       }
 
       if (unit.tile.terrian == MapTileNS.TerrianType.Hill) {
+        if (unit.tile.vantagePoint) {
+          return 0.3f;
+        }
+
         if (unit.IsCavalry()) {
           // cavary debuf on hill
           return -0.2f;
@@ -41,8 +45,13 @@
       if (unit.IsCamping()) {
         return 1f;
       }
-      if (unit.tile.terrian == MapTileNS.TerrianType.Hill && !unit.IsCavalry()) {
-        return 0.6f;
+      if (unit.tile.terrian == MapTileNS.TerrianType.Hill) {
+        if (unit.tile.vantagePoint) {
+          return 0.3f;
+        }
+        if (!unit.IsCavalry()) {
+          return 0.2f;
+        }
       }
       return 0f;
     }

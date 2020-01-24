@@ -25,19 +25,22 @@ public class TileView : View
   public void RefreshVisual() {
     GameObject tileGO = gameObject;
     string txt = "";
+    if (tile.vantagePoint) {
+      txt = "Vat\n";
+    }
     if (tile.terrian == TerrianType.Water) {
       if (tile.isDam)
       {
         txt = txt + "Dam\n";
       }
     } else if (tile.terrian != TerrianType.Mountain) {
-      txt = txt + (tile.burnable ? " Fire" : "");
+      txt = txt + (tile.burnable ? "Fire" : "");
       if (settlementMgr.IsCampable(tile)) {
         txt = txt + " Camp\n";
       }
     }
     if (tile.field == FieldType.Village) {
-      txt = txt + " Village";
+      txt = txt + " Vlg";
     }
     Color fontColor;
     if (tile.field == FieldType.Burning || tile.field == FieldType.Schorched) {
@@ -47,7 +50,6 @@ public class TileView : View
     } else {
       fontColor = Color.white;
     }
-    tileGO.GetComponentInChildren<TextMesh>().fontSize = 10;
     tileGO.GetComponentInChildren<TextMesh>().color = fontColor;
     tileGO.GetComponentInChildren<TextMesh>().text = txt;
 
