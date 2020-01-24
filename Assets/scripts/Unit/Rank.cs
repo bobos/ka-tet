@@ -4,8 +4,11 @@ namespace UnitNS
     public const int MoralePunishLine = 50;
     public static float GetMoralePunish(int morale) {
       const int dropStarts = 70;
-      if (morale >= dropStarts || morale < MoralePunishLine) {
+      if (morale >= dropStarts) {
         return 0f;
+      }
+      if (morale < MoralePunishLine) {
+        return 1f;
       }
 
       return (dropStarts - morale) * 0.05f;
