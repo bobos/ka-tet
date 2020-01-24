@@ -1,4 +1,5 @@
-﻿using UnityEngine.UI;
+﻿using UnityEngine;
+using UnityEngine.UI;
 
 namespace MonoNS
 {
@@ -13,11 +14,12 @@ namespace MonoNS
     }
 
     Text title;
-    public void Set(string faction)
+    public void Set(string faction, Color color)
     {
       if (this != null && this.title != null)
       {
-        this.title.text = faction + "回合";
+        this.title.text = faction;
+        this.title.color = color;
       }
     }
 

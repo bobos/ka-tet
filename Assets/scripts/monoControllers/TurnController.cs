@@ -20,6 +20,7 @@ namespace MonoNS
       cc = hexMap.cameraKeyboardController;
       endingTurn = false;
       TurnChange();
+      if (onNewTurn != null) { onNewTurn(); }
     }
 
     public override void UpdateChild() {}
@@ -30,11 +31,16 @@ namespace MonoNS
     void TurnChange()
     {
       playerTurn = !playerTurn;
-      string faction = playerTurn ? "玩家" : "AI";
+      string faction = textLib.get(playerTurn ? "f_player": "f_AI");
       turnIndicator.Set(turnNum, faction);
       showingTitle = true;
-      title.Set(faction);
-      if (onNewTurn != null) { onNewTurn(); }
+      title.Set(textLib.get(playerTurn ? "other_playerTurn" : "other_AITurn"), Color.white);
+      StartCoroutine(KeepShowingTitle());
+    }
+
+    void WarWeary() {
+      showingTitle = true;
+      title.Set(textLib.get("other_warWeary"), Color.red);
       StartCoroutine(KeepShowingTitle());
     }
 
@@ -229,6 +235,31 @@ namespace MonoNS
       */
       endingTurn = false;
       if (cnt == 0) {
+        if (turnNum > 10) {
+          // starts to drop morale
+          if (turnNum == 11) {
+            WarWeary();
+          }
+
+          WarParty atkParty = playerParty.attackside ? playerParty : aiParty;
+          WarParty defParty = playerParty.attackside ? aiParty : playerParty;
+          foreach (Unit unit in atkParty.GetUnits()) {
+            // drop 1 morale point for attack units per turn
+            if (unit.rf.morale >= Rank.MoralePunishLine) {
+              unit.rf.morale -= 1;
+            }
+          }
+
+          if ((turnNum % 2) != 0) {
+            foreach(Unit unit in defParty.GetUnits()) {
+              // drop 1 morale point for defense side on odd turn
+              if (unit.rf.morale >= Rank.MoralePunishLine) {
+                unit.rf.morale -= 1;
+              }
+            }
+          }
+        }
+
         Weather weather = weatherGenerator.NextDay();
         if (onNewTurn != null) { 
           onNewTurn();

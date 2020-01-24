@@ -101,6 +101,8 @@ namespace TextNS
     {"l_qingshen6", "捉生"},
 
     // faction
+    {"f_player", "玩家"},
+    {"f_AI", "电脑"},
     {"f_liang", "梁"},
     {"f_hejian", "河间"},
 
@@ -111,6 +113,10 @@ namespace TextNS
     {"g_caocao", "曹操"},
     {"g_xuchu", "许褚"},
 
+    // others
+    {"other_playerTurn", "玩家回合"},
+    {"other_AITurn", "电脑回合"},
+    {"other_warWeary", "战争泥潭"},
     // party report
     {"pr_sloppyOnDrill", "General Sloppy On Drill"},
     {"pr_sloppyOnDrill_d", "General is sloppy on drill, which leads the shameful defeat"}
