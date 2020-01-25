@@ -74,19 +74,10 @@ namespace MonoNS
     public void OnSettlementSelect(Settlement s)
     {
       self.SetActive(true);
-      string type = "营寨";
-      if (s.type == Settlement.Type.city)
-      {
-        type = "城市";
-      }
-      if (s.type == Settlement.Type.strategyBase)
-      {
-        type = "大本营";
-      }
-      title.text = s.name + " (" + type + ")";
-      population.text = "人口: 平民" + (s.civillian_male + s.civillian_child + s.civillian_female) + " 兵役" + s.labor;
-      supply.text = "粮草: " + s.supplyDeposit + "石" + " 每回合消耗" + s.MinSupplyNeeded() + "石";
       Unit[] garrison = s.garrison.ToArray();
+      title.text = s.name + "[驻扎部队: " + garrison.Length + "/" + s.parkSlots + "]";
+      population.text = "人口: 平民" + (s.civillian_male + s.civillian_child + s.civillian_female) + " 兵役" + s.labor;
+      supply.text = "粮草每回合消耗" + s.MinSupplyNeeded() + "石";
       garrison1.text = "";
       garrison2.text = "";
       if (garrison.Length > 0)
@@ -99,9 +90,10 @@ namespace MonoNS
         Unit u2 = garrison[1];
         garrison2.text = "部队: " + u2.GeneralName() + " 补给: " + u2.slots + "/" + u2.GetMaxSupplySlots() + " 战兵:" + u2.rf.soldiers + " 兵役:" + u2.labor;
       }
-      defense.text = "城防: " + s.wall;
-      defenseWill.text = "守备: " + s.defensePrep;
-      string state = "正常";
+      defense.text = "城防: " + s.wall.GetLevelTxt() + "[" + s.wall.defensePoint + "/" + s.wall.MaxDefensePoint() + "]";
+      defenseWill.text = "粮仓: " + s.storageLvl.GetLevelTxt()
+        + " [" + s.supplyDeposit + "/" + s.storageLvl.MaxStorage() + "石]";
+      string state = s.IsUnderSiege() ? "被围困" : "正常";
       if (s.state == Settlement.State.constructing)
       {
         state = "筑城中 预计" + s.buildTurns + "回合完成";

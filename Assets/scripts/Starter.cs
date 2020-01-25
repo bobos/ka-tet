@@ -88,7 +88,9 @@ public class Starter : MonoBehaviour {
     // * tactical phase starts *
     Tile strategyBase = hexMap.GetTile(1, 1);
     Tile camp1 = hexMap.GetTile(10, 17);
+    camp1.SetAsCampField("虎牢关", 1);
     Tile camp2 = hexMap.GetTile(19, 2);
+    camp2.SetAsCampField("飞狐口", 2);
     Tile city = hexMap.GetTile(29, 15);
     HashSet<Tile> tiles = new HashSet<Tile>();
     tiles.Add(camp1);
@@ -156,13 +158,18 @@ public class Starter : MonoBehaviour {
 
     // create settlements
     const int supply = 4 * Infantry.MaxTroopNum / 10 * Infantry.BaseSlots;
-    if (!settlementMgr.BuildSettlement("梁军大本营", hexMap.GetTile(1,1),
-                    Settlement.Type.strategyBase,
-                    hexMap.GetAIParty(), 0, 10000, supply * 5 * 5)) {
+    if (!settlementMgr.BuildStrategyBase(hexMap.GetTile(1,1),
+                    hexMap.GetAIParty(), supply * 5 * 5, 5000, 3)) {
       Util.Throw("Failed to build base at 1,1");}
-    if (!settlementMgr.BuildSettlement("河间府", hexMap.GetTile(27, 17),
-                    Settlement.Type.city,
-                    hexMap.GetPlayerParty(), 250000, 5000, supply * 5 * 5)) {
+    if (!settlementMgr.BuildCity("河间府", hexMap.GetTile(27, 17),
+                    hexMap.GetPlayerParty(),
+                    2, // storageLevel
+                    2, // wallLevel
+                    34000, // male
+                    23889, // female
+                    8888, // child
+                    5000, // labor
+                    supply * 5 * 5)) {
       Util.Throw("Failed to build city at 29,12");}
 
     settlementMgr.BuildRoad(strategyBase, camp1);

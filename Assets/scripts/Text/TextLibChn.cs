@@ -77,9 +77,9 @@ namespace TextNS
       {"u_routing", "溃败中"},
       {"u_disbanded", "被歼灭"},
       {"u_standing", ""},
-      {"u_satisfied", @"士卒满意({0})"},
-      {"u_unsatisfied", @"士卒不满({0})"},
-      {"u_riot", @"士卒躁动{0}"},
+      {"u_satisfied", @"士卒满意[不满度: {0}]"},
+      {"u_unsatisfied", @"士卒不满[不满度: {0}]"},
+      {"u_riot", @"士卒躁动[不满度: {0}]"},
       {"rank_rookie", "厢兵"},
       {"rank_veteran", "牙兵"},
       {"rank_elite", "禁军"},
@@ -229,6 +229,14 @@ namespace TextNS
       {"pop_buildingFailed", "无法筑营!"},
       {"pop_poisionDone", "投毒成功!"},
 
+      // settlement
+      {"settlement_storageLvl1", "初级粮仓"},
+      {"settlement_storageLvl2", "中级粮仓"},
+      {"settlement_storageLvl3", "高级粮仓"},
+      {"settlement_wallLvl1", "初级城墙"},
+      {"settlement_wallLvl2", "中级城墙"},
+      {"settlement_wallLvl3", "高级城墙"},
+      {"settlement_strategyBase", @"{0}军大本营"},
       };
     }
   }

@@ -206,14 +206,46 @@ namespace MonoNS
     List<Settlement> attackerRoots;
     List<Settlement> defenderRoots;
     List<Settlement> buildingQueue;
-    public bool BuildSettlement(string name, Tile location, Settlement.Type type, WarParty warParty,
-      int civillian, int labor, int supply = 0, Unit unit = null)
+
+    public bool BuildCamp(Tile location, WarParty warParty, Unit unit) {
+      return BuildSettlement(location.name, location, Settlement.Type.camp, warParty,
+        0, 0, 0, 0, 0,
+        location.storageLevel, 1, unit);
+    }
+
+    public bool BuildStrategyBase(Tile location, WarParty warParty, int supply, int labor,
+      int storageLevel) {
+      return BuildSettlement(
+        System.String.Format(
+          textLib.get("settlement_strategyBase"),
+          warParty.faction.Name()
+        ),
+        location, Settlement.Type.strategyBase, warParty, supply, 0, 0, 0, labor, storageLevel, 1, null);
+    }
+
+    public bool BuildCity(string name, Tile location,
+      WarParty warParty,
+      int storageLevel, int wallLevel,
+      int male, int female, int child, int labor, int supply) {
+      return BuildSettlement(
+        name,
+        location,
+        Settlement.Type.city,
+        warParty,
+        supply, male, female, child, labor, storageLevel, wallLevel, null);
+    }
+
+    private bool BuildSettlement(
+      string name, Tile location, Settlement.Type type, WarParty warParty,
+      int supply, int male, int female, int child, int labor,
+      int storageLevel,
+      int wallLevel, Unit unit)
     {
       if(location.Work2BuildSettlement() == -1) return false; // unbuildable tile
       Settlement settlement = null;
       if (type == Settlement.Type.camp)
       {
-        settlement = new Camp(unit.rf.general.Name() + Cons.textLib.get("b_ownedCamp"), location, warParty, supply, labor);
+        settlement = new Camp(name, location, warParty, storageLevel);
         settlement.onSettlementReady += this.SettlementReady;
         buildingQueue.Add(settlement);
       }
@@ -221,11 +253,12 @@ namespace MonoNS
       {
         if (type == Settlement.Type.city)
         {
-          settlement = new City(name, location, warParty, supply, civillian, labor);
+          settlement = new City(name, location, warParty, supply, male, female,
+            child, labor, storageLevel, wallLevel);
         }
         if (type == Settlement.Type.strategyBase)
         {
-          settlement = new StrategyBase(name, location, warParty, supply, labor);
+          settlement = new StrategyBase(name, location, warParty, supply, labor, storageLevel);
         }
       }
 

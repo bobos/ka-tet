@@ -63,6 +63,25 @@ namespace MapTileNS
       }
     }
 
+    private string _name = "unnamed";
+    private int _storageLevel = 1;
+    public string name {
+      get {
+        return _name;
+      }
+    } 
+
+    public int storageLevel {
+      get {
+        return _storageLevel;
+      }
+    }
+
+    public void SetAsCampField(string name, int storageLevel) {
+      _name = name;
+      _storageLevel = storageLevel;
+    }
+
     public void BuildRoad() {
       road = true;
       SetFieldType(FieldType.Road);
@@ -243,12 +262,6 @@ namespace MapTileNS
         }
       }
       return deployable;
-    }
-
-     // TODO
-    public int GetVantagePoint()
-    {
-      return 0;
     }
 
     public void SetTerrianType(TerrianType type)

@@ -136,9 +136,7 @@ namespace MonoNS
           //if (tile.settlement != null && !tile.settlement.owner.isAI &&
           if (tile.settlement != null
             && tile.settlement.owner.isAI == selectedUnit.IsAI() &&
-            tile.settlement.parkSlots > 0 && (
-              tile.settlement.state == Settlement.State.normal ||
-              tile.settlement.state == Settlement.State.constructing))
+            tile.settlement.parkSlots > 0 && !tile.settlement.IsUnderSiege())
           {
             encampable = true;
             break;
@@ -321,13 +319,9 @@ namespace MonoNS
           try {
             int supply = hexMap.inputField.GetInput();
             int canDist = supply > selectedSettlement.labor ? selectedSettlement.labor : supply;
-            int canTakeIn = transferedSettlement.LaborCanTakeInForOneTurn(); 
             if (supply == 0 || supply != canDist) {
               msgBox.Show("invalid input, max labor can distribute " + canDist);
               return;
-            }
-            if(supply > canTakeIn) {
-              msgBox.Show("too many labor taken in " + canTakeIn + " no sufficient food for them, there might be starving");
             }
             settlementMgr.AddDistJob(selectedSettlement, transferedSettlement, supply, SettlementMgr.QueueJobType.DistLabor);
             popAniController.Show(settlementMgr.GetView(selectedSettlement), textLib.get("pop_transferIssued"), Color.green);
@@ -615,7 +609,7 @@ namespace MonoNS
         if (transferedSettlement == null) {
           return;
         }
-        string suggestions = "MAx Labor take in for last one turn " + transferedSettlement.LaborCanTakeInForOneTurn() + "\n";
+        string suggestions = "";
         if (transferedSettlement.MinSupplyNeeded() > 0) {
           suggestions += "need " + transferedSettlement.MinSupplyNeeded() + " to support garrison\n";
         }
@@ -655,7 +649,7 @@ namespace MonoNS
         }
         string suggestion = "max taken " + (transferedUnit != null ?
                             transferedUnit.LaborCanTakeIn() + "\n" :
-                            transferedSettlement.LaborCanTakeInForOneTurn() + " for last one turn\n");
+                            "No Limit\n");
         if (transferedUnit != null) {
           foreach(KeyValuePair<int, int> kv in transferedUnit.GetLaborSuggestion()) {
             suggestion += kv.Key + " turns of supply needs " + kv.Value + "\n";
@@ -730,8 +724,9 @@ namespace MonoNS
       {
         // TODO: fot test
         //if (settlementMgr.BuildSettlement(tileUnderMouse, Settlement.Type.camp, hexMap.warParties[0]))
-        if (settlementMgr.BuildSettlement("", tileUnderMouse, Settlement.Type.camp,
-            selectedUnit.IsAI() ? hexMap.warParties[1] : hexMap.warParties[0], 0, 0, 0, selectedUnit))
+        if (settlementMgr.BuildCamp(tileUnderMouse,
+            selectedUnit.IsAI() ? hexMap.warParties[1] : hexMap.warParties[0],
+            selectedUnit))
         {
           //TODO: build camp next the unit and consume 1 food
           popAniController.Show(hexMap.GetUnitView(selectedUnit), textLib.get("pop_buildingStarted"), Color.green);

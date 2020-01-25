@@ -4,17 +4,14 @@ using UnitNS;
 using MapTileNS;
 using MonoNS;
 using FieldNS;
-using BuildingNS;
 
 public abstract class Settlement: DataModel
 {
-  public const int MaxGarrisonPerCamp = 4;
-  public const int MaxGarrisonPerBase = 20;
-  public const int DefensePrepMax = 100;
-  public const int DefensePrepDeductRate = 10;
   public const int Visibility = 3;
 
   public int supplyDeposit = 0;
+  public WallDefense wall;
+  public StorageLevel storageLvl;
   public int parkSlots { get; private set; }
   public List<Unit> garrison = new List<Unit>();
   public Tile baseTile;
@@ -64,17 +61,6 @@ public abstract class Settlement: DataModel
 
   public delegate void OnSettlementReady(Settlement settlement);
   public event OnSettlementReady onSettlementReady;
-  public int wall = 0; // TODO: 50, 100, 150
-  private int _defensePrep = DefensePrepMax;
-  public int defensePrep {
-    get {
-      return _defensePrep;
-    }
-
-    set {
-      _defensePrep = value < 0 ? 0 : (value > DefensePrepMax ? DefensePrepMax : value);
-    }
-  }
 
   public State state;
   public Type type;
@@ -125,7 +111,8 @@ public abstract class Settlement: DataModel
     strategyBase
   }
 
-  public Settlement(string name, Tile location, WarParty warParty, int supply, int room)
+  public Settlement(string name, Tile location, WarParty warParty, int supply, int room,
+    StorageLevel storage, WallDefense wall)
   {
     hexMap = GameObject.FindObjectOfType<HexMap>();
     settlementMgr = hexMap.settlementMgr;
@@ -133,6 +120,8 @@ public abstract class Settlement: DataModel
     baseTile = location;
     location.settlement = this;
     owner = warParty;
+    storageLvl = storage;
+    this.wall = wall;
     supplyDeposit = supply > SupplyCanTakeIn() ? SupplyCanTakeIn() : supply;
     parkSlots = room;
     this.name = name;
@@ -163,10 +152,18 @@ public abstract class Settlement: DataModel
     }
   }
 
+  public bool IsUnderSiege() {
+    // TODO
+    return false;
+  }
+
   public bool Encamp(Unit unit)
   {
-    if (unit != null && owner.GetUnits().Contains(unit) && parkSlots > 0
-        && (state == State.normal || state == State.constructing))
+    if (IsUnderSiege()) {
+      return false;
+    }
+
+    if (unit != null && owner.GetUnits().Contains(unit) && parkSlots > 0)
     {
       garrison.Add(unit);
       parkSlots--;
@@ -330,18 +327,20 @@ public abstract class Settlement: DataModel
     units.Add(new List<Unit>());
     Unit[] nearbyUnits = GetReachableUnits();
 
+    if (IsUnderSiege()) {
+      wall.DepleteDefense();
+    } else {
+      wall.RepairDefense();
+    }
+
     if (supplyDeposit == 0)
     {
-      defensePrep -= DefensePrepDeductRate;
       units[0] = garrison;
       foreach(Unit u in nearbyUnits) {
         units[1].Add(u);
       }
       return units;
     }
-
-    // recovering defense preparation
-    defensePrep += DefensePrepDeductRate / 2;
 
     foreach (Unit unit in garrison)
     {
@@ -402,11 +401,6 @@ public abstract class Settlement: DataModel
   public int MaxDistSupply() {
     int canProvide = CalcSupplyCanProvide(labor);
     return supplyDeposit > canProvide ? canProvide : supplyDeposit;
-  }
-
-  public int LaborCanTakeInForOneTurn() {
-    int canTake = MaxPopulation() - labor;
-    return canTake > 0 ? canTake : 0;
   }
 
   public SupplySuggestion[] GetSuggestion() {
@@ -483,73 +477,8 @@ public abstract class Settlement: DataModel
     return MaxSupplyDeposit() - supplyDeposit;
   }
 
-  public virtual int MaxSupplyDeposit() {
-    return int.MaxValue;
-  }
-
-  // TODO: set population for different level of settlement
-  public virtual int MaxPopulation() {
-    return int.MaxValue;
-  }
-}
-
-public class City : Settlement
-{
-
-  public enum Scale {
-    Small,
-    Large,
-    Huge
-  }
-
-  // TODO: pass male, female, child
-  public City(string name, Tile tile, WarParty warParty, int supply, int civillian, int labor, Scale scale = Scale.Large) :
-    base(name, tile, warParty, supply, GetSlots(scale))
-  {
-    this.labor = labor;
-    this.civillian_male = civillian;
-    this.civillian_female = civillian;
-    this.civillian_child = civillian;
-    type = Settlement.Type.city;
-    state = State.normal;
-    buildWork = 0;
-  }
-
-  static int GetSlots(Scale scale) {
-    return MaxGarrisonPerBase;
-  }
-
-}
-
-public class StrategyBase : Settlement
-{
-
-  public StrategyBase(string name, Tile tile, WarParty warParty, int supply, int labor) :
-  base(name, tile, warParty, supply, MaxGarrisonPerBase)
-  {
-    this.civillian_male = civillian_female = civillian_child = 0;
-    this.labor = labor;
-    type = Settlement.Type.strategyBase;
-    state = State.normal;
-    buildWork = 0;
-  }
-}
-
-public class Camp : Settlement
-{
-
-  const int SupportTurns = 3;
-  public Camp(string name, Tile tile, WarParty warParty, int supply, int labor) :
-  base(name, tile, warParty, supply, MaxGarrisonPerCamp)
-  {
-    this.civillian_male = civillian_female = civillian_child = 0;
-    this.labor = labor;
-    type = Settlement.Type.camp;
-    state = State.constructing;
-  }
-
-  public override int MaxSupplyDeposit() {
-    return (int)((Infantry.MaxTroopNum * 5 * SupportTurns) / 10 ) * hexMap.FoodPerTenMenPerTurn(owner.isAI);
+  public int MaxSupplyDeposit() {
+    return storageLvl.MaxStorage();
   }
 
 }
