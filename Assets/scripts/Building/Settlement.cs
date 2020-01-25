@@ -153,8 +153,25 @@ public abstract class Settlement: DataModel
   }
 
   public bool IsUnderSiege() {
-    // TODO
-    return false;
+    bool underSiege = true;
+    foreach(Tile tile in baseTile.GetNeighbourTiles()) {
+      if (!tile.Accessible()) {
+        continue;
+      }
+
+      Unit unit = tile.GetUnit();
+      if (unit == null || unit.IsAI() == owner.isAI) {
+        underSiege = false;
+        break;
+      }
+
+      if (unit.labor < 800) {
+        // can only lay siege with more than 800 labor on one side
+        underSiege = false;
+        break;
+      }
+    }
+    return underSiege;
   }
 
   public bool Encamp(Unit unit)
@@ -327,12 +344,6 @@ public abstract class Settlement: DataModel
     units.Add(new List<Unit>());
     Unit[] nearbyUnits = GetReachableUnits();
 
-    if (IsUnderSiege()) {
-      wall.DepleteDefense();
-    } else {
-      wall.RepairDefense();
-    }
-
     if (supplyDeposit == 0)
     {
       units[0] = garrison;
@@ -354,38 +365,35 @@ public abstract class Settlement: DataModel
       }
     }
 
-    foreach (Unit unit in nearbyUnits)
-    {
-      if (supplyDeposit == 0) {
+    if (IsUnderSiege()) {
+      wall.DepleteDefense();
+      foreach (Unit unit in nearbyUnits) {
         units[1].Add(unit);
-        continue;
       }
+    } else {
+      wall.RepairDefense();
+      foreach (Unit unit in nearbyUnits)
+      {
+        if (supplyDeposit == 0) {
+          units[1].Add(unit);
+          continue;
+        }
 
-      int neededPerTurn = unit.supply.SupplyNeededPerTurn();
-      int neededLabor = CalcNeededLabor(neededPerTurn);
-      if (!unit.IsCavalry() && unit.labor < neededLabor) {
-        units[1].Add(unit);
-        continue;
+        int neededPerTurn = unit.supply.SupplyNeededPerTurn();
+        int neededLabor = CalcNeededLabor(neededPerTurn);
+        if (!unit.IsCavalry() && unit.labor < neededLabor) {
+          units[1].Add(unit);
+          continue;
+        }
+
+        if (neededPerTurn > supplyDeposit) {
+          units[1].Add(unit);
+          continue;
+        }
+
+        unit.supply.Consume(true);
+        supplyDeposit -= neededPerTurn;
       }
-
-      if (neededPerTurn > supplyDeposit) {
-        units[1].Add(unit);
-        continue;
-      }
-
-      /*
-      disable nearby supply route interception
-
-      Unit ambusher = settlementMgr.IsSupplyRouteAmbushed(settlementMgr.GetRoute(this, unit.tile), unit.IsAI());
-      if (ambusher != null) {
-        // supply caravans ambushed
-        SupplyIntercepted(ambusher, null, neededPerTurn, neededLabor, unit);
-        continue;
-      }
-      */
-
-      unit.supply.Consume(true);
-      supplyDeposit -= neededPerTurn;
     }
     return units;
   }

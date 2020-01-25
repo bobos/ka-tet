@@ -244,14 +244,13 @@ namespace MapTileNS
       hexMap.GetTileView(this).RefreshVisual();
     }
 
-    public bool Ambushable()
-    {
-      return terrian == TerrianType.Hill && field == FieldType.Wild;
+    public bool Accessible() {
+      return movementCost != Unit.MovementCostOnUnaccesible;
     }
 
     public bool Passable(bool isAI, bool forDeploy = false) {
       Unit u = GetUnit();
-      bool deployable = u == null && movementCost != Unit.MovementCostOnUnaccesible;
+      bool deployable = u == null && Accessible();
       if (!deployable && u != null) {
         if (u.IsAI() == isAI) {
           if (!forDeploy) {

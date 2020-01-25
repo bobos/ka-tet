@@ -43,7 +43,9 @@ public class SettlementView : View
 
   public void OnSettlementSelect(Settlement settlement)
   {
-    if (settlement != null && Util.eq<Settlement>(settlement, this.settlement))
+    if (settlement != null
+      && Util.eq<Settlement>(settlement, this.settlement)
+      && !settlement.IsUnderSiege())
     {
       HashSet<Tile> tiles = settlementMgr.GetSupplyRangeTiles(settlement);
       Tile[] tileArray = new Tile[tiles.Count];
