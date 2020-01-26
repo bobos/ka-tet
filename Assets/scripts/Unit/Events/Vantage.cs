@@ -14,9 +14,9 @@
     public float AtkBuf() {
       if (unit.IsCamping()) {
         if (unit.IsCavalry()) {
-          return -0.25f;
+          return -0.3f;
         }
-        return 0.4f;
+        return unit.tile.settlement.wall.defensePoint * 0.0025f;
       }
 
       if (unit.tile.terrian == MapTileNS.TerrianType.Hill) {
@@ -43,7 +43,7 @@
 
     public float DefBuf() {
       if (unit.IsCamping()) {
-        return 1f;
+        return unit.tile.settlement.wall.defensePoint * 0.005f;
       }
       if (unit.tile.terrian == MapTileNS.TerrianType.Hill) {
         if (unit.tile.vantagePoint) {

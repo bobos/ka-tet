@@ -17,7 +17,7 @@ public class WallDefense {
     }
     
     if (level == 2) {
-      return 100;
+      return 120;
     }
 
     return 200;
