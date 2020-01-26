@@ -242,7 +242,8 @@ namespace TextNS
       {"pop_buildingStarted", "开始筑营!"},
       {"pop_buildingFailed", "无法筑营!"},
       {"pop_poisionDone", "投毒成功!"},
-      {"pop_damRequireLabor", @"需要{0}民夫"},
+      {"pop_insufficientLabor", @"需要{0}民夫"},
+      {"pop_insufficientPoint", @"需要{0}以动力"},
 
       // settlement
       {"settlement_storageLvl1", "初级粮仓"},

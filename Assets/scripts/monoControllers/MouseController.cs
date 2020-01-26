@@ -162,11 +162,6 @@ namespace MonoNS
           popAniController.Show(hexMap.GetUnitView(selectedUnit), textLib.get("pop_noDamNearby"), Color.yellow);
           return;
         }
-        if (selectedUnit.labor < Flood.RequiredLabor) {
-          popAniController.Show(hexMap.GetUnitView(selectedUnit),
-            System.String.Format(textLib.get("pop_damRequireLabor"), Flood.RequiredLabor), Color.yellow);
-          return;
-        }
         mouseMode = mode.sabotage;
         Update_CurrentFunc = UpdateUnitSabotageDam;
       }
@@ -783,8 +778,12 @@ namespace MonoNS
         }
         if (damTile != null)
         {
-          actionController.sabotage(damTile);
-          Escape();
+          if(!actionController.sabotage(selectedUnit, damTile)){
+            // TODO
+            Debug.LogError("Failed to sabotage, try again!");
+          }
+          Update_CurrentFunc = Update_Animating;
+          return;
         }
       }
     }

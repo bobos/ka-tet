@@ -30,6 +30,8 @@ namespace MonoNS
     public bool FloodAnimating = false;
     public void Flood(Tile tile, HashSet<Tile> tiles = null)
     {
+      
+
       FloodAnimating = true;
       hexMap.cameraKeyboardController.DisableCamera();
       StartCoroutine(CoFlood(tile, tiles == null ? tile.CreateFlood() : tiles));
@@ -141,12 +143,14 @@ namespace MonoNS
       if(tile.epidemic != null && tile.epidemic.OnWeatherChange(weather)) {
         // epidemic triggered
         Unit unit = tile.GetUnit();
-        eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.Epidemic, unit, null));
-        while (eventDialog.Animating) { yield return null; }
+        if (!unit.IsHeatSicknessAffected()) {
+          eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.Epidemic, unit, null));
+          while (eventDialog.Animating) { yield return null; }
 
-        // TODO: check if the unit is from huai areas
-        unitAniController.Riot(unit, unit.epidemic.Occur());
-        while (unitAniController.riotAnimating) { yield return null; }
+          // TODO: check if the unit is from huai areas
+          unitAniController.Riot(unit, unit.epidemic.Occur());
+          while (unitAniController.riotAnimating) { yield return null; }
+        }
       }
 
       if (tile.flood != null) {

@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnitNS;
 using MapTileNS;
+using TextNS;
 
 namespace MonoNS
 {
@@ -226,9 +227,9 @@ namespace MonoNS
       return DoAction(unit, null, tile, actionName.ATTACKEmpty);
     }
 
-    public bool sabotage(Tile tile)
+    public bool sabotage(Unit unit, Tile tile)
     {
-      return DoAction(null, null, tile, actionName.SABOTAGE);
+      return DoAction(unit, null, tile, actionName.SABOTAGE);
     }
 
     public bool burn(Tile tile)
@@ -254,7 +255,7 @@ namespace MonoNS
       }
       if (name == actionName.SABOTAGE)
       {
-        StartCoroutine(Flood(tile));
+        StartCoroutine(Flood(unit, tile));
       }
       if (name == actionName.FIRE)
       {
@@ -283,12 +284,37 @@ namespace MonoNS
       if (actionDone != null) actionDone(unit, null, actionName.MOVE);
     }
 
-    IEnumerator Flood(Tile tile)
+    TextLib textLib {
+      get {
+        return Cons.GetTextLib();
+      }
+    }
+
+    IEnumerator Flood(Unit unit, Tile tile)
     {
-      tileAniController.Flood(tile);
-      while (tileAniController.FloodAnimating)
-      {
-        yield return null;
+      if (unit.labor < MapTileNS.Flood.RequiredLabor) {
+        if (unit.IsShowingAnimation()) {
+          hexMap.popAniController.Show(hexMap.GetUnitView(unit),
+              System.String.Format(textLib.get("pop_insufficientLabor"),
+              MapTileNS.Flood.RequiredLabor), Color.yellow);
+          while (hexMap.popAniController.Animating) { yield return null; }
+        }
+      } else {
+        if (unit.movementRemaining < Unit.BasicMovementCost) {
+          if (unit.IsShowingAnimation()) {
+            hexMap.popAniController.Show(hexMap.GetUnitView(unit),
+                System.String.Format(textLib.get("pop_insufficientPoint"),
+                Unit.BasicMovementCost), Color.yellow);
+            while (hexMap.popAniController.Animating) { yield return null; }
+          }
+        } else {
+          unit.movementRemaining -= Unit.BasicMovementCost;
+          tileAniController.Flood(tile);
+          while (tileAniController.FloodAnimating)
+          {
+            yield return null;
+          }
+        }
       }
       ActionOngoing = false;
     }
