@@ -210,12 +210,11 @@ namespace MapTileNS
       }
     }
 
-    public bool Poision(Unit unit) {
+    public Unit[] Poision(Unit unit) {
       if (poision == null) {
-        return false;
+        return new Unit[0];
       }
-      poision.SetPoision(unit);
-      return true;
+      return poision.SetPoision(unit);
     }
 
     // ==============================================================

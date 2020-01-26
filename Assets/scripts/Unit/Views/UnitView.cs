@@ -164,7 +164,6 @@ namespace UnitNS
         }
         if (name == ActionController.actionName.ATTACK)
         {
-          hexMap.HighlightArea(unit.GetAttackRange(), HexMap.RangeType.attack);
         }
       }
     }

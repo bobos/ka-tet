@@ -31,6 +31,14 @@
         unit.kia += kiaNum;
         unit.rf.soldiers -= kiaNum;
         int laborKilled = (int)(kiaNum / 5);
+
+        laborKilled = laborKilled > unit.labor ? unit.labor : laborKilled;
+        if(unit.hexMap.IsAttackSide(unit.IsAI())) {
+          unit.hexMap.settlementMgr.attackerLaborDead += laborKilled;
+        } else {
+          unit.hexMap.settlementMgr.defenderLaborDead += laborKilled;
+        }
+
         unit.labor -= laborKilled;
         effects[0] = morale;
         effects[1] = movement;
@@ -50,6 +58,14 @@
         unit.kia += kiaNum;
         unit.rf.soldiers -= kiaNum;
         int laborKilled = (int)(kiaNum / 5);
+
+        laborKilled = laborKilled > unit.labor ? unit.labor : laborKilled;
+        if(unit.hexMap.IsAttackSide(unit.IsAI())) {
+          unit.hexMap.settlementMgr.attackerLaborDead += laborKilled;
+        } else {
+          unit.hexMap.settlementMgr.defenderLaborDead += laborKilled;
+        }
+
         unit.labor -= laborKilled;
         effects[0] = morale;
         effects[1] = movement;

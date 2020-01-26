@@ -6,6 +6,7 @@ namespace MapTileNS
   public class Flood
   {
     public const int FloodingLasts = 15;
+    public const int RequiredLabor = 800;
     public int floodingCntDown = 0;
 
     Tile tile;

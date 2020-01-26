@@ -164,7 +164,6 @@ namespace UnitNS
     public Tile tile;
     public int kia;
     public int mia;
-    public int kills;
     public int labor
     {
       get
@@ -593,8 +592,8 @@ namespace UnitNS
       }
     }
 
-    public void Poisioned() {
-      unitPoisioned.Poision();
+    public bool Poisioned() {
+      return unitPoisioned.Poision();
     }
 
     float GetBuff()
@@ -796,21 +795,6 @@ namespace UnitNS
     // ==============================================================
     // ================= path finding ===============================
     // ==============================================================
-
-    // TODO: FIX THIS for AI
-    public Tile[] GetAttackRange()
-    {
-      List<Tile> range = new List<Tile>();
-      foreach (Tile h in tile.neighbours)
-      {
-        Unit u = h.GetUnit();
-        if (u == null || u.IsAI())
-        {
-          range.Add(h);
-        }
-      }
-      return range.ToArray();
-    }
 
     public Tile[] GetAccessibleTiles()
     {

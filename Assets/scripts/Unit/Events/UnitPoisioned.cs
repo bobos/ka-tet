@@ -22,13 +22,13 @@
       this.unit = unit;
     }
 
-    public void Poision() {
+    public bool Poision() {
       if (unit.type == Type.Scout || poisioned) {
-        return;
+        return false;
       }
-      unit.hexMap.eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.Poision, unit, null));
       poisioned = true;
       lastTurns = GetLastTurns();
+      return true;
     }
 
     public void Destroy() {}
@@ -57,6 +57,14 @@
           unit.rf.soldiers -= kiaNum;
           effects[3] = kiaNum;
           int laborKilled = (int)(kiaNum / 5);
+
+          laborKilled = laborKilled > unit.labor ? unit.labor : laborKilled;
+          if(unit.hexMap.IsAttackSide(unit.IsAI())) {
+            unit.hexMap.settlementMgr.attackerLaborDead += laborKilled;
+          } else {
+            unit.hexMap.settlementMgr.defenderLaborDead += laborKilled;
+          }
+
           unit.labor -= laborKilled;
           effects[4] = laborKilled;
         }

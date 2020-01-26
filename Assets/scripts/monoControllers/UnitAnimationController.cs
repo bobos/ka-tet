@@ -320,6 +320,31 @@ namespace MonoNS
       RefreshAnimating = false;
     }
 
+    public bool PoisionAnimating = false;
+    public void Poision(Unit unit, Tile tile) {
+      PoisionAnimating = true;
+      hexMap.cameraKeyboardController.DisableCamera();
+      StartCoroutine(CoPoision(unit, tile));
+    }
+
+    IEnumerator CoPoision(Unit unit, Tile tile) {
+      if (unit.IsShowingAnimation()) {
+        popAniController.Show(hexMap.GetUnitView(unit), textLib.get("pop_poisionDone"), Color.green);
+        while (popAniController.Animating) { yield return null; }
+      }
+
+      foreach(Unit u in tile.Poision(unit)) {
+        if (u.IsAI()) {
+          continue;
+        }
+        eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.Poision, u, null));
+        while (eventDialog.Animating) { yield return null; }
+      }
+
+      hexMap.cameraKeyboardController.EnableCamera();
+      PoisionAnimating = false;
+    }
+
     public bool ShowAnimating = false;
     public void ShowEffects(Unit unit, int[] effects) {
       if (!unit.IsShowingAnimation()) { return; }

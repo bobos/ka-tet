@@ -162,6 +162,11 @@ namespace MonoNS
           popAniController.Show(hexMap.GetUnitView(selectedUnit), textLib.get("pop_noDamNearby"), Color.yellow);
           return;
         }
+        if (selectedUnit.labor < Flood.RequiredLabor) {
+          popAniController.Show(hexMap.GetUnitView(selectedUnit),
+            System.String.Format(textLib.get("pop_damRequireLabor"), Flood.RequiredLabor), Color.yellow);
+          return;
+        }
         mouseMode = mode.sabotage;
         Update_CurrentFunc = UpdateUnitSabotageDam;
       }
@@ -753,9 +758,12 @@ namespace MonoNS
       hexMap.HighlightArea(tileUnderMouse.poision.downStreams.ToArray(), HexMap.RangeType.PoisionRange);
       if (Input.GetMouseButtonUp(0))
       {
-        popAniController.Show(hexMap.GetUnitView(selectedUnit), textLib.get("pop_poisionDone"), Color.green);
-        tileUnderMouse.Poision(selectedUnit);
-        Escape();
+        if (!actionController.poision(selectedUnit, tileUnderMouse)) {
+          // TODO
+          Debug.LogError("Failed to poision river, try again!");
+        }
+        Update_CurrentFunc = Update_Animating;
+        return;
       }
     }
 

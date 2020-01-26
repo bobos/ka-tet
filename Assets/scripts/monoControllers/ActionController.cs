@@ -236,6 +236,10 @@ namespace MonoNS
       return DoAction(null, null, tile, actionName.FIRE);
     }
 
+    public bool poision(Unit unit, Tile tile) {
+      return DoAction(unit, null, tile, actionName.POISION);
+    }
+
     public bool DoAction(Unit unit, Unit[] units, Tile tile, actionName name)
     {
       if (ActionOngoing) return false;
@@ -259,6 +263,10 @@ namespace MonoNS
       if (name == actionName.ATTACKEmpty) 
       {
         StartCoroutine(DoAttackEmptySettlement(unit, tile.settlement));
+      }
+      if (name == actionName.POISION) 
+      {
+        StartCoroutine(DoPoision(unit, tile));
       }
       return true;
     }
@@ -306,6 +314,16 @@ namespace MonoNS
     {
       unitAniController.AttackEmpty(unit, settlement, occupy);
       while (unitAniController.AttackEmptyAnimating)
+      {
+        yield return null;
+      }
+      ActionOngoing = false;
+    }
+
+    IEnumerator DoPoision(Unit unit, Tile tile)
+    {
+      unitAniController.Poision(unit, tile);
+      while (unitAniController.PoisionAnimating)
       {
         yield return null;
       }

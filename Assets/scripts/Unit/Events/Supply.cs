@@ -88,6 +88,14 @@
         unit.kia += deathNum;
         unit.rf.soldiers -= deathNum;
         int laborDead = (int)(deathNum / 5);
+
+        laborDead = laborDead > unit.labor ? unit.labor : laborDead;
+        if(unit.hexMap.IsAttackSide(unit.IsAI())) {
+          unit.hexMap.settlementMgr.attackerLaborDead += laborDead;
+        } else {
+          unit.hexMap.settlementMgr.defenderLaborDead += laborDead;
+        }
+
         unit.labor -= laborDead;
         effects[0] = moraleReduce;
         effects[3] = deathNum;
