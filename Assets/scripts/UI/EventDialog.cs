@@ -45,8 +45,10 @@ namespace MonoNS
     public Sprite InsufficientSupply;
     public Sprite InsufficientLabor;
     public Sprite CampLost;
+    public Sprite CityLost;
     public Sprite Defeated;
     public Sprite Disarmor;
+    public Sprite EmptySettlement;
     public Sprite Resigned;
     public Sprite GeneralExecuted;
     public Sprite GeneralSwapped;
@@ -67,6 +69,10 @@ namespace MonoNS
       BurningCampDestroyUnit,
       EnemyCaptureCamp,
       EnemyCaptureCity,
+      WeCaptureCamp,
+      WeCaptureCity,
+      EnemyBurnCamp,
+      WeBurnCamp,
       Poision,
       Epidemic,
       Disbanded,
@@ -81,6 +87,7 @@ namespace MonoNS
       InsufficientSupplyLabor,
       Disarmor,
       Disarmor1,
+      EmptySettlement,
       Riot,
       GeneralKilledInBattle,
       GeneralReturned,
@@ -181,7 +188,37 @@ namespace MonoNS
 
       if (name == EventName.EnemyCaptureCamp) {
         title.text = textLib.get("event_enemyCaptureCamp_title");
-        description.text = System.String.Format(textLib.get("event_enemyCaptureCamp"), settlement.name);
+        description.text = System.String.Format(textLib.get("event_enemyCaptureCamp"), settlement.name, argu1);
+        image.sprite = CityLost;
+      }
+
+      if (name == EventName.EnemyCaptureCity) {
+        title.text = textLib.get("event_enemyCaptureCity_title");
+        description.text = System.String.Format(textLib.get("event_enemyCaptureCity"), settlement.name, argu1, argu2, argu3);
+        image.sprite = CityLost;
+      }
+
+      if (name == EventName.WeCaptureCamp) {
+        title.text = textLib.get("event_weCaptureCamp_title");
+        description.text = System.String.Format(textLib.get("event_weCaptureCamp"), settlement.name, argu1);
+        image.sprite = CityLost;
+      }
+
+      if (name == EventName.WeCaptureCity) {
+        title.text = textLib.get("event_weCaptureCity_title");
+        description.text = System.String.Format(textLib.get("event_weCaptureCity"), settlement.name, argu1, argu2, argu3);
+        image.sprite = CityLost;
+      }
+
+      if (name == EventName.WeBurnCamp) {
+        title.text = textLib.get("event_weBurnCamp_title");
+        description.text = System.String.Format(textLib.get("event_weBurnCamp"), settlement.name);
+        image.sprite = CampLost;
+      }
+
+      if (name == EventName.EnemyBurnCamp) {
+        title.text = textLib.get("event_enemyBurnCamp_title");
+        description.text = System.String.Format(textLib.get("event_enemyBurnCamp"), settlement.name);
         image.sprite = CampLost;
       }
 
@@ -332,15 +369,15 @@ namespace MonoNS
         image.sprite = Disarmor;
       }
 
-      //if (name == EventName.Disarmor) {
-      //  ToggleDecision();
-      //  title.text = textLib.get("event_disarmor_title");
-      //  description.text = System.String.Format(textLib.get("event_disarmor"),
-      //    unit.GeneralName(), unit.Name());
-      //  image.sprite = Disarmor;
-      //  approveText.text = System.String.Format(textLib.get("event_disarmor_approve_title"), argu1);
-      //  disapproveText.text = System.String.Format(textLib.get("event_disarmor_disapprove_title"), argu2);
-      //}
+      if (name == EventName.EmptySettlement) {
+        ToggleDecision();
+        title.text = textLib.get("event_emptySettlement_title");
+        description.text = System.String.Format(textLib.get("event_emptySettlement"),
+          settlement.name);
+        image.sprite = EmptySettlement;
+        approveText.text = textLib.get("event_emptySettlement_occupy_title");
+        disapproveText.text = textLib.get("event_emptySettlement_burndown_title");
+      }
 
     }
 

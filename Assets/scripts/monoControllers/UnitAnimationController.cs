@@ -231,6 +231,58 @@ namespace MonoNS
       PostAnimating = false;
     }
 
+    public bool AttackEmptyAnimating = false;
+    public void AttackEmpty(Unit unit, Settlement settlement, bool occupy = true) {
+      AttackEmptyAnimating = true;
+      hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(settlement.baseTile).transform.position);
+      hexMap.cameraKeyboardController.DisableCamera();
+      StartCoroutine(CoAttackEmpty(unit, settlement, occupy));
+    }
+
+    IEnumerator CoAttackEmpty(Unit unit, Settlement settlement, bool occupy) {
+      if (settlement.type != Settlement.Type.camp) {
+        occupy = true;
+      } else if (!unit.IsAI()) {
+        eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.EmptySettlement,
+        unit,
+        settlement));
+        while (eventDialog.Animating) { yield return null; }
+        occupy = eventDialog.accepted;
+      }
+
+      if (occupy) {
+        int[] afterMath = settlementMgr.OccupySettlement(unit, settlement);
+        if (settlement.type == Settlement.Type.city) {
+          eventDialog.Show(new MonoNS.Event(
+            unit.IsAI() ? MonoNS.EventDialog.EventName.EnemyCaptureCity : MonoNS.EventDialog.EventName.WeCaptureCity,
+          unit,
+          settlement,
+          afterMath[0], afterMath[1], afterMath[2]));
+        } else {
+          eventDialog.Show(new MonoNS.Event(
+            unit.IsAI() ? MonoNS.EventDialog.EventName.EnemyCaptureCamp : MonoNS.EventDialog.EventName.WeCaptureCamp,
+          unit,
+          settlement,
+          afterMath[0]));
+        }
+      } else {
+        unit.supply.TakeInSupply(settlement.supplyDeposit);
+        eventDialog.Show(new MonoNS.Event(
+            unit.IsAI() ? MonoNS.EventDialog.EventName.EnemyBurnCamp : MonoNS.EventDialog.EventName.WeBurnCamp,
+          unit,
+          settlement));
+      }
+      while (eventDialog.Animating) { yield return null; }
+
+      if (!occupy) {
+        hexMap.settlementAniController.DestroySettlement(settlement, BuildingNS.DestroyType.ByFire);
+        while (hexMap.settlementAniController.Animating) { yield return null; }
+      }
+
+      hexMap.cameraKeyboardController.EnableCamera();
+      AttackEmptyAnimating = false;
+    }
+
     public bool RefreshAnimating = false;
     public void RefreshUnit(Unit unit) {
       RefreshAnimating = true;
@@ -246,14 +298,14 @@ namespace MonoNS
         if(ret != 0) {
           if (ret < 0) {
             int discontent = -ret;
-            // Not allowed
+            // disarmor not allowed
             eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.Disarmor, unit,
               null, discontent));
             while (eventDialog.Animating) { yield return null; }
             Riot(unit, discontent);
             while (riotAnimating) { yield return null; }
           } else {
-            // Allowed
+            // disarmor allowed
             int defReduce = ret;
             eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.Disarmor1, unit,
               null, defReduce));

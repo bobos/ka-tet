@@ -71,7 +71,6 @@ namespace MonoNS
       }
     }
     public LayerMask hexTileLayerMask;
-    List<Unit> attackCandidates = null;
 
     public void OnEndTurnClicked()
     {
@@ -182,15 +181,6 @@ namespace MonoNS
       if (action == ActionController.actionName.ATTACK)
       {
         mouseMode = mode.attack;
-        attackCandidates = new List<Unit>();
-        foreach (Tile h in selectedUnit.GetAttackRange())
-        {
-          Unit u = h.GetUnit();
-          if (u != null && u.IsAI())
-          {
-            attackCandidates.Add(u);
-          }
-        }
         Update_CurrentFunc = UpdateUnitAttack;
       }
 
@@ -493,18 +483,18 @@ namespace MonoNS
       Settlement s = tileUnderMouse.settlement;
       if (mouseMode == mode.attack)
       {
-        if (u != null && attackCandidates.Contains(u))
+        if (s != null && selectedUnit.IsAI() != s.owner.isAI)
         {
-          Unit[] attackers = new Unit[1];
-          attackers[0] = selectedUnit;
-          onUnitAttack(attackers, u);
+          // TODO: check if settlement nearby
+          if (s.garrison.Count() == 0) {
+            if (!actionController.attackEmptySettlement(selectedUnit, tileUnderMouse)) {
+              // TODO
+              Debug.LogError("Failed to attack empty settlement, try again!");
+            }
+            Update_CurrentFunc = Update_Animating;
+            return;
+          }
         }
-        else if (s != null && s.owner.isAI)
-        {
-          // attack settlement
-          // TODO
-        }
-        return;
       }
 
       if (mouseMode == mode.detect)
@@ -571,7 +561,7 @@ namespace MonoNS
       if (!Util.eq<Tile>(tileUnderMouse, selectedUnit.tile))
       {
         Unit u = tileUnderMouse.GetUnit();
-        if (u != null && attackCandidates.Contains(u))
+        if (u != null)
         {
           hover.Show(u.Name());
         }
@@ -666,7 +656,7 @@ namespace MonoNS
       }
     }
 
-    void Update_Moving()
+    void Update_Animating()
     {
       // hits here means ActionOngoing is false already
       Escape();
@@ -686,7 +676,7 @@ namespace MonoNS
             Debug.LogError("Failed to move unit, try again!");
           }
         }
-        Update_CurrentFunc = Update_Moving;
+        Update_CurrentFunc = Update_Animating;
         return;
       }
 

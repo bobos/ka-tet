@@ -55,13 +55,9 @@
         return inSupply;
       }
 
-      int minNeeded = MinSupplyNeeded();
-      if (inSupply >= minNeeded) {
-        minNeeded = inSupply >= needed ? needed : minNeeded;
-        inSupply -= minNeeded;
-        supply += minNeeded;
-        return inSupply;
-      }
+      needed = inSupply >= needed ? needed : inSupply;
+      inSupply -= needed;
+      supply += needed;
       return inSupply;
     }
 

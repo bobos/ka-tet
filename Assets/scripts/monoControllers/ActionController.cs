@@ -196,6 +196,7 @@ namespace MonoNS
       ATTACK,
       POISION,
       SABOTAGE,
+      ATTACKEmpty,
       FIRE,
       AMBUSH,
       ENCAMP,
@@ -218,6 +219,11 @@ namespace MonoNS
     public bool move(Unit unit)
     {
       return DoAction(unit, null, null, actionName.MOVE);
+    }
+
+    public bool attackEmptySettlement(Unit unit, Tile tile)
+    {
+      return DoAction(unit, null, tile, actionName.ATTACKEmpty);
     }
 
     public bool sabotage(Tile tile)
@@ -249,6 +255,10 @@ namespace MonoNS
       if (name == actionName.FIRE)
       {
         StartCoroutine(Burn(tile));
+      }
+      if (name == actionName.ATTACKEmpty) 
+      {
+        StartCoroutine(DoAttackEmptySettlement(unit, tile.settlement));
       }
       return true;
     }
@@ -290,6 +300,16 @@ namespace MonoNS
       yield return new WaitForSeconds(3);
       ActionOngoing = false;
       if (actionDone != null) actionDone(receiver, punchers, actionName.ATTACK);
+    }
+
+    IEnumerator DoAttackEmptySettlement(Unit unit, Settlement settlement, bool occupy = true)
+    {
+      unitAniController.AttackEmpty(unit, settlement, occupy);
+      while (unitAniController.AttackEmptyAnimating)
+      {
+        yield return null;
+      }
+      ActionOngoing = false;
     }
   }
 

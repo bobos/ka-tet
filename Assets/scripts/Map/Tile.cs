@@ -366,6 +366,8 @@ namespace MapTileNS
         _settlement = value;
         if (value != null) {
           SetFieldType(FieldType.Settlement);
+        } else {
+          SetFieldType(FieldType.Schorched);
         }
       }
     }
@@ -424,7 +426,7 @@ namespace MapTileNS
 
     public Tile Escape() {
       Unit unit = GetUnit();
-      foreach (Tile tile in Neighbours<Tile>())
+      foreach (Tile tile in neighbours)
       {
         if (tile.Deployable(unit))
         {
@@ -437,12 +439,7 @@ namespace MapTileNS
     // * PathFind interfaces *
     public PFTile[] GetNeighbourTiles()
     {
-      List<PFTile> ret = new List<PFTile>();
-      foreach (Tile h in Neighbours<Tile>())
-      {
-        ret.Add(h);
-      }
-      return ret.ToArray();
+      return neighbours;
     }
 
     public int AggregateCostToEnter(int costSoFar, PFTile sourceTile, PFUnit unit, Mode mode)

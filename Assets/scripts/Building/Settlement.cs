@@ -16,7 +16,6 @@ public abstract class Settlement: DataModel
   public List<Unit> garrison = new List<Unit>();
   public Tile baseTile;
   public WarParty owner;
-  public int deathToll = 0;
   private int _civillian_male;
   private int _civillian_female;
   private int _civillian_child;
@@ -136,16 +135,7 @@ public abstract class Settlement: DataModel
     return garrison;
   }
 
-  public void Capture() {
-    if (type == Settlement.Type.camp) {
-      hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.EnemyCaptureCamp, null, this));
-    }
-    if (type == Settlement.Type.city) {
-      hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.EnemyCaptureCity, null, this));
-    }
-  }
-
-  public void RemoveUnit(Unit unit) {
+   public void RemoveUnit(Unit unit) {
     if (garrison != null && garrison.Contains(unit))
     {
       garrison.Remove(unit);
@@ -154,7 +144,7 @@ public abstract class Settlement: DataModel
 
   public bool IsUnderSiege() {
     bool underSiege = true;
-    foreach(Tile tile in baseTile.GetNeighbourTiles()) {
+    foreach(Tile tile in baseTile.neighbours) {
       if (!tile.Accessible()) {
         continue;
       }

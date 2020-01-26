@@ -134,7 +134,8 @@ namespace MonoNS
       + "单兵防御:" + unit.def + "\n[基本防御:" + unit.rf.defCore
       + " 等级加成:" + unit.rf.defLvlBuf * 100
       + "% 地形加成:" + unit.vantage.DefBuf() * 100
-      + "% 总计:" +
+      + "% 免胄惩罚:" + unit.disarmorDefDebuf
+      + " 总计:" +
       (unit.GetStaminaBuf() + unit.GetStarvingBuf() + unit.GetNewGeneralBuf() + unit.rf.defLvlBuf + unit.vantage.DefBuf())*100
       + "%]\n"
       + "有效兵力:" + unit.vantage.GetEffective();

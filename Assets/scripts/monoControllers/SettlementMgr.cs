@@ -11,6 +11,12 @@ namespace MonoNS
 {
   public class SettlementMgr : BaseController
   {
+    public int attackerLaborDead = 0;
+    public int defenderLaborDead = 0;
+    public int totalMaleDead = 0;
+    public int totalFemaleDead = 0;
+    public int totalChildDead = 0;
+
     public enum QueueJobType {
       DistSupply,
       DistLabor
@@ -294,6 +300,59 @@ namespace MonoNS
       buildingQueue.Remove(settlement);
     }
 
+    public int[] OccupySettlement(Unit unit, Settlement settlement) {
+      int[] deathNum = new int[3]{0,0,0};
+      settlement.owner = unit.IsAI() ? hexMap.GetAIParty() : hexMap.GetPlayerParty();
+      settlement.Encamp(unit);
+      if (settlement.owner.attackside) {
+        attackerRoots.Add(settlement);
+        defenderRoots.Remove(settlement);
+        if (settlement.type == Settlement.Type.city) {
+          // labor returns to male
+          int returnedMale = (int)(settlement.labor * 0.9f);
+          settlement.civillian_male += returnedMale;
+          settlement.labor -= returnedMale;
+
+          int maleDead = unit.rf.soldiers * 2;
+          int femaleDead = unit.rf.soldiers;
+          int childDead = (int)(unit.rf.soldiers * 0.05f);
+          maleDead = maleDead > settlement.civillian_male ? settlement.civillian_male : maleDead;
+          femaleDead = femaleDead > settlement.civillian_female ? settlement.civillian_female : femaleDead;
+          childDead = childDead > settlement.civillian_child ? settlement.civillian_child : childDead;
+
+          settlement.civillian_male -= maleDead;
+          settlement.civillian_female -= femaleDead;
+          settlement.civillian_child -= childDead;
+
+          totalMaleDead += maleDead;
+          totalFemaleDead += femaleDead;
+          totalChildDead += childDead;
+
+          deathNum[0] = maleDead;
+          deathNum[1] = femaleDead;
+          deathNum[2] = childDead;
+        } else {
+          int laborDead = (int)(settlement.labor * 0.7f);
+          defenderLaborDead += laborDead;
+          settlement.labor -= laborDead;
+
+          deathNum[0] = laborDead;
+        }
+      } else {
+        defenderRoots.Add(settlement);
+        attackerRoots.Remove(settlement);
+        if (settlement.type != Settlement.Type.city) {
+          int laborDead = (int)(settlement.labor * 0.8f);
+          attackerLaborDead += laborDead;
+          settlement.labor -= laborDead;
+
+          deathNum[0] = laborDead;
+        }
+      }
+
+      return deathNum;
+    }
+
     public HashSet<Tile> GetSupplyRangeTiles(Settlement settlement) {
       SetGhostOwner(settlement);
       HashSet<Tile> ret = new HashSet<Tile>();
@@ -328,6 +387,11 @@ namespace MonoNS
       else
       {
         defenderRoots.Remove(camp);
+      }
+      if (camp.owner.attackside) {
+        attackerLaborDead += camp.labor;
+      } else {
+        defenderLaborDead += camp.labor;
       }
     }
 
