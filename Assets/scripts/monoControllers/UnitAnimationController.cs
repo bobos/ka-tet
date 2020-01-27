@@ -345,6 +345,92 @@ namespace MonoNS
       PoisionAnimating = false;
     }
 
+    public bool SiegeAnimating = false;
+    public void Siege(Unit unit) {
+      SiegeAnimating = true;
+      hexMap.cameraKeyboardController.DisableCamera();
+      StartCoroutine(CoSiege(unit));
+    }
+
+    public enum SiegeResult {
+      NoCity,
+      Ready,
+      NoLabor,
+      NoPoint
+    }
+
+    public class SiegePredict {
+      public SiegeResult result = SiegeResult.NoCity;
+      public Settlement target;
+      public const int MinLabor = 800;
+      public const int MinPoint = Unit.BasicMovementCost * 2;
+    }
+
+    public SiegePredict Ready4Siege(Unit unit) {
+      SiegePredict predict = new SiegePredict();
+
+      foreach (Tile tile in unit.tile.neighbours) {
+        if (tile.settlement != null && tile.settlement.owner.isAI != unit.IsAI()) {
+          predict.target = tile.settlement;
+          predict.result = SiegeResult.Ready;
+          break;
+        }
+      }
+
+      if (predict.result == SiegeResult.NoCity) {
+        return predict;
+      }
+
+      if (unit.labor < SiegePredict.MinLabor) {
+        predict.result = SiegeResult.NoLabor;
+      }
+
+      if (unit.movementRemaining < SiegePredict.MinPoint) {
+        predict.result = SiegeResult.NoPoint;
+      }
+
+      return predict;
+    }
+
+    IEnumerator CoSiege(Unit unit) {
+      SiegePredict predict = Ready4Siege(unit); 
+
+      if (predict.result == SiegeResult.Ready) {
+        // siege ready
+        unit.tile.sieged = true;
+        unit.movementRemaining -= SiegePredict.MinPoint;
+        if (unit.IsShowingAnimation()) {
+          popAniController.Show(hexMap.GetUnitView(unit),
+          textLib.get("pop_sieged"), Color.green);
+          while (popAniController.Animating) { yield return null; }
+        }
+
+        if (predict.target.IsUnderSiege()) {
+          eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.UnderSiege, unit, predict.target));
+          while (eventDialog.Animating) { yield return null; }
+        }
+      }
+
+      if (predict.result == SiegeResult.NoLabor) {
+        if (unit.IsShowingAnimation()) {
+          popAniController.Show(hexMap.GetUnitView(unit),
+          System.String.Format(textLib.get("pop_insufficientLabor"), SiegePredict.MinLabor), Color.yellow);
+          while (popAniController.Animating) { yield return null; }
+        }
+      }
+
+      if (predict.result == SiegeResult.NoPoint) {
+        if (unit.IsShowingAnimation()) {
+          popAniController.Show(hexMap.GetUnitView(unit),
+          System.String.Format(textLib.get("pop_insufficientPoint"), SiegePredict.MinPoint), Color.yellow);
+          while (popAniController.Animating) { yield return null; }
+        }
+      }
+
+      hexMap.cameraKeyboardController.EnableCamera();
+      SiegeAnimating = false;
+    }
+
     public bool ShowAnimating = false;
     public void ShowEffects(Unit unit, int[] effects) {
       if (!unit.IsShowingAnimation()) { return; }

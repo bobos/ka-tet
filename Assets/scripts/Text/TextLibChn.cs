@@ -208,6 +208,8 @@ namespace TextNS
       {"event_emptySettlement", @"{0}并无敌军守备，占领还是焚毁?"},
       {"event_emptySettlement_occupy_title", "占领"},
       {"event_emptySettlement_burndown_title", "焚毁"},
+      {"event_underSiege_title", "长围合拢"},
+      {"event_underSiege", @"围城军队连日所筑长围现已合拢，{0}已经被完全包围，任何物资人员已无法出入"},
 
       // pop out msg
       {"pop_discontent", @"不满+{0}"},
@@ -243,7 +245,8 @@ namespace TextNS
       {"pop_buildingFailed", "无法筑营!"},
       {"pop_poisionDone", "投毒成功!"},
       {"pop_insufficientLabor", @"需要{0}民夫"},
-      {"pop_insufficientPoint", @"需要{0}以动力"},
+      {"pop_insufficientPoint", @"需要{0}体力"},
+      {"pop_sieged", "围困工事已修筑"},
 
       // settlement
       {"settlement_storageLvl1", "初级粮仓"},

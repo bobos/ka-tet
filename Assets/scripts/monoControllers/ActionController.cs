@@ -98,12 +98,9 @@ namespace MonoNS
       }
     }
 
-    public void OnAmbushClick()
+    public void OnSiegeClick()
     {
-      if (onBtnClick != null)
-      {
-        onBtnClick(actionName.AMBUSH);
-      }
+      siege(hexMap.mouseController.selectedUnit);
     }
 
     public void OnEncampClick()
@@ -199,7 +196,7 @@ namespace MonoNS
       SABOTAGE,
       ATTACKEmpty,
       FIRE,
-      AMBUSH,
+      SIEGE,
       ENCAMP,
       RETREAT,
       CAMP,
@@ -241,6 +238,10 @@ namespace MonoNS
       return DoAction(unit, null, tile, actionName.POISION);
     }
 
+    public bool siege(Unit unit) {
+      return DoAction(unit, null, null, actionName.SIEGE);
+    }
+
     public bool DoAction(Unit unit, Unit[] units, Tile tile, actionName name)
     {
       if (ActionOngoing) return false;
@@ -268,6 +269,10 @@ namespace MonoNS
       if (name == actionName.POISION) 
       {
         StartCoroutine(DoPoision(unit, tile));
+      }
+      if (name == actionName.SIEGE) 
+      {
+        StartCoroutine(DoSiege(unit));
       }
       return true;
     }
@@ -350,6 +355,16 @@ namespace MonoNS
     {
       unitAniController.Poision(unit, tile);
       while (unitAniController.PoisionAnimating)
+      {
+        yield return null;
+      }
+      ActionOngoing = false;
+    }
+
+    IEnumerator DoSiege(Unit unit)
+    {
+      unitAniController.Siege(unit);
+      while (unitAniController.SiegeAnimating)
       {
         yield return null;
       }

@@ -57,6 +57,7 @@ namespace MonoNS
     public Sprite Retreat;
     public Sprite Poisioned;
     public Sprite Decision;
+    public Sprite UnderSiege;
 
     public delegate void DialogEvent();
     public event DialogEvent eventDialogOn;
@@ -97,6 +98,7 @@ namespace MonoNS
       Retreat,
       FarmDestroyed,
       FarmDestroyedReported,
+      UnderSiege,
       Null
     }
 
@@ -367,6 +369,13 @@ namespace MonoNS
         description.text = System.String.Format(textLib.get("event_disarmor1"),
           unit.GeneralName(), unit.Name(), argu1);
         image.sprite = Disarmor;
+      }
+
+      if (name == EventName.UnderSiege) {
+        title.text = textLib.get("event_underSiege_title");
+        description.text = System.String.Format(textLib.get("event_underSiege"),
+          settlement.name);
+        image.sprite = UnderSiege;
       }
 
       if (name == EventName.EmptySettlement) {

@@ -149,18 +149,12 @@ public abstract class Settlement: DataModel
         continue;
       }
 
-      Unit unit = tile.GetUnit();
-      if (unit == null || unit.IsAI() == owner.isAI) {
-        underSiege = false;
-        break;
-      }
-
-      if (unit.labor < 800) {
-        // can only lay siege with more than 800 labor on one side
+      if (!tile.sieged) {
         underSiege = false;
         break;
       }
     }
+
     return underSiege;
   }
 

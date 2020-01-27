@@ -27,6 +27,7 @@ namespace MapTileNS
     public bool burnable = false;
     public bool road = false;
     public bool vantagePoint = false;
+    public bool sieged = false;
 
     public Dictionary<Tile, Tile[]> roads = new Dictionary<Tile, Tile[]>();
     public Tile(int q, int r, HexMap hexMap) : base(q, r, hexMap) { }

@@ -149,7 +149,8 @@ namespace MonoNS
       morale.text = "士气: " + unit.rf.morale;
       offense.text = "攻击: " + unit.unitAttack;
       defense.text = "防御: " + unit.unitDefence;
-      string stateStr = unit.IsWarWeary() ? " 士气低落" : "";
+      string stateStr = unit.tile.sieged ? "围城中" : ""; 
+      stateStr += unit.IsWarWeary() ? " 士气低落" : "";
       stateStr += " " + unit.GetDiscontent();
       stateStr += unit.IsStarving() ? " 饥饿" : "";
       stateStr += unit.GetStateName();

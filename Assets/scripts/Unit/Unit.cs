@@ -772,6 +772,8 @@ namespace UnitNS
 
       List<Unit> knownUnits = hexMap.combatController.GetKnownEnemies();
       movementRemaining -= takenMovement;
+      // remove the sieging of the previous tile
+      tile.sieged = false;
       SetTile(next);
       return AfterMoveUpdate(knownUnits);
     }
