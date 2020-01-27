@@ -453,8 +453,10 @@ MonoBehaviour:
   InsufficientSupply: {fileID: 21300000, guid: 422d0a25984ef4175a79ef32b7e176e0, type: 3}
   InsufficientLabor: {fileID: 21300000, guid: 7285911bb63f64712a028ffd441f674c, type: 3}
   CampLost: {fileID: 21300000, guid: 59472041d77804acd85d996d35d88200, type: 3}
+  CityLost: {fileID: 21300000, guid: d349ee8405169421abe311279b318995, type: 3}
   Defeated: {fileID: 21300000, guid: 675caf01e27d14b7394a8885b948b188, type: 3}
   Disarmor: {fileID: 21300000, guid: e63b37be7eede4b6a9c274ab2d3afed8, type: 3}
+  EmptySettlement: {fileID: 21300000, guid: 1059b348a39f74c3ca723d453b1dec0a, type: 3}
   Resigned: {fileID: 21300000, guid: e4629d141e3b14dd99a774bbd851f1b6, type: 3}
   GeneralExecuted: {fileID: 21300000, guid: f13d6889331724d5b9723580d4622ebd, type: 3}
   GeneralSwapped: {fileID: 21300000, guid: 213532f93112e44dca3678cf9dc294b1, type: 3}
@@ -463,6 +465,7 @@ MonoBehaviour:
   Retreat: {fileID: 21300000, guid: 67dd8dde88ee04857b40fe47b24c814d, type: 3}
   Poisioned: {fileID: 21300000, guid: 422d0a25984ef4175a79ef32b7e176e0, type: 3}
   Decision: {fileID: 21300000, guid: 27eb635276c2c42fda48435b0ca45708, type: 3}
+  UnderSiege: {fileID: 21300000, guid: 346b49a689e444b909c68f75c2ec9f05, type: 3}
   accepted: 0
 --- !u!1 &124494888
 GameObject:
@@ -719,6 +722,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71a3d3e33216b4c3aa07d8ca49147cc3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  attackerLaborDead: 0
+  defenderLaborDead: 0
+  totalMaleDead: 0
+  totalFemaleDead: 0
+  totalChildDead: 0
   turnEndOngoing: 0
 --- !u!4 &221403538
 Transform:
@@ -4628,7 +4636,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u4F0F\u5175"
+  m_Text: "\u56F4\u57CE"
 --- !u!222 &1061797704
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -7460,10 +7468,10 @@ MonoBehaviour:
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 40
+    m_FontSize: 30
     m_FontStyle: 0
     m_BestFit: 0
-    m_MinSize: 4
+    m_MinSize: 3
     m_MaxSize: 40
     m_Alignment: 0
     m_AlignByGeometry: 0
@@ -7981,7 +7989,10 @@ MonoBehaviour:
   MoveAnimating: 0
   riotAnimating: 0
   PostAnimating: 0
+  AttackEmptyAnimating: 0
   RefreshAnimating: 0
+  PoisionAnimating: 0
+  SiegeAnimating: 0
   ShowAnimating: 0
 --- !u!4 &1812342025
 Transform:
@@ -8393,7 +8404,7 @@ MonoBehaviour:
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 40
+    m_FontSize: 30
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 0
@@ -8659,7 +8670,7 @@ GameObject:
   - component: {fileID: 2042320851}
   - component: {fileID: 2042320850}
   m_Layer: 5
-  m_Name: Ambush
+  m_Name: Siege
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8723,8 +8734,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_MethodName: OnAmbushClick
+      - m_Target: {fileID: 769809669}
+        m_MethodName: OnSiegeClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
