@@ -287,11 +287,16 @@ namespace MonoNS
     Dictionary<Settlement, GameObject> settlement2GO = new Dictionary<Settlement, GameObject>();
     public void CreateSettlement(Settlement settlement)
     {
+      Vector3 position = settlement.baseTile.GetSurfacePosition();
       GameObject GO = (GameObject)Instantiate(settlement.type == Settlement.Type.camp ? hexMap.CampPrefab : hexMap.TentPrefab,
-        settlement.baseTile.GetSurfacePosition(),
+        position,
         Quaternion.identity,
         hexMap.GetTileView(settlement.baseTile).transform);
-      GO.GetComponent<SettlementView>().OnCreate(settlement);
+      SettlementView view = GO.GetComponent<SettlementView>();
+      view.OnCreate(settlement);
+      view.SetNameGO((GameObject)Instantiate(hexMap.NameTextPrefab,
+        SettlementView.NamePosition(position),
+        Quaternion.identity, hexMap.GetTileView(settlement.baseTile).transform));
       settlement2GO[settlement] = GO;
     }
 
@@ -303,6 +308,7 @@ namespace MonoNS
     public int[] OccupySettlement(Unit unit, Settlement settlement) {
       int[] deathNum = new int[3]{0,0,0};
       settlement.owner = unit.IsAI() ? hexMap.GetAIParty() : hexMap.GetPlayerParty();
+      GetView(settlement).UpdateName();
       settlement.Encamp(unit);
       if (settlement.owner.attackside) {
         attackerRoots.Add(settlement);

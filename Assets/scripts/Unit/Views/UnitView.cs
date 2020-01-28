@@ -41,7 +41,7 @@ namespace UnitNS
     }
 
     public void UpdateGeneralName() {
-      nameGO.GetComponent<UnitNameView>().SetName(unit.rf.general);
+      nameGO.GetComponent<UnitNameView>().SetName(unit);
     }
 
     public void UpdateUnitInfo() {

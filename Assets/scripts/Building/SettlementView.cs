@@ -12,6 +12,7 @@ public class SettlementView : View
   MouseController mouseController;
   SettlementMgr settlementMgr;
   HexMap hexMap;
+  GameObject nameGO;
   public Settlement settlement = null;
   public override void OnCreate(DataModel settlement)
   {
@@ -21,6 +22,21 @@ public class SettlementView : View
     mouseController.onSettlementSelect += OnSettlementSelect;
     mouseController.onSettlementDeselect += OnSettlementDeselect;
     settlementMgr = hexMap.settlementMgr;
+  }
+
+  public static Vector3 NamePosition(Vector3 p) {
+    return new Vector3(p.x - 1f, p.y - 1f, p.z);
+  }
+
+  public void SetNameGO(GameObject nameGO) {
+    this.nameGO = nameGO;
+    UpdateName();
+  }
+
+  public void UpdateName() {
+    Color color = settlement.owner.attackside ? Color.red : Color.green;
+    string factionName = settlement.owner.faction.Name();
+    nameGO.GetComponent<UnitNS.UnitNameView>().SetNameColor(settlement.name + "[" + factionName + "]", color, 80);
   }
 
   public void DestroyAnimation(DestroyType type)
@@ -39,6 +55,7 @@ public class SettlementView : View
     mouseController.onSettlementSelect -= OnSettlementSelect;
     mouseController.onSettlementDeselect -= OnSettlementDeselect;
     GameObject.Destroy(gameObject);
+    GameObject.Destroy(nameGO);
   }
 
   public void OnSettlementSelect(Settlement settlement)
