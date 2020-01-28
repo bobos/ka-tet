@@ -83,6 +83,7 @@ namespace TextNS
       {"rank_rookie", "厢兵"},
       {"rank_veteran", "牙兵"},
       {"rank_elite", "禁军"},
+      {"rank_scout", "斥候"},
 
       // region
       {"r_riverRun", "河中"},

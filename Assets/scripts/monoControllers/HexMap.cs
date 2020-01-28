@@ -177,6 +177,14 @@ namespace MonoNS
       return wp.attackside;
     }
 
+    public WarParty GetWarParty(Unit unit) {
+      return unit.IsAI() ? GetAIParty() : GetPlayerParty();
+    }
+
+    public void UpdateWound(Unit unit, int num) {
+      GetWarParty(unit).UpdateWound(unit, num);
+    }
+
     public bool IsInEnemyScoutRange(bool isAI, Tile tile, bool ignoreConcealed = false) {
       HashSet<Tile> enemyScoutArea = new HashSet<Tile>();
       WarParty party = isAI ? GetPlayerParty() : GetAIParty();

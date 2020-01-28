@@ -340,12 +340,6 @@ namespace UnitNS
       return state == State.Disbanded || state == State.Retreated;
     }
 
-    public WarPoint GetWarPoint()
-    {
-      // TODO: add more
-      return new WarPoint();
-    }
-
     public bool IsShowingAnimation() {
       View view = hexMap.GetUnitView(this);
       // TODO: uncomment me
@@ -416,6 +410,8 @@ namespace UnitNS
     }
 
     public void Retreat() {
+      // TODO: return labor
+      labor = 0;
       if (rf.general != null) {
         rf.general.TroopRetreat();
       }
@@ -432,6 +428,12 @@ namespace UnitNS
     {
       int killed = rf.soldiers + rf.wounded;
       kia += killed;
+      if (hexMap.IsAttackSide(IsAI())) {
+        hexMap.settlementMgr.attackerLaborDead += labor;
+      } else {
+        hexMap.settlementMgr.defenderLaborDead += labor;
+      }
+
       rf.soldiers = rf.wounded = labor = 0;
       SetState(State.Disbanded);
       tile.RemoveUnit(this);
@@ -459,6 +461,7 @@ namespace UnitNS
       movementRemaining = movementRemaining - moveReduce; 
       reduced[1] = -moveReduce;
       int woundedNum = (int)(rf.soldiers * disableRatio);
+      hexMap.UpdateWound(this, woundedNum);
       rf.wounded += woundedNum;
       rf.soldiers -= woundedNum;
       reduced[2] = woundedNum;
@@ -474,7 +477,6 @@ namespace UnitNS
       reduced[7] = 0;
       return reduced;
     }
-
 
     // ==============================================================
     // ================= movement mangement =========================

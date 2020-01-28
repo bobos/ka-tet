@@ -5,6 +5,7 @@ namespace UnitNS
   public class Level {
     int exp = 0;
     public Dictionary<int, int> lvlMap = new Dictionary<int, int> {
+      {-1, -1},
       {1, 10000},
       {2, 50000},
       {3, -1}};

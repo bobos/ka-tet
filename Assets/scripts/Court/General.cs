@@ -42,7 +42,6 @@ namespace CourtNS {
     public event OnFieldEvent onFieldEvent;
     public FieldEvent[] fieldRecords;
     public LinkedList<General> nemesis = new LinkedList<General>();
-    public bool knowSoldiers = true;
     public GeneralStat stat = GeneralStat.Idle;
 
     HexMap hexMap;

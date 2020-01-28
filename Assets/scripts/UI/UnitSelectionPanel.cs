@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using UnitNS;
+using FieldNS;
+using System.Collections.Generic;
 
 namespace MonoNS
 {
@@ -186,6 +188,43 @@ namespace MonoNS
 
     public void OnBtnClick(ActionController.actionName action)
     {
+      if (action == ActionController.actionName.SHOWMINE || action == ActionController.actionName.SHOWENEMY) {
+        WarParty wp = action == ActionController.actionName.SHOWENEMY ? hexMap.GetAIParty() : hexMap.GetPlayerParty();
+        WarPartyStat stat = wp.GetStat();
+        List<Settlement> roots = wp.attackside ? hexMap.settlementMgr.attackerRoots : hexMap.settlementMgr.defenderRoots;
+        int labor = stat.numOfLabor;
+        int count = 0;
+        foreach(Settlement s in roots) {
+          labor += s.labor;
+          count++;
+        }
+
+        string info =
+         "步兵: " + stat.numOfInfantryUnit + "只\n" +
+         "  战兵: " + stat.numOfInfantry + " 伤: " + stat.numOfInfantryWound +
+         " 亡: " + stat.numOfInfantryDead + "\n" +
+         "骑兵: " + stat.numOfCavalryUnit + "只\n" +
+         "  战兵: " + stat.numOfCavalry + " 伤: " + stat.numOfCavalryWound +
+         " 亡: " + stat.numOfCavalryDead + "\n" +
+         "斥候: " + stat.numOfScoutUnit + "只\n" +
+         "  战兵: " + stat.numOfScout + " 伤: " + stat.numOfScoutWound +
+         " 亡: " + stat.numOfScoutDead + "\n" +
+         "兵役: " + labor + " 亡: " +
+         (wp.attackside ? hexMap.settlementMgr.attackerLaborDead : hexMap.settlementMgr.defenderLaborDead) + "\n" + 
+         "控制城市: " + count + "\n" +  
+         "总计: 战兵 " + (stat.numOfInfantry + stat.numOfCavalry + stat.numOfScout) +
+         " 伤 " + (stat.numOfInfantryWound + stat.numOfCavalryWound + stat.numOfScoutWound) +
+         " 亡 " + (stat.numOfInfantryDead + stat.numOfCavalryDead + stat.numOfScoutDead) + "\n";
+
+        if (!wp.attackside) {
+          info += "平民死亡: \n" + "  男: " + hexMap.settlementMgr.totalMaleDead +
+           " 女: " + hexMap.settlementMgr.totalFemaleDead +
+           " 幼: " + hexMap.settlementMgr.totalChildDead + "\n";
+        }
+        hexMap.hoverInfo.Show(info);
+        return;
+      }
+
       // disable other buttons than move
       ToggleButtons(false);
       if (action == ActionController.actionName.MOVE)

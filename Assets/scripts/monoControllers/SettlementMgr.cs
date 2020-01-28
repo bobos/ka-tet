@@ -209,8 +209,8 @@ namespace MonoNS
     ActionController actionController;
     MouseController mouseController;
     GhostUnit ghostUnit;
-    List<Settlement> attackerRoots;
-    List<Settlement> defenderRoots;
+    public List<Settlement> attackerRoots;
+    public List<Settlement> defenderRoots;
     List<Settlement> buildingQueue;
 
     public bool BuildCamp(Tile location, WarParty warParty, Unit unit) {

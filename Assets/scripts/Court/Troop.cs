@@ -37,7 +37,7 @@ namespace CourtNS
     }
 
     public Troop(int soldiers, Faction faction, Province province, Type type, Rank rank) {
-      this.rank = rank;
+      this.rank = type == Type.Scout ? Cons.norank : rank;
       this.type = type;
       this.soldiers = soldiers;
       this.faction = faction;

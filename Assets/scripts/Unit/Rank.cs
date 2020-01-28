@@ -22,6 +22,33 @@ namespace UnitNS
     abstract public int Level();
   }
 
+  public class Norank: Rank {
+
+    public override int Level() {
+      return -1;
+    }
+
+    public override string Name() {
+      return Cons.GetTextLib().get("rank_scout");
+    }
+
+    public override string Description() {
+      return Cons.GetTextLib().get("rank_scout_description");
+    }
+
+    public override float AtkBuf(int _morale) {
+      return 0;
+    }
+
+    public override float DefBuf(int _morale) {
+      return 0;
+    }
+
+    public override int RecoverPerTurn() {
+      return 50;
+    }
+  }
+
   public class Rookie: Rank {
 
     public override int Level() {

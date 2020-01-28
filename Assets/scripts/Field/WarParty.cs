@@ -7,21 +7,19 @@ namespace FieldNS
 {
   public class WarPartyStat
   {
-    public int numOfTroops;
-    public int numOfSoldiers;
-    public int numOfDead;
-    public int numOfWound;
+    public int numOfInfantryUnit;
+    public int numOfCavalryUnit;
+    public int numOfScoutUnit;
+    public int numOfInfantry;
+    public int numOfCavalry;
+    public int numOfScout;
+    public int numOfInfantryDead;
+    public int numOfCavalryDead;
+    public int numOfScoutDead;
+    public int numOfInfantryWound;
+    public int numOfCavalryWound;
+    public int numOfScoutWound;
     public int numOfLabor;
-
-    public WarPartyStat(int numOfTroops, int numOfSoldiers, int numOfDead,
-              int numOfWound, int numOfLabor)
-    {
-      this.numOfDead = numOfDead;
-      this.numOfLabor = numOfLabor;
-      this.numOfSoldiers = numOfSoldiers;
-      this.numOfTroops = numOfTroops;
-      this.numOfWound = numOfWound;
-    }
   }
 
   public class WarParty
@@ -37,16 +35,26 @@ namespace FieldNS
       }
     }
     public List<FieldParty> fieldParties = new List<FieldParty>();
-    public int force;
-    public int wounded;
-    public int kia;
-    public int mia;
-    public int captives;
+    public int infantryWounded;
+    public int cavalryWounded;
+    public int scoutWounded;
     public Faction faction;
 
     public bool isAI { get; private set; }
     public bool attackside { get; private set; }
     HashSet<Unit> units = new HashSet<Unit>();
+
+    public void UpdateWound(Unit unit, int num) {
+      if (unit.type == Type.Infantry) {
+        infantryWounded += num;
+      }
+      if (unit.type == Type.Cavalry) {
+        cavalryWounded += num;
+      }
+      if (unit.type == Type.Scout) {
+        scoutWounded += num;
+      }
+    }
 
     public void JoinCampaign(General general) {
       Unit unit = general.commandUnit.onFieldUnit;
@@ -77,26 +85,42 @@ namespace FieldNS
 
     public WarPartyStat GetStat()
     {
-      int numOfDead = 0;
-      int numOfLabor = 0;
-      int numOfSoldiers = 0;
-      int numOfTroops = GetUnits().Count;
-      int numOfWound = 0;
+      // TODO: for AI, consider fog of war
+      WarPartyStat stat = new WarPartyStat();
+      stat.numOfInfantryWound = infantryWounded;
+      stat.numOfCavalryWound = cavalryWounded;
+      stat.numOfScoutWound = scoutWounded;
 
       foreach (Unit unit in units)
       {
-        if (unit.IsGone()) {
-          numOfDead += unit.kia;
-        } else {
-          numOfDead += unit.kia;
-          numOfLabor += unit.labor;
-          numOfSoldiers += unit.rf.soldiers;
-          numOfWound += unit.rf.wounded;
+        int totalDead = unit.kia + unit.mia;
+        if (unit.type == Type.Infantry) {
+          stat.numOfInfantryDead += totalDead;
+          stat.numOfLabor += unit.labor;
+          if (!unit.IsGone()) {
+            stat.numOfInfantry += unit.rf.soldiers;
+            stat.numOfInfantryUnit++;
+          }
+        }
+
+        if (unit.type == Type.Cavalry) {
+          stat.numOfCavalryDead += totalDead;
+          if (!unit.IsGone()) {
+            stat.numOfCavalry += unit.rf.soldiers;
+            stat.numOfCavalryUnit++;
+          }
+        }
+
+        if (unit.type == Type.Scout) {
+          stat.numOfScoutDead += totalDead;
+          if (!unit.IsGone()) {
+            stat.numOfScout += unit.rf.soldiers;
+            stat.numOfScoutUnit++;
+          }
         }
       }
 
-      return new WarPartyStat(numOfTroops, numOfSoldiers,
-                              numOfDead, numOfWound, numOfLabor);
+      return stat;
     }
 
     public void GetVisibleArea(HashSet<Tile> tiles) {

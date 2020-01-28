@@ -47,6 +47,7 @@
         effects[0] = morale;
 
         int woundedNum = GetEffectNum();
+        unit.hexMap.UpdateWound(unit, woundedNum);
         unit.rf.wounded += woundedNum;
         unit.rf.soldiers -= woundedNum;
         effects[2] = woundedNum;

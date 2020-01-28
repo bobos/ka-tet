@@ -25,6 +25,7 @@
         unit.rf.morale += morale;
         unit.movementRemaining += movement;
         int woundedNum = (int)(unit.rf.soldiers * SnowDisableRate);
+        unit.hexMap.UpdateWound(unit, woundedNum);
         unit.rf.wounded += woundedNum;
         unit.rf.soldiers -= woundedNum;
         int kiaNum = (int)(unit.rf.soldiers * SnowKillRate);
@@ -52,6 +53,7 @@
         int movement = (int)(unit.movementRemaining / (-4)) * 3;
         unit.movementRemaining += movement;
         int woundedNum = (int)(unit.rf.soldiers * BlizardDisableRate);
+        unit.hexMap.UpdateWound(unit, woundedNum);
         unit.rf.wounded += woundedNum;
         unit.rf.soldiers -= woundedNum;
         int kiaNum = (int)(unit.rf.soldiers * BlizardKillRate);

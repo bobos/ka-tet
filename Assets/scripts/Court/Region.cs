@@ -36,12 +36,16 @@ namespace CourtNS
     {
       if (unitType == Type.Infantry)
         return 40;
+      if (unitType == Type.Scout)
+        return 150;
       return 100;
     }
 
     public override int Def(Type unitType)
     {
       if (unitType == Type.Infantry)
+        return 50;
+      if (unitType == Type.Scout)
         return 50;
       return 20;
     }
@@ -86,12 +90,16 @@ namespace CourtNS
     {
       if (unitType == Type.Infantry)
         return 50;
+      if (unitType == Type.Scout)
+        return 130;
       return 80;
     }
 
     public override int Def(Type unitType)
     {
       if (unitType == Type.Infantry)
+        return 80;
+      if (unitType == Type.Scout)
         return 80;
       return 30;
     }
@@ -136,12 +144,16 @@ namespace CourtNS
     {
       if (unitType == Type.Infantry)
         return 40;
+      if (unitType == Type.Scout)
+        return 120;
       return 70;
     }
 
     public override int Def(Type unitType)
     {
       if (unitType == Type.Infantry)
+        return 50;
+      if (unitType == Type.Scout)
         return 50;
       return 30;
     }
@@ -186,12 +198,16 @@ namespace CourtNS
     {
       if (unitType == Type.Infantry)
         return 60;
+      if (unitType == Type.Scout)
+        return 130;
       return 80;
     }
 
     public override int Def(Type unitType)
     {
       if (unitType == Type.Infantry)
+        return 90;
+      if (unitType == Type.Scout)
         return 90;
       return 30;
     }
@@ -236,6 +252,8 @@ namespace CourtNS
     {
       if (unitType == Type.Infantry)
         return 40;
+      if (unitType == Type.Scout)
+        return 150;
       return 100;
     }
 
@@ -243,6 +261,8 @@ namespace CourtNS
     {
       if (unitType == Type.Infantry)
         return 40;
+      if (unitType == Type.Scout)
+        return 60;
       return 40;
     }
 

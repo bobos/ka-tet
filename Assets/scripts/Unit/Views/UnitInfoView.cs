@@ -20,6 +20,9 @@ namespace UnitNS
       if (troop.rank.Level() == 3) {
         textMesh.color = Color.magenta;
       }
+      if (troop.rank.Level() == -1) {
+        textMesh.color = Color.yellow;
+      }
     }
     
     // Update is called once per frame

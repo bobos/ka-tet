@@ -134,7 +134,7 @@ public class Starter : MonoBehaviour {
       new Troop(3000, Cons.HeJian, Cons.riverRun, Type.Infantry, Cons.elite)
     );
     zhaoyun.Assign(hexMap,
-      new Troop(250, Cons.HeJian, Cons.riverRun, Type.Scout, Cons.veteran)
+      new Troop(250, Cons.HeJian, Cons.riverRun, Type.Scout, Cons.norank)
     );
     guanyu.Assign(hexMap,
       new Troop(15000, Cons.HeJian, Cons.riverRun, Type.Infantry, Cons.rookie)
