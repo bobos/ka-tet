@@ -241,7 +241,7 @@ public abstract class Settlement: DataModel
   }
 
   public bool IsFunctional() {
-    return state == State.normal;
+    return state == State.normal && !IsUnderSiege();
   }
 
   public void DistSupply(int amount, Settlement to) {
@@ -275,19 +275,54 @@ public abstract class Settlement: DataModel
     hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.LaborReached, null, to, amount));
   }
 
-  public void SupplyIntercepted(Unit enemy, Settlement to, int amount, int labors = 0, Unit unit = null) {
-    int adjustedAmount = amount;
-    int adjustedLabor = labors;
-    if (adjustedLabor == 0) {
-      adjustedAmount = supplyDeposit > amount ? amount : supplyDeposit;
-      int neededLabor = CalcNeededLabor(adjustedAmount);
-      adjustedLabor = availableLabor > neededLabor ? neededLabor : availableLabor; 
-      int supplyCanSend = CalcSupplyCanProvide(adjustedLabor);
-
-      adjustedAmount = adjustedAmount > supplyCanSend ? supplyCanSend : adjustedAmount; 
-      adjustedLabor = CalcNeededLabor(adjustedAmount);
-      availableLabor -= adjustedLabor;
+  int[] InterceptResult(Unit enemy) {
+    int[] result = new int[]{0, 0, 0};
+    // TODO: general trait gaining
+    if (enemy.rf.soldiers >= Util.Rand(50, 255) &&
+        enemy.rf.morale >= Util.Rand(45, 65)) {
+      result[0] = 1;
+      if (Cons.FairChance()) {
+        result[1] = Util.Rand(1, 10);
+        if (Cons.SlimChance()) {
+          // killed
+          result[2] = Util.Rand(1, 8);
+        }
+      }
+      enemy.rf.morale += Cons.InterceptMoraleImpact;
+    } else {
+      if (Cons.HighlyLikely()) {
+        result[1] = Util.Rand(10, 30);
+        if (Cons.MostLikely()) {
+          result[2] = Util.Rand(5, 20);
+        }
+      }
+      enemy.rf.morale -= Cons.InterceptMoraleImpact * 2;
+      enemy.DiscoveredByEnemy();
     }
+
+    enemy.rf.soldiers -= (result[1] + result[2]);
+    enemy.rf.wounded += result[1];
+    hexMap.UpdateWound(enemy, result[1]);
+    enemy.kia += result[2];
+    return result;
+  }
+
+  public void SupplyIntercepted(Unit enemy, Settlement to, int amount) {
+    int[] result = InterceptResult(enemy);
+    if (result[0] == 0) {
+      // Failed
+      hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.InterceptFailed,
+        enemy, null, Cons.InterceptMoraleImpact*2, result[1], result[2]));
+      return;
+    }
+    int adjustedAmount = supplyDeposit > amount ? amount : supplyDeposit;
+    int neededLabor = CalcNeededLabor(adjustedAmount);
+    int adjustedLabor = availableLabor > neededLabor ? neededLabor : availableLabor; 
+    int supplyCanSend = CalcSupplyCanProvide(adjustedLabor);
+
+    adjustedAmount = adjustedAmount > supplyCanSend ? supplyCanSend : adjustedAmount; 
+    adjustedLabor = CalcNeededLabor(adjustedAmount);
+    availableLabor -= adjustedLabor;
 
     int killedLaborEscort = (int)(Util.Rand(0.008f, 0.04f) * adjustedLabor);
     labor -= killedLaborEscort;
@@ -295,20 +330,34 @@ public abstract class Settlement: DataModel
     int needed = enemy.supply.GetNeededSupply();
     int supplyTaken = needed > adjustedAmount ? adjustedAmount : needed;
     enemy.supply.TakeTransferSupply(supplyTaken);
-    if (to != null) {
-      hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.SupplyIntercepted, null, to, adjustedAmount, killedLaborEscort));
+    if (to.owner.attackside) {
+      settlementMgr.attackerLaborDead += killedLaborEscort;
+    } else {
+      settlementMgr.defenderLaborDead += killedLaborEscort;
     }
-    if (unit != null) {
-      hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.unitSupplyIntercepted, unit, null, adjustedAmount, killedLaborEscort));
-    }
+    hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.SupplyIntercepted, enemy, to,
+      adjustedAmount, killedLaborEscort, Cons.InterceptMoraleImpact, result[1], result[2]));
   }
 
   public void LaborIntercepted(Unit enemy, Settlement to, int amount) {
+    int[] result = InterceptResult(enemy);
+    if (result[0] == 0) {
+      // Failed
+      hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.InterceptFailed,
+        enemy, null, Cons.InterceptMoraleImpact*2, result[1], result[2]));
+      return;
+    }
     int adjustedLabor = availableLabor > amount ? amount : availableLabor;
     availableLabor -= adjustedLabor;
     int killedLabor = (int)(Util.Rand(0.008f, 0.04f) * adjustedLabor);
     labor -= killedLabor;
-    hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.LaborIntercepted, null, to, killedLabor));
+    if (to.owner.attackside) {
+      settlementMgr.attackerLaborDead += killedLabor;
+    } else {
+      settlementMgr.defenderLaborDead += killedLabor;
+    }
+    hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.LaborIntercepted, enemy, to,
+      killedLabor, Cons.InterceptMoraleImpact, result[1], result[2]));
   }
 
   public void TakeInSupply(int supply) {

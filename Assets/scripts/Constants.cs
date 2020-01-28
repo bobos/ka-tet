@@ -4,6 +4,7 @@ using CourtNS;
 
 public class Cons {
   
+  public const int InterceptMoraleImpact = 5;
   public static bool HighlyLikely() {
     return Util.Rand(0f, 1f) < 0.8f;
   }

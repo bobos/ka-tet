@@ -154,6 +154,9 @@ namespace UnitNS
     public int concealCoolDownTurn = 0;
     public int movementRemaining {
       get {
+        if (__movementRemaining > GetFullMovement()) {
+          __movementRemaining = GetFullMovement();
+        }
         return __movementRemaining;
       }
       set {
@@ -386,10 +389,11 @@ namespace UnitNS
         }
       }
 
-      movementRemaining = GetFullMovement();
       supply.RefreshSupply();
       turnDone = false;
-      return weatherEffect.Apply();
+      int[] ret = weatherEffect.Apply();
+      movementRemaining = GetFullMovement();
+      return ret;
     }
 
     bool turnDone = false;

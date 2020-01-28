@@ -81,8 +81,8 @@ namespace MonoNS
       SupplyRouteBlocked,
       LaborReached,
       SupplyIntercepted,
-      unitSupplyIntercepted,
       LaborIntercepted,
+      InterceptFailed,
       InsufficientSupply,
       InsufficientLabor,
       InsufficientSupplyLabor,
@@ -256,21 +256,23 @@ namespace MonoNS
 
       if (name == EventName.SupplyIntercepted) {
         title.text = textLib.get("event_supplyIntercepted_title");
-        description.text = System.String.Format(textLib.get("event_supplyIntercepted"), settlement.name, argu1, argu2);
-        image.sprite = SupplyIntercepted;
+        description.text = System.String.Format(textLib.get("event_supplyIntercepted"),
+          settlement.name, unit.rf.general.Name(), argu1, argu2, argu3, argu4, argu5);
+        image.sprite = Ambushed;
       }
 
       if (name == EventName.LaborIntercepted) {
         title.text = textLib.get("event_laborIntercepted_title");
-        description.text = System.String.Format(textLib.get("event_laborIntercepted"), settlement.name, argu1);
-        image.sprite = Ambushed;
+        description.text = System.String.Format(textLib.get("event_laborIntercepted"),
+          settlement.name, unit.rf.general.Name(), argu1, argu2, argu3, argu4);
+        image.sprite = LaborIntercepted;
       }
 
-      if (name == EventName.unitSupplyIntercepted) {
-        title.text = textLib.get("event_unitSupplyIntercepted_title");
-        description.text = System.String.Format(textLib.get("event_unitSupplyIntercepted"),
-          unit.GeneralName(), unit.Name(), argu1, argu2);
-        image.sprite = LaborIntercepted;
+      if (name == EventName.InterceptFailed) {
+        title.text = textLib.get("event_interceptFailed_title");
+        description.text = System.String.Format(textLib.get("event_interceptFailed"),
+          unit.rf.general.Name(), argu1, argu2, argu3);
+        image.sprite = SupplyIntercepted;
       }
 
       if (name == EventName.SupplyRouteBlocked) {
