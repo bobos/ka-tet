@@ -114,6 +114,7 @@ namespace MonoNS
       hexMap.cameraKeyboardController.EnableCamera();
       // after each step, recalculate fog
       FoW.Get().Fog();
+      hexMap.mouseController.RefreshUnitPanel(unit);
       MoveAnimating = false;
     }
 

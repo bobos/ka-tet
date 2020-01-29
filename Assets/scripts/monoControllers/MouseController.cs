@@ -160,6 +160,13 @@ namespace MonoNS
       }
     }
 
+    public void RefreshUnitPanel(Unit unit) {
+      if (Util.eq<Unit>(unit, selectedUnit)) {
+        PrepareUnitSelection();
+        hexMap.unitSelectionPanel.ToggleButtons(true, unit);
+      }
+    }
+
     public void OnBtnClick(ActionController.actionName action)
     {
       if (action == ActionController.actionName.MOVE)

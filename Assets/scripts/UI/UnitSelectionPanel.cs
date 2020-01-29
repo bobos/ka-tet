@@ -100,7 +100,7 @@ namespace MonoNS
       ToggleButtons(!unit.TurnDone(), unit);
     }
 
-    void ToggleButtons(bool state, Unit unit)
+    public void ToggleButtons(bool state, Unit unit)
     {
       foreach (GameObject button in buttons)
       {
@@ -239,7 +239,6 @@ namespace MonoNS
       ToggleButtons(false, unit);
       self.SetActive(false);
     }
-
 
     public void OnBtnClick(ActionController.actionName action)
     {

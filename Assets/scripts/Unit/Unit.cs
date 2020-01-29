@@ -21,10 +21,10 @@ namespace UnitNS
     public const int MovementcostOnPlain = 15;
     public const int MovementcostOnPlainRoad = 12;
     public const int MovementCostOnUnaccesible = -1;
-    public const int DisbandUnitUnder = 20;
+    public const int DisbandUnitUnder = 50;
 
-    public const int L1Visibility = 5; // under 4000 
-    public const int L2Visibility = 8; // > 4000
+    public const int L1Visibility = 3;
+    public const int L2Visibility = 5;
     public const int L1DiscoverRange = 1; // under 2000
     public const int L2DiscoverRange = 2; // > 4000
     public const int ConcealCoolDownIn = 3;
@@ -351,13 +351,16 @@ namespace UnitNS
     }
 
     public Tile[] GetScoutArea() {
-      return tile.GetNeighboursWithinRange<Tile>(rf.soldiers > 2000 ? L2DiscoverRange : L1DiscoverRange,
+      return tile.GetNeighboursWithinRange<Tile>(rf.soldiers > 5000 ? L2DiscoverRange : L1DiscoverRange,
                                                  (Tile _tile) => true);
     }
 
     public Tile[] GetVisibleArea() {
-      return tile.GetNeighboursWithinRange<Tile>(rf.soldiers > 4000 ? L2Visibility : L1Visibility,
-                                                 (Tile _tile) => true);
+      int v = L1Visibility;
+      if (type == Type.Scout) {
+        v = L2Visibility;
+      }
+      return tile.GetNeighboursWithinRange<Tile>(v, (Tile _tile) => true);
     }
 
     protected virtual bool Concealable() {
@@ -391,8 +394,8 @@ namespace UnitNS
 
       supply.RefreshSupply();
       turnDone = false;
-      int[] ret = weatherEffect.Apply();
       movementRemaining = GetFullMovement();
+      int[] ret = weatherEffect.Apply();
       return ret;
     }
 
