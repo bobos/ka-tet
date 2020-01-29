@@ -15,8 +15,7 @@ namespace MapTileNS
     public const float HillHeightStart = 0.5f;
     public const float HillHeightEnd = 1.0f;
     public const float HighgroundWatermark = 0.65f;
-    //public const int Work2BuildCamp = 34;
-    public const int Work2BuildCamp = 10;
+    public const int Work2BuildCamp = 34;
     public const float HighGround = 0.312f;
     public const float VantageGround = 0.8f;
     public Flood flood = null;
@@ -78,9 +77,15 @@ namespace MapTileNS
       }
     }
 
+    bool campField = false;
     public void SetAsCampField(string name, int storageLevel) {
       _name = name;
       _storageLevel = storageLevel;
+      campField = true;
+    }
+
+    public bool IsCampable() {
+      return campField && Accessible(); 
     }
 
     public void BuildRoad() {
@@ -181,13 +186,6 @@ namespace MapTileNS
       if (wildFire != null) {
         wildFire.BurnTile();
       }
-    }
-
-    public bool IsFloodable() {
-      if (flood != null) {
-        return isDam && flood.Floodable();
-      }
-      return false;
     }
 
     public bool IsBurnable() {

@@ -16,10 +16,10 @@ namespace UnitNS
     protected abstract Unit Clone();
 
     public const int BasicMovementCost = 20; // For actions like: attack
-    public const int MovementcostOnHill = 30;
-    public const int MovementcostOnHillRoad = 20;
-    public const int MovementcostOnPlain = 20;
-    public const int MovementcostOnPlainRoad = 15;
+    public const int MovementcostOnHill = 25;
+    public const int MovementcostOnHillRoad = 15;
+    public const int MovementcostOnPlain = 15;
+    public const int MovementcostOnPlainRoad = 12;
     public const int MovementCostOnUnaccesible = -1;
     public const int DisbandUnitUnder = 20;
 
@@ -371,7 +371,7 @@ namespace UnitNS
     // When unit ends in settlement
     public int EndedInSettlement(int supply)
     {
-      rf.morale = IsWarWeary() ? (GetRetreatThreshold() + 1) : rf.morale;
+      rf.morale = rf.morale > GetRetreatThreshold() ? rf.morale: GetRetreatThreshold();
       if (state == State.Routing) {
         SetState(State.Stand);
       }
@@ -474,6 +474,13 @@ namespace UnitNS
       rf.soldiers -= kiaNum;
       reduced[3] = kiaNum;
       int killLabor = (int)(kiaNum * 0.8f);
+      killLabor = killLabor > labor ? labor : killLabor;
+      if(hexMap.IsAttackSide(IsAI())) {
+        hexMap.settlementMgr.attackerLaborDead += killLabor;
+      } else {
+        hexMap.settlementMgr.defenderLaborDead += killLabor;
+      }
+
       labor -= killLabor;
       reduced[4] = killLabor;
       reduced[5] = 0;
@@ -558,7 +565,7 @@ namespace UnitNS
     // ==============================================================
     public int GetRetreatThreshold()
     {
-      return rf.province.region.RetreatThreshold();
+      return Rank.MoralePunishLine - 10;
     }
 
     // ==============================================================
@@ -598,7 +605,7 @@ namespace UnitNS
       }
     }
 
-    public bool Poisioned() {
+    public bool CanBePoisioned() {
       return unitPoisioned.Poision();
     }
 

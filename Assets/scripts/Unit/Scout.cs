@@ -6,7 +6,7 @@ namespace UnitNS
   public class Scout : Unit
   {
     public const int MinTroopNum = 50;
-    public const int MaxTroopNum = 250;
+    public const int MaxTroopNum = 200;
 
     public static Unit Create(bool clone, Troop troop, Tile tile, int supply, State state = State.Stand, 
                     int kia = 0, int mia = 0, int movement = -1) {
@@ -33,7 +33,7 @@ namespace UnitNS
 
     protected override float GetMovementModifier()
     {
-      return 2.0f;
+      return 1.8f;
     }
 
     protected override int GetBaseSupplySlots()

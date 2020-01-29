@@ -13,17 +13,22 @@
 
     public int[] Apply() {
       int[] effects = new int[8]{0,0,0,0,0,0,0,0};
+      if (unit.type == Type.Scout) {
+        return effects;
+      }
+
       if (Cons.IsHeavyRain(unit.hexMap.weatherGenerator.currentWeather)) {
-        if (unit.IsCamping()) return effects;
         int movement = (int)(unit.movementRemaining / (-2));
         unit.movementRemaining += movement;
         effects[1] = movement;
       } else if (Cons.IsSnow(unit.hexMap.weatherGenerator.currentWeather)) {
-        if (unit.IsCamping()) return effects;
-        int morale = -1;
         int movement = (int)(unit.movementRemaining / (-2));
-        unit.rf.morale += morale;
         unit.movementRemaining += movement;
+        effects[1] = movement;
+        if (unit.IsCamping()) return effects;
+
+        int morale = -1;
+        unit.rf.morale += morale;
         int woundedNum = (int)(unit.rf.soldiers * SnowDisableRate);
         unit.hexMap.UpdateWound(unit, woundedNum);
         unit.rf.wounded += woundedNum;
@@ -42,16 +47,17 @@
 
         unit.labor -= laborKilled;
         effects[0] = morale;
-        effects[1] = movement;
         effects[2] = woundedNum;
         effects[3] = kiaNum;
         effects[4] = laborKilled;
       } else if (Cons.IsBlizard(unit.hexMap.weatherGenerator.currentWeather)) {
-        if (unit.IsCamping()) return effects;
-        int morale = -5;
-        unit.rf.morale += morale;
         int movement = (int)(unit.movementRemaining / (-4)) * 3;
         unit.movementRemaining += movement;
+        effects[1] = movement;
+        if (unit.IsCamping()) return effects;
+
+        int morale = -5;
+        unit.rf.morale += morale;
         int woundedNum = (int)(unit.rf.soldiers * BlizardDisableRate);
         unit.hexMap.UpdateWound(unit, woundedNum);
         unit.rf.wounded += woundedNum;
@@ -70,7 +76,6 @@
 
         unit.labor -= laborKilled;
         effects[0] = morale;
-        effects[1] = movement;
         effects[2] = woundedNum;
         effects[3] = kiaNum;
         effects[4] = laborKilled;

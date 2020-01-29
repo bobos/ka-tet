@@ -9,7 +9,7 @@
     }
 
     public bool IsWarWeary() {
-      return unit.type != Type.Scout && unit.rf.morale <= unit.GetRetreatThreshold();
+      return unit.type != Type.Scout && unit.rf.morale < unit.GetRetreatThreshold();
     }
 
     public int GetWarWearyDissertNum()
@@ -28,7 +28,13 @@
       unit.mia += miaNum;
       unit.rf.soldiers -= miaNum;
       int laborDisserter = (int) (miaNum / 4);
+      laborDisserter = laborDisserter > unit.labor ? unit.labor : laborDisserter;
       unit.labor -= laborDisserter;
+      if(unit.hexMap.IsAttackSide(unit.IsAI())) {
+        unit.hexMap.settlementMgr.attackerLaborDead += laborDisserter;
+      } else {
+        unit.hexMap.settlementMgr.defenderLaborDead += laborDisserter;
+      }
       effects[4] = laborDisserter;
 
       return effects;

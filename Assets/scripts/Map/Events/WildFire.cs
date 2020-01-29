@@ -39,7 +39,7 @@ namespace MapTileNS
       HashSet<Tile> affectedTiles = new HashSet<Tile>();
       if (Burnable()) 
       {
-        tile.isDam = false;
+        tile.burnable = false;
         affectedTiles.Add(tile);
         GetTile2Burn(affectedTiles);
       }

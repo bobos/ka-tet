@@ -91,7 +91,7 @@ public class Starter : MonoBehaviour {
     camp1.SetAsCampField("虎牢关", 1);
     Tile camp2 = hexMap.GetTile(19, 2);
     camp2.SetAsCampField("飞狐口", 2);
-    Tile city = hexMap.GetTile(29, 15);
+    Tile city = hexMap.GetTile(27, 17);
     HashSet<Tile> tiles = new HashSet<Tile>();
     tiles.Add(camp1);
     tiles.Add(camp2);
@@ -131,7 +131,7 @@ public class Starter : MonoBehaviour {
 
     // step 3, assign general to units
     liubei.Assign(hexMap,
-      new Troop(3000, Cons.HeJian, Cons.riverRun, Type.Infantry, Cons.elite)
+      new Troop(5000, Cons.HeJian, Cons.riverRun, Type.Infantry, Cons.elite)
     );
     zhaoyun.Assign(hexMap,
       new Troop(250, Cons.HeJian, Cons.riverRun, Type.Scout, Cons.norank)
@@ -177,9 +177,9 @@ public class Starter : MonoBehaviour {
     settlementMgr.BuildRoad(camp2, city);
 
     // after settlement created, general enters campaign
-    liubei.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(27, 18), 0, 0);
+    liubei.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(27, 18), 0, 5000);
     zhaoyun.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(28, 18), 0);
-    guanyu.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(27, 17), 0, 1500);
+    guanyu.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(27, 17), 0, 15000);
     zhangfei.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(28, 17), 0);
 
     // * AI *

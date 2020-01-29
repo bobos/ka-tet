@@ -5,6 +5,7 @@ using MapTileNS;
 using TextNS;
 using UnityEngine;
 using NatureNS;
+using CourtNS;
 
 namespace MonoNS
 {
@@ -30,8 +31,6 @@ namespace MonoNS
     public bool FloodAnimating = false;
     public void Flood(Tile tile, HashSet<Tile> tiles = null)
     {
-      
-
       FloodAnimating = true;
       hexMap.cameraKeyboardController.DisableCamera();
       StartCoroutine(CoFlood(tile, tiles == null ? tile.CreateFlood() : tiles));
@@ -143,11 +142,10 @@ namespace MonoNS
       if(tile.epidemic != null && tile.epidemic.OnWeatherChange(weather)) {
         // epidemic triggered
         Unit unit = tile.GetUnit();
-        if (!unit.IsHeatSicknessAffected()) {
+        if (unit.type != Type.Scout && !unit.IsHeatSicknessAffected() &&
+        !Util.eq<Region>(unit.rf.province.region, Cons.lowLand)) {
           eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.Epidemic, unit, null));
           while (eventDialog.Animating) { yield return null; }
-
-          // TODO: check if the unit is from huai areas
           unitAniController.Riot(unit, unit.epidemic.Occur());
           while (unitAniController.riotAnimating) { yield return null; }
         }

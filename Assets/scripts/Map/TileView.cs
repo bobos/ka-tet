@@ -35,8 +35,8 @@ public class TileView : View
       }
     } else if (tile.terrian != TerrianType.Mountain) {
       txt = txt + (tile.burnable ? "Fire" : "");
-      if (settlementMgr.IsCampable(tile)) {
-        txt = txt + " Camp\n";
+      if (tile.IsCampable()) {
+        txt = txt + " Camp\n" + tile.name;
       }
     }
     if (tile.field == FieldType.Village) {

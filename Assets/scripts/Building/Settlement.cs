@@ -110,6 +110,8 @@ public abstract class Settlement: DataModel
     strategyBase
   }
 
+  public int room = 0;
+
   public Settlement(string name, Tile location, WarParty warParty, int supply, int room,
     StorageLevel storage, WallDefense wall)
   {
@@ -122,7 +124,7 @@ public abstract class Settlement: DataModel
     storageLvl = storage;
     this.wall = wall;
     supplyDeposit = supply > SupplyCanTakeIn() ? SupplyCanTakeIn() : supply;
-    parkSlots = room;
+    parkSlots = this.room = room;
     this.name = name;
     this.supply = new BuildingNS.Supply(hexMap);
   }
@@ -140,6 +142,14 @@ public abstract class Settlement: DataModel
     {
       garrison.Remove(unit);
     }
+  }
+
+  public bool HasRoom() {
+    return parkSlots > 0;
+  }
+
+  public bool IsEmpty() {
+    return garrison.Count == 0;
   }
 
   public bool IsUnderSiege() {
@@ -278,7 +288,7 @@ public abstract class Settlement: DataModel
   int[] InterceptResult(Unit enemy) {
     int[] result = new int[]{0, 0, 0};
     // TODO: general trait gaining
-    if (enemy.rf.soldiers >= Util.Rand(50, 255) &&
+    if (enemy.rf.soldiers >= Util.Rand(Scout.MinTroopNum, Scout.MaxTroopNum + 2) &&
         enemy.rf.morale >= Util.Rand(45, 65)) {
       result[0] = 1;
       if (Cons.FairChance()) {

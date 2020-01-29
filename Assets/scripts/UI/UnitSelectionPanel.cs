@@ -40,12 +40,12 @@ namespace MonoNS
     GameObject self;
     public GameObject MoveButton;
     public GameObject AttackButton;
-    public GameObject DefendButton;
+    public GameObject DefendButton; // Poison
     public GameObject CampButton;
     public GameObject SabotageButton;
     public GameObject NextTurnButton;
     public GameObject FireButton;
-    public GameObject AmbushButton;
+    public GameObject AmbushButton; // Siege
     public GameObject EncampButton;
     public GameObject RetreatButton;
     public GameObject TransferSupplyButton;
@@ -76,13 +76,13 @@ namespace MonoNS
 
     public void EventDialogOn() {
       if (self.activeSelf) {
-        ToggleButtons(false);
+        ToggleButtons(false, mouseController.selectedUnit);
       }
     }
 
     public void EventDialogOff() {
       if (self.activeSelf) {
-        ToggleButtons(true);
+        ToggleButtons(true, mouseController.selectedUnit);
       }
     }
 
@@ -97,14 +97,69 @@ namespace MonoNS
 
     void RefreshButtons(Unit unit)
     {
-      ToggleButtons(!unit.TurnDone());
+      ToggleButtons(!unit.TurnDone(), unit);
     }
 
-    void ToggleButtons(bool state)
+    void ToggleButtons(bool state, Unit unit)
     {
       foreach (GameObject button in buttons)
       {
-        button.SetActive(state);
+        button.SetActive(false);
+      }
+      if (!state) return;
+
+      MoveButton.SetActive(true);
+      NextTurnButton.SetActive(true);
+      RetreatButton.SetActive(true);
+      
+      if (mouseController.nearEnemy || mouseController.nearEnemySettlement != null) {
+        AttackButton.SetActive(true);
+      }
+
+      if (mouseController.nearMySettlement != null && mouseController.nearMySettlement.HasRoom()
+        && !mouseController.nearMySettlement.IsUnderSiege()) {
+        EncampButton.SetActive(true);
+      }
+
+      if (unit.type == Type.Scout) {
+        if (mouseController.nearDam != null) {
+          SabotageButton.SetActive(true);
+        }
+
+        if (mouseController.nearFire != null) {
+          FireButton.SetActive(true);
+        }
+
+        if (mouseController.nearWater) {
+          DefendButton.SetActive(true);
+        }
+      }
+
+      if (unit.type == Type.Infantry) {
+        if (mouseController.inCampField != null) {
+          CampButton.SetActive(true);
+        }
+
+        if (mouseController.nearEnemySettlement != null && !mouseController.nearEnemySettlement.IsEmpty()) {
+          AmbushButton.SetActive(true);
+        }
+
+        if (mouseController.nearAlly || mouseController.nearMySettlement != null) {
+          if (unit.labor > 0) {
+            TransferLaborButton.SetActive(true);
+          }
+          if (unit.supply.supply > 0) {
+            TransferSupplyButton.SetActive(true);
+          }
+        }
+      }
+
+      if (unit.type == Type.Cavalry) {
+        if (mouseController.nearAlly || mouseController.nearMySettlement != null) {
+          if (unit.supply.supply > 0) {
+            TransferSupplyButton.SetActive(true);
+          }
+        }
       }
     }
 
@@ -172,7 +227,7 @@ namespace MonoNS
         return;
       }
 
-      ToggleButtons(false);
+      ToggleButtons(false, unit);
       // TODO: AI test
       if (unit.IsAI() == !turnController.player) {
         RefreshButtons(unit);
@@ -181,7 +236,7 @@ namespace MonoNS
 
     public void OnUnitDeselect(Unit unit)
     {
-      ToggleButtons(false);
+      ToggleButtons(false, unit);
       self.SetActive(false);
     }
 
@@ -200,13 +255,13 @@ namespace MonoNS
         }
 
         string info =
-         "步兵: " + stat.numOfInfantryUnit + "只\n" +
+         "步兵: " + stat.numOfInfantryUnit + "都\n" +
          "  战兵: " + stat.numOfInfantry + " 伤: " + stat.numOfInfantryWound +
          " 亡: " + stat.numOfInfantryDead + "\n" +
-         "骑兵: " + stat.numOfCavalryUnit + "只\n" +
+         "骑兵: " + stat.numOfCavalryUnit + "都\n" +
          "  战兵: " + stat.numOfCavalry + " 伤: " + stat.numOfCavalryWound +
          " 亡: " + stat.numOfCavalryDead + "\n" +
-         "斥候: " + stat.numOfScoutUnit + "只\n" +
+         "斥候: " + stat.numOfScoutUnit + "队\n" +
          "  战兵: " + stat.numOfScout + " 伤: " + stat.numOfScoutWound +
          " 亡: " + stat.numOfScoutDead + "\n" +
          "兵役: " + labor + " 亡: " +
@@ -226,7 +281,7 @@ namespace MonoNS
       }
 
       // disable other buttons than move
-      ToggleButtons(false);
+      ToggleButtons(false, mouseController.selectedUnit);
       if (action == ActionController.actionName.MOVE)
       {
         MoveButton.SetActive(true);

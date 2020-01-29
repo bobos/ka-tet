@@ -87,7 +87,6 @@ namespace MonoNS
       updateReady = true;
     }
 
-    Tile[] tmpTiles;
     PopTextAnimationController popAniController {
       get {
         return hexMap.popAniController;
@@ -98,6 +97,69 @@ namespace MonoNS
         return Cons.GetTextLib();
       }
     }
+
+    public Settlement nearEnemySettlement = null;
+    public Settlement nearMySettlement = null;
+    public Tile nearDam = null;
+    public Tile nearFire = null;
+    public Tile inCampField = null;
+    public bool nearAlly = false;
+    public bool nearEnemy = false;
+    public bool nearWater = false;
+
+    void PrepareUnitSelection() {
+      nearEnemySettlement = null;
+      nearMySettlement = null;
+      nearDam = null;
+      nearFire = null;
+      nearAlly = false;
+      nearEnemy = false;
+      nearWater = false;
+      inCampField = null;
+
+      Settlement s = null;
+      if (tileUnderMouse.IsCampable()) {
+        inCampField = tileUnderMouse;
+      }
+
+      foreach(Tile tile in tileUnderMouse.neighbours) {
+        if (tile.settlement != null) {
+          s = tile.settlement;
+        }
+
+        if (tile.burnable) {
+          nearFire = tile;
+        }
+
+        if (tile.isDam) {
+          nearDam = tile;
+        }
+
+        if (tile.terrian == TerrianType.Water) {
+          nearWater = true;
+        }
+
+        Unit u = tile.GetUnit();
+        if (u != null && u.IsAI() == selectedUnit.IsAI()) {
+          nearAlly = true;
+        }
+
+        if (u != null && u.IsAI() != selectedUnit.IsAI() && !u.IsConcealed()) {
+          nearEnemy = true;
+        }
+
+        //TODO: check assault for Scout with enemy in 2 rings and self is hidden
+
+      }
+
+      if (s != null && selectedUnit.IsAI() == s.owner.isAI) {
+        nearMySettlement = s;
+      }
+      if (s != null && selectedUnit.IsAI() != s.owner.isAI) {
+        nearEnemySettlement = s;
+      }
+    }
+
     public void OnBtnClick(ActionController.actionName action)
     {
       if (action == ActionController.actionName.MOVE)
@@ -108,68 +170,44 @@ namespace MonoNS
 
       if (action == ActionController.actionName.CAMP)
       {
-        mouseMode = mode.camp;
-        // TODO: for test
-        //tmpTiles = settlementMgr.GetCampableFields(hexMap.warParties[0].attackside);
-        tmpTiles = settlementMgr.GetCampableFields();
-        hexMap.HighlightArea(tmpTiles, HexMap.RangeType.camp);
-        Update_CurrentFunc = UpdateUnitCamp;
+        if (settlementMgr.BuildCamp(inCampField,
+            selectedUnit.IsAI() ? hexMap.warParties[1] : hexMap.warParties[0],
+            selectedUnit))
+        {
+          popAniController.Show(hexMap.GetUnitView(selectedUnit), textLib.get("pop_buildingStarted"), Color.green);
+          Escape();
+        }
+        else
+        {
+          popAniController.Show(hexMap.GetUnitView(selectedUnit), textLib.get("pop_buildingFailed"), Color.red);
+        }
       }
 
-      if (action == ActionController.actionName.POISION && selectedUnit != null)
+      if (action == ActionController.actionName.POISION)
       {
-        if (!selectedUnit.tile.waterBound) {
-          popAniController.Show(hexMap.GetUnitView(selectedUnit), textLib.get("pop_notWaterbound"), Color.yellow);
-          return;
-        }
         mouseMode = mode.sabotage;
         Update_CurrentFunc = UpdateUnitPoision;
       }
 
-      if (action == ActionController.actionName.ENCAMP && selectedUnit != null)
+      if (action == ActionController.actionName.ENCAMP)
       {
-        bool encampable = false;
-        foreach (Tile tile in selectedUnit.tile.neighbours)
-        {
-          // TODO: for test
-          //if (tile.settlement != null && !tile.settlement.owner.isAI &&
-          if (tile.settlement != null
-            && tile.settlement.owner.isAI == selectedUnit.IsAI() &&
-            tile.settlement.parkSlots > 0 && !tile.settlement.IsUnderSiege())
-          {
-            encampable = true;
-            break;
-          }
-        }
-        if (!encampable)
-        {
-          popAniController.Show(hexMap.GetUnitView(selectedUnit), textLib.get("pop_noCampNearby"), Color.yellow);
-          return;
-        }
-        mouseMode = mode.detect;
-        Update_CurrentFunc = UpdateUnitEncamp;
+        nearMySettlement.Encamp(selectedUnit);
+        return;
       }
 
-      if (action == ActionController.actionName.SABOTAGE && selectedUnit != null)
+      if (action == ActionController.actionName.SABOTAGE)
       {
-        bool dambound = false;
-        foreach (Tile tile in selectedUnit.tile.neighbours)
-        {
-          if (tile.terrian == TerrianType.Water && tile.isDam) dambound = true;
+        if(!actionController.sabotage(selectedUnit, nearDam)){
+          // TODO
+          Debug.LogError("Failed to sabotage, try again!");
         }
-        if (!dambound)
-        {
-          popAniController.Show(hexMap.GetUnitView(selectedUnit), textLib.get("pop_noDamNearby"), Color.yellow);
-          return;
-        }
-        mouseMode = mode.sabotage;
-        Update_CurrentFunc = UpdateUnitSabotageDam;
+        return;
       }
 
-      if (action == ActionController.actionName.FIRE && selectedUnit != null)
+      if (action == ActionController.actionName.FIRE)
       {
-        mouseMode = mode.sabotage;
-        Update_CurrentFunc = UpdateUnitSetFire;
+        actionController.burn(nearFire);
+        return;
       }
 
       if (action == ActionController.actionName.BURNCAMP)
@@ -187,19 +225,6 @@ namespace MonoNS
       if (action == ActionController.actionName.TRANSFERSUPPLY ||
           action == ActionController.actionName.TRANSFERLABOR)
       {
-        bool allyNearBy = false;
-        foreach (Tile tile in selectedUnit.tile.neighbours)
-        {
-          Unit u = tile.GetUnit();
-          if (u != null && u.IsAI() == selectedUnit.IsAI()) allyNearBy = true;
-          if (tile.settlement != null && tile.settlement.owner.isAI == selectedUnit.IsAI()
-              && tile.settlement.IsFunctional()) allyNearBy = true;
-        }
-        if (!allyNearBy)
-        {
-          popAniController.Show(hexMap.GetUnitView(selectedUnit), textLib.get("pop_noAllyNearby"), Color.yellow);
-          return;
-        }
         mouseMode = action == ActionController.actionName.TRANSFERLABOR ? mode.transferLabor : mode.transfer;
         transferedUnit = null;
         transferedSettlement = null;
@@ -359,7 +384,6 @@ namespace MonoNS
       move,
       attack,
       sabotage,
-      camp,
       burnCamp,
       transfer,
       transferLabor,
@@ -483,10 +507,9 @@ namespace MonoNS
       Settlement s = tileUnderMouse.settlement;
       if (mouseMode == mode.attack)
       {
-        if (s != null && selectedUnit.IsAI() != s.owner.isAI)
+        if (Util.eq<Tile>(nearEnemySettlement.baseTile, tileUnderMouse))
         {
-          // TODO: check if settlement nearby
-          if (s.garrison.Count() == 0) {
+          if (nearEnemySettlement.IsEmpty()) {
             if (!actionController.attackEmptySettlement(selectedUnit, tileUnderMouse)) {
               // TODO
               Debug.LogError("Failed to attack empty settlement, try again!");
@@ -509,6 +532,7 @@ namespace MonoNS
         else if (u != null)
         {
           selectedUnit = u;
+          PrepareUnitSelection();
           if (onUnitSelect != null) onUnitSelect(selectedUnit);
         }
         else
@@ -705,45 +729,6 @@ namespace MonoNS
       }
     }
 
-    void UpdateUnitCamp()
-    {
-      if (Input.GetMouseButtonUp(0) && tileUnderMouse != null
-        && !Util.eq<Tile>(tileUnderMouse, selectedUnit.tile) &&
-        tileUnderMouse.GetUnit() == null &&
-        tmpTiles.Contains(tileUnderMouse))
-      {
-        // TODO: fot test
-        //if (settlementMgr.BuildSettlement(tileUnderMouse, Settlement.Type.camp, hexMap.warParties[0]))
-        if (settlementMgr.BuildCamp(tileUnderMouse,
-            selectedUnit.IsAI() ? hexMap.warParties[1] : hexMap.warParties[0],
-            selectedUnit))
-        {
-          //TODO: build camp next the unit and consume 1 food
-          popAniController.Show(hexMap.GetUnitView(selectedUnit), textLib.get("pop_buildingStarted"), Color.green);
-          Escape();
-        }
-        else
-        {
-          popAniController.Show(hexMap.GetUnitView(selectedUnit), textLib.get("pop_buildingFailed"), Color.red);
-        }
-      }
-    }
-
-    void UpdateUnitEncamp()
-    {
-      if (Input.GetMouseButtonUp(0) && tileUnderMouse != null
-        && !Util.eq<Tile>(tileUnderMouse, selectedUnit.tile) &&
-        tileUnderMouse.settlement != null
-        // TODO: for test
-        //!tileUnderMouse.settlement.owner.isAI && tileUnderMouse.settlement.parkSlots > 0
-        )
-      {
-        if (tileUnderMouse.settlement.Encamp(selectedUnit)) {
-          Escape();
-        }
-      }
-    }
-
     void UpdateUnitPoision()
     {
       if (tileUnderMouse == null || tileUnderMouse.terrian != TerrianType.Water
@@ -759,32 +744,6 @@ namespace MonoNS
         }
         Update_CurrentFunc = Update_Animating;
         return;
-      }
-    }
-
-    void UpdateUnitSabotageDam()
-    {
-      if (Input.GetMouseButtonUp(0) && tileUnderMouse != null
-        && !Util.eq<Tile>(tileUnderMouse, selectedUnit.tile))
-      {
-        Tile damTile = null;
-        foreach (Tile h in selectedUnit.tile.neighbours)
-        {
-          if (Util.eq<Tile>(tileUnderMouse, h)
-            && h.IsFloodable())
-          {
-            damTile = h;
-          }
-        }
-        if (damTile != null)
-        {
-          if(!actionController.sabotage(selectedUnit, damTile)){
-            // TODO
-            Debug.LogError("Failed to sabotage, try again!");
-          }
-          Update_CurrentFunc = Update_Animating;
-          return;
-        }
       }
     }
 

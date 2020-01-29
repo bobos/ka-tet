@@ -54,7 +54,7 @@ namespace CourtNS
     {
       if (unitType == Type.Infantry)
         return 100;
-      return 180;
+      return 170;
     }
 
     public override int Will()
@@ -162,7 +162,7 @@ namespace CourtNS
     {
       if (unitType == Type.Infantry)
         return 100;
-      return 130;
+      return 140;
     }
 
     public override int Will()
@@ -270,7 +270,7 @@ namespace CourtNS
     {
       if (unitType == Type.Infantry)
         return 80;
-      return 200;
+      return 180;
     }
 
     public override int Will()

@@ -1,6 +1,20 @@
-1. Dam is only destroyable in Summer or Spring and in Rain or HeavyRain
-2. When LvlFire and LvlForest reaches the top level, becomes Heavy Cavalry and Heavy Infantry, extra attck&defense buff, intemidate nearby normal units, movement punishment, maincost punishment, 2 horse one horseman
-3. move through alliance unit, but can not stay
-4. unit consume settlement's supply within its range, but only replenish supply when camped
-5. enemy unit not supplied within range
-6. unit -slots reset to 0 in supply range, unit not consuming self supply in settlement
+Game Tips:
+1. 5000士兵+5000民夫，移动最大化，筑城速度最大化
+2. 15000士兵+15000民夫，战力最大化
+2. [斥候外]酷暑, 在无风并且不靠近河流的地方行军，一定几率增加部队不满
+3. 斥候隐藏于道路上可伏击，人数最低50，士气最低45，数值越高成功几率越高
+4. 步兵围城至少需要800民夫
+5. [斥候外]酷暑在野外一定几率发生脱帽事件
+6. 部队总人数超过11000时，移动力逐渐下降，到15000时降到平时50%
+7. [斥候外]暴雨，大雪，小雪，移动力至少降低50%
+8. 下雨降低部队攻击力, 暴雨下降50%，小雨20%
+9. [斥候外]春夏季，田野行军一定几率触发毁坏稻田事件
+10. [斥候外]春夏季，下雨天于两淮密林中，非两淮部队一定几率染上痢疾
+11. 士气低于70，攻击防御等级加成有效兵力下降，小于50时，有效兵力降到2000，攻击防御等级加成降到0
+12. 20回合后，战争泥潭，攻击部队每回合士气-1，防御部队每两回合士气-1
+13. [斥候外]士气低于40时，部队出现逃兵，随身粮草上限-1，部队回到营寨内一回合，士气可回到40
+14. 部队城内攻击防御加成基于城防点数
+15. 骑兵在营寨和山地攻击力下降, 在高地和平原攻击力上升, 在营寨防御力上升
+16. 步兵在营寨攻防上升，在山地高地攻击防御上升
+17. 饥饿状态攻防下降30%，精力充沛下攻击防御上升5%，疲惫状态下下降5%到20%
+18. 战场换帅士气下降5，攻防下降30%

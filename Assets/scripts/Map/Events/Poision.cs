@@ -41,7 +41,7 @@ namespace MapTileNS
         {
           Unit unit = t.GetUnit();
           if (unit != null && !Util.eq<Unit>(unit, initiator)) {
-            if (unit.Poisioned()) {
+            if (unit.CanBePoisioned()) {
               units.Add(unit);
             }
           }

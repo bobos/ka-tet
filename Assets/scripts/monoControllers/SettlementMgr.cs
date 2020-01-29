@@ -45,11 +45,6 @@ namespace MonoNS
       campableTiles = tiles;
     }
 
-    public bool IsCampable(Tile tile) {
-      if (campableTiles == null) return false;
-      return campableTiles.Contains(tile);
-    } 
-
     // TODO: just for tmp test
     public void BuildRoad(Tile from, Tile to) {
       List<Tile> path = new List<Tile>(); 
@@ -411,7 +406,7 @@ namespace MonoNS
 
     int GetGhostUnitRangeForSettlementSupply()
     {
-      return (int)(ghostUnit.GetFullMovement() * 2);
+      return (int)(ghostUnit.GetFullMovement());
     }
 
     void SetGhostOwner(Settlement settlement) {
