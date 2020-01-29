@@ -608,8 +608,8 @@ namespace MonoNS
           return;
         }
         string needed = "" + (transferedUnit != null ? transferedUnit.supply.SupplyNeededPerTurn()
-          : transferedSettlement.MinSupplyNeeded());
-        int minNeeded = transferedUnit != null ? transferedUnit.supply.MinSupplyNeeded() : transferedSettlement.MinSupplyNeeded(); 
+          : transferedSettlement.SupplyNeeded());
+        int minNeeded = transferedUnit != null ? transferedUnit.supply.MinSupplyNeeded() : transferedSettlement.SupplyNeeded(); 
         string suggestions = "needed " + needed + " supply for last one turn, at least " + minNeeded + " supply to support one turn\n";
         if (transferedSettlement != null) {
           foreach(Settlement.SupplySuggestion sug in transferedSettlement.GetSuggestion()) {
@@ -631,8 +631,8 @@ namespace MonoNS
           return;
         }
         string suggestions = "";
-        if (transferedSettlement.MinSupplyNeeded() > 0) {
-          suggestions += "need " + transferedSettlement.MinSupplyNeeded() + " to support garrison\n";
+        if (transferedSettlement.SupplyNeeded() > 0) {
+          suggestions += "need " + transferedSettlement.SupplyNeeded() + " to support garrison\n";
         }
         foreach(Settlement.SupplySuggestion sug in transferedSettlement.GetSuggestion()) {
           suggestions += "to support " + sug.supportTroop + " infantry per turn, need labor "
