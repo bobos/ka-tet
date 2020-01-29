@@ -2,8 +2,8 @@
 {
   public class Supply
   {
-    public const float Starving2DeathRate = 0.01f;
-    public const float Starving2EscapeRate = 0.02f;
+    public const float Starving2DeathRate = 0.0025f;
+    public const float Starving2EscapeRate = 0.003f;
     public bool consumed = false;
     public bool isStarving = false;
     Unit unit;
@@ -79,7 +79,7 @@
       int neededHalf = MinSupplyNeeded();
       if (supply < neededHalf) {
         supply = 0;
-        int moraleReduce = -8;
+        int moraleReduce = -5;
         unit.rf.morale += moraleReduce;
         int miaNum = GetStarvingDessertNum();
         unit.mia += miaNum;

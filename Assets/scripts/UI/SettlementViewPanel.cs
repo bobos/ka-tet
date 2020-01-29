@@ -77,7 +77,7 @@ namespace MonoNS
       Unit[] garrison = s.garrison.ToArray();
       title.text = s.name + "[驻扎部队: " + garrison.Length + "/" + s.room + "]";
       population.text = "人口: 平民" + (s.civillian_male + s.civillian_child + s.civillian_female) + " 兵役" + s.labor;
-      supply.text = "粮草每回合消耗" + s.MinSupplyNeeded() + "石";
+      supply.text = "粮草每回合消耗" + s.SupplyNeeded() + "石";
       garrison1.text = "";
       garrison2.text = "";
       if (garrison.Length > 0)

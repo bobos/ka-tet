@@ -4,8 +4,8 @@ namespace UnitNS
 {
   public class ArmyEpidemic
   {
-    public const float DisableRate = 0.01f;
-    public const float KillRate = 0.005f;
+    public const float DisableRate = 0.005f;
+    public const float KillRate = 0.0025f;
     int __lastTurns = 0;
     public int lastTurns
     {

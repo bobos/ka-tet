@@ -2,8 +2,8 @@
 {
   public class UnitPoisioned
   {
-    public const float DisableRate = 0.01f;
-    public const float KillRate = 0.005f;
+    public const float DisableRate = 0.0025f;
+    public const float KillRate = 0.001f;
     int __lastTurns = 0;
     public int lastTurns
     {
@@ -42,7 +42,7 @@
       if (IsValid())
       {
         lastTurns--;
-        int morale = -1;
+        int morale = -2;
         unit.rf.morale += morale;
         effects[0] = morale;
 

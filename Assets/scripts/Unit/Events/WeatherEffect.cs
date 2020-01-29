@@ -4,8 +4,8 @@
   {
     public const float SnowKillRate = 0.0025f;
     public const float SnowDisableRate = 0.005f;
-    public const float BlizardKillRate = 0.0125f;
-    public const float BlizardDisableRate = 0.025f;
+    public const float BlizardKillRate = 0.005f;
+    public const float BlizardDisableRate = 0.01f;
     Unit unit;
     public WeatherEffect(Unit unit) {
       this.unit = unit;

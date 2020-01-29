@@ -110,31 +110,7 @@ namespace MonoNS
           }
         }
       }
-
-      List<Settlement> roots = warParty.attackside ? attackerRoots : defenderRoots;
-      HashSet<Unit> units = warParty.GetUnits();
-      foreach (Settlement root in roots)
-      {
-        if (root.state != Settlement.State.constructing) {
-          SettlementView view = GetView(root);
-          List<List<Unit>> failedUnits = root.ReduceSupply();
-          foreach(Unit u in failedUnits[0]) {
-            popAniController.Show(view, 
-              System.String.Format(textLib.get("pop_failedToSupplyUnitInSettlement"), u.GeneralName()),
-              Color.yellow);
-            while (popAniController.Animating) { yield return null; }
-          }
-
-          foreach(Unit u in failedUnits[1]) {
-            popAniController.Show(hexMap.GetUnitView(u), 
-              textLib.get("pop_failedToSupplyUnitNearby"),
-              Color.yellow);
-            while (popAniController.Animating) { yield return null; }
-          }
-        }
-        root.availableLabor = root.labor;
-      }
-
+      
       List<DistJob> jobs = warParty.attackside ? attackerDistJobs : defenderDistJobs;
       foreach(DistJob job in jobs) {
         if (!job.from.IsFunctional() || !job.to.IsFunctional()) {
@@ -153,7 +129,7 @@ namespace MonoNS
           continue;
         }
         Tile[] route = job.from.baseTile.roads[job.to.baseTile];
-        Unit ambusher = IsSupplyRouteAmbushed(route, units.First().IsAI());
+        Unit ambusher = IsSupplyRouteAmbushed(route, warParty.isAI);
         if (ambusher != null) {
           // There is enemy unit ambushed on the supply route
           if (job.type == QueueJobType.DistSupply) {
@@ -177,6 +153,30 @@ namespace MonoNS
         attackerDistJobs = new List<DistJob>();
       } else {
         defenderDistJobs = new List<DistJob>();
+      }
+
+      List<Settlement> roots = warParty.attackside ? attackerRoots : defenderRoots;
+      HashSet<Unit> units = warParty.GetUnits();
+      foreach (Settlement root in roots)
+      {
+        if (root.state != Settlement.State.constructing) {
+          SettlementView view = GetView(root);
+          List<List<Unit>> failedUnits = root.ReduceSupply();
+          foreach(Unit u in failedUnits[0]) {
+            popAniController.Show(view, 
+              System.String.Format(textLib.get("pop_failedToSupplyUnitInSettlement"), u.GeneralName()),
+              Color.yellow);
+            while (popAniController.Animating) { yield return null; }
+          }
+
+          foreach(Unit u in failedUnits[1]) {
+            popAniController.Show(hexMap.GetUnitView(u), 
+              textLib.get("pop_failedToSupplyUnitNearby"),
+              Color.yellow);
+            while (popAniController.Animating) { yield return null; }
+          }
+        }
+        root.availableLabor = root.labor;
       }
 
       turnEndOngoing = false;

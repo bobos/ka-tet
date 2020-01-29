@@ -2,7 +2,7 @@
 {
   public class WarWeary
   {
-    public const float DesertRate = 0.01f;
+    public const float DesertRate = 0.005f;
     Unit unit;
     public WarWeary(Unit unit) {
       this.unit = unit;

@@ -242,10 +242,10 @@ public abstract class Settlement: DataModel
     return state == State.normal;
   }
 
-  public int MinSupplyNeeded() {
+  public int SupplyNeeded() {
     int supplyNeeded = 0;
     foreach (Unit unit in garrison) {
-      supplyNeeded += unit.supply.MinSupplyNeeded();
+      supplyNeeded += unit.supply.SupplyNeededPerTurn();
     }
     return supplyNeeded;
   }
@@ -334,7 +334,7 @@ public abstract class Settlement: DataModel
     adjustedLabor = CalcNeededLabor(adjustedAmount);
     availableLabor -= adjustedLabor;
 
-    int killedLaborEscort = (int)(Util.Rand(0.008f, 0.04f) * adjustedLabor);
+    int killedLaborEscort = (int)(Util.Rand(0.008f, 0.01f) * adjustedLabor);
     labor -= killedLaborEscort;
     supplyDeposit -= adjustedAmount;
     int needed = enemy.supply.GetNeededSupply();
@@ -359,7 +359,7 @@ public abstract class Settlement: DataModel
     }
     int adjustedLabor = availableLabor > amount ? amount : availableLabor;
     availableLabor -= adjustedLabor;
-    int killedLabor = (int)(Util.Rand(0.008f, 0.04f) * adjustedLabor);
+    int killedLabor = (int)(Util.Rand(0.008f, 0.01f) * adjustedLabor);
     labor -= killedLabor;
     if (to.owner.attackside) {
       settlementMgr.attackerLaborDead += killedLabor;
@@ -442,11 +442,11 @@ public abstract class Settlement: DataModel
   }
 
   public int CalcNeededLabor(int supply) {
-    return supply;
+    return (int)(supply / 10);
   }
 
   public int CalcSupplyCanProvide(int labor) {
-    return labor;
+    return labor * 10;
   }
 
   public int MaxDistSupply() {

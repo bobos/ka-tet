@@ -297,29 +297,10 @@ namespace MonoNS
 
     IEnumerator Flood(Unit unit, Tile tile)
     {
-      if (unit.labor < MapTileNS.Flood.RequiredLabor) {
-        if (unit.IsShowingAnimation()) {
-          hexMap.popAniController.Show(hexMap.GetUnitView(unit),
-              System.String.Format(textLib.get("pop_insufficientLabor"),
-              MapTileNS.Flood.RequiredLabor), Color.yellow);
-          while (hexMap.popAniController.Animating) { yield return null; }
-        }
-      } else {
-        if (unit.movementRemaining < Unit.BasicMovementCost) {
-          if (unit.IsShowingAnimation()) {
-            hexMap.popAniController.Show(hexMap.GetUnitView(unit),
-                System.String.Format(textLib.get("pop_insufficientPoint"),
-                Unit.BasicMovementCost), Color.yellow);
-            while (hexMap.popAniController.Animating) { yield return null; }
-          }
-        } else {
-          unit.movementRemaining -= Unit.BasicMovementCost;
-          tileAniController.Flood(tile);
-          while (tileAniController.FloodAnimating)
-          {
-            yield return null;
-          }
-        }
+      tileAniController.Flood(tile);
+      while (tileAniController.FloodAnimating)
+      {
+        yield return null;
       }
       ActionOngoing = false;
     }
