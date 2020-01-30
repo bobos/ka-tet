@@ -300,7 +300,7 @@ namespace MapTileNS
       Unit u = GetUnit();
       if (u != null)
       {
-        if (mode != Mode.Supply) {
+        if (mode == Mode.Normal) {
           // normal path find and access range
           if (u.IsAI() == unit.IsAI()) {
             return Unit.MovementCostOnUnaccesible;
@@ -326,6 +326,22 @@ namespace MapTileNS
 
       if (vantagePoint) {
         ret = (int)(ret * 1.2f);
+      }
+
+      if (ret > 0 && mode == Mode.Normal && unit.type != Type.Scout) {
+        int cnt = 0;
+        foreach (Tile t in neighbours) {
+          Unit u1 = t.GetUnit();
+          Settlement s = t.settlement;
+          if (u1 != null && u1.IsAI() != unit.IsAI() && u1.type != Type.Scout) {
+            cnt++;
+          }
+
+          if (u1 == null && s != null && !s.IsEmpty() && s.owner.isAI != unit.IsAI()) {
+            cnt++;
+          }
+        }
+        ret = ret + ret * cnt * 2;
       }
 
       return ret > 0 ? ret : Unit.MovementCostOnUnaccesible;

@@ -67,6 +67,7 @@
       return needed < 0 ? 0 : needed;
     }
 
+    public bool halfFeed = false;
     public int[] Consume(bool alreadyDone = false)
     {
       int[] effects = new int[8]{0,0,0,0,0,0,0,0};
@@ -107,6 +108,7 @@
       }
 
       if (supply < needed) {
+        halfFeed = true;
         supply = 0;
       } else {
         supply -= needed;

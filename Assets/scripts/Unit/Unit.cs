@@ -305,8 +305,16 @@ namespace UnitNS
       return unitPoisioned.IsValid();
     }
 
+    public bool IsHungry() {
+      return IsStarving() || IsHalfStarving();
+    }
+
     public bool IsStarving() {
       return (supply != null && supply.isStarving) || false;
+    }
+
+    public bool IsHalfStarving() {
+      return supply != null && !supply.isStarving && supply.halfFeed;
     }
 
     public bool IsWarWeary() {
@@ -388,7 +396,7 @@ namespace UnitNS
         concealCoolDownTurn--;
       } else {
         if (Concealable() && state == State.Stand) {
-          if (!hexMap.IsInEnemyScoutRange(this.IsAI(), tile)) SetState(State.Conceal);
+          if (!hexMap.GetRangeForDiscoveryWarning(this.IsAI()).Contains(tile)) SetState(State.Conceal);
         }
       }
 
@@ -500,7 +508,7 @@ namespace UnitNS
       int point = (int)(
           rf.mov * GetMovementModifier() *
           (rf.morale >= Troop.MaxMorale ? 1.2f : 1f) *
-          (1f + (IsStarving() ? -0.45f : 0f)) * 
+          (1f + (IsHungry() ? -0.45f : 0f)) * 
           (IsSick() ? 0.7f : 1f));
       // ghost unit doesnt have vantage
       return vantage != null ? vantage.MovementPoint(point) : point;
@@ -508,7 +516,7 @@ namespace UnitNS
 
     public StaminaLvl GetStaminaLevel()
     {
-      if (IsStarving())
+      if (IsHungry())
       {
         return StaminaLvl.Exhausted;
       }
@@ -629,7 +637,7 @@ namespace UnitNS
 
     public float GetStarvingBuf()
     {
-      return IsStarving() ? -0.3f : 0f;
+      return IsHungry() ? -0.3f : 0f;
     }
 
     public float GetStaminaBuf()
@@ -727,7 +735,7 @@ namespace UnitNS
     bool AfterMoveUpdate(List<Unit> knownUnit) {
       bool continueMoving = true;
 
-      if (IsConcealed() && hexMap.IsInEnemyScoutRange(this.IsAI(), tile)) {
+      if (IsConcealed() && hexMap.GetRangeForDiscoveryCheck(this.IsAI()).Contains(tile)) {
         DiscoveredByEnemy();
         continueMoving = false;
       }

@@ -209,7 +209,7 @@ namespace MonoNS
       string stateStr = unit.tile.sieged ? "围城中" : ""; 
       stateStr += unit.IsWarWeary() ? " 士气低落" : "";
       stateStr += " " + unit.GetDiscontent();
-      stateStr += unit.IsStarving() ? " 饥饿" : "";
+      stateStr += unit.IsHungry() ? (unit.IsStarving() ? " 饥饿" : " 半饥饿") : "";
       stateStr += unit.GetStateName();
       int desserter = unit.IsStarving() ? unit.GetStarvingDessertNum() : 0;
       int killed = unit.IsStarving() ? unit.GetStarvingKillNum() : 0;

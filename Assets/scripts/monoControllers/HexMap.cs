@@ -185,19 +185,36 @@ namespace MonoNS
       GetWarParty(unit).UpdateWound(unit, num);
     }
 
-    public bool IsInEnemyScoutRange(bool isAI, Tile tile, bool ignoreConcealed = false) {
+    public HashSet<Tile> GetRangeForDiscoveryWarning(bool isAI) {
+      return GetEnemyRange(isAI, 0);
+    }
+
+    public HashSet<Tile> GetRangeForDiscoveryCheck(bool isAI) {
+      return GetEnemyRange(isAI, 1);
+    }
+
+    public HashSet<Tile> GetRangeForGuardCheck(bool isAI) {
+      return GetEnemyRange(isAI, 2);
+    }
+
+    HashSet<Tile> GetEnemyRange(bool isAI, int type) {
+      // type: 0 for discovery warning, 1 for discovery check, 2 for guarded tile check
       HashSet<Tile> enemyScoutArea = new HashSet<Tile>();
       WarParty party = isAI ? GetPlayerParty() : GetAIParty();
       foreach (Unit u in party.GetUnits())
       {
-        foreach(Tile t in u.GetScoutArea()) {
-          if (u.IsConcealed() && ignoreConcealed) {
+        if (type == 2 && u.type == Type.Scout) {
+          continue;
+        }
+
+        foreach(Tile t in (type == 0 || type == 1) ? u.GetScoutArea() : u.tile.neighbours) {
+          if (type == 0 && u.IsConcealed()) {
             continue;
           }
           enemyScoutArea.Add(t);
         }
       }
-      return enemyScoutArea.Contains(tile);
+      return enemyScoutArea;
     }
 
     public void CreateLine(Tile[] path)
@@ -473,14 +490,30 @@ namespace MonoNS
     public void HighlightArea(Tile[] tiles, RangeType type, Unit unit = null)
     {
       DehighlightArea();
+      HashSet<Tile> spotWarningRange = unit != null && unit.IsConcealed()
+        ? GetRangeForDiscoveryWarning(unit.IsAI()) : null;
+      HashSet<Tile> guardWarningRange = unit != null ? GetRangeForGuardCheck(unit.IsAI()) : null;
+      Tile[] visible = unit != null && unit.type != Type.Scout ? unit.GetVisibleArea() : null;
       foreach (Tile tile in tiles)
       {
         Material mat = null;
         if (type == RangeType.attack) mat = AttackRange;
         if (type == RangeType.movement) {
           mat = MovementRange;
-          if (unit != null && unit.IsConcealed() && IsInEnemyScoutRange(unit.IsAI(), tile, true)) {
+          if (unit != null && unit.IsConcealed() && spotWarningRange.Contains(tile)) {
             mat = WarningMat;
+          }
+          if (unit.type != Type.Scout && guardWarningRange.Contains(tile)) {
+            bool found = false;
+            foreach (Tile t in visible) {
+              if (Util.eq<Tile>(tile, t)) {
+                found = true;
+                break;
+              }
+            }
+            if (found) {
+              mat = CampRange;
+            }
           }
         }
         if (type == RangeType.camp) mat = CampRange;
