@@ -70,7 +70,8 @@
     public bool halfFeed = false;
     public int[] Consume(bool alreadyDone = false)
     {
-      int[] effects = new int[8]{0,0,0,0,0,0,0,0};
+      int[] effects = new int[9]{0,0,0,0,0,0,0,0,0};
+      halfFeed = false;
       if (alreadyDone) {
         consumed = true;
         return effects;
@@ -102,6 +103,7 @@
         effects[3] = deathNum;
         effects[4] = laborDead;
         effects[5] = miaNum;
+        effects[8] = Cons.EvenChance() ? 2 : 0;
         return effects;
       } else {
         consumed = true;
@@ -109,6 +111,7 @@
 
       if (supply < needed) {
         halfFeed = true;
+        effects[8] = Cons.EvenChance() ? 1 : 0;
         supply = 0;
       } else {
         supply -= needed;

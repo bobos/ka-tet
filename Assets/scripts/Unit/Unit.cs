@@ -39,6 +39,7 @@ namespace UnitNS
     public UnitPoisioned unitPoisioned;
     public Riot riot;
     public MarchOnHeat marchOnHeat;
+    public MarchOnExhaustion marchOnExhaustion;
     public FarmDestroy farmDestroy;
     public Supply supply;
     public WeatherEffect weatherEffect;
@@ -77,6 +78,7 @@ namespace UnitNS
       unitPoisioned = new UnitPoisioned(this);
       riot = new Riot(this);
       marchOnHeat = new MarchOnHeat(this);
+      marchOnExhaustion = new MarchOnExhaustion(this);
       supply = new Supply(this, initSupply);
       weatherEffect = new WeatherEffect(this);
       warWeary = new WarWeary(this);
@@ -469,7 +471,8 @@ namespace UnitNS
 
     public int[] TakeEffect(int reduceMorale, float movementDropRatio = 0f,
       float disableRatio = 0f, float killRatio = 0f) {
-      int[] reduced = new int[8]; // morale, movement, wounded, killed, laborKilled, disserter, attack, def
+      // morale, movement, wounded, killed, laborKilled, disserter, attack, def, discontent
+      int[] reduced = new int[]{0,0,0,0,0,0,0,0,0};
       rf.morale -= reduceMorale;
       reduced[0] = -reduceMorale;
       int moveReduce = (int)(movementRemaining * movementDropRatio);

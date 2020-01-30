@@ -38,7 +38,7 @@
     }
 
     public int[] Apply() {
-      int[] effects = new int[8]{0,0,0,0,0,0,0,0};
+      int[] effects = new int[9]{0,0,0,0,0,0,0,0,0};
       if (IsValid())
       {
         lastTurns--;

@@ -78,7 +78,9 @@ namespace MonoNS
 
       if (tile == null) {
         discontent = unit.marchOnHeat.Occur();
+        discontent += unit.marchOnExhaustion.Occur();
       }
+
       if (unit.IsShowingAnimation()) {
         hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(unit.tile).transform.position);
       }
@@ -312,7 +314,7 @@ namespace MonoNS
               null, defReduce));
             while (eventDialog.Animating) { yield return null; }
             unit.disarmorDefDebuf = defReduce; 
-            ShowEffects(unit, new int[8]{0,0,0,0,0,0,0,-defReduce});
+            ShowEffects(unit, new int[9]{0,0,0,0,0,0,0,-defReduce,0});
             while (ShowAnimating) { yield return null; }
           }
         }
@@ -451,6 +453,7 @@ namespace MonoNS
       int desserter = effects[5];
       int atk = effects[6];
       int def = effects[7];
+      int discontent = effects[8];
       if (morale != 0) {
         popAniController.Show(view,
           textLib.get("pop_morale") + (morale > 0 ? ("+" + morale) : ("" + morale)),
@@ -504,6 +507,13 @@ namespace MonoNS
         popAniController.Show(view,
           textLib.get("pop_def") + (def > 0 ? ("+" + def) : ("" + def)),
           def > 0 ? Color.green : Color.red);
+        while (popAniController.Animating) { yield return null; }
+      }
+
+      if (discontent != 0) {
+        popAniController.Show(view, 
+          System.String.Format(textLib.get("pop_discontent"), discontent),
+          Color.yellow);
         while (popAniController.Animating) { yield return null; }
       }
 

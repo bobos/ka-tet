@@ -12,7 +12,7 @@
     }
 
     public int[] Apply() {
-      int[] effects = new int[8]{0,0,0,0,0,0,0,0};
+      int[] effects = new int[9]{0,0,0,0,0,0,0,0,0};
       if (unit.type == Type.Scout) {
         return effects;
       }
@@ -20,11 +20,9 @@
       if (Cons.IsHeavyRain(unit.hexMap.weatherGenerator.currentWeather)) {
         int movement = (int)(unit.movementRemaining / (-2));
         unit.movementRemaining += movement;
-        effects[1] = movement;
       } else if (Cons.IsSnow(unit.hexMap.weatherGenerator.currentWeather)) {
         int movement = (int)(unit.movementRemaining / (-2));
         unit.movementRemaining += movement;
-        effects[1] = movement;
         if (unit.IsCamping()) return effects;
 
         int morale = -1;
@@ -53,7 +51,6 @@
       } else if (Cons.IsBlizard(unit.hexMap.weatherGenerator.currentWeather)) {
         int movement = (int)(unit.movementRemaining / (-4)) * 3;
         unit.movementRemaining += movement;
-        effects[1] = movement;
         if (unit.IsCamping()) return effects;
 
         int morale = -5;

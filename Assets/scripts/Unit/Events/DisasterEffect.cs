@@ -13,7 +13,7 @@ namespace UnitNS
         return unit.TakeEffect(8, 0.1f, 0.05f, 0.025f);
       }
 
-      return new int[]{0,0,0,0,0,0,0,0};
+      return new int[]{0,0,0,0,0,0,0,0,0};
     }
   }
 }

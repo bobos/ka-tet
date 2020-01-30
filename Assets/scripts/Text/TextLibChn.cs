@@ -220,6 +220,7 @@ namespace TextNS
       {"pop_failedToDistSupply", "无法转运粮草"},
       {"pop_failedToDistLabor", "无法转移民夫"},
       {"pop_starving", "部队饥饿!"},
+      {"pop_halfStarving", "部队半饥饿!"},
       {"pop_damBroken", "决堤!"},
       {"pop_morale", "士气"},
       {"pop_movement", "移动力"},

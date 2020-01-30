@@ -171,27 +171,33 @@ namespace MonoNS
       while (settlementMgr.turnEndOngoing) { yield return null; }
       foreach (Unit unit in otherP.GetUnits())
       {
-        int[] effects = new int[8]{0,0,0,0,0,0,0,0};
+        int[] effects = new int[9]{0,0,0,0,0,0,0,0,0};
         if (!unit.supply.consumed) {
           effects = unit.supply.Consume();
         }
-        if (!unit.supply.consumed) {
+        if (!unit.supply.consumed || unit.supply.halfFeed) {
           View view;
           if (unit.IsCamping()) {
             view = settlementMgr.GetView(unit.tile.settlement);
           } else {
             view = hexMap.GetUnitView(unit);
           }
-          hexMap.popAniController.Show(view, textLib.get("pop_starving"), Color.red);
+          hexMap.popAniController.Show(view,
+            textLib.get(unit.supply.halfFeed ? "pop_halfStarving" : "pop_starving"),
+            Color.red);
           while (hexMap.popAniController.Animating)
           {
             yield return null;
           }
+          int discontent = effects[8];
+          effects[8] = 0;
           unitAniController.ShowEffects(unit, effects);
           while (unitAniController.ShowAnimating) { yield return null; }
-          unitAniController.Riot(unit, 2);
+
+          unitAniController.Riot(unit, discontent);
           while (unitAniController.riotAnimating) { yield return null; }
         }
+        
         unitAniController.RefreshUnit(unit);
         while (unitAniController.RefreshAnimating) { yield return null; }
         hexMap.SetUnitSkin(unit);
