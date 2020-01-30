@@ -88,6 +88,7 @@ namespace MonoNS
       InsufficientSupplyLabor,
       Disarmor,
       Disarmor1,
+      UnitConflict,
       EmptySettlement,
       Riot,
       GeneralKilledInBattle,
@@ -142,6 +143,7 @@ namespace MonoNS
       Animating = true;
       EventName name = currentEvent = dialogEvent.name;
       Unit unit = currentUnit = dialogEvent.unit;
+      Unit unit1 = dialogEvent.unit1;
       Settlement settlement = currentSettlement = dialogEvent.settlement;
       Settlement settlement1 = dialogEvent.settlement1;
       int argu1 = dialogEvent.moraleReduce;
@@ -380,6 +382,13 @@ namespace MonoNS
         image.sprite = UnderSiege;
       }
 
+      if (name == EventName.UnitConflict) {
+        title.text = textLib.get("event_unitConflict_title");
+        description.text = System.String.Format(textLib.get("event_unitConflict"),
+          unit.rf.general.Name(), unit1.rf.general.Name(), argu1, argu2, argu3, argu4, argu5);
+        image.sprite = drown;
+      }
+
       if (name == EventName.EmptySettlement) {
         ToggleDecision();
         title.text = textLib.get("event_emptySettlement_title");
@@ -409,6 +418,7 @@ namespace MonoNS
   public class Event {
     public EventDialog.EventName name;
     public Unit unit = null;
+    public Unit unit1 = null;
     public Settlement settlement = null;
     public int moraleReduce = 0;
     public int wounded = 0;
@@ -419,7 +429,7 @@ namespace MonoNS
     public General general = null;
     public Event(EventDialog.EventName name, Unit unit, Settlement settlement,
       int moraleReduce = 0, int wounded = 0, int killed = 0, int killedLabor = 0, int supply = 0,
-      Settlement settlement1 = null, General general= null) {
+      Settlement settlement1 = null, General general= null, Unit unit1 = null) {
         this.name = name;
         this.unit = unit;
         this.settlement = settlement;
@@ -430,6 +440,7 @@ namespace MonoNS
         this.supply = supply;
         this.settlement1 = settlement1;
         this.general = general;
+        this.unit1 = unit1;
     }
   }
 }

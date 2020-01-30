@@ -319,6 +319,20 @@ namespace MonoNS
           }
         }
       }
+
+      ConflictResult conflict = unit.unitConflict.Occur();
+      if (conflict.discontent != 0) {
+        // unit conflict happens
+        eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.UnitConflict, unit,
+          null, conflict.discontent, conflict.unit1Wound, conflict.unit1Dead,
+          conflict.unit2Wound, conflict.unit2Dead, null, null, conflict.unit2));
+        while (eventDialog.Animating) { yield return null; }
+
+        Riot(unit, conflict.discontent);
+        while (riotAnimating) { yield return null; }
+        Riot(conflict.unit2, conflict.discontent);
+        while (riotAnimating) { yield return null; }
+      }
       hexMap.cameraKeyboardController.EnableCamera();
       RefreshAnimating = false;
     }

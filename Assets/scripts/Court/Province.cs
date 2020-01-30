@@ -13,6 +13,8 @@ namespace CourtNS
 
     protected Dictionary<string, int> CavNameSeq;
     protected Dictionary<string, int> InfNameSeq;
+    public Faction ownerFaction;
+    public Party ownerParty;
 
     protected Province (Region region) {
       this.region = region;

@@ -43,6 +43,7 @@ namespace UnitNS
     public FarmDestroy farmDestroy;
     public Supply supply;
     public WeatherEffect weatherEffect;
+    public UnitConflict unitConflict;
     public WarWeary warWeary;
     public Vantage vantage;
     WeatherGenerator weatherGenerator;
@@ -81,6 +82,7 @@ namespace UnitNS
       marchOnExhaustion = new MarchOnExhaustion(this);
       supply = new Supply(this, initSupply);
       weatherEffect = new WeatherEffect(this);
+      unitConflict = new UnitConflict(this);
       warWeary = new WarWeary(this);
       vantage = new Vantage(this);
       farmDestroy = new FarmDestroy(this);

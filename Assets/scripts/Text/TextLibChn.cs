@@ -122,8 +122,12 @@ namespace TextNS
       {"f_hejian", "河间"},
 
       // party
-      {"p_eagleParty", "猪党"},
-      {"p_pigeonParty", "狗党"},
+      {"p_eagleParty", "东林党"},
+      {"p_pigeonParty", "内戚党"},
+      {"p_yanParty", "阉党"},
+      {"party_relationNormal", "缓和"},
+      {"party_relationTense", "紧张"},
+      {"party_relationXtense", "一触即发"},
 
       // generals
       {"g_liubei", "李存勖"},
@@ -211,6 +215,8 @@ namespace TextNS
       {"event_emptySettlement_burndown_title", "焚毁"},
       {"event_underSiege_title", "长围合拢"},
       {"event_underSiege", @"围城军队连日所筑长围现已合拢，{0}已经被完全包围，任何物资人员已无法出入"},
+      {"event_unitConflict_title", "士卒斗殴"},
+      {"event_unitConflict", @"由于朝中两派关系紧张, {0}所部与临近驻扎的{1}部发生冲突，{0}所部有{3}人受伤{4}人伤重不治，{1}所部则是{5}人受伤{6}人死亡，两部士兵不满+{2}"},
 
       // pop out msg
       {"pop_discontent", @"不满+{0}"},

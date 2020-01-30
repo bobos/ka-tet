@@ -1,7 +1,6 @@
 ﻿using NatureNS;
 using TextNS;
 using CourtNS;
-using System;
 
 public class Cons {
   
@@ -162,17 +161,17 @@ public class Cons {
     Cons.lowLand.UncomfortableRegions.Add(upLand);
   }
 
+  //* parties */
+  //* HeJian */
+  public static Party Pigeon = new Party("p_pigeonParty", "p_pigeonParty_d");
+  public static Party Eagle = new Party("p_eagleParty", "p_eagleParty_d");
+
+  //* Liang */
+  public static Party Tiger = new Party("p_yanParty", "p_yanParty_d");
+
   //* factions */
-  public static Faction Jin = new Jin(true, 2000000);
   public static Faction Liang = new Liang(true, 5000000);
   public static Faction HeJian = new HeJian(false, 100000);
   public static Faction GF = new Ghost();
 
-  //* parties */
-  //* HeJian */
-  public static Party Pigeon = new Party(HeJian, "p_pigeonParty", "p_pigeonParty_d");
-  public static Party Eagle = new Party(HeJian, "p_eagleParty", "p_eagleParty_d");
-
-  //* Liang */
-  public static Party Tiger = new Party(Liang, "p_yanParty", "p_yanParty_d");
 }

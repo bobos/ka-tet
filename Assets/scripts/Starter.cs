@@ -13,6 +13,8 @@ public class Starter : MonoBehaviour {
     // HexMap must be the first controller to initiate
     HexMap hexMap = GameObject.FindObjectOfType<HexMap>();
     Cons.InitRegion();
+    Cons.huaiWest.ownerFaction = Cons.HeJian;
+    Cons.huaiWest.ownerParty = Cons.Pigeon;
     // Set War Province
     hexMap.warProvince = Cons.huaiWest;
 
@@ -119,7 +121,7 @@ public class Starter : MonoBehaviour {
     General zhaoyun = new General("g_zhaoyun", "g_zhaoyun_d", Cons.riverRun, new Traits[0]); 
     General machao = new General("g_machao", "g_machao_d", Cons.riverRun, new Traits[0]); 
     liubei.JoinFaction(Cons.HeJian, Cons.Pigeon);
-    guanyu.JoinFaction(Cons.HeJian, Cons.Pigeon);
+    guanyu.JoinFaction(Cons.HeJian, Cons.Eagle);
     zhangfei.JoinFaction(Cons.HeJian, Cons.Pigeon);
     zhaoyun.JoinFaction(Cons.HeJian, Cons.Eagle);
     machao.JoinFaction(Cons.HeJian, Cons.Eagle);

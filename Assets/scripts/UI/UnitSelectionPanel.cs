@@ -275,6 +275,8 @@ namespace MonoNS
            " 女: " + hexMap.settlementMgr.totalFemaleDead +
            " 幼: " + hexMap.settlementMgr.totalChildDead + "\n";
         }
+
+        info += "党派关系： " + wp.faction.GetParties()[0].GetRelationDescription();
         hexMap.hoverInfo.Show(info);
         return;
       }

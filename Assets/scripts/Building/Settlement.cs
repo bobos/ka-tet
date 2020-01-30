@@ -288,7 +288,7 @@ public abstract class Settlement: DataModel
   int[] InterceptResult(Unit enemy) {
     int[] result = new int[]{0, 0, 0};
     // TODO: general trait gaining
-    if (enemy.rf.soldiers >= Util.Rand(Scout.MinTroopNum, Scout.MaxTroopNum + 2) &&
+    if (enemy.rf.soldiers >= Util.Rand(Unit.DisbandUnitUnder, Scout.MaxTroopNum + 2) &&
         enemy.rf.morale >= Util.Rand(45, 65)) {
       result[0] = 1;
       if (Cons.FairChance()) {

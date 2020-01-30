@@ -39,9 +39,7 @@ namespace CourtNS {
 
     public abstract string Name();
     public abstract string Description();
-    public virtual Party[] GetParties() {
-      return new Party[0];
-    }
+    public abstract Party[] GetParties();
 
     public bool IsAI() {
       return isAI;
@@ -123,17 +121,6 @@ namespace CourtNS {
     }
   }
 
-  public class Jin: _Faction {
-		public Jin(bool isAI, int population):base (isAI, population) {}
-    public override string Name() {
-      return txtLib.get("f_jin");
-    }
-
-    public override string Description() {
-      return txtLib.get("f_jin_d");
-    }
-  }
-
   public class Ghost: _Faction {
 		public Ghost():base (true, 1000000) {}
 
@@ -148,54 +135,9 @@ namespace CourtNS {
     public override void SetAs(bool AI) {
       isAI = AI;
     }
-  }
 
-	//神策军 昭义军 龙骧军 天武军 河间府 黑云都 效节军 剑南军
-	public class ShenCe: _Faction {
-		public ShenCe(bool isAI, int population):base (isAI, population) {}
-
-    public override string Name() {
-      return txtLib.get("f_shence");
-    }
-
-    public override string Description() {
-      return txtLib.get("f_shence_d");
-    }
-  }
-
-	public class ZhaoYi: _Faction {
-		public ZhaoYi(bool isAI, int population):base (isAI, population) {}
-
-    public override string Name() {
-      return txtLib.get("f_zhaoyi");
-    }
-
-    public override string Description() {
-      return txtLib.get("f_zhaoyi_d");
-    }
-  }
-
-	public class LongXiang: _Faction {
-		public LongXiang(bool isAI, int population):base (isAI, population) {}
-
-    public override string Name() {
-      return txtLib.get("f_longxiang");
-    }
-
-    public override string Description() {
-      return txtLib.get("f_longxiang_d");
-    }
-  }
-
-	public class TianWu: _Faction {
-		public TianWu(bool isAI, int population):base (isAI, population) {}
-
-    public override string Name() {
-      return txtLib.get("f_tianwu");
-    }
-
-    public override string Description() {
-      return txtLib.get("f_tianwu_d");
+    public override Party[] GetParties() {
+      return new Party[]{};
     }
   }
 
@@ -216,39 +158,4 @@ namespace CourtNS {
     }
   }
 
-	public class HeiYun: _Faction {
-		public HeiYun(bool isAI, int population):base (isAI, population) {}
-
-    public override string Name() {
-      return txtLib.get("f_heiyun");
-    }
-
-    public override string Description() {
-      return txtLib.get("f_heyun_d");
-    }
-  }
-
-	public class XiaoJie: _Faction {
-		public XiaoJie(bool isAI, int population):base (isAI, population) {}
-
-    public override string Name() {
-      return txtLib.get("f_xiaojie");
-    }
-
-    public override string Description() {
-      return txtLib.get("f_xiaojie_d");
-    }
-  }
-
-	public class JianNan: _Faction {
-		public JianNan(bool isAI, int population):base (isAI, population) {}
-
-    public override string Name() {
-      return txtLib.get("f_jiannan");
-    }
-
-    public override string Description() {
-      return txtLib.get("f_jiannan_d");
-    }
-  }
 }

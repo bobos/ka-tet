@@ -29,7 +29,8 @@ namespace MonoNS
       indicator.text += "风向: " + Cons.DirectionDisplay(windGenerator.direction) + "\n";
       indicator.text += "明日: " + windGenerator.ForecastWind().Name() + "\n";
       indicator.text += "明日风向: " + Cons.DirectionDisplay(windGenerator.ForecastDirection()) + "\n";
-      indicator.text += hexMap.warProvince.Name();
+      indicator.text += hexMap.warProvince.Name() + "[" + hexMap.warProvince.ownerFaction.Name()
+        + " " + hexMap.warProvince.ownerParty.Name() + "]";
     }
 
     public override void UpdateChild() {}
