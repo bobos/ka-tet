@@ -36,6 +36,11 @@ namespace CourtNS
       seq[pickedName] = seq[pickedName] + 1;
       return Name() + textLib.get(pickedName) + textLib.get("l_" + seq[pickedName]) + textLib.get("l_legion");
     }
+
+    public void DeductOneAgriculturePoint() {
+      // TODO: update this
+    }
+
   }
 
   // HeZhong

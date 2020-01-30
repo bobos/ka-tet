@@ -205,10 +205,8 @@ namespace TextNS
       {"event_epidemic", @"{0}所部{1}因久驻因暴雨过后而蚊虫滋生的密林，大量士卒染上痢疾"},
       {"event_poision_title", "遭人投毒"},
       {"event_poision", @"{0}所部{1}因饮用了上游遭歹人投毒的河水，大量士卒染病"},
-      {"event_farmDestroyed_title", "毁坏百姓稻田"},
-      {"event_farmDestroyed", @"因所部士兵行军中毁伤了附近百姓稻田，{0}将军已对犯事兵士进行了责罚，军中颇为不满，部队不满+{1}"},
-      {"event_farmDestroyedReported_title", "参本!"},
-      {"event_farmDestroyedReported", @"御史接到参本，所述近日{0}将军纵容所部兵士毁伤百姓稻田且殴伤抗议百姓并且企图掩盖恶行，但终为同僚所发，朝中纷纷，你不得不勒令犯事将领回朝问罪，以平息事端，{1}朝廷影响力-{2}!"},
+      {"event_farmDestroyed_title", "参本!"},
+      {"event_farmDestroyed", @"御史接来自战区参本, 所述近日{0}将军所部士兵行军中毁坏了大量百姓稻田，朝中甚为不满，{1}朝中影响力下降{2}点，士卒亦颇多怨言"},
       {"event_emptySettlement_title", "无人守备"},
       {"event_emptySettlement", @"{0}并无敌军守备，占领还是焚毁?"},
       {"event_emptySettlement_occupy_title", "占领"},
@@ -255,6 +253,7 @@ namespace TextNS
       {"pop_insufficientLabor", @"需要{0}民夫"},
       {"pop_insufficientPoint", @"需要{0}体力"},
       {"pop_sieged", "围困工事已修筑"},
+      {"pop_farmDestroyed", "农田被毁"},
 
       // settlement
       {"settlement_storageLvl1", "初级粮仓"},

@@ -99,20 +99,24 @@ namespace MonoNS
         popAniController.Show(view, textLib.get("pop_discovered"), Color.yellow);
         while(popAniController.Animating) { yield return null; }
       }
-      int ret = unit.farmDestroy.Occur();
-      if (ret != -1) {
-        // occured
-        if (ret == 0) {
-          // stash event
-          hexMap.eventStasher.Add(unit.rf.general, MonoNS.EventDialog.EventName.FarmDestroyed);
-        } else {
-          eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.FarmDestroyed, unit,
-            null, ret));
-          while (eventDialog.Animating) { yield return null; }
-          Riot(unit, ret);
-          while (riotAnimating) { yield return null; }
+      FarmDestryResult ret = unit.farmDestroy.Occur();
+      if (ret.destroyed) {
+        if (unit.IsShowingAnimation()) {
+          popAniController.Show(view, textLib.get("pop_farmDestroyed"), Color.yellow);
+          while(popAniController.Animating) { yield return null; }
         }
+        unit.tile.SetFieldType(FieldType.Wild);
       }
+      if (ret.discontent != 0) {
+        eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.FarmDestroyed, unit,
+          null, ret.influence));
+        while (eventDialog.Animating) { yield return null; }
+        Riot(unit, ret.discontent);
+        while (riotAnimating) { yield return null; }
+      }
+      // stash event
+      // hexMap.eventStasher.Add(unit.rf.general, MonoNS.EventDialog.EventName.FarmDestroyed);
+
       hexMap.cameraKeyboardController.EnableCamera();
       // after each step, recalculate fog
       FoW.Get().Fog();

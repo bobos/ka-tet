@@ -357,8 +357,8 @@ namespace MonoNS
       if (name == EventName.FarmDestroyed) {
         title.text = textLib.get("event_farmDestroyed_title");
         description.text = System.String.Format(textLib.get("event_farmDestroyed"),
-          unit.GeneralName(), argu1);
-        image.sprite = Decision;
+          unit.GeneralName(), unit.rf.general.party.Name(), argu1);
+        image.sprite = GeneralSwapped;
       }
 
       if (name == EventName.Disarmor) {
