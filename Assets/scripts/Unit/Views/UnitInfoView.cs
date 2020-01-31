@@ -11,7 +11,7 @@ namespace UnitNS
   
     public void SetName(Troop troop) {
       TextMesh textMesh = this.transform.GetComponent<TextMesh>();
-      textMesh.text = troop.rank.Name() + "[" + troop.soldiers + "]";
+      textMesh.text = troop.province.Name() + "-" + troop.rank.Name() + "[" + troop.soldiers + "]";
       textMesh.fontSize = 60;
       textMesh.color = Color.white;
       if (troop.rank.Level() == 2) {

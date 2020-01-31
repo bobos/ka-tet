@@ -36,6 +36,7 @@ namespace UnitNS
     public bool clone = false;
     public ArmorRemEvent armorRemEvent;
     public ArmyEpidemic epidemic;
+    public AltitudeSickness altitudeSickness;
     public UnitPoisioned unitPoisioned;
     public Riot riot;
     public MarchOnHeat marchOnHeat;
@@ -44,6 +45,7 @@ namespace UnitNS
     public Supply supply;
     public WeatherEffect weatherEffect;
     public UnitConflict unitConflict;
+    public PlainSickness plainSickness;
     public WarWeary warWeary;
     public Vantage vantage;
     WeatherGenerator weatherGenerator;
@@ -75,6 +77,7 @@ namespace UnitNS
 
     public void Init() {
       epidemic = new ArmyEpidemic(this);
+      altitudeSickness = new AltitudeSickness(this);
       armorRemEvent = new ArmorRemEvent(this);
       unitPoisioned = new UnitPoisioned(this);
       riot = new Riot(this);
@@ -83,6 +86,7 @@ namespace UnitNS
       supply = new Supply(this, initSupply);
       weatherEffect = new WeatherEffect(this);
       unitConflict = new UnitConflict(this);
+      plainSickness = new PlainSickness(this);
       warWeary = new WarWeary(this);
       vantage = new Vantage(this);
       farmDestroy = new FarmDestroy(this);
@@ -90,7 +94,7 @@ namespace UnitNS
 
     public void CloneInit(int disarmorDefDebuf, float newGeneralDebuf,
     ArmyEpidemic epidemic, UnitPoisioned poisioned, Supply supply, WeatherEffect weatherEffect,
-    Vantage vantage) {
+    Vantage vantage, PlainSickness plainSickness) {
       this.disarmorDefDebuf = disarmorDefDebuf;
       this.newGeneralDebuf = newGeneralDebuf;
       this.epidemic = epidemic;
@@ -98,6 +102,7 @@ namespace UnitNS
       this.weatherEffect = weatherEffect;
       this.vantage = vantage;
       this.supply = supply;
+      this.plainSickness = plainSickness;
     }
 
     public void SpawnOnMap() {
@@ -249,6 +254,11 @@ namespace UnitNS
       return epidemic.GetIllTurns();
     }
 
+    public int GetAltitudeSickTurns()
+    {
+      return altitudeSickness.lastTurns;
+    }
+
     public int GetHeatSickEffectNum()
     {
       return epidemic.GetEffectNum();
@@ -337,6 +347,10 @@ namespace UnitNS
       return _IsVisible(this.state);
     }
 
+    public bool IsHillLander() {
+      return Util.eq<Region>(rf.province.region, Cons.hillLand);
+    }
+
     bool _IsVisible(State state) {
       foreach (State s in visibleStates)
       {
@@ -408,6 +422,9 @@ namespace UnitNS
       turnDone = false;
       movementRemaining = GetFullMovement();
       int[] ret = weatherEffect.Apply();
+      if (altitudeSickness.lastTurns > 0) {
+        movementRemaining = 0;
+      }
       return ret;
     }
 
@@ -513,7 +530,8 @@ namespace UnitNS
       int point = (int)(
           rf.mov * GetMovementModifier() *
           (rf.morale >= Troop.MaxMorale ? 1.2f : 1f) *
-          (1f + (IsHungry() ? -0.45f : 0f)) * 
+          (1f + (IsHungry() ? -0.45f : 0f)) *
+          (1f + (plainSickness != null && plainSickness.affected ? -(plainSickness.moveDebuf) : 0f)) *
           (IsSick() ? 0.7f : 1f));
       // ghost unit doesnt have vantage
       return vantage != null ? vantage.MovementPoint(point) : point;
@@ -529,11 +547,11 @@ namespace UnitNS
       {
         return StaminaLvl.Vigorous;
       }
-      if (movementRemaining > 30)
+      if (movementRemaining >= (int)(GetFullMovement()/2))
       {
         return StaminaLvl.Fresh;
       }
-      if (movementRemaining > ((this.type == Type.Infantry) ? Infantry.ExhaustLine : Cavalry.ExhaustLine))
+      if (movementRemaining >= (int)(GetFullMovement()/5))
       {
         return StaminaLvl.Tired;
       }
@@ -603,7 +621,7 @@ namespace UnitNS
       get
       {
         int attack = (int)(rf.atk + (rf.atk * 
-        (GetBuff() + vantage.AtkBuf() + weatherEffect.AtkBuf())
+        (GetBuff() + vantage.AtkBuf() + weatherEffect.AtkBuf() - plainSickness.atkDebuf)
         ));
         return attack <= 0 ? 1 : attack;
       }

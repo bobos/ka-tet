@@ -139,17 +139,17 @@ public class Starter : MonoBehaviour {
       new Troop(250, Cons.HeJian, Cons.riverRun, Type.Scout, Cons.norank)
     );
     guanyu.Assign(hexMap,
-      new Troop(15000, Cons.HeJian, Cons.riverRun, Type.Infantry, Cons.rookie)
+      new Troop(15000, Cons.HeJian, Cons.middleEarth, Type.Infantry, Cons.rookie)
     );
     zhangfei.Assign(hexMap,
-      new Troop(1500, Cons.HeJian, Cons.middleEarth, Type.Cavalry, Cons.rookie)
+      new Troop(1500, Cons.HeJian, Cons.riverWest, Type.Cavalry, Cons.rookie)
     );
 
     caocao.Assign(hexMap,
       new Troop(7000, Cons.Liang, Cons.riverNorth, Type.Infantry, Cons.elite)
     );
     xuchu.Assign(hexMap,
-      new Troop(3000, Cons.Liang, Cons.riverNorth, Type.Cavalry, Cons.elite)
+      new Troop(3000, Cons.Liang, Cons.farWest, Type.Cavalry, Cons.elite)
     );
 
     // step 4, on field assignment

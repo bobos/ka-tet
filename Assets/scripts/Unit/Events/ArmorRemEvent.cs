@@ -9,7 +9,7 @@
     }
 
     public int Occur() {
-      if (unit.type != Type.Scout && !unit.IsAI() && !fired
+      if (unit.type != Type.Scout && !unit.IsAI() && !unit.IsHillLander() && !fired
         && !unit.tile.waterBound && unit.IsOnField() && Cons.TinyChance()) {
         // TODO apply general trait
         fired = true;

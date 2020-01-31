@@ -8,7 +8,7 @@
     }
 
     public int Occur() {
-      if (unit.type == Type.Scout
+      if (unit.type == Type.Scout || unit.IsHillLander()
       || Cons.IsWind(unit.hexMap.windGenerator.current) || Cons.IsGale(unit.hexMap.windGenerator.current)
       ||!Cons.IsHeat(unit.hexMap.weatherGenerator.currentWeather)
       || unit.tile.waterBound || unit.IsCamping()) {

@@ -89,6 +89,8 @@ namespace MonoNS
       Disarmor,
       Disarmor1,
       UnitConflict,
+      AltitudeSickness,
+      PlainSickness,
       EmptySettlement,
       Riot,
       GeneralKilledInBattle,
@@ -387,6 +389,20 @@ namespace MonoNS
         description.text = System.String.Format(textLib.get("event_unitConflict"),
           unit.rf.general.Name(), unit1.rf.general.Name(), argu1, argu2, argu3, argu4, argu5);
         image.sprite = drown;
+      }
+
+      if (name == EventName.AltitudeSickness) {
+        title.text = textLib.get("event_altitudeSickness_title");
+        description.text = System.String.Format(textLib.get("event_altitudeSickness"),
+          unit.rf.general.Name());
+        image.sprite = Retreat;
+      }
+
+      if (name == EventName.PlainSickness) {
+        title.text = textLib.get("event_plainSickness_title");
+        description.text = System.String.Format(textLib.get("event_plainSickness"),
+          unit.rf.general.Name());
+        image.sprite = Retreat;
       }
 
       if (name == EventName.EmptySettlement) {

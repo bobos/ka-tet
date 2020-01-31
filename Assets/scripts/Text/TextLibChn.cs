@@ -86,7 +86,7 @@ namespace TextNS
       {"rank_scout", "斥候"},
 
       // region
-      {"r_riverRun", "河中"},
+      {"r_riverRun", "河间"},
       {"r_riverSouth", "河南"},
       {"r_riverNorth", "河北"},
       {"r_riverEast", "河东"},
@@ -108,8 +108,12 @@ namespace TextNS
 
 		  {"l_longwei", "龙威"},
       {"l_longshen", "龙武"},
+		  {"l_longwei1", "神武"},
+      {"l_longshen1", "殿前"},
       {"l_huben", "虎贲"},
       {"l_qingshen", "擒生"},
+      {"l_huben1", "铁林"},
+      {"l_qingshen1", "浮屠"},
 		  {"l_longwei5", "神龙"},
       {"l_longshen5", "龙神"},
 		  {"l_longwei6", "虎威"},
@@ -215,6 +219,10 @@ namespace TextNS
       {"event_underSiege", @"围城军队连日所筑长围现已合拢，{0}已经被完全包围，任何物资人员已无法出入"},
       {"event_unitConflict_title", "士卒斗殴"},
       {"event_unitConflict", @"由于朝中两派关系紧张, {0}所部与临近驻扎的{1}部发生冲突，{0}所部有{3}人受伤{4}人伤重不治，{1}所部则是{5}人受伤{6}人死亡，两部士兵不满+{2}"},
+      {"event_altitudeSickness_title", "高原反应"},
+      {"event_altitudeSickness", @"由于过度疲劳, {0}所部部分士卒出现高原反应，士卒颇多不满，部队不得不就地休整"},
+      {"event_plainSickness_title", "战马出现平原反应"},
+      {"event_plainSickness", @"由于{0}所部骑兵多来自于高原，部队大部分战马出现了平原气候不适，这将极大影响部队的机动力和冲击力"},
 
       // pop out msg
       {"pop_discontent", @"不满+{0}"},
@@ -254,6 +262,8 @@ namespace TextNS
       {"pop_insufficientPoint", @"需要{0}体力"},
       {"pop_sieged", "围困工事已修筑"},
       {"pop_farmDestroyed", "农田被毁"},
+      {"pop_altitudeSickness", "高原反应"},
+      {"pop_plainSickness", "战马平原反应"},
 
       // settlement
       {"settlement_storageLvl1", "初级粮仓"},

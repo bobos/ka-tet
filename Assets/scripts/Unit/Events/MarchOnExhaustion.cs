@@ -8,7 +8,8 @@
     }
 
     public int Occur() {
-      if (unit.GetStaminaLevel() == StaminaLvl.Exhausted && unit.type != Type.Scout && Cons.SlimChance()) {
+      if (!unit.IsHillLander() && unit.GetStaminaLevel() == StaminaLvl.Exhausted && unit.type != Type.Scout
+        && Cons.SlimChance()) {
         return 1;
       }
       return 0;

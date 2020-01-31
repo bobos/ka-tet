@@ -22,7 +22,7 @@ namespace UnitNS
            || Cons.IsSummer(unit.hexMap.weatherGenerator.season))) {
         if (unit.hexMap.IsAttackSide(unit.IsAI())) {
           result.destroyed = true;
-        } else if (!unit.IsAI()) {
+        } else if (!unit.IsAI() && !unit.IsHillLander()) {
           if (Cons.FiftyFifty()) {
             result.destroyed = true;
             if(!Util.eq<CourtNS.Party>(unit.rf.general.party, unit.hexMap.warProvince.ownerParty)) {

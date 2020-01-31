@@ -13,7 +13,7 @@ namespace UnitNS
       unit.Init();
       if (clone) {
         unit.CloneInit(unit.disarmorDefDebuf, unit.GetNewGeneralBuf(), unit.epidemic, unit.unitPoisioned,
-          unit.supply, unit.weatherEffect, unit.vantage);
+          unit.supply, unit.weatherEffect, unit.vantage, unit.plainSickness);
       }
       return unit;
     }

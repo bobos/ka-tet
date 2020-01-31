@@ -93,6 +93,19 @@ namespace MonoNS
       UnitView view = hexMap.GetUnitView(unit);
       view.Move(unit.tile);
       while (view.Animating) { yield return null; }
+      int r = unit.altitudeSickness.Occur();
+      if (r != 0) {
+        // altitude sickness
+        discontent = r;
+        if (!unit.IsAI()) {
+          eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.AltitudeSickness, unit,
+            null));
+          while (eventDialog.Animating) { yield return null; }
+        } else if (unit.IsShowingAnimation()) {
+          popAniController.Show(view, textLib.get("pop_altitudeSickness"), Color.red);
+          while(popAniController.Animating) { yield return null; }
+        }
+      }
       Riot(unit, discontent);
       while (riotAnimating) { yield return null; }
       if (!unit.IsAI() && discovered) {
@@ -225,6 +238,15 @@ namespace MonoNS
         while (ShowAnimating) { yield return null; }
       }
 
+      if (unit.altitudeSickness.lastTurns > 0) {
+        if (unit.IsShowingAnimation()) {
+          popAniController.Show(view, textLib.get("pop_altitudeSickness"), Color.yellow);
+          while (popAniController.Animating) { yield return null; }
+        }
+        ShowEffects(unit, new int[9]{0,0,unit.altitudeSickness.Apply(),0,0,0,0,0,0});
+        while (ShowAnimating) { yield return null; }
+      }
+
       if (unit.IsPoisioned()) {
         if (unit.IsShowingAnimation()) {
           popAniController.Show(view, textLib.get("pop_poisioned"), Color.yellow);
@@ -336,6 +358,21 @@ namespace MonoNS
         while (riotAnimating) { yield return null; }
         Riot(conflict.unit2, conflict.discontent);
         while (riotAnimating) { yield return null; }
+      }
+
+      if (Cons.FiftyFifty()) {
+        int ret = unit.plainSickness.Occur();
+        if (ret > 0) {
+          if (!unit.IsAI()) {
+            eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.PlainSickness, unit, null));
+            while (eventDialog.Animating) { yield return null; }
+          } else if (unit.IsShowingAnimation()) {
+            popAniController.Show(hexMap.GetUnitView(unit), textLib.get("pop_plainSickness"), Color.yellow);
+            while (popAniController.Animating) { yield return null; }
+          }
+          Riot(unit, ret);
+          while (riotAnimating) { yield return null; }
+        }
       }
       hexMap.cameraKeyboardController.EnableCamera();
       RefreshAnimating = false;

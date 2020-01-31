@@ -183,6 +183,8 @@ namespace MonoNS
       + " 等级加成:" + unit.rf.atkLvlBuf * 100
       + "% 地形加成:" + unit.vantage.AtkBuf() * 100
       + "% 气候加成:" + unit.weatherEffect.AtkBuf() * 100
+      +
+      (unit.plainSickness.affected ? ("% 平原反应惩罚:" + unit.plainSickness.atkDebuf * 100) : "")
       + "% 总计:" +
       (unit.GetStaminaBuf() + unit.GetStarvingBuf() + unit.GetNewGeneralBuf()
        + unit.rf.atkLvlBuf + unit.vantage.AtkBuf() + unit.weatherEffect.AtkBuf())*100
@@ -219,10 +221,10 @@ namespace MonoNS
         stateStr += "[本轮" + desserter + "人逃亡" + (killed > 0 ? (killed + "人亡") : "") + "]";
       }
       state.text = stateStr;
-      illness.text = unit.GetHeatSickTurns() > 0 ? "痢疾: 预计本轮至少伤亡"+ unit.GetHeatSickEffectNum()
-      + "人,疫情还将持续" + unit.GetHeatSickTurns() + "回合" : "";
-      poision.text = unit.GetPoisionTurns() > 0 ? "中毒: 预计本轮伤亡"+ unit.GetPoisionEffectNum()
-      + "人,病情还将持续" + unit.GetPoisionTurns() + "回合" : "";
+      illness.text = unit.GetHeatSickTurns() > 0 ? "痢疾: 将持续" + unit.GetHeatSickTurns() + "回合 " : "";
+      illness.text += unit.GetAltitudeSickTurns() > 0 ? "高原反应: 将持续" + unit.GetAltitudeSickTurns() + "回合" : "";
+      illness.text += unit.plainSickness.affected  ? "平原反应" : "";
+      poision.text = unit.GetPoisionTurns() > 0 ? "中毒: 将持续" + unit.GetPoisionTurns() + "回合" : "";
       if (unit.clone) {
         return;
       }

@@ -9,7 +9,6 @@ namespace  UnitNS
     public const float MovementCostModifierOnHill = 2f;
     public const int MinTroopNum = 300;
     public const int MaxTroopNum = 3000;
-    public const int ExhaustLine = 10;
 
     public static Unit Create(bool clone, Troop troop, Tile tile, int supply, State state = State.Stand, 
                     int kia = 0, int mia = 0, int movement = -1) {
@@ -17,7 +16,7 @@ namespace  UnitNS
       unit.Init();
       if (clone) {
         unit.CloneInit(unit.disarmorDefDebuf, unit.GetNewGeneralBuf(), unit.epidemic, unit.unitPoisioned,
-          unit.supply, unit.weatherEffect, unit.vantage);
+          unit.supply, unit.weatherEffect, unit.vantage, unit.plainSickness);
       }
       return unit;
     }
