@@ -199,6 +199,7 @@ namespace MonoNS
       if (action == ActionController.actionName.ENCAMP)
       {
         nearMySettlement.Encamp(selectedUnit);
+        Escape();
         return;
       }
 

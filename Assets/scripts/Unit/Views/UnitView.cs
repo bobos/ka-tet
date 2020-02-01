@@ -63,6 +63,7 @@ namespace UnitNS
     }
 
     public void Deactivate() {
+      OnUnitDeselect(mouseController.selectedUnit);
       ToggleText(false);
       viewActivated = false;
     }
@@ -80,6 +81,7 @@ namespace UnitNS
 
     public void Destroy()
     {
+      OnUnitDeselect(mouseController.selectedUnit);
       actionController.onBtnClick -= OnBtnClick;
       actionController.actionDone -= ActionDone;
       mouseController.onUnitSelect -= OnUnitSelect;

@@ -52,6 +52,7 @@ public class SettlementView : View
 
   public void Destroy()
   {
+    OnSettlementDeselect(mouseController.selectedSettlement);
     mouseController.onSettlementSelect -= OnSettlementSelect;
     mouseController.onSettlementDeselect -= OnSettlementDeselect;
     GameObject.Destroy(gameObject);
