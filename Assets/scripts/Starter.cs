@@ -22,6 +22,8 @@ public class Starter : MonoBehaviour {
     List<BaseController> controllers = new List<BaseController>();
     ActionController actionController = GameObject.FindObjectOfType<ActionController>();
     controllers.Add(actionController);
+    WargameController wargameController = GameObject.FindObjectOfType<WargameController>();
+    controllers.Add(wargameController);
     EventDialog eventDialog = GameObject.FindObjectOfType<EventDialog>();
     controllers.Add(eventDialog);
     MouseController mouseController = GameObject.FindObjectOfType<MouseController>();

@@ -119,11 +119,27 @@ namespace MonoNS
       }
     }
 
-    public void OnBurnCampClick()
+    public void OnWargameClick()
     {
       if (onBtnClick != null)
       {
-        onBtnClick(actionName.BURNCAMP);
+        onBtnClick(actionName.WARGAME);
+      }
+    }
+
+    public void OnCancelWargameClick()
+    {
+      if (onBtnClick != null)
+      {
+        onBtnClick(actionName.WGCANCEL);
+      }
+    }
+
+    public void OnConfirmlWargameClick()
+    {
+      if (onBtnClick != null)
+      {
+        onBtnClick(actionName.WGCONFIRM);
       }
     }
 
@@ -202,7 +218,9 @@ namespace MonoNS
       CAMP,
       SHOWMINE,
       SHOWENEMY,
-      BURNCAMP,
+      WARGAME,
+      WGCONFIRM,
+      WGCANCEL,
       DECAMP,
       DISTSUPPLY,
       DISTLABOR,

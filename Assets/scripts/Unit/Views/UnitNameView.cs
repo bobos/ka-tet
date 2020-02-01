@@ -11,7 +11,7 @@ namespace UnitNS
   
     public void SetName(Unit unit) {
       Color color = unit.hexMap.GetWarParty(unit).attackside ? Color.red : Color.green;
-      SetNameColor(unit.rf.general.Name() + "[" + unit.rf.general.party.Name() + "]", color, 60);
+      SetNameColor((unit.hexMap.wargameController.start ? "推演*" : "") + unit.rf.general.Name() + "[" + unit.rf.general.party.Name() + "]", color, 60);
     }
 
     public void SetNameColor(string name, Color color, int size) {

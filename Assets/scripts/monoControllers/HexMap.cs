@@ -22,6 +22,7 @@ namespace MonoNS
     public UnitSelectionPanel unitSelectionPanel;
     public SettlementViewPanel settlementViewPanel;
     public WeatherIndicator weatherIndicator;
+    public WargameController wargameController;
     public HoverInfo hoverInfo;
     public TurnIndicator turnIndicator;
     public TurnPhaseTitle turnPhaseTitle;
@@ -136,6 +137,7 @@ namespace MonoNS
       tileAniController = GameObject.FindObjectOfType<TileAnimationController>();
       popAniController = GameObject.FindObjectOfType<PopTextAnimationController>();
       eventStasher = GameObject.FindObjectOfType<EventStasher>();
+      wargameController = GameObject.FindObjectOfType<WargameController>();
       // init actionBroker
       actionBroker = UnitActionBroker.GetBroker();
       actionBroker.onUnitAction += OnUnitAction;
@@ -179,6 +181,10 @@ namespace MonoNS
 
     public WarParty GetWarParty(Unit unit) {
       return unit.IsAI() ? GetAIParty() : GetPlayerParty();
+    }
+
+    public WarParty GetWarParty() {
+      return turnController.playerTurn ? GetPlayerParty() : GetAIParty();
     }
 
     public void UpdateWound(Unit unit, int num) {
@@ -297,6 +303,17 @@ namespace MonoNS
       }
     }
 
+    public void DarkenUnit(Unit unit) {
+      if (unit == null) return;
+      if (!unit2GO.ContainsKey(unit))
+      {
+        // unit has encamped
+        return;
+      }
+      GameObject view = unit2GO[unit];
+      SetTroopSkin(view, GreySkin);
+    }
+
     public void SetUnitSkin(Unit unit)
     {
       if (unit == null) return;
@@ -308,7 +325,7 @@ namespace MonoNS
       GameObject view = unit2GO[unit];
       if (unit.TurnDone())
       {
-        SetTroopSkin(view, GreySkin);
+        DarkenUnit(unit);
       }
       else
       {
@@ -333,11 +350,22 @@ namespace MonoNS
         }
       }
     }
+
+    public void OnWargameMove(Unit unit, Tile tile) {
+      DestroyUnitView(unit);
+      CreateUnitViewAt(unit, tile);
+    }
     
     public void HighlightUnit(Unit unit)
     {
       if (unit == null && unit2GO.ContainsKey(unit)) return;
       SetTroopSkin(unit2GO[unit], UnitHightlight);
+    }
+
+    public void UnhighlightUnit(Unit unit)
+    {
+      if (unit == null && unit2GO.ContainsKey(unit)) return;
+      SetTroopSkin(unit2GO[unit], unit.IsAI() ? AISkin : PlayerSkin);
     }
 
     void CreateTileGO(Tile tile)

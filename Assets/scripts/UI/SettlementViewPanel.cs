@@ -102,6 +102,9 @@ namespace MonoNS
       this.inNetwork.text = "";
 
       EnableButtons(s.IsFunctional());
+      if (hexMap.wargameController.start) {
+        DisableButtons();
+      }
       // TODO: for test
       //if (s.owner.isAI)
       //{

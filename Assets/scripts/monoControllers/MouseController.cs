@@ -217,10 +217,15 @@ namespace MonoNS
         return;
       }
 
-      if (action == ActionController.actionName.BURNCAMP)
+      if (action == ActionController.actionName.WARGAME)
       {
-        mouseMode = mode.burnCamp;
-        Update_CurrentFunc = UpdateBurnCamp;
+        hexMap.wargameController.StartWargame();
+      }
+
+      if (action == ActionController.actionName.WGCANCEL)
+      {
+        hexMap.wargameController.Cancel();
+        Escape();
       }
 
       if (action == ActionController.actionName.ATTACK)
@@ -391,7 +396,6 @@ namespace MonoNS
       move,
       attack,
       sabotage,
-      burnCamp,
       transfer,
       transferLabor,
       dist,
@@ -511,6 +515,11 @@ namespace MonoNS
       if (tileUnderMouse.IsThereConcealedEnemy(!hexMap.turnController.playerTurn)) {
         u = null;
       }
+      if (u != null && hexMap.wargameController.start && u.type == Type.Scout)
+      {
+        u = null;
+      }
+
       Settlement s = tileUnderMouse.settlement;
       if (mouseMode == mode.attack)
       {
@@ -521,7 +530,7 @@ namespace MonoNS
               // TODO
               Debug.LogError("Failed to attack empty settlement, try again!");
             }
-            Update_CurrentFunc = Update_Animating;
+            Update_CurrentFunc = Escape;
             return;
           }
         }
@@ -687,12 +696,6 @@ namespace MonoNS
       }
     }
 
-    void Update_Animating()
-    {
-      // hits here means ActionOngoing is false already
-      Escape();
-    }
-
     void UpdateUnitMovement()
     {
       if (Input.GetMouseButtonUp(0))
@@ -701,19 +704,24 @@ namespace MonoNS
         if (selectedPath != null && selectedPath.Length > 0)
         {
           selectedUnit.SetPath(selectedPath);
-          if (!actionController.move(selectedUnit))
-          {
-            // TODO
-            Debug.LogError("Failed to move unit, try again!");
+          if (hexMap.wargameController.start) {
+            hexMap.wargameController.Add(tileUnderMouse, selectedUnit, selectedPath);
+          } else {
+            if (!actionController.move(selectedUnit))
+            {
+              // TODO
+              Debug.LogError("Failed to move unit, try again!");
+            }
           }
         }
-        Update_CurrentFunc = Update_Animating;
+        Update_CurrentFunc = Escape;
         return;
       }
 
       if (tileUnderMouse != null && !Util.eq<Tile>(tileUnderMouse, selectedUnit.tile))
       {
-        if (!tileUnderMouse.DeployableForPathFind(selectedUnit))
+        if (!tileUnderMouse.DeployableForPathFind(selectedUnit) ||
+         !selectedUnit.GetAccessibleTiles().Contains(tileUnderMouse))
         {
           selectedPath = new Tile[0];
         }
@@ -749,7 +757,7 @@ namespace MonoNS
           // TODO
           Debug.LogError("Failed to poision river, try again!");
         }
-        Update_CurrentFunc = Update_Animating;
+        Update_CurrentFunc = Escape;
         return;
       }
     }
@@ -772,19 +780,6 @@ namespace MonoNS
         if (burnTile != null)
         {
           actionController.burn(burnTile);
-          Escape();
-        }
-      }
-    }
-
-    void UpdateBurnCamp()
-    {
-      if (Input.GetMouseButtonUp(0) && tileUnderMouse != null
-        && !Util.eq<Tile>(tileUnderMouse, selectedUnit.tile))
-      {
-        if (tileUnderMouse.settlement != null)
-        {
-          //settlementMgr.DestroyCamp(tileUnderMouse.settlement, BuildingNS.DestroyType.ByFire);
           Escape();
         }
       }

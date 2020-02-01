@@ -435,7 +435,8 @@ namespace MapTileNS
       {
         return null;
       }
-      return units.First();
+      // just in case of wargame, there is hidden unit on the tile so war game unit will be last one
+      return units.Last();
     }
 
     public Tile Escape() {

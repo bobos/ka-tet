@@ -482,7 +482,7 @@ namespace UnitNS
 
     public bool waitingForOrders()
     {
-      if ((path != null && path.Count != 0) && GetAccessibleTiles().Length > 1)
+      if ((path != null && path.Count != 0) && GetPureAccessibleTiles().Length > 1)
         // maybe we can set skip flags to skip the turn, e.g. defend/fortify etc.
         return false;
       return true;
@@ -693,13 +693,7 @@ namespace UnitNS
       // TODO: target tile should be within unit's accessible range
       if (!target.DeployableForPathFind(this)) return null;
       Unit clone = Clone();
-      int totalCost = 0;
-      foreach(Tile tile in path) {
-        if (!Util.eq<Tile>(this.tile, tile)) {
-          // get rid of the first tile
-          totalCost = AggregateCostToEnterTile(tile, totalCost, PathFind.Mode.Normal);
-        }
-      }
+      int totalCost = GetPathCost(path);
       if (totalCost < 0 || totalCost > movementRemaining) {
         // out of reach, preflight fails
         return null;
@@ -713,6 +707,17 @@ namespace UnitNS
     {
       // TODO: add unit to virtual hex
       this.tile = tile;
+    }
+
+    public int GetPathCost(Tile[] path) {
+      int totalCost = 0;
+      foreach(Tile tile in path) {
+        if (!Util.eq<Tile>(this.tile, tile)) {
+          // get rid of the first tile
+          totalCost = AggregateCostToEnterTile(tile, totalCost, PathFind.Mode.Normal);
+        }
+      }
+      return totalCost;
     }
 
     // ==============================================================
@@ -825,6 +830,19 @@ namespace UnitNS
       return AfterMoveUpdate(knownUnits);
     }
 
+    public void SetWargameTile(Tile h) {
+      if (tile != null)
+      {
+        tile.RemoveUnit(this);
+      }
+      h.AddUnit(this);
+      // TODO: remove for AI
+      //if (!IsAI()) {
+        hexMap.OnWargameMove(this, h);
+      //}
+      tile = h;
+    }
+
     public void SetTile(Tile h, bool dontAddToNewTile = false)
     {
       if (tile != null)
@@ -845,9 +863,24 @@ namespace UnitNS
     // ================= path finding ===============================
     // ==============================================================
 
+    public Tile[] GetPureAccessibleTiles() {
+      return PFTile2Tile(PathFinder.FindAccessibleTiles(tile, this, movementRemaining));
+    }
+
     public Tile[] GetAccessibleTiles()
     {
-      return PFTile2Tile(PathFinder.FindAccessibleTiles(tile, this, movementRemaining));
+      List<Tile> area = new List<Tile>();
+      HashSet<Tile> visible = FieldNS.FoW.Get().GetVisibleArea();
+      if (hexMap.wargameController.start) {
+        visible = hexMap.wargameController.visibleArea;
+      }
+
+      foreach (Tile tile in GetPureAccessibleTiles()) {
+        if (visible.Contains(tile)) {
+          area.Add(tile);
+        }
+      }
+      return area.ToArray();
     }
 
     public Tile[] GetAccessibleTilesForSupply(Tile start, int remaining)

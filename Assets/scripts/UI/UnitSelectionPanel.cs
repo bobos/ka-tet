@@ -108,9 +108,14 @@ namespace MonoNS
       }
       if (!state) return;
 
-      MoveButton.SetActive(true);
-      NextTurnButton.SetActive(true);
-      RetreatButton.SetActive(true);
+      if (hexMap.wargameController.start && hexMap.wargameController.IsWargameUnit(unit)) {
+      } else {
+        MoveButton.SetActive(true);
+      }
+      if (!hexMap.wargameController.start) {
+        NextTurnButton.SetActive(true);
+        RetreatButton.SetActive(true);
+      }
       
       if (mouseController.nearEnemy || mouseController.nearEnemySettlement != null) {
         AttackButton.SetActive(true);
@@ -118,7 +123,9 @@ namespace MonoNS
 
       if (mouseController.nearMySettlement != null && mouseController.nearMySettlement.HasRoom()
         && !mouseController.nearMySettlement.IsUnderSiege()) {
-        EncampButton.SetActive(true);
+        if (!hexMap.wargameController.start) {
+          EncampButton.SetActive(true);
+        }
       }
 
       if (unit.type == Type.Scout) {
@@ -136,15 +143,17 @@ namespace MonoNS
       }
 
       if (unit.type == Type.Infantry) {
-        if (mouseController.inCampField != null) {
+        if (mouseController.inCampField != null && !hexMap.wargameController.start) {
           CampButton.SetActive(true);
         }
 
-        if (mouseController.nearEnemySettlement != null && !mouseController.nearEnemySettlement.IsEmpty()) {
+        if (mouseController.nearEnemySettlement != null && !mouseController.nearEnemySettlement.IsEmpty()
+          && !hexMap.wargameController.start) {
           AmbushButton.SetActive(true);
         }
 
-        if (mouseController.nearAlly || mouseController.nearMySettlement != null) {
+        if ((mouseController.nearAlly || mouseController.nearMySettlement != null) && 
+         !hexMap.wargameController.start) {
           if (unit.labor > 0) {
             TransferLaborButton.SetActive(true);
           }
@@ -155,7 +164,8 @@ namespace MonoNS
       }
 
       if (unit.type == Type.Cavalry) {
-        if (mouseController.nearAlly || mouseController.nearMySettlement != null) {
+        if ((mouseController.nearAlly || mouseController.nearMySettlement != null) ||
+         !hexMap.wargameController.start) {
           if (unit.supply.supply > 0) {
             TransferSupplyButton.SetActive(true);
           }

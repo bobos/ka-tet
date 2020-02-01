@@ -2,6 +2,7 @@
 using MapTileNS;
 using MonoNS;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace UnitNS
 {
@@ -138,9 +139,13 @@ namespace UnitNS
     {
       if (Util.eq<Unit>(unit, this.unit))
       {
-        hexMap.HighlightArea(unit.GetAccessibleTiles(), HexMap.RangeType.movement, this.unit);
-        hexMap.HighlightPath(unit.GetPath());
         if (!unit.IsAI() && !unit.TurnDone()) hexMap.HighlightUnit(unit);
+        if (hexMap.wargameController.start && hexMap.wargameController.IsWargameUnit(unit)) {
+        } else {
+          Tile[] range = unit.GetAccessibleTiles();
+          hexMap.HighlightArea(range, HexMap.RangeType.movement, this.unit);
+          hexMap.HighlightPath(unit.GetPath());
+        }
       }
     }
 
@@ -150,7 +155,7 @@ namespace UnitNS
       {
         hexMap.DehighlightPath();
         hexMap.DehighlightArea();
-        hexMap.SetUnitSkin(unit);
+        hexMap.UnhighlightUnit(unit);
       }
     }
 
