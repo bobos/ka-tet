@@ -44,6 +44,12 @@ namespace MonoNS
       StartCoroutine(KeepShowingTitle());
     }
 
+    public void ShowTitle(string txt, Color color) {
+      showingTitle = true;
+      title.Set(txt, color);
+      StartCoroutine(KeepShowingTitle());
+    }
+
     IEnumerator KeepShowingTitle()
     {
       yield return new WaitForSeconds(1);

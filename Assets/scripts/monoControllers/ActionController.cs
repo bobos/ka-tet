@@ -139,7 +139,7 @@ namespace MonoNS
     {
       if (onBtnClick != null)
       {
-        onBtnClick(actionName.WGCONFIRM);
+        hexMap.wargameController.Commit();
       }
     }
 

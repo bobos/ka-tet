@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using MapTileNS;
 using UnitNS;
 using UnityEngine;
@@ -64,9 +65,29 @@ namespace MonoNS {
       ToggleScouts(false);
     }
 
+    public bool CommitAnimating = false;
     public void Commit() {
-      Quit();
-      //
+      CommitAnimating = true;
+      StartCoroutine(CoCommit());
+    }
+
+    IEnumerator CoCommit() {
+      if (hexMap.turnController.playerTurn) {
+        hexMap.turnController.ShowTitle(Cons.GetTextLib().get("title_wargame_commiting"), Color.green);
+        while (hexMap.turnController.showingTitle) { yield  return null; }
+      }
+      Cancel();
+      unitList.Reverse();
+      foreach(WargameUnit u in unitList) {
+        u.unit.SetPath(u.path);
+        hexMap.actionController.move(u.unit);
+        while (hexMap.actionController.ActionOngoing) { yield  return null; }
+      }
+      if (hexMap.turnController.playerTurn) {
+        hexMap.turnController.ShowTitle(Cons.GetTextLib().get("title_wargame_committed"), Color.white);
+        while (hexMap.turnController.showingTitle) { yield  return null; }
+      }
+      CommitAnimating = false;
     }
 
     public void Cancel() {

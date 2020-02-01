@@ -703,10 +703,11 @@ namespace MonoNS
         // copy the path to movement queue
         if (selectedPath != null && selectedPath.Length > 0)
         {
-          selectedUnit.SetPath(selectedPath);
           if (hexMap.wargameController.start) {
             hexMap.wargameController.Add(tileUnderMouse, selectedUnit, selectedPath);
+            Escape();
           } else {
+            selectedUnit.SetPath(selectedPath);
             if (!actionController.move(selectedUnit))
             {
               // TODO

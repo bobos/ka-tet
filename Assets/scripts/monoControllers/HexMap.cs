@@ -502,7 +502,12 @@ namespace MonoNS
       if (unit != null && !unit.IsConcealed()) {
         ActivateUnitView(unit);
       }
-      Overlay(tile, TransMat);
+      if (FoW.Get() == null ||
+        FoW.Get().GetVisibleArea().Contains(tile)) {
+        Overlay(tile, TransMat);
+      } else {
+        OverlayFoW(tile);
+      }
     }
 
     public void DehighlightArea()

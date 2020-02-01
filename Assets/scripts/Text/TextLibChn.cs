@@ -273,6 +273,9 @@ namespace TextNS
       {"settlement_wallLvl2", "中级城墙"},
       {"settlement_wallLvl3", "高级城墙"},
       {"settlement_strategyBase", @"{0}军大本营"},
+      
+      {"title_wargame_commiting", "执行作战计划"},
+      {"title_wargame_committed", "执行完毕"},
       };
     }
   }

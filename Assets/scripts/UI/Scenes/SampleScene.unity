@@ -1554,8 +1554,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 599.6, y: 85.5}
+  m_AnchoredPosition: {x: -21.15, y: 0}
+  m_SizeDelta: {x: 288.3, y: 67.05}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &384592930
 MonoBehaviour:
@@ -2390,8 +2390,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -364, y: 592.65}
-  m_SizeDelta: {x: 167.66, y: 74.9}
+  m_AnchoredPosition: {x: -291.39, y: 586.26}
+  m_SizeDelta: {x: 395.32, y: 96.022}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &543447896
 MonoBehaviour:
@@ -4282,8 +4282,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -365.8, y: 536}
-  m_SizeDelta: {x: 164.06, y: 74.9}
+  m_AnchoredPosition: {x: -291.89996, y: 583.1}
+  m_SizeDelta: {x: 396.34, y: 86.7}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1009013494
 MonoBehaviour:
@@ -4427,18 +4427,18 @@ MonoBehaviour:
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 40
+    m_FontSize: 50
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 4
-    m_MaxSize: 40
+    m_MaxSize: 50
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u63A8\u6F14"
+  m_Text: "\u4F5C\u6218\u8BA1\u5212"
 --- !u!222 &1009888535
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -5546,8 +5546,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -364, y: 488.04996}
-  m_SizeDelta: {x: 164.06, y: 74.9}
+  m_AnchoredPosition: {x: -291.7, y: 527}
+  m_SizeDelta: {x: 397.3, y: 82.8}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1224093719
 MonoBehaviour:
@@ -6694,18 +6694,18 @@ MonoBehaviour:
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 40
+    m_FontSize: 50
     m_FontStyle: 0
     m_BestFit: 0
-    m_MinSize: 4
-    m_MaxSize: 40
+    m_MinSize: 0
+    m_MaxSize: 50
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u53D6\u6D88"
+  m_Text: "\u64A4\u9500\u4F5C\u6218\u8BA1\u5212"
 --- !u!222 &1497568356
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -8404,6 +8404,7 @@ MonoBehaviour:
   WargameBtn: {fileID: 543447894}
   CommitBtn: {fileID: 1009013492}
   CancelBtn: {fileID: 1224093717}
+  CommitAnimating: 0
 --- !u!4 &1827010563
 Transform:
   m_ObjectHideFlags: 0
@@ -9580,18 +9581,18 @@ MonoBehaviour:
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 40
+    m_FontSize: 50
     m_FontStyle: 0
     m_BestFit: 0
-    m_MinSize: 4
-    m_MaxSize: 40
+    m_MinSize: 0
+    m_MaxSize: 50
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u63D0\u4EA4"
+  m_Text: "\u6267\u884C\u4F5C\u6218\u8BA1\u5212"
 --- !u!222 &2143459584
 CanvasRenderer:
   m_ObjectHideFlags: 0
