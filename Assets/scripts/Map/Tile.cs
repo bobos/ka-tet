@@ -223,7 +223,7 @@ namespace MapTileNS
     public FieldType field;
     public bool isDam = false;
 
-    int movementCost = Unit.BasicMovementCost;
+    int movementCost;
     public void SetFieldType(FieldType type)
     {
       field = type;
@@ -316,8 +316,9 @@ namespace MapTileNS
       if (unit.IsCavalry())
       {
         // apply movement modifier for calvary unit
-        ret = (int)(movementCost * (terrian == TerrianType.Plain ?
-                    1f : Cavalry.MovementCostModifierOnHill));
+        ret = (int)(movementCost * (
+          (terrian == TerrianType.Plain || field == FieldType.Road) ?
+          Cavalry.MovementCostModifierOnPlainOrRoad : Cavalry.MovementCostModifierOnHill));
       }
       else
       {

@@ -421,7 +421,7 @@ namespace MonoNS
       public SiegeResult result = SiegeResult.NoCity;
       public Settlement target;
       public const int MinLabor = 800;
-      public const int MinPoint = Unit.BasicMovementCost * 2;
+      public const int MinPoint = Unit.ActionCost;
     }
 
     public SiegePredict Ready4Siege(Unit unit) {

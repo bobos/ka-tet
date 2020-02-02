@@ -25,7 +25,7 @@ namespace UnitNS
       happened = true;
       if (Cons.FiftyFifty()) {
         affected = true;
-        atkDebuf = moveDebuf = 0.2f;
+        atkDebuf = moveDebuf = 0.3f;
         return 2;
       }
 

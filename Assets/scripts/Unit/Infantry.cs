@@ -56,11 +56,6 @@ namespace  UnitNS
       return suggestions;
     }
 
-    protected override float GetMovementModifier()
-    {
-      return 1f;
-    }
-
     protected override int GetBaseSupplySlots()
     {
       int labors = labor;

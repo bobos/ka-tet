@@ -13,7 +13,13 @@ namespace CourtNS
     // Min atk or def point must be x * 0.05f = 1 --> 20
     public abstract int Atk(Type unitType);
     public abstract int Def(Type unitType);
-    public abstract int Mov(Type unitType);
+    public int Mov(Type unitType)
+    {
+      if (unitType == Type.Scout) {
+        return 200;
+      }
+      return 100;
+    }
     public abstract int Will();
     public abstract int RetreatThreshold();
     public abstract int ExtraSupplySlot();
@@ -48,13 +54,6 @@ namespace CourtNS
       if (unitType == Type.Scout)
         return 50;
       return 20;
-    }
-
-    public override int Mov(Type unitType)
-    {
-      if (unitType == Type.Infantry)
-        return 100;
-      return 170;
     }
 
     public override int Will()
@@ -104,13 +103,6 @@ namespace CourtNS
       return 30;
     }
 
-    public override int Mov(Type unitType)
-    {
-      if (unitType == Type.Infantry)
-        return 100;
-      return 160;
-    }
-
     public override int Will()
     {
       return 80;
@@ -156,13 +148,6 @@ namespace CourtNS
       if (unitType == Type.Scout)
         return 50;
       return 30;
-    }
-
-    public override int Mov(Type unitType)
-    {
-      if (unitType == Type.Infantry)
-        return 100;
-      return 140;
     }
 
     public override int Will()
@@ -212,13 +197,6 @@ namespace CourtNS
       return 30;
     }
 
-    public override int Mov(Type unitType)
-    {
-      if (unitType == Type.Infantry)
-        return 100;
-      return 150;
-    }
-
     public override int Will()
     {
       return 90;
@@ -264,13 +242,6 @@ namespace CourtNS
       if (unitType == Type.Scout)
         return 60;
       return 40;
-    }
-
-    public override int Mov(Type unitType)
-    {
-      if (unitType == Type.Infantry)
-        return 80;
-      return 180;
     }
 
     public override int Will()

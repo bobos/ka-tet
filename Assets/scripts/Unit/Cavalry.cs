@@ -6,7 +6,8 @@ namespace  UnitNS
   public class Cavalry : Unit
   {
     public const int BaseSlots = Infantry.BaseSlots + 2;
-    public const float MovementCostModifierOnHill = 2f;
+    public const float MovementCostModifierOnHill = 1.5f;
+    public const float MovementCostModifierOnPlainOrRoad = 0.7f;
     public const int MinTroopNum = 300;
     public const int MaxTroopNum = 3000;
 
@@ -31,11 +32,6 @@ namespace  UnitNS
     public override bool IsCavalry()
     {
       return true;
-    }
-
-    protected override float GetMovementModifier()
-    {
-      return 1f;
     }
 
     protected override int GetBaseSupplySlots()

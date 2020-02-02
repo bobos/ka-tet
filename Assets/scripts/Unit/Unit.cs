@@ -11,15 +11,14 @@ namespace UnitNS
   public abstract class Unit : PFUnit, DataModel
   {
     public abstract bool IsCavalry();
-    protected abstract float GetMovementModifier();
     protected abstract int GetBaseSupplySlots();
     protected abstract Unit Clone();
 
-    public const int BasicMovementCost = 20; // For actions like: attack
+    public const int ActionCost = 30; // For actions like: attack
     public const int MovementcostOnHill = 25;
-    public const int MovementcostOnHillRoad = 15;
-    public const int MovementcostOnPlain = 15;
-    public const int MovementcostOnPlainRoad = 12;
+    public const int MovementcostOnHillRoad = 20;
+    public const int MovementcostOnPlain = 20;
+    public const int MovementcostOnPlainRoad = 15;
     public const int MovementCostOnUnaccesible = -1;
     public const int DisbandUnitUnder = 50;
 
@@ -525,33 +524,28 @@ namespace UnitNS
     // ==============================================================
     // ================= movement mangement =========================
     // ==============================================================
+
     public int GetFullMovement()
     {
-      int point = (int)(
-          rf.mov * GetMovementModifier() *
-          (rf.morale >= Troop.MaxMorale ? 1.2f : 1f) *
-          (1f + (IsHungry() ? -0.45f : 0f)) *
-          (1f + (plainSickness != null && plainSickness.affected ? -(plainSickness.moveDebuf) : 0f)) *
-          (IsSick() ? 0.7f : 1f));
-      // ghost unit doesnt have vantage
-      return vantage != null ? vantage.MovementPoint(point) : point;
+      return (int)(
+        // ghost unit doesnt have vantage
+        (vantage != null ? vantage.MovementPoint(rf.mov) : rf.mov) *
+        (IsHungry() ? 0.5f : 1) *
+        (plainSickness != null && plainSickness.affected ? (1 - plainSickness.moveDebuf) : 1) *
+        (IsSick() ? 0.5f : 1));
     }
 
     public StaminaLvl GetStaminaLevel()
     {
-      if (IsHungry())
-      {
-        return StaminaLvl.Exhausted;
-      }
-      if (movementRemaining >= GetFullMovement())
+      if (movementRemaining >= 70)
       {
         return StaminaLvl.Vigorous;
       }
-      if (movementRemaining >= (int)(GetFullMovement()/2))
+      if (movementRemaining >= 30)
       {
         return StaminaLvl.Fresh;
       }
-      if (movementRemaining >= (int)(GetFullMovement()/5))
+      if (movementRemaining >= 15)
       {
         return StaminaLvl.Tired;
       }
@@ -677,10 +671,10 @@ namespace UnitNS
 
       if (GetStaminaLevel() == StaminaLvl.Tired)
       {
-        return -0.05f;
+        return -0.025f;
       }
 
-      return -0.2f;
+      return -0.05f;
     }
 
     // ==============================================================

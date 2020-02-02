@@ -406,7 +406,7 @@ namespace MonoNS
 
     int GetGhostUnitRangeForSettlementSupply()
     {
-      return (int)(ghostUnit.GetFullMovement());
+      return (int)(ghostUnit.GetFullMovement() * 1.3f);
     }
 
     void SetGhostOwner(Settlement settlement) {

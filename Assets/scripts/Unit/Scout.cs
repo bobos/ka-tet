@@ -30,11 +30,6 @@ namespace UnitNS
       return true;
     }
 
-    protected override float GetMovementModifier()
-    {
-      return 1.4f;
-    }
-
     protected override int GetBaseSupplySlots()
     {
       return 10;
