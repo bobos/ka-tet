@@ -63,6 +63,7 @@ namespace MonoNS {
       CommitBtn.SetActive(false);
       CancelBtn.SetActive(false);
       ToggleScouts(false);
+      hexMap.CleanLines();
     }
 
     public bool CommitAnimating = false;

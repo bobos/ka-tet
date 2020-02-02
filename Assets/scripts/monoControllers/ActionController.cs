@@ -135,12 +135,19 @@ namespace MonoNS
       }
     }
 
+    //TODO
     public void OnConfirmlWargameClick()
     {
-      if (onBtnClick != null)
-      {
-        hexMap.wargameController.Commit();
-      }
+      hexMap.wargameController.Commit();
+    }
+
+    //TODO
+    public void OnConfirmAttackClick() {
+      hexMap.combatController.CommenceOperation();
+    }
+
+    public void OnCancelAttackClick() {
+      hexMap.combatController.CancelOperation();
     }
 
     public void OnGarrisonMgtClick()

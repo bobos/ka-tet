@@ -506,12 +506,17 @@ namespace MonoNS
     public delegate void OnSettlementDeselect(Settlement deselectedSettlement);
     public event OnSettlementDeselect onSettlementDeselect;
 
+    public Unit targetUnit;
+    public Settlement targetSettlement;
     void ClickOnTile()
     {
+      targetUnit = null;
+      targetSettlement = null;
       if (mouseMode == mode.detect) {
         msgBox.Show(tileUnderMouse.Q + ", " + tileUnderMouse.R);
       }
       Unit u = tileUnderMouse.GetUnit();
+      Settlement s = tileUnderMouse.settlement;
       // TODO: search playerTurn when disable AI turn debug
       if (tileUnderMouse.IsThereConcealedEnemy(!hexMap.turnController.playerTurn)) {
         u = null;
@@ -521,19 +526,15 @@ namespace MonoNS
         u = null;
       }
 
-      Settlement s = tileUnderMouse.settlement;
-      if (mouseMode == mode.attack)
-      {
-        if (Util.eq<Tile>(nearEnemySettlement.baseTile, tileUnderMouse))
-        {
-          if (nearEnemySettlement.IsEmpty()) {
-            if (!actionController.attackEmptySettlement(selectedUnit, tileUnderMouse)) {
-              // TODO
-              Debug.LogError("Failed to attack empty settlement, try again!");
-            }
-            Update_CurrentFunc = Escape;
-            return;
-          }
+      if (mouseMode == mode.attack) {
+        if(u != null && u.IsAI() != selectedUnit.IsAI()) {
+          targetUnit = u;
+          return;
+        }
+
+        if (s != null && s.owner.isAI != selectedUnit.IsAI()) {
+          targetSettlement = s;
+          return;
         }
       }
 
@@ -593,20 +594,38 @@ namespace MonoNS
 
     void UpdateUnitAttack()
     {
-      if (Input.GetMouseButtonUp(0) && tileUnderMouse != null)
-      {
-        ClickOnTile();
+      if (tileUnderMouse == null) {
         return;
       }
-      hover.Show("");
-      if (!Util.eq<Tile>(tileUnderMouse, selectedUnit.tile))
+      if (Input.GetMouseButtonUp(0))
       {
-        Unit u = tileUnderMouse.GetUnit();
-        if (u != null)
+        ClickOnTile();
+        if (targetSettlement != null)
         {
-          hover.Show(u.Name());
+          if (targetSettlement.IsEmpty()) {
+            if (!actionController.attackEmptySettlement(selectedUnit, tileUnderMouse)) {
+              // TODO
+              Debug.LogError("Failed to attack empty settlement, try again!");
+            }
+            Update_CurrentFunc = Escape;
+            return;
+          }
+        }
+
+        if (targetUnit != null) {
+          OperationPredict predict = hexMap.combatController.StartOperation(selectedUnit, targetUnit, true);
+          hover.Show("攻方点数:" + predict.attackerOptimPoints + "\n守方点数:" + predict.defenderOptimPoints
+           + "\n预计结果:" + predict.sugguestedResult.GetResult());
         }
       }
+      //else if (!Util.eq<Tile>(tileUnderMouse, selectedUnit.tile))
+      //{
+      //  Unit u = tileUnderMouse.GetUnit();
+      //  if (u != null)
+      //  {
+      //    hover.Show(u.Name());
+      //  }
+      //}
     }
 
     void UpdateUnitTransferSupply()

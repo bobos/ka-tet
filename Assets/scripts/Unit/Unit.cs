@@ -14,7 +14,7 @@ namespace UnitNS
     protected abstract int GetBaseSupplySlots();
     protected abstract Unit Clone();
 
-    public const int ActionCost = 30; // For actions like: attack
+    public const int ActionCost = 40; // For actions like: attack
     public const int MovementcostOnHill = 25;
     public const int MovementcostOnHillRoad = 20;
     public const int MovementcostOnPlain = 20;
@@ -541,11 +541,11 @@ namespace UnitNS
       {
         return StaminaLvl.Vigorous;
       }
-      if (movementRemaining >= 30)
+      if (movementRemaining >= 40)
       {
         return StaminaLvl.Fresh;
       }
-      if (movementRemaining >= 15)
+      if (movementRemaining > 20)
       {
         return StaminaLvl.Tired;
       }
@@ -720,7 +720,7 @@ namespace UnitNS
     public void UpdateGeneralName() {
       UnitView view = hexMap.GetUnitView(this);
       if (view != null) {
-        view.UpdateGeneralName();
+        view.UpdateUnitInfo();
       }
     }
 

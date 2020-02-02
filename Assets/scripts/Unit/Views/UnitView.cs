@@ -2,7 +2,6 @@
 using MapTileNS;
 using MonoNS;
 using System.Collections;
-using System.Collections.Generic;
 
 namespace UnitNS
 {
@@ -12,7 +11,6 @@ namespace UnitNS
     Vector3 currentVelocity;
     HexMap hexMap;
     public Unit unit;
-    public GameObject nameGO;
     public GameObject unitInfoGO;
     ActionController actionController;
     MouseController mouseController;
@@ -41,25 +39,14 @@ namespace UnitNS
       return new Vector3(unitPosition.x - 0.5f, unitPosition.y, unitPosition.z);
     }
 
-    public void UpdateGeneralName() {
-      nameGO.GetComponent<UnitNameView>().SetName(unit);
-    }
-
     public void UpdateUnitInfo() {
-      unitInfoGO.GetComponent<UnitInfoView>().SetName(unit.rf);
+      unitInfoGO.GetComponent<UnitInfoView>().SetName(unit);
     }
 
-    void ToggleUnitInfo(bool on) {
+    public void ToggleText(bool on) {
       foreach(MeshRenderer mr in unitInfoGO.GetComponentsInChildren<MeshRenderer>()) {
         mr.enabled = on;
       }
-    }
-
-    void ToggleText(bool on) {
-      foreach(MeshRenderer mr in nameGO.GetComponentsInChildren<MeshRenderer>()) {
-        mr.enabled = on;
-      }
-      ToggleUnitInfo(on);
     }
 
     public void Deactivate() {
@@ -87,7 +74,7 @@ namespace UnitNS
       mouseController.onUnitSelect -= OnUnitSelect;
       mouseController.onModeQuit -= OnModeQuit;
       mouseController.onUnitDeselect -= OnUnitDeselect;
-      Destroy(nameGO);
+      //Destroy(nameGO);
       Destroy(unitInfoGO);
     }
 
@@ -132,7 +119,6 @@ namespace UnitNS
       if (viewActivated) {
         hexMap.HighlightPath(unit.GetPath());
         Animating = true;
-        ToggleUnitInfo(false);
       }
       currentVelocity = Vector3.zero;
     }
@@ -184,13 +170,14 @@ namespace UnitNS
       Vector3 originPosition = this.transform.position;
       // NOTE: this point to the gameobject not the component
       this.transform.position = Vector3.SmoothDamp(originPosition, newPosition, ref currentVelocity, 0.1f);
-      nameGO.transform.position = Vector3.SmoothDamp(originPosition, newPosition, ref currentVelocity, 0.1f);
+      //nameGO.transform.position = Vector3.SmoothDamp(originPosition, newPosition, ref currentVelocity, 0.1f);
+      unitInfoGO.transform.position = Vector3.SmoothDamp(originPosition, newPosition, ref currentVelocity, 0.1f);
       if (Vector3.Distance(this.transform.position, newPosition) < 0.1f)
       {
-        if (viewActivated) {
-          ToggleUnitInfo(true);
-        }
-        nameGO.transform.position = NamePosition(newPosition);
+        //if (viewActivated) {
+        //  ToggleUnitInfo(true);
+        //}
+        //nameGO.transform.position = NamePosition(newPosition);
         unitInfoGO.transform.position = UnitInfoPosition(newPosition);
         Animating = false;
       }

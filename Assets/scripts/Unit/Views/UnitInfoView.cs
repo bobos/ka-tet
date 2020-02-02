@@ -9,20 +9,20 @@ namespace UnitNS
     void Start () {
     }
   
-    public void SetName(Troop troop) {
+    public void SetName(Unit unit) {
       TextMesh textMesh = this.transform.GetComponent<TextMesh>();
-      textMesh.text = troop.province.Name() + "-" + troop.rank.Name() + "[" + troop.soldiers + "]";
+      Color color = unit.hexMap.GetWarParty(unit).attackside ? Color.yellow : Color.white;
+      string title = (unit.hexMap.wargameController.start ? "[推演]\n" : "") + unit.GeneralName() + "[" + unit.rf.general.party.Name() + "]\n";
+      textMesh.text = title + unit.rf.province.Name() + "-" + unit.rf.rank.Name() + "[" + unit.rf.soldiers + "]";
       textMesh.fontSize = 60;
-      textMesh.color = Color.white;
-      if (troop.rank.Level() == 2) {
-        textMesh.color = Color.green;
-      }
-      if (troop.rank.Level() == 3) {
-        textMesh.color = Color.magenta;
-      }
-      if (troop.rank.Level() == -1) {
-        textMesh.color = Color.yellow;
-      }
+      textMesh.color = color;
+    }
+
+    public void SetStr(string str, Color color) {
+      TextMesh textMesh = this.transform.GetComponent<TextMesh>();
+      textMesh.text = str;
+      textMesh.fontSize = 60;
+      textMesh.color = color;
     }
     
     // Update is called once per frame

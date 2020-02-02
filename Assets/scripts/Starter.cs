@@ -187,8 +187,10 @@ public class Starter : MonoBehaviour {
     zhangfei.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(28, 17), 0);
 
     // * AI *
-    caocao.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(1, 1), 0, 6000);
-    xuchu.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(2, 1), 0);
+    //caocao.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(1, 1), 0, 6000);
+    caocao.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(26, 15), 0, 6000);
+    xuchu.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(27, 15), 0);
+    //xuchu.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(2, 1), 0);
     SettlementMgr.Ready4Refresh = true;
     FoW.Init(hexMap);
     cameraKeyboardController.FixCameraAt(hexMap.GetUnitView(liubei.commandUnit.onFieldUnit).transform.position);

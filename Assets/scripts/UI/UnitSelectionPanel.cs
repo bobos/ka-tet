@@ -22,7 +22,8 @@ namespace MonoNS
       turnController.onNewTurn += OnNewTurn;
       GameObject[] btns = {MoveButton, AttackButton, DefendButton, CampButton,
                            SabotageButton, FireButton, AmbushButton, EncampButton,
-                           RetreatButton, TransferSupplyButton, TransferLaborButton};
+                           RetreatButton, TransferSupplyButton, TransferLaborButton,
+                           AttackCancelButton, AttackConfirmButton};
       buttons = btns;
       mouseController.onUnitSelect += OnUnitSelect;
       mouseController.onUnitPreflight += OnUnitSelect;
@@ -50,6 +51,8 @@ namespace MonoNS
     public GameObject RetreatButton;
     public GameObject TransferSupplyButton;
     public GameObject TransferLaborButton;
+    public GameObject AttackConfirmButton;
+    public GameObject AttackCancelButton;
     GameObject[] buttons;
 
     public Text title;
@@ -118,7 +121,16 @@ namespace MonoNS
       }
       
       if (mouseController.nearEnemy || mouseController.nearEnemySettlement != null) {
-        AttackButton.SetActive(true);
+        if (!hexMap.combatController.start) {
+          AttackButton.SetActive(true);
+        }
+      }
+
+      if (hexMap.combatController.start) {
+        if (!hexMap.wargameController.start) {
+          AttackConfirmButton.SetActive(true);
+        }
+        AttackCancelButton.SetActive(true);
       }
 
       if (mouseController.nearMySettlement != null && mouseController.nearMySettlement.HasRoom()

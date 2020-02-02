@@ -98,6 +98,7 @@ namespace MonoNS
     public GameObject PopTextPrefab;
     public WarParty[] warParties = new WarParty[2];
     public List<GameObject> lineCache = new List<GameObject>();
+    public List<GameObject> lineLabels = new List<GameObject>();
 
     public Tile[,] tiles;
 
@@ -223,18 +224,29 @@ namespace MonoNS
       return enemyScoutArea;
     }
 
-    public void CreateLine(Tile[] path)
+    public void CreateArrow(Tile[] path, Color color, string label, Color kolor)
     {
       if (path.Length == 0) return;
+      CreateLine(path, color);
+      CreateLine(path, color);
+      GameObject unitInfoGO = (GameObject)Instantiate(UnitInfoPrefab,
+          tile2GO[path[0]].transform.position,
+          Quaternion.identity, tile2GO[path[0]].transform);
+      unitInfoGO.GetComponent<UnitInfoView>().SetStr(label, kolor);
+      lineLabels.Add(unitInfoGO);
+    }
+
+    void CreateLine(Tile[] path, Color color) {
       GameObject myLine = new GameObject();
       lineCache.Add(myLine);
       myLine.transform.position = tile2GO[path[0]].transform.position + (Vector3.up * 0.5f);
       myLine.AddComponent<LineRenderer>();
       LineRenderer lr = myLine.GetComponent<LineRenderer>();
       lr.material = new Material(Shader.Find("Particles/Alpha Blended Premultiply"));
-      //lr.SetWidth(0.1f, 0.1f);
-      lr.startWidth = 0.1f;
-      lr.endWidth = 0.1f;
+      lr.startWidth = 0.4f;
+      lr.endWidth = 0.01f;
+      lr.startColor = color;
+      lr.endColor = color;
       Vector3[] ps = new Vector3[path.Length];
       for (int i = 0; i < path.Length; i++)
       {
@@ -251,7 +263,15 @@ namespace MonoNS
       {
         GameObject.Destroy(line);
       }
+      foreach (GameObject label in lineLabels) {
+        GameObject.Destroy(label);
+      }
+      foreach (UnitView view in toggledUnitViews) {
+        view.ToggleText(true);
+      }
       lineCache = new List<GameObject>();
+      lineLabels = new List<GameObject>();
+      toggledUnitViews = new List<UnitView>();
     }
 
     public void DehighlightPath()
@@ -366,6 +386,25 @@ namespace MonoNS
     {
       if (unit == null && unit2GO.ContainsKey(unit)) return;
       SetTroopSkin(unit2GO[unit], unit.IsAI() ? AISkin : PlayerSkin);
+    }
+
+    List<UnitView> toggledUnitViews = new List<UnitView>();
+    public void ShowAttackArrow(Unit fromUnit, Unit toUnit,
+      int joinPossibility, int percentageForce, int operationPoint) {
+      string txt = fromUnit.GeneralName() + "\n" + joinPossibility + "%\n" + operationPoint + "(" + percentageForce + "%)";
+      UnitView view = GetUnitView(fromUnit);
+      toggledUnitViews.Add(view);
+      view.ToggleText(false);
+      CreateArrow(new Tile[]{fromUnit.tile, toUnit.tile}, Color.black, txt, joinPossibility > 70 ? Color.cyan : Color.red);
+    }
+
+    public void ShowDefendArrow(Unit fromUnit, Unit toUnit,
+      int joinPossibility, int percentageForce, int operationPoint) {
+      string txt = fromUnit.GeneralName() + "\n" + joinPossibility + "%\n" + operationPoint + "(" + percentageForce + "%)";
+      UnitView view = GetUnitView(fromUnit);
+      toggledUnitViews.Add(view);
+      view.ToggleText(false);
+      CreateArrow(new Tile[]{fromUnit.tile, toUnit.tile}, Color.blue, txt, joinPossibility > 70 ? Color.cyan : Color.red);
     }
 
     void CreateTileGO(Tile tile)
@@ -611,16 +650,12 @@ namespace MonoNS
       GameObject unitGO = (GameObject)Instantiate(prefab,
           position,
           Quaternion.identity, tileGO.transform);
-      GameObject nameGO = (GameObject)Instantiate(NameTextPrefab,
-          namePosition,
-          Quaternion.identity, tileGO.transform);
       UnitView view = unitGO.GetComponent<UnitView>();
-      view.nameGO = nameGO;
 
       GameObject unitInfoGO = (GameObject)Instantiate(UnitInfoPrefab,
           unitInfoPosition,
           Quaternion.identity, tileGO.transform);
-      unitInfoGO.GetComponent<UnitInfoView>().SetName(unit.rf);
+      unitInfoGO.GetComponent<UnitInfoView>().SetName(unit);
       view.unitInfoGO = unitInfoGO;
 
       view.OnCreate(unit);

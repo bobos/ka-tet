@@ -34,7 +34,7 @@ public class SettlementView : View
   }
 
   public void UpdateName() {
-    Color color = settlement.owner.attackside ? Color.red : Color.green;
+    Color color = settlement.owner.attackside ? Color.yellow : Color.white;
     string factionName = settlement.owner.faction.Name();
     nameGO.GetComponent<UnitNS.UnitNameView>().SetNameColor(settlement.name + "[" + factionName + "]", color, 80);
   }

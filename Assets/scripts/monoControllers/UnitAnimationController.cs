@@ -443,7 +443,7 @@ namespace MonoNS
         predict.result = SiegeResult.NoLabor;
       }
 
-      if (unit.movementRemaining < SiegePredict.MinPoint) {
+      if (unit.GetStaminaLevel() == StaminaLvl.Tired || unit.GetStaminaLevel() == StaminaLvl.Exhausted) {
         predict.result = SiegeResult.NoPoint;
       }
 

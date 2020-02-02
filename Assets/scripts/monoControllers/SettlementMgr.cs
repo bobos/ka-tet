@@ -198,6 +198,8 @@ namespace MonoNS
         Settlement settlement = mouseController.selectedSettlement;
         if (settlement == null || settlement.garrison.ToArray().Length == 0) return;
         settlement.Decamp(settlement.garrison[0]);
+        hexMap.settlementViewPanel.OnSettlementDeselect(settlement);
+        GetView(settlement).OnSettlementDeselect(settlement);
       }
     }
 

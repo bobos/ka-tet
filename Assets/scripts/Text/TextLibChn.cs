@@ -276,6 +276,12 @@ namespace TextNS
       
       {"title_wargame_commiting", "执行作战计划"},
       {"title_wargame_committed", "执行完毕"},
+
+      {"operation_minor_defeat", "小败"},
+      {"operation_major_defeat", "大败"},
+      {"operation_minor_victory", "小捷"},
+      {"operation_major_victory", "大捷"},
+
       };
     }
   }
