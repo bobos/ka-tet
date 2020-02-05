@@ -121,7 +121,7 @@ namespace MonoNS
       }
       
       if (mouseController.nearEnemy || mouseController.nearEnemySettlement != null) {
-        if (!hexMap.combatController.start) {
+        if (!hexMap.combatController.start && unit.GetStaminaLevel() != StaminaLvl.Exhausted) {
           AttackButton.SetActive(true);
         }
       }

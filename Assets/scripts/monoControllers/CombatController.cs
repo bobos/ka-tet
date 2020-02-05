@@ -70,6 +70,11 @@ namespace MonoNS
     List<Unit> supportDefenders;
 
     public OperationPredict StartOperation(Unit attacker, Unit targetUnit, bool ImAttacker) {
+      if (attacker.GetStaminaLevel() == StaminaLvl.Exhausted) {
+        // no enough stamina, can not start operation
+        return null;
+      }
+
       start = true;
       hexMap.unitSelectionPanel.ToggleButtons(true, attacker);
       this.attacker = attacker;
