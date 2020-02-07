@@ -42,7 +42,7 @@ namespace MonoNS
     int mouseDragThreshold = 4;
     Unit __selectedUnit = null;
     Unit __transferedUnit = null;
-    mode mouseMode;
+    public mode mouseMode;
     public Unit selectedUnit
     {
       get { return __selectedUnit; }
@@ -106,6 +106,7 @@ namespace MonoNS
     public bool nearAlly = false;
     public bool nearEnemy = false;
     public bool nearWater = false;
+    public List<Unit> nearbyEnemey = null;
 
     void PrepareUnitSelection() {
       nearEnemySettlement = null;
@@ -116,6 +117,7 @@ namespace MonoNS
       nearEnemy = false;
       nearWater = false;
       inCampField = null;
+      nearbyEnemey = new List<Unit>();
 
       Settlement s = null;
       if (tileUnderMouse.IsCampable()) {
@@ -146,6 +148,7 @@ namespace MonoNS
 
         if (u != null && u.IsAI() != selectedUnit.IsAI() && !u.IsConcealed()) {
           nearEnemy = true;
+          nearbyEnemey.Add(u);
         }
 
         //TODO: check assault for Scout with enemy in 2 rings and self is hidden
@@ -167,6 +170,7 @@ namespace MonoNS
       }
     }
 
+    List<Unit> highlightEnemyUnits;
     public void OnBtnClick(ActionController.actionName action)
     {
       if (action == ActionController.actionName.MOVE)
@@ -233,6 +237,10 @@ namespace MonoNS
       {
         mouseMode = mode.attack;
         Update_CurrentFunc = UpdateUnitAttack;
+        msgBox.Show("选择进攻目标!");
+        foreach(Unit u in nearbyEnemey) {
+          hexMap.TargetUnit(u);
+        }
       }
 
       if (action == ActionController.actionName.TRANSFERSUPPLY ||
@@ -390,7 +398,7 @@ namespace MonoNS
       }
     }
 
-    enum mode
+    public enum mode
     {
       detect,
       camera,
@@ -441,6 +449,13 @@ namespace MonoNS
             transferedUnit = null;
             transferedSettlement = null;
             hexMap.inputField.DeactivateInput();
+          }
+          if (mouseMode == mode.attack) {
+            msgBox.Show("");
+            foreach(Unit u in nearbyEnemey) {
+              hexMap.SetUnitSkin(u);
+            }
+            hexMap.combatController.CancelOperation();
           }
           onModeQuit(selectedUnit);
         }
@@ -594,6 +609,7 @@ namespace MonoNS
 
     void UpdateUnitAttack()
     {
+        //hexMap.combatController.CancelOperation();
       if (tileUnderMouse == null) {
         return;
       }
@@ -602,6 +618,7 @@ namespace MonoNS
         ClickOnTile();
         if (targetSettlement != null)
         {
+          msgBox.Show("");
           if (targetSettlement.IsEmpty()) {
             if (!actionController.attackEmptySettlement(selectedUnit, tileUnderMouse)) {
               // TODO
@@ -613,19 +630,20 @@ namespace MonoNS
         }
 
         if (targetUnit != null) {
+          msgBox.Show("");
           OperationPredict predict = hexMap.combatController.StartOperation(selectedUnit, targetUnit, true);
           hover.Show("攻方点数:" + predict.attackerOptimPoints + "\n守方点数:" + predict.defenderOptimPoints
            + "\n预计结果:" + predict.sugguestedResult.GetResult());
         }
       }
-      //else if (!Util.eq<Tile>(tileUnderMouse, selectedUnit.tile))
-      //{
-      //  Unit u = tileUnderMouse.GetUnit();
-      //  if (u != null)
-      //  {
-      //    hover.Show(u.Name());
-      //  }
-      //}
+      else if (!Util.eq<Tile>(tileUnderMouse, selectedUnit.tile))
+      {
+        Unit u = tileUnderMouse.GetUnit();
+        if (u != null)
+        {
+          hover.Show(u.Name());
+        }
+      }
     }
 
     void UpdateUnitTransferSupply()

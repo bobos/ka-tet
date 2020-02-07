@@ -146,10 +146,6 @@ namespace MonoNS
       hexMap.combatController.CommenceOperation();
     }
 
-    public void OnCancelAttackClick() {
-      hexMap.combatController.CancelOperation();
-    }
-
     public void OnGarrisonMgtClick()
     {
       if (onBtnClick != null)

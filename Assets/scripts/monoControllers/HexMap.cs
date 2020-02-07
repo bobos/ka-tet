@@ -382,6 +382,11 @@ namespace MonoNS
       SetTroopSkin(unit2GO[unit], UnitHightlight);
     }
 
+    public void TargetUnit(Unit unit) {
+      if (unit == null && unit2GO.ContainsKey(unit)) return;
+      SetTroopSkin(unit2GO[unit], AttackRange);
+    }
+
     public void UnhighlightUnit(Unit unit)
     {
       if (unit == null && unit2GO.ContainsKey(unit)) return;

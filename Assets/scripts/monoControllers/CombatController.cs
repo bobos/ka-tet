@@ -210,7 +210,6 @@ namespace MonoNS
     public void CancelOperation() {
       start = false;
       hexMap.CleanLines();
-      hexMap.unitSelectionPanel.ToggleButtons(true, attacker);
     }
 
     public void CommenceOperation() {
