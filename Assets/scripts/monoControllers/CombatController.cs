@@ -126,7 +126,9 @@ namespace MonoNS
       // defenders
       unitPredict = new UnitPredict();
       unitPredict.unit = defender;
-      unitPredict.percentOfEffectiveForce = 100;
+      unitPredict.percentOfEffectiveForce = GetEffectiveForcePercentage(defender);
+      // Exausted defense drop 50%
+      unitPredict.percentOfEffectiveForce = unitPredict.percentOfEffectiveForce == 0 ? 50 : unitPredict.percentOfEffectiveForce;
       unitPredict.joinPossibility = 100;
       // TODO: Wind buff
       unitPredict.operationPoint = defender.unitDefence;

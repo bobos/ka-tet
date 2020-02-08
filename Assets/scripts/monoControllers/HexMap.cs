@@ -422,6 +422,7 @@ namespace MonoNS
           tileGO.transform.position,
           Quaternion.identity, tileGO.transform);
       unitInfoGO.GetComponent<UnitInfoView>().SetStr(txt, Color.cyan);
+      lineLabels.Add(unitInfoGO);
     }
 
     void CreateTileGO(Tile tile)
