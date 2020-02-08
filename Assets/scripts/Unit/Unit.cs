@@ -91,7 +91,7 @@ namespace UnitNS
       farmDestroy = new FarmDestroy(this);
     }
 
-    public void CloneInit(int disarmorDefDebuf, float newGeneralDebuf,
+    public void CloneInit(float disarmorDefDebuf, float newGeneralDebuf,
     ArmyEpidemic epidemic, UnitPoisioned poisioned, Supply supply, WeatherEffect weatherEffect,
     Vantage vantage, PlainSickness plainSickness) {
       this.disarmorDefDebuf = disarmorDefDebuf;
@@ -599,37 +599,39 @@ namespace UnitNS
     // ==============================================================
     // ================= buff & debuff ==============================
     // ==============================================================
-    public int disarmorDefDebuf = 0;
+    public float disarmorDefDebuf = 0;
     public int def
     {
       get
       {
-        int defence = (int)(rf.def + (rf.def *
-        (GetBuff() + vantage.DefBuf())
-        ) - disarmorDefDebuf);
-        return defence <= 0 ? 1 : defence;
+        return rf.defCore;
       }
     }
     public int atk
     {
       get
       {
-        int attack = (int)(rf.atk + (rf.atk * 
-        (GetBuff() + vantage.AtkBuf() + weatherEffect.AtkBuf() - plainSickness.atkDebuf)
-        ));
-        return attack <= 0 ? 1 : attack;
+        return rf.atkCore;
       }
     }
 
     public int unitAttack {
       get {
-        return (int)(vantage.TotalPoints(atk) * 0.01f);
+        int total = vantage.TotalPoints(atk);
+        total = (int)(total + total * (
+          GetBuff() + vantage.AtkBuf() + weatherEffect.AtkBuf() - plainSickness.atkDebuf + rf.atkLvlBuf
+        ));
+        return total < 0 ? 0 : total;
       }
     }
 
     public int unitDefence {
       get {
-        return (int)(vantage.TotalPoints(def) * 0.01f);
+        int total = vantage.TotalPoints(def);
+        total = (int)(total + total * (
+        GetBuff() + vantage.DefBuf() + rf.defLvlBuf - disarmorDefDebuf
+        ));
+        return total < 0 ? 0 : total;
       }
     }
 

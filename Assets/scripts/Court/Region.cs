@@ -41,19 +41,19 @@ namespace CourtNS
     public override int Atk(Type unitType)
     {
       if (unitType == Type.Infantry)
-        return 40;
+        return 2;
       if (unitType == Type.Scout)
-        return 150;
-      return 100;
+        return 5;
+      return 5;
     }
 
     public override int Def(Type unitType)
     {
       if (unitType == Type.Infantry)
-        return 50;
+        return 1;
       if (unitType == Type.Scout)
-        return 50;
-      return 20;
+        return 3;
+      return 1;
     }
 
     public override int Will()
@@ -88,19 +88,19 @@ namespace CourtNS
     public override int Atk(Type unitType)
     {
       if (unitType == Type.Infantry)
-        return 50;
+        return 2;
       if (unitType == Type.Scout)
-        return 130;
-      return 80;
+        return 5;
+      return 4;
     }
 
     public override int Def(Type unitType)
     {
       if (unitType == Type.Infantry)
-        return 80;
+        return 2;
       if (unitType == Type.Scout)
-        return 80;
-      return 30;
+        return 3;
+      return 2;
     }
 
     public override int Will()
@@ -135,19 +135,19 @@ namespace CourtNS
     public override int Atk(Type unitType)
     {
       if (unitType == Type.Infantry)
-        return 40;
+        return 1;
       if (unitType == Type.Scout)
-        return 120;
-      return 70;
+        return 5;
+      return 4;
     }
 
     public override int Def(Type unitType)
     {
       if (unitType == Type.Infantry)
-        return 50;
+        return 1;
       if (unitType == Type.Scout)
-        return 50;
-      return 30;
+        return 3;
+      return 1;
     }
 
     public override int Will()
@@ -182,19 +182,19 @@ namespace CourtNS
     public override int Atk(Type unitType)
     {
       if (unitType == Type.Infantry)
-        return 60;
+        return 2;
       if (unitType == Type.Scout)
-        return 130;
-      return 80;
+        return 5;
+      return 5;
     }
 
     public override int Def(Type unitType)
     {
       if (unitType == Type.Infantry)
-        return 90;
+        return 3;
       if (unitType == Type.Scout)
-        return 90;
-      return 30;
+        return 3;
+      return 3;
     }
 
     public override int Will()
@@ -229,19 +229,19 @@ namespace CourtNS
     public override int Atk(Type unitType)
     {
       if (unitType == Type.Infantry)
-        return 40;
+        return 2;
       if (unitType == Type.Scout)
-        return 150;
-      return 100;
+        return 5;
+      return 5;
     }
 
     public override int Def(Type unitType)
     {
       if (unitType == Type.Infantry)
-        return 40;
+        return 1;
       if (unitType == Type.Scout)
-        return 60;
-      return 40;
+        return 3;
+      return 2;
     }
 
     public override int Will()

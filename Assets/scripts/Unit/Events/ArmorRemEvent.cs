@@ -19,7 +19,7 @@
     }
 
     int DefReduce() {
-      return (int)(unit.rf.def * 0.25f);
+      return 25;
     } 
 
     int Discontent() {

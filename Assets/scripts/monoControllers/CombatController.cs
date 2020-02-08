@@ -8,25 +8,13 @@ using CourtNS;
 namespace MonoNS
 {
   public class OperationGeneralResult {
-    public int result;
-    public OperationGeneralResult(int result) {
-      this.result = result;
+    public int chance;
+    public OperationGeneralResult(int chance) {
+      this.chance = chance > 10 ? 10 : (chance < 0 ? 0 : chance);
     }
 
     public string GetResult() {
-      if (result == 0) {
-        //major defeat
-        return Cons.GetTextLib().get("operation_major_defeat");
-      }
-      if (result == 1) {
-        //minor defeat
-        return Cons.GetTextLib().get("operation_minor_defeat");
-      }
-      if (result == 2) {
-        //minor victory
-        return Cons.GetTextLib().get("operation_minor_victory");
-      }
-      return Cons.GetTextLib().get("operation_major_victory");
+      return System.String.Format(Cons.GetTextLib().get("operation_success_chance"), chance);
     }
   }
 
@@ -69,7 +57,7 @@ namespace MonoNS
     List<Unit> supportAttackers; 
     List<Unit> supportDefenders;
 
-    public OperationPredict StartOperation(Unit attacker, Unit targetUnit, bool ImAttacker) {
+    public OperationPredict StartOperation(Unit attacker, Unit targetUnit) {
       if (attacker.GetStaminaLevel() == StaminaLvl.Exhausted) {
         // no enough stamina, can not start operation
         return null;
@@ -129,7 +117,7 @@ namespace MonoNS
 
         // TODO: join possibility
         unitPredict.joinPossibility = GetJoinPossibility(unit, attacker);
-        unitPredict.operationPoint = (int)(unit.unitAttack * unitPredict.percentOfEffectiveForce * 0.001f);
+        unitPredict.operationPoint = (int)(unit.unitAttack * unitPredict.percentOfEffectiveForce * 0.01f);
         predict.attackers.Add(unitPredict);
         predict.attackerOptimPoints += unitPredict.operationPoint;
         hexMap.ShowAttackArrow(unit, targetUnit,
@@ -163,7 +151,7 @@ namespace MonoNS
         }
 
         unitPredict.joinPossibility = GetJoinPossibility(unit, targetUnit);
-        unitPredict.operationPoint = (int)(unit.unitDefence * unitPredict.percentOfEffectiveForce * 0.001f);
+        unitPredict.operationPoint = (int)(unit.unitDefence * unitPredict.percentOfEffectiveForce * 0.01f);
         predict.defenders.Add(unitPredict);
         predict.defenderOptimPoints += unitPredict.operationPoint;
         if (!Util.eq<Unit>(unit, targetUnit)) {
@@ -173,17 +161,17 @@ namespace MonoNS
       }
 
       if (predict.defenderOptimPoints >= predict.attackerOptimPoints) {
-        if (ImAttacker) {
-          predict.sugguestedResult = new OperationGeneralResult(1);
-        } else {
-          predict.sugguestedResult = new OperationGeneralResult(2);
-        }
+        predict.sugguestedResult = new OperationGeneralResult(0);
+      } else if (predict.attackerOptimPoints >= (int)(predict.defenderOptimPoints * 1.5f)) {
+        predict.sugguestedResult = new OperationGeneralResult(10);
+      } else if (predict.attackerOptimPoints >= (int)(predict.defenderOptimPoints * 1.4f)) {
+        predict.sugguestedResult = new OperationGeneralResult(8);
+      } else if (predict.attackerOptimPoints >= (int)(predict.defenderOptimPoints * 1.3f)) {
+        predict.sugguestedResult = new OperationGeneralResult(5);
+      } else if (predict.attackerOptimPoints >= (int)(predict.defenderOptimPoints * 1.2f)) {
+        predict.sugguestedResult = new OperationGeneralResult(3);
       } else {
-        if (ImAttacker) {
-          predict.sugguestedResult = new OperationGeneralResult(2);
-        } else {
-          predict.sugguestedResult = new OperationGeneralResult(1);
-        }
+        predict.sugguestedResult = new OperationGeneralResult(1);
       }
 
       return predict;

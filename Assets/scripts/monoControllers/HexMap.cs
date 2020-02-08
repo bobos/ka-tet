@@ -396,7 +396,7 @@ namespace MonoNS
     List<UnitView> toggledUnitViews = new List<UnitView>();
     public void ShowAttackArrow(Unit fromUnit, Unit toUnit,
       int joinPossibility, int percentageForce, int operationPoint) {
-      string txt = fromUnit.GeneralName() + "\n" + joinPossibility + "%\n" + operationPoint + "(" + percentageForce + "%)";
+      string txt = fromUnit.GeneralName() + "\n" + joinPossibility + "%\n" + operationPoint*0.001f + "(" + percentageForce + "%)";
       UnitView view = GetUnitView(fromUnit);
       toggledUnitViews.Add(view);
       view.ToggleText(false);
@@ -405,7 +405,7 @@ namespace MonoNS
 
     public void ShowDefendArrow(Unit fromUnit, Unit toUnit,
       int joinPossibility, int percentageForce, int operationPoint) {
-      string txt = fromUnit.GeneralName() + "\n" + joinPossibility + "%\n" + operationPoint + "(" + percentageForce + "%)";
+      string txt = fromUnit.GeneralName() + "\n" + joinPossibility + "%\n" + operationPoint*0.001f + "(" + percentageForce + "%)";
       UnitView view = GetUnitView(fromUnit);
       toggledUnitViews.Add(view);
       view.ToggleText(false);

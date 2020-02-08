@@ -75,12 +75,6 @@ namespace CourtNS
       }
     }
 
-    public int atk {
-      get {
-        return (int)(atkCore + (atkCore * atkLvlBuf));
-      }
-    }
-
     public float atkLvlBuf {
       get {
         return rank.AtkBuf(morale);
@@ -90,12 +84,6 @@ namespace CourtNS
     public float defLvlBuf {
       get {
         return rank.DefBuf(morale);
-      }
-    }
-
-    public int def {
-      get {
-        return (int)(defCore + (defCore * defLvlBuf));
       }
     }
 

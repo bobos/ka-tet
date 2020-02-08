@@ -339,9 +339,7 @@ namespace MonoNS
             eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.Disarmor1, unit,
               null, defReduce));
             while (eventDialog.Animating) { yield return null; }
-            unit.disarmorDefDebuf = defReduce; 
-            ShowEffects(unit, new int[9]{0,0,0,0,0,0,0,-defReduce,0});
-            while (ShowAnimating) { yield return null; }
+            unit.disarmorDefDebuf = defReduce * 0.01f; 
           }
         }
       }

@@ -190,7 +190,7 @@ namespace TextNS
       {"event_supplyRouteBlocked", @"我军{0}与{1}之间的所有补给线遭到敌军切断，请立即派兵驱逐补给线上敌军以恢复两地交通补给！"},
       {"event_disarmor_title", "酷热难当"},
       {"event_disarmor", @"酷暑连日，{1}士兵终日顶盔贯甲行军备战已致多人中暑晕厥，军中抱怨者甚，有士卒恳求只着毡帽上身免披铁甲以解暑热，遭{0}厉斥，部队不满+{2}"},
-      {"event_disarmor1", @"酷暑连日，{1}士兵终日顶盔贯甲行军备战已致多人中暑晕厥，军中抱怨者甚，有士卒恳求只着毡帽上身免披铁甲以解暑热，{0}许之，部队防御-{2}"},
+      {"event_disarmor1", @"酷暑连日，{1}士兵终日顶盔贯甲行军备战已致多人中暑晕厥，军中抱怨者甚，有士卒恳求只着毡帽上身免披铁甲以解暑热，{0}许之，部队防御下降{2}%"},
       {"event_riot_title", "部队哗变"},
       {"event_riot", @"{0}将军所部{1}因军中积怨深厚，发生哗变，部队士气下降{2}！"},
       {"event_generalExecuted_title", "死亡"},
@@ -277,10 +277,7 @@ namespace TextNS
       {"title_wargame_commiting", "执行作战计划"},
       {"title_wargame_committed", "执行完毕"},
 
-      {"operation_minor_defeat", "小败"},
-      {"operation_major_defeat", "大败"},
-      {"operation_minor_victory", "小捷"},
-      {"operation_major_victory", "大捷"},
+      {"operation_success_chance", @"胜算{0}成"},
 
       };
     }

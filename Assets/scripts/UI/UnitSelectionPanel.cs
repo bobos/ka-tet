@@ -191,6 +191,7 @@ namespace MonoNS
     public void OnUnitSelect(Unit unit)
     {
       self.SetActive(true);
+      bool isPreflight = !Util.eq<Unit>(unit, mouseController.selectedUnit);
 
       // set attack, defense details
       string details = 
@@ -199,35 +200,38 @@ namespace MonoNS
       + "% 饥饿惩罚:" + unit.GetStarvingBuf() * 100
       + "% 整合度惩罚:" + unit.GetNewGeneralBuf() * 100
 
-      + "%\n单兵攻击:" + unit.atk + "\n[基本攻击:" + unit.rf.atkCore
+      + "%\n单兵攻击:" + unit.atk + "\n进攻加成:\n"
       + " 等级加成:" + unit.rf.atkLvlBuf * 100
       + "% 地形加成:" + unit.vantage.AtkBuf() * 100
       + "% 气候加成:" + unit.weatherEffect.AtkBuf() * 100
       +
       (unit.plainSickness.affected ? ("% 平原反应惩罚:" + unit.plainSickness.atkDebuf * 100) : "")
-      + "% 总计:" +
+      + "%\n 总计进攻加成:" +
       (unit.GetStaminaBuf() + unit.GetStarvingBuf() + unit.GetNewGeneralBuf()
        + unit.rf.atkLvlBuf + unit.vantage.AtkBuf() + unit.weatherEffect.AtkBuf())*100
-      + "%]\n"
+      + "%\n"
 
-      + "单兵防御:" + unit.def + "\n[基本防御:" + unit.rf.defCore
+      + "单兵防御:" + unit.def + "\n防御加成:\n"
       + " 等级加成:" + unit.rf.defLvlBuf * 100
       + "% 地形加成:" + unit.vantage.DefBuf() * 100
-      + "% 免胄惩罚:" + unit.disarmorDefDebuf
-      + " 总计:" +
+      + "% 免胄惩罚:" + unit.disarmorDefDebuf * 100
+      + "%\n 总计防御加成:" +
       (unit.GetStaminaBuf() + unit.GetStarvingBuf() + unit.GetNewGeneralBuf() + unit.rf.defLvlBuf + unit.vantage.DefBuf())*100
-      + "%]\n"
+      + "%\n"
       + "有效兵力:" + unit.vantage.GetEffective();
       hexMap.hoverInfo.Show(details);
 
       title.text = unit.GeneralName();
-      movement.text = "移动力:" + unit.movementRemaining + "/" + unit.GetFullMovement();
+      movement.text = "移动力:" + (isPreflight ? mouseController.selectedUnit.movementRemaining + " -> " : "")
+        + unit.movementRemaining + "/" + unit.GetFullMovement();
       stamina.text = "体力: " + unit.GetStaminaLvlName();
       slots.text = "粮草: " + unit.supply.supply + "石" + " 可维持" + unit.slots + "/" + unit.GetMaxSupplySlots() + "回合" + " 每回合消耗:" + unit.supply.SupplyNeededPerTurn() + "石";
       num.text = unit.Name() + "[兵:" + unit.rf.soldiers + "/伤:" + unit.rf.wounded + "/亡:" + unit.kia + "/逃:" + unit.mia + "/役:" + unit.labor + "]";
       morale.text = "士气: " + unit.rf.morale;
-      offense.text = "攻击: " + unit.unitAttack;
-      defense.text = "防御: " + unit.unitDefence;
+      offense.text = "攻击: " + (isPreflight ? (int)(mouseController.selectedUnit.unitAttack * 0.001f) + " -> " : "")
+        + (int)(unit.unitAttack * 0.001f);
+      defense.text = "防御: " + (isPreflight ? (int)(mouseController.selectedUnit.unitDefence * 0.001f) + " -> " : "")
+        + (int)(unit.unitDefence * 0.001f);
       string stateStr = unit.tile.sieged ? "围城中" : ""; 
       stateStr += unit.IsWarWeary() ? " 士气低落" : "";
       stateStr += " " + unit.GetDiscontent();

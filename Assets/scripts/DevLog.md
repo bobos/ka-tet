@@ -45,3 +45,10 @@ Game Tips:
 主帅指挥范围决定部队士气buff，范围外部队, 指令执行可能违背
 主帅能力：1星周围一格 2星周围3格 3星周围5格 4星周围10格 5星全图
 all event not showing for AI
+atk >= 1.5*def 100% win
+atk >= 1.4 80% win
+atk >= 1.3 50% win
+atk >= 1.2 30% win
+atk >= 1.1 10% win
+atk <= 1 0% win
+every 5 point kill/wound a soldier

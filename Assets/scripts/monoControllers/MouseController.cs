@@ -631,19 +631,19 @@ namespace MonoNS
 
         if (targetUnit != null) {
           msgBox.Show("");
-          OperationPredict predict = hexMap.combatController.StartOperation(selectedUnit, targetUnit, true);
-          hover.Show("攻方点数:" + predict.attackerOptimPoints + "\n守方点数:" + predict.defenderOptimPoints
-           + "\n预计结果:" + predict.sugguestedResult.GetResult());
+          OperationPredict predict = hexMap.combatController.StartOperation(selectedUnit, targetUnit);
+          hover.Show("攻方点数:" + predict.attackerOptimPoints * 0.001f + "\n守方点数:" + predict.defenderOptimPoints * 0.001f
+           + "\n胜算几何:" + predict.sugguestedResult.GetResult());
         }
       }
-      else if (!Util.eq<Tile>(tileUnderMouse, selectedUnit.tile))
-      {
-        Unit u = tileUnderMouse.GetUnit();
-        if (u != null)
-        {
-          hover.Show(u.Name());
-        }
-      }
+      //else if (!Util.eq<Tile>(tileUnderMouse, selectedUnit.tile))
+      //{
+      //  Unit u = tileUnderMouse.GetUnit();
+      //  if (u != null)
+      //  {
+      //    hover.Show(u.Name());
+      //  }
+      //}
     }
 
     void UpdateUnitTransferSupply()
