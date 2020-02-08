@@ -91,15 +91,9 @@ namespace UnitNS
       farmDestroy = new FarmDestroy(this);
     }
 
-    public void CloneInit(float disarmorDefDebuf, float newGeneralDebuf,
-    ArmyEpidemic epidemic, UnitPoisioned poisioned, Supply supply, WeatherEffect weatherEffect,
-    Vantage vantage, PlainSickness plainSickness) {
+    public void CloneInit(float disarmorDefDebuf, float newGeneralDebuf, Supply supply, PlainSickness plainSickness) {
       this.disarmorDefDebuf = disarmorDefDebuf;
       this.newGeneralDebuf = newGeneralDebuf;
-      this.epidemic = epidemic;
-      this.unitPoisioned = poisioned;
-      this.weatherEffect = weatherEffect;
-      this.vantage = vantage;
       this.supply = supply;
       this.plainSickness = plainSickness;
     }
@@ -684,6 +678,7 @@ namespace UnitNS
     // ==============================================================
     public Unit Preflight(Tile target, Tile[] path = null)
     {
+      // NOTE: must NOT destroy clone unit, because there are objects borrowed from host
       // No preflight for camping unit
       if (state == State.Camping) return null;
       // TODO: target tile should be within unit's accessible range

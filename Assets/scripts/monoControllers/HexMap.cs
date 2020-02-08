@@ -412,6 +412,18 @@ namespace MonoNS
       CreateArrow(new Tile[]{fromUnit.tile, toUnit.tile}, Color.blue, txt, joinPossibility > 70 ? Color.cyan : Color.red);
     }
 
+     public void ShowDefenderStat(Unit defender, int joinPossibility, int percentageForce, int operationPoint) {
+      string txt = defender.GeneralName() + "\n" + joinPossibility + "%\n" + operationPoint*0.001f + "(" + percentageForce + "%)";
+      UnitView view = GetUnitView(defender);
+      toggledUnitViews.Add(view);
+      view.ToggleText(false);
+      GameObject tileGO = tile2GO[defender.tile];
+      GameObject unitInfoGO = (GameObject)Instantiate(UnitInfoPrefab,
+          tileGO.transform.position,
+          Quaternion.identity, tileGO.transform);
+      unitInfoGO.GetComponent<UnitInfoView>().SetStr(txt, Color.cyan);
+    }
+
     void CreateTileGO(Tile tile)
     {
       GameObject prefab = null;

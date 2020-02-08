@@ -10,12 +10,12 @@ namespace  UnitNS
     public const int MaxTroopNum = 15000;
 
     public static Unit Create(bool clone, Troop troop, Tile tile, int supply, int labor, State state = State.Stand, 
-                    int kia = 0, int mia = 0, int movement = -1) {
+                    int kia = 0, int mia = 0, int movement = -1, float disarmorDefDebuf = 0f,
+                    float newGenBuf = 0f, Supply theSupply = null, PlainSickness plainSickness = null) {
       Unit unit = new Infantry(clone, troop, tile, supply, labor, state, kia, mia, movement);
       unit.Init();
       if (clone) {
-        unit.CloneInit(unit.disarmorDefDebuf, unit.GetNewGeneralBuf(), unit.epidemic, unit.unitPoisioned,
-          unit.supply, unit.weatherEffect, unit.vantage, unit.plainSickness);
+        unit.CloneInit(disarmorDefDebuf, newGenBuf, theSupply, unit.plainSickness);
       }
       return unit;
     }
@@ -73,7 +73,8 @@ namespace  UnitNS
 
     protected override Unit Clone()
     {
-      return Create(true, rf, tile, supply.supply, labor, state, kia, mia, movementRemaining);
+      return Create(true, rf, tile, supply.supply, labor, state, kia, mia, movementRemaining,
+        disarmorDefDebuf, GetNewGeneralBuf(), supply, plainSickness);
     }
 
     protected override bool Concealable() {

@@ -228,10 +228,10 @@ namespace MonoNS
       slots.text = "粮草: " + unit.supply.supply + "石" + " 可维持" + unit.slots + "/" + unit.GetMaxSupplySlots() + "回合" + " 每回合消耗:" + unit.supply.SupplyNeededPerTurn() + "石";
       num.text = unit.Name() + "[兵:" + unit.rf.soldiers + "/伤:" + unit.rf.wounded + "/亡:" + unit.kia + "/逃:" + unit.mia + "/役:" + unit.labor + "]";
       morale.text = "士气: " + unit.rf.morale;
-      offense.text = "攻击: " + (isPreflight ? (int)(mouseController.selectedUnit.unitAttack * 0.001f) + " -> " : "")
-        + (int)(unit.unitAttack * 0.001f);
-      defense.text = "防御: " + (isPreflight ? (int)(mouseController.selectedUnit.unitDefence * 0.001f) + " -> " : "")
-        + (int)(unit.unitDefence * 0.001f);
+      offense.text = "攻击: " + (isPreflight ? mouseController.selectedUnit.unitAttack * 0.001f + " -> " : "")
+        + unit.unitAttack * 0.001f;
+      defense.text = "防御: " + (isPreflight ? mouseController.selectedUnit.unitDefence * 0.001f + " -> " : "")
+        + unit.unitDefence * 0.001f;
       string stateStr = unit.tile.sieged ? "围城中" : ""; 
       stateStr += unit.IsWarWeary() ? " 士气低落" : "";
       stateStr += " " + unit.GetDiscontent();

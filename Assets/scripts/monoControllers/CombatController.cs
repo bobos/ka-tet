@@ -57,6 +57,16 @@ namespace MonoNS
     List<Unit> supportAttackers; 
     List<Unit> supportDefenders;
 
+    int GetEffectiveForcePercentage(Unit unit) {
+      if (unit.GetStaminaLevel() == StaminaLvl.Tired) {
+        return 70;
+      } else if (unit.GetStaminaLevel() == StaminaLvl.Exhausted) {
+        return 0;
+      } else {
+         return 100;
+      }
+    }
+
     public OperationPredict StartOperation(Unit attacker, Unit targetUnit) {
       if (attacker.GetStaminaLevel() == StaminaLvl.Exhausted) {
         // no enough stamina, can not start operation
@@ -90,7 +100,7 @@ namespace MonoNS
       OperationPredict predict = new OperationPredict();
       UnitPredict unitPredict = new UnitPredict();
       unitPredict.unit = attacker;
-      unitPredict.percentOfEffectiveForce = 100;
+      unitPredict.percentOfEffectiveForce = GetEffectiveForcePercentage(attacker);
       unitPredict.joinPossibility = 100;
       // TODO: Wind buff, tmp morale buff from commander
       unitPredict.operationPoint = attacker.unitAttack;
@@ -102,18 +112,7 @@ namespace MonoNS
       foreach(Unit unit in supportAttackers) {
         unitPredict = new UnitPredict();
         unitPredict.unit = unit;
-        if (unit.GetStaminaLevel() == StaminaLvl.Vigorous) {
-          unitPredict.percentOfEffectiveForce = 100;
-        }
-        if (unit.GetStaminaLevel() == StaminaLvl.Fresh) {
-          unitPredict.percentOfEffectiveForce = 80;
-        }
-        if (unit.GetStaminaLevel() == StaminaLvl.Tired) {
-          unitPredict.percentOfEffectiveForce = 50;
-        }
-        if (unit.GetStaminaLevel() == StaminaLvl.Exhausted) {
-          unitPredict.percentOfEffectiveForce = 0;
-        }
+        unitPredict.percentOfEffectiveForce = GetEffectiveForcePercentage(unit);
 
         // TODO: join possibility
         unitPredict.joinPossibility = GetJoinPossibility(unit, attacker);
@@ -130,26 +129,16 @@ namespace MonoNS
       unitPredict.percentOfEffectiveForce = 100;
       unitPredict.joinPossibility = 100;
       // TODO: Wind buff
-      unitPredict.operationPoint = attacker.unitDefence;
+      unitPredict.operationPoint = defender.unitDefence;
       predict.defenders.Add(unitPredict);
       predict.defenderOptimPoints += unitPredict.operationPoint;
+      hexMap.ShowDefenderStat(defender, unitPredict.joinPossibility,
+        unitPredict.percentOfEffectiveForce, unitPredict.operationPoint);
 
       foreach(Unit unit in supportDefenders) {
         unitPredict = new UnitPredict();
         unitPredict.unit = unit;
-        if (unit.GetStaminaLevel() == StaminaLvl.Vigorous) {
-          unitPredict.percentOfEffectiveForce = 100;
-        }
-        if (unit.GetStaminaLevel() == StaminaLvl.Fresh) {
-          unitPredict.percentOfEffectiveForce = 80;
-        }
-        if (unit.GetStaminaLevel() == StaminaLvl.Tired) {
-          unitPredict.percentOfEffectiveForce = 50;
-        }
-        if (unit.GetStaminaLevel() == StaminaLvl.Exhausted) {
-          unitPredict.percentOfEffectiveForce = 0;
-        }
-
+        unitPredict.percentOfEffectiveForce = GetEffectiveForcePercentage(unit);
         unitPredict.joinPossibility = GetJoinPossibility(unit, targetUnit);
         unitPredict.operationPoint = (int)(unit.unitDefence * unitPredict.percentOfEffectiveForce * 0.01f);
         predict.defenders.Add(unitPredict);
