@@ -61,7 +61,9 @@ namespace MonoNS
       if (playerAttack) {
         btn2.SetActive(true);
       } else {
-        btn2.SetActive(false);
+        // TODO: remove AI test
+        //btn2.SetActive(false);
+        btn2.SetActive(true);
       }
       self.SetActive(true);
 
@@ -113,13 +115,13 @@ namespace MonoNS
         textLib.get("event_operationDetail_unit") + ":\n" + atkSerial + "\n" +
         textLib.get("event_operationDetail_inf") + ": " + atkInf + "\n" +
         textLib.get("event_operationDetail_cav") + ": " + atkCav + "\n" +
-        textLib.get("event_operationDetail_total") + ": " + predict.attackerOptimPoints;
+        textLib.get("event_operationDetail_total") + ": " + predict.attackerOptimPoints * 0.001f;
 
       rightDescription.text = textLib.get("event_operationDetail_gen") + ":\n" + defGenerals + "\n" +
         textLib.get("event_operationDetail_unit") + ":\n" + defSerial + "\n" +
         textLib.get("event_operationDetail_inf") + ": " + defInf + "\n" +
         textLib.get("event_operationDetail_cav") + ": " + defCav + "\n" +
-        textLib.get("event_operationDetail_total") + ": " + predict.defenderOptimPoints;
+        textLib.get("event_operationDetail_total") + ": " + predict.defenderOptimPoints * 0.001f;
 
       middleDescription.text = textLib.get("event_possibleVictRate_" + predict.sugguestedResult.chance);
       if (playerAttack) {

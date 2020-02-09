@@ -26,6 +26,8 @@ namespace MonoNS
     public int operationPoint;
     public bool windAdvantage = false;
     public bool windDisadvantage = false;
+    public int dead = 0;
+    public int wounded = 0;
   }
 
   public class OperationPredict {
@@ -249,6 +251,59 @@ namespace MonoNS
       hexMap.CleanLines();
     }
 
+    void AllocateCasualty(int total, List<UnitPredict> units) {
+      while (total > 0) {
+        foreach(UnitPredict up in units) {
+          Unit unit = up.unit;
+          // rookie
+          if (unit.rf.rank.Level() == 1) {
+            if (unit.IsCavalry()) {
+              // TODO: -3
+              // update up.dead and up.wounded
+            } else {
+              if (total > 10) {
+                total -= 10;
+              } else {
+                total = 0;
+                // deduct
+                break;
+              }
+            }
+          }
+
+          // veteran
+          if (unit.rf.rank.Level() == 2) {
+            if (unit.IsCavalry()) {
+              // -2
+            } else {
+              if (total > 5) {
+                total -= 5;
+              } else {
+                total = 0;
+                // deduct
+                break;
+              }
+            }
+          }
+
+          // elite
+          if (unit.rf.rank.Level() == 3 || unit.rf.rank.Level() == -1) {
+            if (unit.IsCavalry()) {
+              // -1
+            } else {
+              if (total > 3) {
+                total -= 3;
+              } else {
+                total = 0;
+                // deduct
+                break;
+              }
+            }
+          }
+        }
+      }
+    }
+
     public bool commenceOpAnimating = false;
     public void CommenceOperation() {
       if (!start) {
@@ -263,6 +318,100 @@ namespace MonoNS
       while (hexMap.cameraKeyboardController.fixingCamera) { yield return null; }
       hexMap.eventDialogAlt.ShowOperationEvent(predict, !attacker.IsAI());
       while (hexMap.eventDialogAlt.Animating) { yield return null; };
+      if (hexMap.eventDialogAlt.btn1Clicked) {
+        int defenderTotal = 0;
+        int attackerTotal = 0;
+        foreach (UnitPredict u in predict.attackers) {
+          attackerTotal += u.unit.rf.soldiers;
+        }
+
+        foreach (UnitPredict u in predict.defenders) {
+          defenderTotal += u.unit.rf.soldiers;
+        }
+
+        int attackerCasualty = 0;
+        int defenderCasualty = 0;
+        bool attackerBigger = true;
+        int factor = 0;
+        if (predict.attackerOptimPoints > predict.defenderOptimPoints) {
+          factor = (int)((predict.attackerOptimPoints / predict.defenderOptimPoints) * 10) - 10;
+        } else {
+          attackerBigger = false;
+          factor = (int)((predict.defenderOptimPoints / predict.attackerOptimPoints) * 10) - 10;
+        }
+
+// 1.0 to 1.1 - 0.01(both)
+// 1.2 to 1.6 - def: x - 1, atk: (x -1) * (0.5 - 0.6)   
+// 1.7 to 2.0 - atk: (x - 1) * (0.25 - 0.4)
+// 2.1 to 3.0 - atk: (x - 1) * (0.125 - 0.2)
+// 3.1 to 4.0 - atk: (x - 1) * (0.1 - 0.125);
+// 4.0 above - atk: (x - 1) * 0.05
+        if (factor <= 1) {
+          defenderCasualty = attackerCasualty = (int)(defenderTotal * 0.01f);
+        } else {
+          if (attackerBigger) {
+            defenderCasualty = (int)(defenderTotal * factor * 0.01f);
+          } else {
+            attackerCasualty = (int)(attackerTotal * factor * 0.01f);
+          }
+
+          if (factor > 1 && factor <= 6) {
+            if (attackerBigger) {
+              attackerCasualty = (int)(defenderCasualty * Util.Rand(5, 6) * 0.1f);
+            } else {
+              defenderCasualty = (int)(attackerCasualty * Util.Rand(5, 6) * 0.1f);
+            }
+          }
+
+          if (factor > 6 && factor <= 20) {
+            if (attackerBigger) {
+              attackerCasualty = (int)(defenderCasualty * Util.Rand(25, 40) * 0.01f);
+            } else {
+              defenderCasualty = (int)(attackerCasualty * Util.Rand(25, 40) * 0.01f);
+            }
+          }
+
+          if (factor > 20 && factor <= 30) {
+            if (attackerBigger) {
+              attackerCasualty = (int)(defenderCasualty * Util.Rand(125, 200) * 0.001f);
+            } else {
+              defenderCasualty = (int)(attackerCasualty * Util.Rand(125, 200) * 0.001f);
+            }
+          }
+
+          if (factor > 30 && factor <= 40) {
+            if (attackerBigger) {
+              attackerCasualty = (int)(defenderCasualty * Util.Rand(100, 125) * 0.001f);
+            } else {
+              defenderCasualty = (int)(attackerCasualty * Util.Rand(100, 125) * 0.001f);
+            }
+          }
+
+          if (factor > 40) {
+            if (attackerBigger) {
+              attackerCasualty = (int)(defenderCasualty * 0.05f);
+            } else {
+              defenderCasualty = (int)(attackerCasualty * 0.05f);
+            }
+          }
+        }
+
+        attackerCasualty = attackerCasualty > attackerTotal ? attackerTotal : attackerCasualty;
+        defenderCasualty = defenderCasualty > defenderTotal ? defenderTotal : defenderCasualty;
+
+        AllocateCasualty(defenderCasualty, predict.defenders);
+        AllocateCasualty(attackerCasualty, predict.attackers);
+
+        // commence attack
+        int dice = Util.Rand(1, 10);
+        if (dice > predict.sugguestedResult.chance) {
+          // attacker lose
+          // TODO: morale, horse capture from total cav dead
+
+        } else {
+          // defender lose
+        }
+      }
       CancelOperation();
     }
 
