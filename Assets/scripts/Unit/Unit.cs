@@ -152,7 +152,6 @@ namespace UnitNS
       broker.BrokeChange(this, ActionType.UnitVisible, tile);
     }
 
-    public int honorMeter = 0; // -2, -1, 0, 1, 2
     public int concealCoolDownTurn = 0;
     public int movementRemaining {
       get {
@@ -285,14 +284,6 @@ namespace UnitNS
     public bool IsAI()
     {
       return rf.faction.IsAI();
-    }
-
-    public bool IsDefeated() {
-      return honorMeter < 0;
-    }
-
-    public bool IsVictory() {
-      return honorMeter > 0;
     }
 
     public bool IsHeatSicknessAffected() {

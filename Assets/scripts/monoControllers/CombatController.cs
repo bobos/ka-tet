@@ -421,6 +421,8 @@ namespace MonoNS
         if (dice > predict.sugguestedResult.chance) {
           // attacker lose
           // TODO: morale depends on result type, horse capture from total cav dead
+          // accumulate phase result for both sides,
+          // accumulate operation result(kill+wounded vs enemy kill+wounded) for per commander for party influence update
 
         } else {
           // defender lose
