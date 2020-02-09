@@ -4,6 +4,7 @@ using UnitNS;
 using FieldNS;
 using MapTileNS;
 using CourtNS;
+using System.Collections;
 
 namespace MonoNS
 {
@@ -127,6 +128,7 @@ namespace MonoNS
       }
     }
 
+    OperationPredict predict;
     public OperationPredict StartOperation(Unit attacker, Unit targetUnit) {
       if (attacker.GetStaminaLevel() == StaminaLvl.Exhausted) {
         // no enough stamina, can not start operation
@@ -220,6 +222,7 @@ namespace MonoNS
         predict.sugguestedResult = new OperationGeneralResult(1);
       }
 
+      this.predict = predict;
       return predict;
     }
 
@@ -246,10 +249,20 @@ namespace MonoNS
       hexMap.CleanLines();
     }
 
+    public bool commenceOpAnimating = false;
     public void CommenceOperation() {
-      // TODO
-      // show pop msg
-      // ...
+      if (!start) {
+        return;
+      }
+      commenceOpAnimating = true;
+      StartCoroutine(CoCommenceOperation());
+    }
+
+    IEnumerator CoCommenceOperation() {
+      hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(attacker.tile).transform.position);
+      while (hexMap.cameraKeyboardController.fixingCamera) { yield return null; }
+      hexMap.eventDialogAlt.ShowOperationEvent(predict, !attacker.IsAI());
+      while (hexMap.eventDialogAlt.Animating) { yield return null; };
       CancelOperation();
     }
 

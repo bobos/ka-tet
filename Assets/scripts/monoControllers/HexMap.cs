@@ -29,6 +29,7 @@ namespace MonoNS
     public UnitActionBroker actionBroker;
     public InputField inputField;
     public EventDialog eventDialog;
+    public EventDialogAlt eventDialogAlt;
     public SettlementAnimationController settlementAniController;
     public UnitAnimationController unitAniController;
     public TileAnimationController tileAniController;
@@ -133,6 +134,7 @@ namespace MonoNS
       turnPhaseTitle = GameObject.FindObjectOfType<TurnPhaseTitle>();
       inputField = GameObject.FindObjectOfType<InputField>();
       eventDialog = GameObject.FindObjectOfType<EventDialog>();
+      eventDialogAlt = GameObject.FindObjectOfType<EventDialogAlt>();
       settlementAniController = GameObject.FindObjectOfType<SettlementAnimationController>();
       unitAniController = GameObject.FindObjectOfType<UnitAnimationController>();
       tileAniController = GameObject.FindObjectOfType<TileAnimationController>();

@@ -220,6 +220,27 @@ namespace TextNS
       {"event_altitudeSickness", @"由于过度疲劳, {0}所部部分士卒出现高原反应，士卒颇多不满，部队不得不就地休整"},
       {"event_plainSickness_title", "战马出现平原反应"},
       {"event_plainSickness", @"由于{0}所部骑兵多来自于高原，部队大部分战马出现了平原气候不适，这将极大影响部队的机动力和冲击力"},
+      {"event_attackerSide_title", "进攻方"},
+      {"event_defenderSide_title", "防御方"},
+      {"event_ourSide_title", "我方"},
+      {"event_aiSide_title", "敌方"},
+      {"event_operationDetail_gen", "参战将领"},
+      {"event_operationDetail_unit", "作战序列"},
+      {"event_operationDetail_inf", "步兵数量"},
+      {"event_operationDetail_cav", "骑兵数量"},
+      {"event_operationDetail_total", "总战力"},
+      {"event_possibleVictRate_0", "本方必败无疑"},
+      {"event_possibleVictRate_1", "本方有一成胜算"},
+      {"event_possibleVictRate_2", "本方有两成胜算"},
+      {"event_possibleVictRate_3", "本方有三成胜算"},
+      {"event_possibleVictRate_4", "本方有四成胜算"},
+      {"event_possibleVictRate_5", "本方有五成胜算"},
+      {"event_possibleVictRate_6", "本方有六成胜算"},
+      {"event_possibleVictRate_7", "本方有七成胜算"},
+      {"event_possibleVictRate_8", "本方有八成胜算"},
+      {"event_possibleVictRate_9", "本方有九成胜算"},
+      {"event_possibleVictRate_10", "本方必胜无疑"},
+      {"event_confirmAttack", "确定要进攻吗?"},
 
       // pop out msg
       {"pop_discontent", @"不满+{0}"},
@@ -275,6 +296,8 @@ namespace TextNS
       {"title_wargame_committed", "执行完毕"},
 
       {"operation_success_chance", @"胜算{0}成"},
+      {"misc_windAdvantage", "背风面"},
+      {"misc_windDisadvantage", "迎风面"},
 
       };
     }

@@ -161,7 +161,6 @@ namespace MonoNS
       ToggleConfirm();
 
       // TODO: AI Test
-      // TODO: Queue Event
       if (eventDialogOn != null) eventDialogOn();
       self.SetActive(true);
       if (name == EventName.WildFireDestroyCamp) {

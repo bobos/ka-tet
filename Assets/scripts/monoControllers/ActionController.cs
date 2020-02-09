@@ -135,15 +135,13 @@ namespace MonoNS
       }
     }
 
-    //TODO
     public void OnConfirmlWargameClick()
     {
       hexMap.wargameController.Commit();
     }
 
-    //TODO
     public void OnConfirmAttackClick() {
-      hexMap.combatController.CommenceOperation();
+      commentOperation();
     }
 
     public void OnGarrisonMgtClick()
@@ -200,6 +198,18 @@ namespace MonoNS
       }
     }
 
+    public void OnMidBtn1Click() {
+      if (onBtnClick != null) {
+        onBtnClick(actionName.MIDBTN1);
+      }
+    }
+
+    public void OnMidBtn2Click() {
+      if (onBtnClick != null) {
+        onBtnClick(actionName.MIDBTN2);
+      }
+    }
+
     public void PerformImmediateAction(Unit unit, actionName action)
     {
       unit.SetEndState(action);
@@ -232,6 +242,9 @@ namespace MonoNS
       TRANSFERLABOR,
       INPUTCONFIRM,
       EVENTDIALOGCONFIRM,
+      COMMENCEOP,
+      MIDBTN1,
+      MIDBTN2
     }
 
     // Make sure this is sequential
@@ -261,6 +274,10 @@ namespace MonoNS
 
     public bool siege(Unit unit) {
       return DoAction(unit, null, null, actionName.SIEGE);
+    }
+
+    public bool commentOperation() {
+      return DoAction(null, null, null, actionName.COMMENCEOP);
     }
 
     public bool DoAction(Unit unit, Unit[] units, Tile tile, actionName name)
@@ -295,6 +312,10 @@ namespace MonoNS
       {
         StartCoroutine(DoSiege(unit));
       }
+      if (name == actionName.COMMENCEOP) 
+      {
+        StartCoroutine(DoCommenceOp());
+      }
       return true;
     }
 
@@ -308,6 +329,13 @@ namespace MonoNS
       while (unitAniController.MoveAnimating) { yield return null; }
       ActionOngoing = false;
       if (actionDone != null) actionDone(unit, null, actionName.MOVE);
+    }
+
+    IEnumerator DoCommenceOp()
+    {
+      hexMap.combatController.CommenceOperation();
+      while (hexMap.combatController.commenceOpAnimating) { yield return null; }
+      ActionOngoing = false;
     }
 
     TextLib textLib {
