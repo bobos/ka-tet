@@ -304,6 +304,13 @@ namespace MonoNS
       }
     }
 
+    public enum ResultType {
+      Close,
+      Small,
+      Great,
+      Crusing
+    }
+
     public bool commenceOpAnimating = false;
     public void CommenceOperation() {
       if (!start) {
@@ -333,6 +340,7 @@ namespace MonoNS
         int defenderCasualty = 0;
         bool attackerBigger = true;
         int factor = 0;
+        ResultType resultLevel;
         if (predict.attackerOptimPoints > predict.defenderOptimPoints) {
           factor = (int)((predict.attackerOptimPoints / predict.defenderOptimPoints) * 10) - 10;
         } else {
@@ -347,6 +355,7 @@ namespace MonoNS
 // 3.1 to 4.0 - atk: (x - 1) * (0.1 - 0.125);
 // 4.0 above - atk: (x - 1) * 0.05
         if (factor <= 1) {
+          resultLevel = ResultType.Close;
           defenderCasualty = attackerCasualty = (int)(defenderTotal * 0.01f);
         } else {
           if (attackerBigger) {
@@ -356,6 +365,7 @@ namespace MonoNS
           }
 
           if (factor > 1 && factor <= 6) {
+            resultLevel = ResultType.Small;
             if (attackerBigger) {
               attackerCasualty = (int)(defenderCasualty * Util.Rand(5, 6) * 0.1f);
             } else {
@@ -364,6 +374,7 @@ namespace MonoNS
           }
 
           if (factor > 6 && factor <= 20) {
+            resultLevel = Cons.EvenChance() ? ResultType.Great : ResultType.Small;
             if (attackerBigger) {
               attackerCasualty = (int)(defenderCasualty * Util.Rand(25, 40) * 0.01f);
             } else {
@@ -372,6 +383,7 @@ namespace MonoNS
           }
 
           if (factor > 20 && factor <= 30) {
+            resultLevel = Cons.EvenChance() ? ResultType.Crusing : ResultType.Great;
             if (attackerBigger) {
               attackerCasualty = (int)(defenderCasualty * Util.Rand(125, 200) * 0.001f);
             } else {
@@ -380,6 +392,7 @@ namespace MonoNS
           }
 
           if (factor > 30 && factor <= 40) {
+            resultLevel = Cons.HighlyLikely() ? ResultType.Crusing : ResultType.Great;
             if (attackerBigger) {
               attackerCasualty = (int)(defenderCasualty * Util.Rand(100, 125) * 0.001f);
             } else {
@@ -388,6 +401,7 @@ namespace MonoNS
           }
 
           if (factor > 40) {
+            resultLevel = ResultType.Crusing;
             if (attackerBigger) {
               attackerCasualty = (int)(defenderCasualty * 0.05f);
             } else {
@@ -406,7 +420,7 @@ namespace MonoNS
         int dice = Util.Rand(1, 10);
         if (dice > predict.sugguestedResult.chance) {
           // attacker lose
-          // TODO: morale, horse capture from total cav dead
+          // TODO: morale depends on result type, horse capture from total cav dead
 
         } else {
           // defender lose
