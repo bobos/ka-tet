@@ -19,7 +19,6 @@
 
   public enum StaminaLvl
   {
-    Vigorous,
     Fresh,
     Tired,
     Exhausted

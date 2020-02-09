@@ -235,11 +235,7 @@ namespace UnitNS
       {
         return txtLib.get("u_tired");
       }
-      if (lvl == StaminaLvl.Fresh)
-      {
-        return txtLib.get("u_fresh");
-      }
-      return txtLib.get("u_vigorous");
+      return txtLib.get("u_fresh");
     }
 
     public int GetHeatSickTurns()
@@ -531,11 +527,7 @@ namespace UnitNS
 
     public StaminaLvl GetStaminaLevel()
     {
-      if (movementRemaining >= 70)
-      {
-        return StaminaLvl.Vigorous;
-      }
-      if (movementRemaining >= 40)
+      if (movementRemaining >= 50)
       {
         return StaminaLvl.Fresh;
       }
@@ -635,7 +627,7 @@ namespace UnitNS
 
     float GetBuff()
     {
-      return GetStarvingBuf() + GetStaminaBuf() + GetNewGeneralBuf();
+      return GetStarvingBuf() + GetNewGeneralBuf();
     }
 
     float newGeneralDebuf = 0f;
@@ -651,26 +643,6 @@ namespace UnitNS
     public float GetStarvingBuf()
     {
       return IsHungry() ? -0.3f : 0f;
-    }
-
-    public float GetStaminaBuf()
-    {
-      if (GetStaminaLevel() == StaminaLvl.Vigorous)
-      {
-        return 0.05f;
-      }
-
-      if (GetStaminaLevel() == StaminaLvl.Fresh)
-      {
-        return 0f;
-      }
-
-      if (GetStaminaLevel() == StaminaLvl.Tired)
-      {
-        return -0.025f;
-      }
-
-      return -0.05f;
     }
 
     // ==============================================================

@@ -58,20 +58,17 @@ namespace TextNS
                 "combat disadvantage to the army face the direction of the blowing"},
             
       // direction
-      {"d_dueNorth", "正北"},
-      {"d_dueSouth", "正南"},
-      {"d_dueWest", "正西"},
-      {"d_dueEast", "正东"},
-      {"d_northEast", "东北"},
-      {"d_northWest", "西北"},
-      {"d_southEast", "东南"},
-      {"d_southWest", "西南"},
+      {"d_dueNorth", "正北 ↼"},
+      {"d_dueSouth", "正南 ⇀"},
+      {"d_northEast", "东北 ↖"},
+      {"d_northWest", "西北 ↙"},
+      {"d_southEast", "东南 ↗"},
+      {"d_southWest", "西南 ↘"},
 
   //   unit
   	  {"u_exhausted", "精疲力竭"},
   	  {"u_tired", "人困马乏"},
   	  {"u_fresh", "充沛"},
-  	  {"u_vigorous", "极佳"},
       {"u_concealing", "隐蔽中"},
       {"u_camping", "驻扎中"},
       {"u_routing", "溃败中"},

@@ -394,26 +394,36 @@ namespace MonoNS
     }
 
     List<UnitView> toggledUnitViews = new List<UnitView>();
-    public void ShowAttackArrow(Unit fromUnit, Unit toUnit,
-      int joinPossibility, int percentageForce, int operationPoint) {
-      string txt = fromUnit.GeneralName() + "\n" + joinPossibility + "%\n" + operationPoint*0.001f + "(" + percentageForce + "%)";
+    public void ShowAttackArrow(Unit fromUnit, Unit toUnit, UnitPredict predict) {
+      string txt = fromUnit.GeneralName() + "\n" + predict.joinPossibility + "%\n" + predict.operationPoint*0.001f
+        + "(" + predict.percentOfEffectiveForce + "%)" +
+        (predict.windAdvantage ? "↑↑↑" : (predict.windDisadvantage ? "↓↓": "")) +
+       (fromUnit.GetStaminaLevel() == StaminaLvl.Tired ? "☹"
+        : (fromUnit.GetStaminaLevel() == StaminaLvl.Exhausted ? "☹☹" : ""));
       UnitView view = GetUnitView(fromUnit);
       toggledUnitViews.Add(view);
       view.ToggleText(false);
-      CreateArrow(new Tile[]{fromUnit.tile, toUnit.tile}, Color.black, txt, joinPossibility > 70 ? Color.cyan : Color.red);
+      CreateArrow(new Tile[]{fromUnit.tile, toUnit.tile}, Color.black, txt,
+        predict.joinPossibility > 70 ? Color.cyan : Color.red);
     }
 
-    public void ShowDefendArrow(Unit fromUnit, Unit toUnit,
-      int joinPossibility, int percentageForce, int operationPoint) {
-      string txt = fromUnit.GeneralName() + "\n" + joinPossibility + "%\n" + operationPoint*0.001f + "(" + percentageForce + "%)";
+    public void ShowDefendArrow(Unit fromUnit, Unit toUnit, UnitPredict predict) {
+      string txt = fromUnit.GeneralName() + "\n" + predict.joinPossibility + "%\n"
+        + predict.operationPoint*0.001f + "(" + predict.percentOfEffectiveForce + "%)" +
+       (fromUnit.GetStaminaLevel() == StaminaLvl.Tired ? "☹"
+        : (fromUnit.GetStaminaLevel() == StaminaLvl.Exhausted ? "☹☹" : ""));
       UnitView view = GetUnitView(fromUnit);
       toggledUnitViews.Add(view);
       view.ToggleText(false);
-      CreateArrow(new Tile[]{fromUnit.tile, toUnit.tile}, Color.blue, txt, joinPossibility > 70 ? Color.cyan : Color.red);
+      CreateArrow(new Tile[]{fromUnit.tile, toUnit.tile}, Color.blue, txt,
+        predict.joinPossibility > 70 ? Color.cyan : Color.red);
     }
 
-     public void ShowDefenderStat(Unit defender, int joinPossibility, int percentageForce, int operationPoint) {
-      string txt = defender.GeneralName() + "\n" + joinPossibility + "%\n" + operationPoint*0.001f + "(" + percentageForce + "%)";
+     public void ShowDefenderStat(Unit defender, UnitPredict predict) {
+      string txt = defender.GeneralName() + "\n" + predict.joinPossibility + "%\n"
+        + predict.operationPoint*0.001f + "(" + predict.percentOfEffectiveForce + "%)" +
+       (defender.GetStaminaLevel() == StaminaLvl.Tired ? "☹"
+        : (defender.GetStaminaLevel() == StaminaLvl.Exhausted ? "☹☹" : ""));
       UnitView view = GetUnitView(defender);
       toggledUnitViews.Add(view);
       view.ToggleText(false);

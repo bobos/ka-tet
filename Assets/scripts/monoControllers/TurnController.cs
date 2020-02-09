@@ -247,9 +247,9 @@ namespace MonoNS
       */
       endingTurn = false;
       if (cnt == 0) {
-        if (turnNum > 20) {
+        if (turnNum > 15) {
           // starts to drop morale
-          if (turnNum == 21) {
+          if (turnNum == 16) {
             WarWeary();
           }
 

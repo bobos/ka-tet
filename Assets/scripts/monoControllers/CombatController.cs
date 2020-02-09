@@ -23,6 +23,8 @@ namespace MonoNS
     public int percentOfEffectiveForce;
     public int joinPossibility;
     public int operationPoint;
+    public bool windAdvantage = false;
+    public bool windDisadvantage = false;
   }
 
   public class OperationPredict {
@@ -67,6 +69,64 @@ namespace MonoNS
       }
     }
 
+    void SetGaleVantage(Unit unit, Unit target, UnitPredict predict) {
+      if (Cons.IsGale(hexMap.windGenerator.current)) {
+        if (hexMap.windGenerator.direction == Cons.Direction.dueNorth) {
+          if(Util.eq<Tile>(target.tile.SouthTile<Tile>(), unit.tile)) {
+            predict.windDisadvantage = true;
+          } else if(Util.eq<Tile>(target.tile.NorthTile<Tile>(), unit.tile)) {
+            predict.windAdvantage = true;
+          }
+        }
+
+        if (hexMap.windGenerator.direction == Cons.Direction.northEast) {
+          if(Util.eq<Tile>(target.tile.SouthWestTile<Tile>(), unit.tile)) {
+            predict.windDisadvantage = true;
+          } else if(Util.eq<Tile>(target.tile.NorthEastTile<Tile>(), unit.tile)) {
+            predict.windAdvantage = true;
+          }
+        }
+
+        if (hexMap.windGenerator.direction == Cons.Direction.northWest) {
+          if(Util.eq<Tile>(target.tile.SouthEastTile<Tile>(), unit.tile)) {
+            predict.windDisadvantage = true;
+          } else if(Util.eq<Tile>(target.tile.NorthWestTile<Tile>(), unit.tile)) {
+            predict.windAdvantage = true;
+          }
+        }
+
+        if (hexMap.windGenerator.direction == Cons.Direction.dueSouth) {
+          if(Util.eq<Tile>(target.tile.NorthTile<Tile>(), unit.tile)) {
+            predict.windDisadvantage = true;
+          } else if(Util.eq<Tile>(target.tile.SouthTile<Tile>(), unit.tile)) {
+            predict.windAdvantage = true;
+          }
+        }
+
+        if (hexMap.windGenerator.direction == Cons.Direction.southEast) {
+          if(Util.eq<Tile>(target.tile.NorthWestTile<Tile>(), unit.tile)) {
+            predict.windDisadvantage = true;
+          } else if(Util.eq<Tile>(target.tile.SouthEastTile<Tile>(), unit.tile)) {
+            predict.windAdvantage = true;
+          }
+        }
+
+        if (hexMap.windGenerator.direction == Cons.Direction.southWest) {
+          if(Util.eq<Tile>(target.tile.NorthEastTile<Tile>(), unit.tile)) {
+            predict.windDisadvantage = true;
+          } else if(Util.eq<Tile>(target.tile.SouthWestTile<Tile>(), unit.tile)) {
+            predict.windAdvantage = true;
+          }
+        }
+      }
+
+      if (predict.windAdvantage) {
+        predict.percentOfEffectiveForce += 30;
+      } else if (predict.windDisadvantage) {
+        predict.percentOfEffectiveForce -= 20;
+      }
+    }
+
     public OperationPredict StartOperation(Unit attacker, Unit targetUnit) {
       if (attacker.GetStaminaLevel() == StaminaLvl.Exhausted) {
         // no enough stamina, can not start operation
@@ -102,25 +162,23 @@ namespace MonoNS
       unitPredict.unit = attacker;
       unitPredict.percentOfEffectiveForce = GetEffectiveForcePercentage(attacker);
       unitPredict.joinPossibility = 100;
-      // TODO: Wind buff, tmp morale buff from commander
-      unitPredict.operationPoint = attacker.unitAttack;
+      SetGaleVantage(attacker, defender, unitPredict);
+      // TODO:tmp morale buff from commander
+      unitPredict.operationPoint = (int)(attacker.unitAttack * unitPredict.percentOfEffectiveForce * 0.01f);
       predict.attackers.Add(unitPredict);
       predict.attackerOptimPoints += unitPredict.operationPoint;
-      hexMap.ShowAttackArrow(attacker, targetUnit,
-          unitPredict.joinPossibility, unitPredict.percentOfEffectiveForce, unitPredict.operationPoint);
+      hexMap.ShowAttackArrow(attacker, targetUnit, unitPredict);
 
       foreach(Unit unit in supportAttackers) {
         unitPredict = new UnitPredict();
         unitPredict.unit = unit;
         unitPredict.percentOfEffectiveForce = GetEffectiveForcePercentage(unit);
-
-        // TODO: join possibility
+        SetGaleVantage(unit, defender, unitPredict);
         unitPredict.joinPossibility = GetJoinPossibility(unit, attacker);
         unitPredict.operationPoint = (int)(unit.unitAttack * unitPredict.percentOfEffectiveForce * 0.01f);
         predict.attackers.Add(unitPredict);
         predict.attackerOptimPoints += unitPredict.operationPoint;
-        hexMap.ShowAttackArrow(unit, targetUnit,
-          unitPredict.joinPossibility, unitPredict.percentOfEffectiveForce, unitPredict.operationPoint);
+        hexMap.ShowAttackArrow(unit, targetUnit, unitPredict);
       }
 
       // defenders
@@ -130,12 +188,10 @@ namespace MonoNS
       // Exausted defense drop 50%
       unitPredict.percentOfEffectiveForce = unitPredict.percentOfEffectiveForce == 0 ? 50 : unitPredict.percentOfEffectiveForce;
       unitPredict.joinPossibility = 100;
-      // TODO: Wind buff
-      unitPredict.operationPoint = defender.unitDefence;
+      unitPredict.operationPoint = (int)(defender.unitDefence * unitPredict.percentOfEffectiveForce * 0.01f);
       predict.defenders.Add(unitPredict);
       predict.defenderOptimPoints += unitPredict.operationPoint;
-      hexMap.ShowDefenderStat(defender, unitPredict.joinPossibility,
-        unitPredict.percentOfEffectiveForce, unitPredict.operationPoint);
+      hexMap.ShowDefenderStat(defender, unitPredict);
 
       foreach(Unit unit in supportDefenders) {
         unitPredict = new UnitPredict();
@@ -146,8 +202,7 @@ namespace MonoNS
         predict.defenders.Add(unitPredict);
         predict.defenderOptimPoints += unitPredict.operationPoint;
         if (!Util.eq<Unit>(unit, targetUnit)) {
-          hexMap.ShowDefendArrow(unit, targetUnit,
-            unitPredict.joinPossibility, unitPredict.percentOfEffectiveForce, unitPredict.operationPoint);
+          hexMap.ShowDefendArrow(unit, targetUnit, unitPredict);
         }
       }
 

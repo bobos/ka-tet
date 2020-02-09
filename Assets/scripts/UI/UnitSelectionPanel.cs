@@ -196,7 +196,6 @@ namespace MonoNS
       // set attack, defense details
       string details = 
       "基本加成\n"
-      + "精力加成:" + unit.GetStaminaBuf() * 100
       + "% 饥饿惩罚:" + unit.GetStarvingBuf() * 100
       + "% 整合度惩罚:" + unit.GetNewGeneralBuf() * 100
 
@@ -207,7 +206,7 @@ namespace MonoNS
       +
       (unit.plainSickness.affected ? ("% 平原反应惩罚:" + unit.plainSickness.atkDebuf * 100) : "")
       + "%\n 总计进攻加成:" +
-      (unit.GetStaminaBuf() + unit.GetStarvingBuf() + unit.GetNewGeneralBuf()
+      (unit.GetStarvingBuf() + unit.GetNewGeneralBuf()
        + unit.rf.atkLvlBuf + unit.vantage.AtkBuf() + unit.weatherEffect.AtkBuf())*100
       + "%\n"
 
@@ -216,7 +215,7 @@ namespace MonoNS
       + "% 地形加成:" + unit.vantage.DefBuf() * 100
       + "% 免胄惩罚:" + unit.disarmorDefDebuf * 100
       + "%\n 总计防御加成:" +
-      (unit.GetStaminaBuf() + unit.GetStarvingBuf() + unit.GetNewGeneralBuf() + unit.rf.defLvlBuf + unit.vantage.DefBuf())*100
+      (unit.GetStarvingBuf() + unit.GetNewGeneralBuf() + unit.rf.defLvlBuf + unit.vantage.DefBuf())*100
       + "%\n"
       + "有效兵力:" + unit.vantage.GetEffective();
       hexMap.hoverInfo.Show(details);

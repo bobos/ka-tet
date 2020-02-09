@@ -70,7 +70,6 @@ namespace TextNS
   	{"u_exhausted", "Exhausted"},
   	{"u_tired", "Tired"},
   	{"u_fresh", "Fresh"},
-  	{"u_vigorous", "Vigorous"},
     {"u_concealing", "Concealling"},
     {"u_camping", "Camping"},
     {"u_routing", "Routing"},
