@@ -433,7 +433,7 @@ namespace MonoNS
     public delegate void OnModeQuit(Unit unit);
     public event OnModeQuit onModeQuit;
 
-    void Escape()
+    public void Escape()
     {
       selectedPath = null;
       if (selectedUnit != null)
@@ -609,7 +609,6 @@ namespace MonoNS
 
     void UpdateUnitAttack()
     {
-        //hexMap.combatController.CancelOperation();
       if (tileUnderMouse == null) {
         return;
       }
@@ -631,19 +630,17 @@ namespace MonoNS
 
         if (targetUnit != null) {
           msgBox.Show("");
-          OperationPredict predict = hexMap.combatController.StartOperation(selectedUnit, targetUnit);
-          hover.Show("攻方点数:" + predict.attackerOptimPoints * 0.001f + "\n守方点数:" + predict.defenderOptimPoints * 0.001f
-           + "\n胜算几何:" + predict.sugguestedResult.GetResult());
+          hexMap.combatController.StartOperation(selectedUnit, targetUnit);
+          hexMap.actionController.commenceOperation();
+        }
+      } else if (!Util.eq<Tile>(tileUnderMouse, selectedUnit.tile))
+      {
+        Unit u = tileUnderMouse.GetUnit();
+        if (u != null)
+        {
+          hover.Show(u.Name());
         }
       }
-      //else if (!Util.eq<Tile>(tileUnderMouse, selectedUnit.tile))
-      //{
-      //  Unit u = tileUnderMouse.GetUnit();
-      //  if (u != null)
-      //  {
-      //    hover.Show(u.Name());
-      //  }
-      //}
     }
 
     void UpdateUnitTransferSupply()

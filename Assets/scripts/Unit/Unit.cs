@@ -50,6 +50,7 @@ namespace UnitNS
     WeatherGenerator weatherGenerator;
     TurnController turnController;
     int initSupply = 0;
+    public bool justDefeated = false;
     public Unit(bool clone, Troop troop, Tile tile, State state,
                 int supply, int labor, int kia, int mia, int movement = -1)
     {
@@ -182,7 +183,7 @@ namespace UnitNS
     public Troop rf;
     public State state = State.Stand;
 
-    int __labor;
+    int __labor = 0;
     int __movementRemaining;
     Queue<Tile> path;
     // ==============================================================
@@ -390,6 +391,7 @@ namespace UnitNS
     // Before new turn starts
     public int[] RefreshUnit()
     {
+      justDefeated = false;
       if (concealCoolDownTurn > 0) {
         concealCoolDownTurn--;
       } else {
@@ -419,12 +421,6 @@ namespace UnitNS
       turnDone = true;
     }
 
-    public void DestroyEvents() {
-      epidemic.Destroy();
-      armorRemEvent.Destroy();
-      unitPoisioned.Destroy();
-    }
-
     public void Retreat() {
       // TODO: return labor
       labor = 0;
@@ -436,13 +432,13 @@ namespace UnitNS
       if (tile.settlement != null && tile.settlement.owner.isAI == this.IsAI()) {
         tile.settlement.RemoveUnit(this);
       }
-      DestroyEvents();
       hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.Retreat, this, null));
     }
 
     public int Destroy()
     {
       int killed = rf.soldiers + rf.wounded;
+      hexMap.UpdateWound(this, -rf.wounded);
       kia += killed;
       if (hexMap.IsAttackSide(IsAI())) {
         hexMap.settlementMgr.attackerLaborDead += labor;
@@ -456,7 +452,6 @@ namespace UnitNS
       if (tile.settlement != null && tile.settlement.owner.isAI == this.IsAI()) {
         tile.settlement.RemoveUnit(this);
       }
-      DestroyEvents();
       return killed;
     }
 

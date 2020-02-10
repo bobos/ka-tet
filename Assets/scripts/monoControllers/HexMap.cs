@@ -194,6 +194,10 @@ namespace MonoNS
       GetWarParty(unit).UpdateWound(unit, num);
     }
 
+    public void CaptureHorse(Unit unit, int num) {
+      GetWarParty(unit).CaptureHorse(num);
+    }
+
     public HashSet<Tile> GetRangeForDiscoveryWarning(bool isAI) {
       return GetEnemyRange(isAI, 0);
     }
@@ -269,7 +273,9 @@ namespace MonoNS
         GameObject.Destroy(label);
       }
       foreach (UnitView view in toggledUnitViews) {
-        view.ToggleText(true);
+        if (view != null) {
+          view.ToggleText(true);
+        }
       }
       lineCache = new List<GameObject>();
       lineLabels = new List<GameObject>();

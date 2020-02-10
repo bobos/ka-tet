@@ -54,6 +54,78 @@ namespace MonoNS
       self.SetActive(false);
     }
 
+    public void ShowOperationResult(CombatController.ResultType result, bool attackerWin, bool playerAttack,
+      int atkInfTotal, int atkCavTotal, int defInfTotal, int defCavTotal,
+      int atkInfDead, int atkInfWnd, int atkLaborDead, int atkCavDead, int atkCavWnd,
+      int defInfDead, int defInfWnd, int defLaborDead, int defCavDead, int defCavWnd,
+      int capturedHorse) {
+      btn1Clicked = btn2Clicked = false;
+      Animating = true;
+      btn1.SetActive(true);
+      btn2.SetActive(false);
+      self.SetActive(true);
+
+      leftTitle.text = textLib.get("event_attackerSide_title") + "(" + 
+        (playerAttack ? textLib.get("event_ourSide_title") : textLib.get("event_aiSide_title")) + ")";
+
+      rightTitle.text = textLib.get("event_defenderSide_title") + "(" + 
+        (playerAttack ? textLib.get("event_aiSide_title") : textLib.get("event_ourSide_title")) + ")";
+
+      leftImg.sprite = attackerSide;
+      rightImg.sprite = defenderSide;
+
+      leftDescription.text = textLib.get("event_operationResult_infTotal") + ": " + atkInfTotal + "\n" +
+        textLib.get("event_operationResult_infDead") + ": " + atkInfDead + "\n" +
+        textLib.get("event_operationResult_infWnd") + ": " + atkInfWnd + "\n\n" +
+        textLib.get("event_operationResult_cavTotal") + ": " + atkCavTotal + "\n" +
+        textLib.get("event_operationResult_cavDead") + ": " + atkCavDead + "\n" +
+        textLib.get("event_operationResult_cavWnd") + ": " + atkCavWnd + "\n\n" +
+        textLib.get("event_operationResult_total") + ": " + (atkInfDead + atkCavDead) + "\n\n" +
+        textLib.get("event_operationResult_laborDead") + ": " + atkLaborDead + "\n";
+
+      rightDescription.text = textLib.get("event_operationResult_infTotal") + ": " + defInfTotal + "\n" +
+        textLib.get("event_operationResult_infDead") + ": " + defInfDead + "\n" +
+        textLib.get("event_operationResult_infWnd") + ": " + defInfWnd + "\n\n" +
+        textLib.get("event_operationResult_cavTotal") + ": " + defCavTotal + "\n" +
+        textLib.get("event_operationResult_cavDead") + ": " + defCavDead + "\n" +
+        textLib.get("event_operationResult_cavWnd") + ": " + defCavWnd + "\n\n" +
+        textLib.get("event_operationResult_total") + ": " + (defInfDead + defCavDead) + "\n\n" +
+        textLib.get("event_operationResult_laborDead") + ": " + defLaborDead + "\n";
+
+      string horseCapture = textLib.get("event_operationResult_horse") + ": " + capturedHorse + "\n";
+      if (attackerWin) {
+        leftDescription.text += horseCapture;
+      } else {
+        rightDescription.text += horseCapture;
+      }
+
+      string finalResult;
+      if (attackerWin == playerAttack) {
+        // player win
+        if (result == CombatController.ResultType.Close) {
+          finalResult = "event_operationResult_weCloseWin";
+        } else if (result == CombatController.ResultType.Small) {
+          finalResult = "event_operationResult_weSmallWin";
+        } else if (result == CombatController.ResultType.Great) {
+          finalResult = "event_operationResult_weGreatWin";
+        } else {
+          finalResult = "event_operationResult_weCrushingWin";
+        }
+      } else {
+        if (result == CombatController.ResultType.Close) {
+          finalResult = "event_operationResult_theyCloseWin";
+        } else if (result == CombatController.ResultType.Small) {
+          finalResult = "event_operationResult_theySmallWin";
+        } else if (result == CombatController.ResultType.Great) {
+          finalResult = "event_operationResult_theyGreatWin";
+        } else {
+          finalResult = "event_operationResult_theyCrushingWin";
+        }
+      }
+
+      middleDescription.text = textLib.get(finalResult);
+    }
+
     public void ShowOperationEvent(OperationPredict predict, bool playerAttack) {
       btn1Clicked = btn2Clicked = false;
       Animating = true;
@@ -82,7 +154,7 @@ namespace MonoNS
         unitInfo += u.unit.GetStaminaLevel() != StaminaLvl.Fresh ? ("[" + u.unit.GetStaminaLvlName() + "]") : "";
         unitInfo += u.windAdvantage ? ("[" + textLib.get("misc_windAdvantage") + "]") : "";
         unitInfo += u.windDisadvantage ? ("[" + textLib.get("misc_windDisadvantage") + "]") : "";
-        atkSerial += unitInfo + " ";
+        atkSerial += unitInfo + "\n";
 
         if (u.unit.IsCavalry()) {
           atkCav += u.unit.rf.soldiers;
@@ -94,7 +166,7 @@ namespace MonoNS
       foreach (UnitPredict u in predict.defenders) {
         defGenerals += u.unit.GeneralName() + "\n";
         defSerial += u.unit.Name() +
-          (u.unit.GetStaminaLevel() != StaminaLvl.Fresh ? ("(" + u.unit.GetStaminaLvlName() + ") ") : " ");
+          (u.unit.GetStaminaLevel() != StaminaLvl.Fresh ? ("(" + u.unit.GetStaminaLvlName() + ") ") : "") + "\n";
         if (u.unit.IsCavalry()) {
           defCav += u.unit.rf.soldiers;
         } else {

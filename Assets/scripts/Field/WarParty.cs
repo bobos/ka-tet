@@ -43,6 +43,12 @@ namespace FieldNS
     public bool isAI { get; private set; }
     public bool attackside { get; private set; }
     HashSet<Unit> units = new HashSet<Unit>();
+    public int capturedHorse = 0;
+
+    // TODO: phase ends, add horses to faction and reset the horse to 0
+    public void CaptureHorse(int num) {
+      capturedHorse += num;
+    }
 
     public void UpdateWound(Unit unit, int num) {
       if (unit.type == Type.Infantry) {

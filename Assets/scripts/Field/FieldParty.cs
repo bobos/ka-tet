@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using CourtNS;
+using MonoNS;
 
 namespace FieldNS
 {
@@ -9,8 +10,13 @@ namespace FieldNS
     public PartyReport[] reports;
     public FieldParty counterFieldParty;
     public HashSet<General> generals = new HashSet<General>();
+    public List<CombatController.ResultType> victories;
+    public List<CombatController.ResultType> defeats;
     public FieldParty(Party party)
     {
+      // TODO: report the point when phase ends
+      victories = new List<CombatController.ResultType>();
+      defeats = new List<CombatController.ResultType>();
       this.party = party;
       PartyReport[] reports = { new SloppyOnDrill(this) };
       this.reports = reports;

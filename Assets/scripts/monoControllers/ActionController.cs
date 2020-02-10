@@ -140,10 +140,6 @@ namespace MonoNS
       hexMap.wargameController.Commit();
     }
 
-    public void OnConfirmAttackClick() {
-      commentOperation();
-    }
-
     public void OnGarrisonMgtClick()
     {
       if (onBtnClick != null)
@@ -276,7 +272,7 @@ namespace MonoNS
       return DoAction(unit, null, null, actionName.SIEGE);
     }
 
-    public bool commentOperation() {
+    public bool commenceOperation() {
       return DoAction(null, null, null, actionName.COMMENCEOP);
     }
 

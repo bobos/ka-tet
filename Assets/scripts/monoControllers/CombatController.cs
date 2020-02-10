@@ -28,6 +28,7 @@ namespace MonoNS
     public bool windDisadvantage = false;
     public int dead = 0;
     public int wounded = 0;
+    public int laborDead = 0;
   }
 
   public class OperationPredict {
@@ -247,57 +248,94 @@ namespace MonoNS
     }
 
     public void CancelOperation() {
-      start = false;
-      hexMap.CleanLines();
+      if (start) {
+        start = false;
+        hexMap.CleanLines();
+      }
+    }
+
+    void Helper(UnitPredict up, int step, int maxWd) {
+      Unit unit = up.unit;
+      int wounded = Util.Rand(0, maxWd);
+      int dead = step - wounded;
+      up.wounded += wounded;
+      up.dead += dead;
+
+      unit.rf.wounded += wounded;
+      unit.kia += dead;
+      unit.rf.soldiers -= step;
+
+      if (unit.labor > 1) {
+        int laborDead = Util.Rand(0, 1);
+        up.laborDead += laborDead;
+        unit.labor -= laborDead;
+      }
     }
 
     void AllocateCasualty(int total, List<UnitPredict> units) {
       while (total > 0) {
         foreach(UnitPredict up in units) {
           Unit unit = up.unit;
+
+          if (unit.rf.soldiers == 0) {
+            continue;
+          }
+
+          if (total < 10) {
+            if (unit.rf.soldiers < total) {
+              total -= unit.rf.soldiers;
+              up.dead += unit.rf.soldiers;
+              up.laborDead += unit.labor;
+              unit.rf.soldiers = 0;
+              unit.labor = 0;
+            } else {
+              up.dead += total;
+              unit.rf.soldiers -= total;
+              total = 0;
+              break;
+            }
+            continue;
+          }
+
+          if (unit.rf.soldiers < 10) {
+            total -= unit.rf.soldiers;
+            up.dead += unit.rf.soldiers;
+            up.laborDead += unit.labor;
+            unit.rf.soldiers = 0;
+            unit.labor = 0;
+            continue;
+          }
+
           // rookie
           if (unit.rf.rank.Level() == 1) {
-            if (unit.IsCavalry()) {
-              // TODO: -3
-              // update up.dead and up.wounded
+            if (!unit.IsCavalry()) {
+              total -= 10;
+              Helper(up, 10, 1);
             } else {
-              if (total > 10) {
-                total -= 10;
-              } else {
-                total = 0;
-                // deduct
-                break;
-              }
+              total -= 3;
+              Helper(up, 3, 1);
             }
           }
 
           // veteran
           if (unit.rf.rank.Level() == 2) {
-            if (unit.IsCavalry()) {
-              // -2
+            if (!unit.IsCavalry()) {
+              total -= 5;
+              Helper(up, 5, 1);
             } else {
-              if (total > 5) {
-                total -= 5;
-              } else {
-                total = 0;
-                // deduct
-                break;
-              }
+              total -= 2;
+              Helper(up, 2, 1);
             }
           }
 
           // elite
           if (unit.rf.rank.Level() == 3 || unit.rf.rank.Level() == -1) {
-            if (unit.IsCavalry()) {
-              // -1
+            if (!unit.IsCavalry()) {
+              total -= 3;
+              Helper(up, 3, 1);
             } else {
-              if (total > 3) {
-                total -= 3;
-              } else {
-                total = 0;
-                // deduct
-                break;
-              }
+              total -= 1;
+              Helper(up, 1, 1);
             }
           }
         }
@@ -308,7 +346,34 @@ namespace MonoNS
       Close,
       Small,
       Great,
-      Crusing
+      Crushing
+    }
+
+    int[] GetVicBuf(ResultType type) {
+      if (type == ResultType.Close) {
+        return new int[]{1, 0, -1};
+      }
+      if (type == ResultType.Small) {
+        return new int[]{2, 1, -2};
+      }
+      if (type == ResultType.Great) {
+        return new int[]{3, 2, -3};
+      }
+      return new int[]{4, 2, -4};
+    }
+
+    // initiatorMorale, supporterMorale, initiatorDiscontent
+    int[] GetDftBuf(ResultType type) {
+      if (type == ResultType.Close) {
+        return new int[]{-5, -3, 0};
+      }
+      if (type == ResultType.Small) {
+        return new int[]{-10, -5, 1};
+      }
+      if (type == ResultType.Great) {
+        return new int[]{-15, -10, 3};
+      }
+      return new int[]{-25, -20, 8};
     }
 
     public bool commenceOpAnimating = false;
@@ -328,25 +393,41 @@ namespace MonoNS
       if (hexMap.eventDialogAlt.btn1Clicked) {
         int defenderTotal = 0;
         int attackerTotal = 0;
+        int attackerInfTotal = 0;
+        int attackerCavTotal = 0;
+        int defenderInfTotal = 0;
+        int defenderCavTotal = 0;
+
         foreach (UnitPredict u in predict.attackers) {
           attackerTotal += u.unit.rf.soldiers;
+          if (u.unit.IsCavalry()) {
+            attackerCavTotal += u.unit.rf.soldiers;
+          } else {
+            attackerInfTotal += u.unit.rf.soldiers;
+          }
         }
 
         foreach (UnitPredict u in predict.defenders) {
           defenderTotal += u.unit.rf.soldiers;
+          if (u.unit.IsCavalry()) {
+            defenderCavTotal += u.unit.rf.soldiers;
+          } else {
+            defenderInfTotal += u.unit.rf.soldiers;
+          }
         }
 
         int attackerCasualty = 0;
         int defenderCasualty = 0;
         bool attackerBigger = true;
         int factor = 0;
-        ResultType resultLevel;
+        ResultType resultLevel = ResultType.Close;
         if (predict.attackerOptimPoints > predict.defenderOptimPoints) {
           factor = (int)((predict.attackerOptimPoints / predict.defenderOptimPoints) * 10) - 10;
         } else {
           attackerBigger = false;
           factor = (int)((predict.defenderOptimPoints / predict.attackerOptimPoints) * 10) - 10;
         }
+        factor = factor > 95 ? 95 : factor;
 
 // 1.0 to 1.1 - 0.01(both)
 // 1.2 to 1.6 - def: x - 1, atk: (x -1) * (0.5 - 0.6)   
@@ -355,13 +436,17 @@ namespace MonoNS
 // 3.1 to 4.0 - atk: (x - 1) * (0.1 - 0.125);
 // 4.0 above - atk: (x - 1) * 0.05
         if (factor <= 1) {
-          resultLevel = ResultType.Close;
-          defenderCasualty = attackerCasualty = (int)(defenderTotal * 0.01f);
+          float f = 0.02f;
+          if (Cons.SlimChance()) {
+            f = 0.1f;
+          }
+          defenderCasualty = (int)(defenderTotal * f);
+          attackerCasualty = (int)(attackerTotal * f);
         } else {
           if (attackerBigger) {
-            defenderCasualty = (int)(defenderTotal * factor * 0.01f);
+            defenderCasualty = (int)(defenderTotal * factor * 0.02f);
           } else {
-            attackerCasualty = (int)(attackerTotal * factor * 0.01f);
+            attackerCasualty = (int)(attackerTotal * factor * 0.02f);
           }
 
           if (factor > 1 && factor <= 6) {
@@ -383,7 +468,7 @@ namespace MonoNS
           }
 
           if (factor > 20 && factor <= 30) {
-            resultLevel = Cons.EvenChance() ? ResultType.Crusing : ResultType.Great;
+            resultLevel = Cons.EvenChance() ? ResultType.Crushing : ResultType.Great;
             if (attackerBigger) {
               attackerCasualty = (int)(defenderCasualty * Util.Rand(125, 200) * 0.001f);
             } else {
@@ -392,7 +477,7 @@ namespace MonoNS
           }
 
           if (factor > 30 && factor <= 40) {
-            resultLevel = Cons.HighlyLikely() ? ResultType.Crusing : ResultType.Great;
+            resultLevel = Cons.HighlyLikely() ? ResultType.Crushing : ResultType.Great;
             if (attackerBigger) {
               attackerCasualty = (int)(defenderCasualty * Util.Rand(100, 125) * 0.001f);
             } else {
@@ -401,7 +486,7 @@ namespace MonoNS
           }
 
           if (factor > 40) {
-            resultLevel = ResultType.Crusing;
+            resultLevel = ResultType.Crushing;
             if (attackerBigger) {
               attackerCasualty = (int)(defenderCasualty * 0.05f);
             } else {
@@ -416,19 +501,184 @@ namespace MonoNS
         AllocateCasualty(defenderCasualty, predict.defenders);
         AllocateCasualty(attackerCasualty, predict.attackers);
 
-        // commence attack
-        int dice = Util.Rand(1, 10);
-        if (dice > predict.sugguestedResult.chance) {
-          // attacker lose
-          // TODO: morale depends on result type, horse capture from total cav dead
-          // accumulate phase result for both sides,
-          // accumulate operation result(kill+wounded vs enemy kill+wounded) for per commander for party influence update
+        List<UnitPredict> all = new List<UnitPredict>();
+        int attackerInfDead = 0;
+        int attackerInfWnd = 0;
+        int attackerLaborDead = 0;
+        int attackerCavDead = 0;
+        int attackerCavWnd = 0;
 
-        } else {
-          // defender lose
+        int defenderInfDead = 0;
+        int defenderInfWnd = 0;
+        int defenderLaborDead = 0;
+        int defenderCavDead = 0;
+        int defenderCavWnd = 0;
+
+        foreach(UnitPredict up in predict.attackers) {
+          up.unit.movementRemaining -= Unit.ActionCost;
+          if (up.unit.IsCavalry()) {
+            attackerCavDead += up.dead;
+            attackerCavWnd += up.wounded;
+          } else {
+            attackerInfDead += up.dead;
+            attackerInfWnd += up.wounded;
+            attackerLaborDead += up.laborDead;
+          }
+          all.Add(up);
         }
+
+        foreach(UnitPredict up in predict.defenders) {
+          up.unit.movementRemaining -= (Unit.ActionCost -10);
+          if (up.unit.IsCavalry()) {
+            defenderCavDead += up.dead;
+            defenderCavWnd += up.wounded;
+          } else {
+            defenderInfDead += up.dead;
+            defenderInfWnd += up.wounded;
+            defenderLaborDead += up.laborDead;
+          }
+          all.Add(up);
+        }
+
+        foreach(UnitPredict up in all) {
+          Unit unit = up.unit;
+          hexMap.UpdateWound(unit, up.wounded);
+          if(hexMap.IsAttackSide(unit.IsAI())) {
+            hexMap.settlementMgr.attackerLaborDead += up.laborDead;
+          } else {
+            hexMap.settlementMgr.defenderLaborDead += up.laborDead;
+          }
+
+          // morale, movement, wounded, killed, laborKilled, disserter, attack, def, discontent
+          int[] stats = new int[]{0,0,up.wounded,up.dead,up.laborDead,0,0,0,0};
+          hexMap.unitAniController.ShowEffects(unit, stats);
+          while (hexMap.unitAniController.ShowAnimating) { yield return null; }
+
+          if (unit.rf.soldiers <= Unit.DisbandUnitUnder) {
+            // unit disbanded
+            hexMap.unitAniController.DestroyUnit(unit, DestroyType.ByDisband);
+            while (hexMap.unitAniController.DestroyAnimating) { yield return null; }
+          }
+        }
+
+        int dice = Util.Rand(1, 10);
+        bool atkWin = dice <= predict.sugguestedResult.chance;
+        int capturedHorse = (int)((atkWin ? defenderCavDead : attackerCavDead) * 0.2f);
+        hexMap.CaptureHorse(atkWin ? attacker : defender, capturedHorse);
+
+        hexMap.eventDialogAlt.ShowOperationResult(resultLevel, atkWin, !attacker.IsAI(),
+          attackerInfTotal, attackerCavTotal, defenderInfTotal, defenderCavTotal,
+          attackerInfDead, attackerInfWnd, attackerLaborDead, attackerCavDead, attackerCavWnd,
+          defenderInfDead, defenderInfWnd, defenderLaborDead, defenderCavDead, defenderCavWnd,
+          capturedHorse);
+        while(hexMap.eventDialogAlt.Animating) { yield return null; }
+        CancelOperation();
+
+        int[] vicBuf = GetVicBuf(resultLevel);
+        int[] dftBuf = GetDftBuf(resultLevel);
+        if (atkWin) {
+          // TODO: mark justDefeated unit on map
+          defender.justDefeated = true;
+          // TODO
+          // 1. accumulate operation result(kill+wounded vs enemy kill+wounded) for per commander for party influence update
+          // 2. body cover
+          // 3. routing unit
+          // 4. sourrouding
+          // 5. deduct movementpoint
+          // 6. kill general
+          // 7. general trait not justDefeated flag
+          // 8. general trait no routing(stand ground) 
+
+          int morale = vicBuf[0];
+          int morale1 = vicBuf[1];
+          int discontent = vicBuf[2];
+          foreach (UnitPredict up in predict.attackers) {
+            int[] stats = new int[]{0,0,0,0,0,0,0,0,0};
+            Unit unit = up.unit;
+            if (Util.eq<Unit>(unit, attacker)) {
+              unit.rf.morale += morale;
+              unit.riot.Discontent(discontent); 
+              stats[0] = morale;
+              stats[8] = discontent;
+            } else {
+              unit.rf.morale += morale1;
+              stats[0] = morale1;
+            }
+
+            hexMap.unitAniController.ShowEffects(unit, stats);
+            while (hexMap.unitAniController.ShowAnimating) { yield return null; }
+          }
+
+          morale = dftBuf[0];
+          morale1 = dftBuf[1];
+          discontent = dftBuf[2];
+          foreach (UnitPredict up in predict.defenders) {
+            int[] stats = new int[]{0,0,0,0,0,0,0,0,0};
+            Unit unit = up.unit;
+            if (Util.eq<Unit>(unit, defender)) {
+              unit.rf.morale += morale;
+              stats[0] = morale;
+              hexMap.unitAniController.Riot(unit, discontent);
+              while (hexMap.unitAniController.riotAnimating) { yield return null; }
+            } else {
+              unit.rf.morale += morale1;
+              stats[0] = morale1;
+            }
+
+            hexMap.unitAniController.ShowEffects(unit, stats);
+            while (hexMap.unitAniController.ShowAnimating) { yield return null; }
+          }
+        } else {
+          // defender win
+          int morale = vicBuf[0];
+          int morale1 = vicBuf[1];
+          int discontent = vicBuf[2];
+          foreach (UnitPredict up in predict.defenders) {
+            int[] stats = new int[]{0,0,0,0,0,0,0,0,0};
+            Unit unit = up.unit;
+            if (Util.eq<Unit>(unit, defender)) {
+              unit.rf.morale += morale;
+              unit.riot.Discontent(discontent); 
+              stats[0] = morale;
+              stats[8] = discontent;
+            } else {
+              unit.rf.morale += morale1;
+              stats[0] = morale1;
+            }
+
+            hexMap.unitAniController.ShowEffects(unit, stats);
+            while (hexMap.unitAniController.ShowAnimating) { yield return null; }
+          }
+
+          morale = dftBuf[0];
+          morale1 = dftBuf[1];
+          discontent = dftBuf[2];
+          foreach (UnitPredict up in predict.attackers) {
+            int[] stats = new int[]{0,0,0,0,0,0,0,0,0};
+            Unit unit = up.unit;
+            if (Util.eq<Unit>(unit, attacker)) {
+              unit.rf.morale += morale;
+              stats[0] = morale;
+              hexMap.unitAniController.Riot(unit, discontent);
+              while (hexMap.unitAniController.riotAnimating) { yield return null; }
+            } else {
+              unit.rf.morale += morale1;
+              stats[0] = morale1;
+            }
+
+            hexMap.unitAniController.ShowEffects(unit, stats);
+            while (hexMap.unitAniController.ShowAnimating) { yield return null; }
+          }
+        }
+      } else {
+        CancelOperation();
       }
-      CancelOperation();
+      // TODO: uncomment
+      //if (!attacker.IsAI()) {
+        hexMap.mouseController.Escape();
+      //}
+      hexMap.unitSelectionPanel.ToggleButtons(true, attacker);
+      commenceOpAnimating = false;
     }
 
     public void ActionDone(Unit unitUnderAttack, Unit[] attackers, ActionController.actionName actionName)

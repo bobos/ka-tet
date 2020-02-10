@@ -564,9 +564,15 @@ namespace MonoNS
       }
 
       if (discontent != 0) {
-        popAniController.Show(view, 
-          System.String.Format(textLib.get("pop_discontent"), discontent),
-          Color.yellow);
+        if (discontent < 0) {
+          popAniController.Show(view, 
+            System.String.Format(textLib.get("pop_content"), -discontent),
+            Color.green);
+        } else {
+          popAniController.Show(view, 
+            System.String.Format(textLib.get("pop_discontent"), discontent),
+            Color.yellow);
+        }
         while (popAniController.Animating) { yield return null; }
       }
 

@@ -191,6 +191,13 @@ namespace MonoNS
         image.sprite = flood;
       }
 
+      if (name == EventName.Disbanded) {
+        title.text = textLib.get("event_disbandDestroyUnit_title");
+        description.text = System.String.Format(textLib.get("event_disbandDestroyUnit"), unit.GeneralName(),
+          unit.Name(), argu3);
+        image.sprite = UnitDestroyByDisband;
+      }
+
       if (name == EventName.EnemyCaptureCamp) {
         title.text = textLib.get("event_enemyCaptureCamp_title");
         description.text = System.String.Format(textLib.get("event_enemyCaptureCamp"), settlement.name, argu1);

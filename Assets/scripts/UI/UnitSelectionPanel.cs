@@ -23,7 +23,7 @@ namespace MonoNS
       GameObject[] btns = {MoveButton, AttackButton, DefendButton, CampButton,
                            SabotageButton, FireButton, AmbushButton, EncampButton,
                            RetreatButton, TransferSupplyButton, TransferLaborButton,
-                           AttackConfirmButton};
+                           };
       buttons = btns;
       mouseController.onUnitSelect += OnUnitSelect;
       mouseController.onUnitPreflight += OnUnitSelect;
@@ -51,7 +51,6 @@ namespace MonoNS
     public GameObject RetreatButton;
     public GameObject TransferSupplyButton;
     public GameObject TransferLaborButton;
-    public GameObject AttackConfirmButton;
     GameObject[] buttons;
 
     public Text title;
@@ -108,7 +107,9 @@ namespace MonoNS
       {
         button.SetActive(false);
       }
-      if (!state) return;
+      // TODO: uncomment
+      //if (!state || hexMap.combatController.start || unit.IsAI()) return;
+      if (!state || hexMap.combatController.start) return;
 
       if (hexMap.wargameController.start && hexMap.wargameController.IsWargameUnit(unit)) {
       } else {
@@ -122,12 +123,6 @@ namespace MonoNS
       if (mouseController.nearEnemy || mouseController.nearEnemySettlement != null) {
         if (!hexMap.combatController.start && unit.GetStaminaLevel() != StaminaLvl.Exhausted) {
           AttackButton.SetActive(true);
-        }
-      }
-
-      if (hexMap.combatController.start) {
-        if (!hexMap.wargameController.start) {
-          AttackConfirmButton.SetActive(true);
         }
       }
 
