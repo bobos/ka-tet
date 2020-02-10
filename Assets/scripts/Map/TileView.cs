@@ -25,8 +25,11 @@ public class TileView : View
   public void RefreshVisual() {
     GameObject tileGO = gameObject;
     string txt = "";
+    if (tile.deadZone != null && tile.deadZone.DecompositionCntDown > 0) {
+      txt = "☠☠☠☠☠\n";
+    }
     if (tile.vantagePoint) {
-      txt = "Vat\n";
+      txt += "Vat\n";
     }
     if (tile.terrian == TerrianType.Water) {
       if (tile.isDam)

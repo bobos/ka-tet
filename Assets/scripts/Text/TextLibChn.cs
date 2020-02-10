@@ -303,6 +303,8 @@ namespace TextNS
       {"pop_farmDestroyed", "农田被毁"},
       {"pop_altitudeSickness", "高原反应"},
       {"pop_plainSickness", "战马平原反应"},
+      {"pop_notJoinOperation", "按兵不动"},
+      {"pop_joinOperation", "投入战斗"},
 
       // settlement
       {"settlement_storageLvl1", "初级粮仓"},

@@ -22,6 +22,7 @@ namespace MapTileNS
     public WildFire wildFire = null;
     public Epidemic epidemic = null;
     public Poision poision = null;
+    public DeadZone deadZone = null;
     public bool waterBound = false;
     public bool burnable = false;
     public bool road = false;
@@ -43,6 +44,7 @@ namespace MapTileNS
       }
       if (terrian != TerrianType.Water) {
         wildFire = new WildFire(this, burnable);
+        deadZone = new DeadZone(this);
       }
       if (terrian == TerrianType.Water) {
         poision = new Poision(this);
@@ -51,7 +53,7 @@ namespace MapTileNS
         epidemic = new Epidemic(this);
       }
 
-      if (flood != null || wildFire != null || epidemic != null) {
+      if (flood != null || wildFire != null || epidemic != null || deadZone != null) {
         hexMap.weatherGenerator.tileCB.Add(this);
       }
 
@@ -185,6 +187,9 @@ namespace MapTileNS
     public void Burn() {
       if (wildFire != null) {
         wildFire.BurnTile();
+        if (deadZone != null) {
+          deadZone.Clean();
+        }
       }
     }
 

@@ -230,7 +230,7 @@ namespace MonoNS
     }
 
     int GetJoinPossibility(Unit unit1, Unit unit2) {
-      // TODO: consider other factors 
+      // TODO: apply commander range and general triats to adjust possibility 
       if (Util.eq<Party>(unit1.rf.general.party, unit2.rf.general.party)) {
         return 100;
       }
@@ -244,7 +244,7 @@ namespace MonoNS
         return 80;
       }
 
-      return 60;
+      return 10;
     }
 
     public void CancelOperation() {
@@ -398,6 +398,29 @@ namespace MonoNS
         int defenderInfTotal = 0;
         int defenderCavTotal = 0;
 
+        List<UnitPredict> newAttackers = new List<UnitPredict>();
+        List<UnitPredict> newDefenders = new List<UnitPredict>();
+        List<Unit> giveupAttackers = new List<Unit>();
+        List<Unit> giveupDefenders = new List<Unit>();
+
+        foreach (UnitPredict u in predict.attackers) {
+          if (u.joinPossibility >= Util.Rand(0, 100)) {
+            newAttackers.Add(u);
+          } else {
+            giveupAttackers.Add(u.unit);
+          }
+        }
+        predict.attackers = newAttackers;
+        foreach (UnitPredict u in predict.defenders) {
+          if (u.joinPossibility >= Util.Rand(0, 100)) {
+            newDefenders.Add(u);
+          } else {
+            giveupDefenders.Add(u.unit);
+          }
+        }
+        predict.defenders = newDefenders;
+        predict.attackerOptimPoints = predict.defenderOptimPoints = 0;
+
         foreach (UnitPredict u in predict.attackers) {
           attackerTotal += u.unit.rf.soldiers;
           if (u.unit.IsCavalry()) {
@@ -405,6 +428,7 @@ namespace MonoNS
           } else {
             attackerInfTotal += u.unit.rf.soldiers;
           }
+          predict.attackerOptimPoints += u.operationPoint;
         }
 
         foreach (UnitPredict u in predict.defenders) {
@@ -413,6 +437,39 @@ namespace MonoNS
             defenderCavTotal += u.unit.rf.soldiers;
           } else {
             defenderInfTotal += u.unit.rf.soldiers;
+          }
+          predict.defenderOptimPoints += u.operationPoint;
+        }
+        hexMap.CleanLines();
+        foreach(Unit unit in giveupAttackers) {
+          hexMap.popAniController.Show(hexMap.GetUnitView(unit), 
+            Cons.GetTextLib().get("pop_notJoinOperation"),
+            Color.red);
+          while (hexMap.popAniController.Animating) { yield return null; }
+        }
+        foreach(UnitPredict up in newAttackers) {
+          hexMap.popAniController.Show(hexMap.GetUnitView(up.unit), 
+            Cons.GetTextLib().get("pop_joinOperation"),
+            Color.green);
+          while (hexMap.popAniController.Animating) { yield return null; }
+          hexMap.ShowAttackArrow(up.unit, defender, up);
+        }
+
+        foreach(Unit unit in giveupDefenders) {
+          hexMap.popAniController.Show(hexMap.GetUnitView(unit), 
+            Cons.GetTextLib().get("pop_notJoinOperation"),
+            Color.red);
+          while (hexMap.popAniController.Animating) { yield return null; }
+        }
+        foreach(UnitPredict up in newDefenders) {
+          hexMap.popAniController.Show(hexMap.GetUnitView(up.unit), 
+            Cons.GetTextLib().get("pop_joinOperation"),
+            Color.green);
+          while (hexMap.popAniController.Animating) { yield return null; }
+          if (Util.eq<Unit>(up.unit, defender)) {
+            hexMap.ShowDefenderStat(defender, up);
+          } else {
+            hexMap.ShowDefendArrow(up.unit, defender, up);
           }
         }
 
@@ -584,7 +641,6 @@ namespace MonoNS
           // 2. body cover
           // 3. routing unit
           // 4. sourrouding
-          // 5. deduct movementpoint
           // 6. kill general
           // 7. general trait not justDefeated flag
           // 8. general trait no routing(stand ground) 
@@ -593,8 +649,11 @@ namespace MonoNS
           int morale1 = vicBuf[1];
           int discontent = vicBuf[2];
           foreach (UnitPredict up in predict.attackers) {
-            int[] stats = new int[]{0,0,0,0,0,0,0,0,0};
             Unit unit = up.unit;
+            if (unit.IsGone()) {
+              continue;
+            }
+            int[] stats = new int[]{0,0,0,0,0,0,0,0,0};
             if (Util.eq<Unit>(unit, attacker)) {
               unit.rf.morale += morale;
               unit.riot.Discontent(discontent); 
@@ -613,8 +672,11 @@ namespace MonoNS
           morale1 = dftBuf[1];
           discontent = dftBuf[2];
           foreach (UnitPredict up in predict.defenders) {
-            int[] stats = new int[]{0,0,0,0,0,0,0,0,0};
             Unit unit = up.unit;
+            if (unit.IsGone()) {
+              continue;
+            }
+            int[] stats = new int[]{0,0,0,0,0,0,0,0,0};
             if (Util.eq<Unit>(unit, defender)) {
               unit.rf.morale += morale;
               stats[0] = morale;
@@ -634,8 +696,11 @@ namespace MonoNS
           int morale1 = vicBuf[1];
           int discontent = vicBuf[2];
           foreach (UnitPredict up in predict.defenders) {
-            int[] stats = new int[]{0,0,0,0,0,0,0,0,0};
             Unit unit = up.unit;
+            if (unit.IsGone()) {
+              continue;
+            }
+            int[] stats = new int[]{0,0,0,0,0,0,0,0,0};
             if (Util.eq<Unit>(unit, defender)) {
               unit.rf.morale += morale;
               unit.riot.Discontent(discontent); 
@@ -654,8 +719,11 @@ namespace MonoNS
           morale1 = dftBuf[1];
           discontent = dftBuf[2];
           foreach (UnitPredict up in predict.attackers) {
-            int[] stats = new int[]{0,0,0,0,0,0,0,0,0};
             Unit unit = up.unit;
+            if (unit.IsGone()) {
+              continue;
+            }
+            int[] stats = new int[]{0,0,0,0,0,0,0,0,0};
             if (Util.eq<Unit>(unit, attacker)) {
               unit.rf.morale += morale;
               stats[0] = morale;
@@ -670,6 +738,10 @@ namespace MonoNS
             while (hexMap.unitAniController.ShowAnimating) { yield return null; }
           }
         }
+        int deadToll = attackerInfDead + attackerCavDead + attackerLaborDead
+          + defenderInfDead + defenderCavDead + defenderLaborDead;
+        Tile tile = atkWin ? defender.tile : attacker.tile;
+        tile.deadZone.Occur(deadToll);
       } else {
         CancelOperation();
       }
