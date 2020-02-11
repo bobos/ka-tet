@@ -241,10 +241,10 @@ namespace MonoNS
       }
 
       if (relation == Party.Relation.tense) {
-        return 80;
+        return 70;
       }
 
-      return 10;
+      return 50;
     }
 
     public void CancelOperation() {
@@ -365,15 +365,15 @@ namespace MonoNS
     // initiatorMorale, supporterMorale, initiatorDiscontent
     int[] GetDftBuf(ResultType type) {
       if (type == ResultType.Close) {
-        return new int[]{-5, -3, 0};
+        return new int[]{-10, -3, 0};
       }
       if (type == ResultType.Small) {
-        return new int[]{-10, -5, 1};
+        return new int[]{-15, -5, 1};
       }
       if (type == ResultType.Great) {
-        return new int[]{-15, -10, 3};
+        return new int[]{-20, -10, 3};
       }
-      return new int[]{-25, -20, 8};
+      return new int[]{-30, -20, 8};
     }
 
     public bool commenceOpAnimating = false;
@@ -634,8 +634,10 @@ namespace MonoNS
         int[] vicBuf = GetVicBuf(resultLevel);
         int[] dftBuf = GetDftBuf(resultLevel);
         if (atkWin) {
-          // TODO: mark justDefeated unit on map
-          defender.justDefeated = true;
+          // TODO: general trait apply to stop chaos 
+          defender.chaos = (resultLevel == ResultType.Small && Cons.EvenChance())
+            || (resultLevel == ResultType.Great && Cons.MostLikely())
+            || resultLevel == ResultType.Crushing;
           // TODO
           // 1. accumulate operation result(kill+wounded vs enemy kill+wounded) for per commander for party influence update
           // 2. body cover
@@ -689,6 +691,15 @@ namespace MonoNS
 
             hexMap.unitAniController.ShowEffects(unit, stats);
             while (hexMap.unitAniController.ShowAnimating) { yield return null; }
+          }
+
+          if (defender.chaos) {
+            hexMap.popAniController.Show(hexMap.GetUnitView(defender), 
+              Cons.GetTextLib().get("pop_chaos"),
+              Color.red);
+            while (hexMap.popAniController.Animating) { yield return null; }
+            hexMap.GetUnitView(defender).UpdateUnitInfo();
+            // TODO routing
           }
         } else {
           // defender win

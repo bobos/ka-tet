@@ -52,8 +52,8 @@ namespace CourtNS
       if (unitType == Type.Infantry)
         return 1;
       if (unitType == Type.Scout)
-        return 3;
-      return 1;
+        return 4;
+      return 5;
     }
 
     public override int Will()
@@ -100,7 +100,7 @@ namespace CourtNS
         return 2;
       if (unitType == Type.Scout)
         return 3;
-      return 2;
+      return 4;
     }
 
     public override int Will()
@@ -147,7 +147,7 @@ namespace CourtNS
         return 1;
       if (unitType == Type.Scout)
         return 3;
-      return 1;
+      return 4;
     }
 
     public override int Will()
@@ -185,7 +185,7 @@ namespace CourtNS
         return 2;
       if (unitType == Type.Scout)
         return 5;
-      return 5;
+      return 4;
     }
 
     public override int Def(Type unitType)
@@ -194,7 +194,7 @@ namespace CourtNS
         return 3;
       if (unitType == Type.Scout)
         return 3;
-      return 3;
+      return 4;
     }
 
     public override int Will()
@@ -241,7 +241,7 @@ namespace CourtNS
         return 1;
       if (unitType == Type.Scout)
         return 3;
-      return 2;
+      return 4;
     }
 
     public override int Will()

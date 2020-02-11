@@ -412,7 +412,7 @@ namespace MonoNS
       toggledUnitViews.Add(view);
       view.ToggleText(false);
       CreateArrow(new Tile[]{fromUnit.tile, toUnit.tile}, Color.black, txt,
-        predict.joinPossibility > 70 ? Color.cyan : Color.red);
+        predict.joinPossibility >= 70 ? Color.cyan : Color.red);
     }
 
     public void ShowDefendArrow(Unit fromUnit, Unit toUnit, UnitPredict predict) {
@@ -424,7 +424,7 @@ namespace MonoNS
       toggledUnitViews.Add(view);
       view.ToggleText(false);
       CreateArrow(new Tile[]{fromUnit.tile, toUnit.tile}, Color.blue, txt,
-        predict.joinPossibility > 70 ? Color.cyan : Color.red);
+        predict.joinPossibility >= 70 ? Color.cyan : Color.red);
     }
 
      public void ShowDefenderStat(Unit defender, UnitPredict predict) {

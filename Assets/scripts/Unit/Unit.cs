@@ -50,7 +50,7 @@ namespace UnitNS
     WeatherGenerator weatherGenerator;
     TurnController turnController;
     int initSupply = 0;
-    public bool justDefeated = false;
+    public bool chaos = false;
     public Unit(bool clone, Troop troop, Tile tile, State state,
                 int supply, int labor, int kia, int mia, int movement = -1)
     {
@@ -391,7 +391,11 @@ namespace UnitNS
     // Before new turn starts
     public int[] RefreshUnit()
     {
-      justDefeated = false;
+      if (chaos) {
+        chaos = false;
+        hexMap.GetUnitView(this).UpdateUnitInfo();
+      }
+
       if (concealCoolDownTurn > 0) {
         concealCoolDownTurn--;
       } else {
@@ -613,7 +617,7 @@ namespace UnitNS
 
     float GetBuff()
     {
-      return GetStarvingBuf() + GetNewGeneralBuf();
+      return GetStarvingBuf() + GetNewGeneralBuf() + GetChaosBuf();
     }
 
     float newGeneralDebuf = 0f;
@@ -629,6 +633,10 @@ namespace UnitNS
     public float GetStarvingBuf()
     {
       return IsHungry() ? -0.3f : 0f;
+    }
+
+    public float GetChaosBuf() {
+      return chaos ? -0.8f : 0f;
     }
 
     // ==============================================================
