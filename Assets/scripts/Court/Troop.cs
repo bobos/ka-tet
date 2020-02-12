@@ -22,7 +22,7 @@ namespace CourtNS
     public General general;
     public int wounded = 0;
     public Unit onFieldUnit;
-    Type type;
+    public Type type;
     int _morale;
     int _soldiers;
     public int atkCore;

@@ -27,7 +27,11 @@ namespace UnitNS
     public const int L1DiscoverRange = 1; // under 2000
     public const int L2DiscoverRange = 2; // > 4000
     public const int ConcealCoolDownIn = 3;
-    public Type type;
+    public Type type {
+      get {
+        return rf.type;
+      }
+    }
 
     private TextNS.TextLib txtLib = Cons.GetTextLib();
 

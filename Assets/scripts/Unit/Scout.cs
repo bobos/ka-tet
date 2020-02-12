@@ -22,7 +22,6 @@ namespace UnitNS
                  int kia = 0, int mia = 0, int movement = -1):
           base(clone, troop, tile, state, supply, 0, kia, mia, movement)
     {
-      this.type = Type.Scout;
     }
 
     public override bool IsCavalry()

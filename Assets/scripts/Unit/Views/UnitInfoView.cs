@@ -12,9 +12,9 @@ namespace UnitNS
     public void SetName(Unit unit) {
       TextMesh textMesh = this.transform.GetComponent<TextMesh>();
       Color color = unit.hexMap.GetWarParty(unit).attackside ? Color.yellow : Color.white;
-      string title = (unit.IsCavalry() ? (unit.type == Type.Cavalry ? "♘" : "♞") : "♖")
-        + (unit.chaos ? "☠" : "")
+      string title = (unit.chaos ? "☠" : "")
         + "\n"
+        + (unit.IsCavalry() ? (unit.type == Type.Scout ? "♘" : "♞") : "♜")
         + (unit.hexMap.wargameController.start ? "[推演]\n" : "")
         + unit.GeneralName()
         + "[" + unit.rf.general.party.Name() + "]"
