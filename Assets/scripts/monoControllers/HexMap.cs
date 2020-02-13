@@ -230,11 +230,10 @@ namespace MonoNS
       return enemyScoutArea;
     }
 
-    public void CreateArrow(Tile[] path, Color color, string label, Color kolor)
+    public void CreateArrow(Tile[] path, Material mat, string label, Color kolor)
     {
       if (path.Length == 0) return;
-      CreateLine(path, color);
-      CreateLine(path, color);
+      CreateLine(path, mat);
       GameObject unitInfoGO = (GameObject)Instantiate(UnitInfoPrefab,
           tile2GO[path[0]].transform.position,
           Quaternion.identity, tile2GO[path[0]].transform);
@@ -242,17 +241,16 @@ namespace MonoNS
       lineLabels.Add(unitInfoGO);
     }
 
-    void CreateLine(Tile[] path, Color color) {
+    void CreateLine(Tile[] path, Material mat) {
       GameObject myLine = new GameObject();
       lineCache.Add(myLine);
       myLine.transform.position = tile2GO[path[0]].transform.position + (Vector3.up * 0.5f);
       myLine.AddComponent<LineRenderer>();
       LineRenderer lr = myLine.GetComponent<LineRenderer>();
-      lr.material = new Material(Shader.Find("Particles/Alpha Blended Premultiply"));
+      //lr.material = new Material(Shader.Find("Particles/Alpha Blended Premultiply"));
+      lr.material = mat;
       lr.startWidth = 0.4f;
       lr.endWidth = 0.01f;
-      lr.startColor = color;
-      lr.endColor = color;
       Vector3[] ps = new Vector3[path.Length];
       for (int i = 0; i < path.Length; i++)
       {
@@ -411,7 +409,7 @@ namespace MonoNS
       UnitView view = GetUnitView(fromUnit);
       toggledUnitViews.Add(view);
       view.ToggleText(false);
-      CreateArrow(new Tile[]{fromUnit.tile, toUnit.tile}, Color.black, txt,
+      CreateArrow(new Tile[]{fromUnit.tile, toUnit.tile}, MatBurning, txt,
         predict.joinPossibility >= 70 ? Color.cyan : Color.red);
     }
 
@@ -423,7 +421,7 @@ namespace MonoNS
       UnitView view = GetUnitView(fromUnit);
       toggledUnitViews.Add(view);
       view.ToggleText(false);
-      CreateArrow(new Tile[]{fromUnit.tile, toUnit.tile}, Color.blue, txt,
+      CreateArrow(new Tile[]{fromUnit.tile, toUnit.tile}, MatOcean, txt,
         predict.joinPossibility >= 70 ? Color.cyan : Color.red);
     }
 

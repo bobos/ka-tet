@@ -132,8 +132,10 @@ public class Starter : MonoBehaviour {
 
     General caocao = new General("g_caocao", "g_caocao_d", Cons.riverNorth, new Traits[0]); 
     General xuchu = new General("g_xuchu", "g_xuchu_d", Cons.riverNorth, new Traits[0]); 
+    General abc = new General("g_abc", "g_abc", Cons.riverNorth, new Traits[0]); 
     caocao.JoinFaction(Cons.Liang, Cons.Tiger);
     xuchu.JoinFaction(Cons.Liang, Cons.Tiger);
+    abc.JoinFaction(Cons.Liang, Cons.Tiger);
 
     // step 3, assign general to units
     liubei.Assign(hexMap,
@@ -154,6 +156,9 @@ public class Starter : MonoBehaviour {
     );
     xuchu.Assign(hexMap,
       new Troop(3000, Cons.Liang, Cons.farWest, Type.Cavalry, Cons.elite)
+    );
+    abc.Assign(hexMap,
+      new Troop(5000, Cons.Liang, Cons.riverNorth, Type.Infantry, Cons.veteran)
     );
 
     // step 4, on field assignment
@@ -190,8 +195,9 @@ public class Starter : MonoBehaviour {
 
     // * AI *
     //caocao.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(1, 1), 0, 6000);
-    caocao.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(26, 15), 0, 6000);
-    xuchu.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(27, 15), 0);
+    caocao.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(26, 15), 6000, 6000);
+    abc.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(25, 16), 6000, 2000);
+    xuchu.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(27, 15), 3000);
     //xuchu.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(2, 1), 0);
     SettlementMgr.Ready4Refresh = true;
     FoW.Init(hexMap);

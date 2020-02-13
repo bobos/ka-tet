@@ -102,7 +102,7 @@ namespace MonoNS
             null));
           while (eventDialog.Animating) { yield return null; }
         } else if (unit.IsShowingAnimation()) {
-          popAniController.Show(view, textLib.get("pop_altitudeSickness"), Color.red);
+          popAniController.Show(view, textLib.get("pop_altitudeSickness"), Color.white);
           while(popAniController.Animating) { yield return null; }
         }
       }
@@ -219,7 +219,7 @@ namespace MonoNS
           unit.SetState(State.Routing);
           unit.labor = 0;
           if (unit.IsShowingAnimation()) {
-            popAniController.Show(view, textLib.get("pop_routing"), Color.red);
+            popAniController.Show(view, textLib.get("pop_routing"), Color.white);
             while (popAniController.Animating) { yield return null; }
             view.RoutAnimation();
             while (view.Animating) { yield return null; }
@@ -517,56 +517,56 @@ namespace MonoNS
       if (morale != 0) {
         popAniController.Show(view,
           textLib.get("pop_morale") + (morale > 0 ? ("+" + morale) : ("" + morale)),
-          morale > 0 ? Color.green : Color.red);
+          morale > 0 ? Color.green : Color.white);
         while (popAniController.Animating) { yield return null; }
       }
 
       if (movement != 0) {
         popAniController.Show(view,
           textLib.get("pop_movement") + (movement > 0 ? ("+" + movement) : ("" + movement)),
-          movement > 0 ? Color.green : Color.red);
+          movement > 0 ? Color.green : Color.white);
         while (popAniController.Animating) { yield return null; }
       }
 
       if (wounded != 0) {
         popAniController.Show(view,
           textLib.get("pop_wounded") + wounded,
-          Color.red);
+          Color.white);
         while (popAniController.Animating) { yield return null; }
       }
 
       if (killed != 0) {
         popAniController.Show(view,
           textLib.get("pop_killed") + killed,
-          Color.red);
+          Color.white);
         while (popAniController.Animating) { yield return null; }
       }
 
       if (laborKilled != 0) {
         popAniController.Show(view,
           textLib.get("pop_laborKilled") + laborKilled,
-          Color.red);
+          Color.white);
         while (popAniController.Animating) { yield return null; }
       }
 
       if (desserter != 0) {
         popAniController.Show(view,
           textLib.get("pop_desserter") + desserter,
-          Color.red);
+          Color.white);
         while (popAniController.Animating) { yield return null; }
       }
 
       if (atk != 0) {
         popAniController.Show(view,
           textLib.get("pop_atk") + (atk > 0 ? ("+" + atk) : ("" + atk)),
-          atk > 0 ? Color.green : Color.red);
+          atk > 0 ? Color.green : Color.white);
         while (popAniController.Animating) { yield return null; }
       }
 
       if (def != 0) {
         popAniController.Show(view,
           textLib.get("pop_def") + (def > 0 ? ("+" + def) : ("" + def)),
-          def > 0 ? Color.green : Color.red);
+          def > 0 ? Color.green : Color.white);
         while (popAniController.Animating) { yield return null; }
       }
 

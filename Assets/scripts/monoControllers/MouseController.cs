@@ -190,7 +190,7 @@ namespace MonoNS
         }
         else
         {
-          popAniController.Show(hexMap.GetUnitView(selectedUnit), textLib.get("pop_buildingFailed"), Color.red);
+          popAniController.Show(hexMap.GetUnitView(selectedUnit), textLib.get("pop_buildingFailed"), Color.white);
         }
       }
 

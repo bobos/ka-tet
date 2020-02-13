@@ -19,6 +19,9 @@ namespace UnitNS
         unit.rf.morale += moraleReduce;
         return moraleReduce;
       }
+      if (discontent < 0) {
+        discontent = 0;
+      }
       return 0;
     }
 

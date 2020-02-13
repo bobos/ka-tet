@@ -38,7 +38,7 @@ namespace MonoNS
 
     IEnumerator CoFlood(Tile t, HashSet<Tile> tiles)
     {
-      popAniController.Show(hexMap.GetTileView(t), textLib.get("pop_damBroken"), Color.red);
+      popAniController.Show(hexMap.GetTileView(t), textLib.get("pop_damBroken"), Color.white);
       while (popAniController.Animating) { yield return null; }
       foreach(Tile tile in tiles) {
         hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(tile).transform.position);

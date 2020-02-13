@@ -138,6 +138,7 @@ namespace TextNS
       {"g_caocao", "朱温"},
       {"g_xuchu", "王彦章"},
       {"g_machao", "夏鲁奇"},
+      {"g_abc", "牛存节"},
 
       // party report
       {"pr_sloppyOnDrill", "疏于操练"},
@@ -306,6 +307,8 @@ namespace TextNS
       {"pop_notJoinOperation", "按兵不动"},
       {"pop_joinOperation", "投入战斗"},
       {"pop_chaos", "混乱"},
+      {"pop_escapeNoRout", "无路可逃"},
+      {"pop_crashedByAlly", "溃兵冲击"},
 
       // settlement
       {"settlement_storageLvl1", "初级粮仓"},

@@ -444,7 +444,7 @@ namespace MonoNS
         foreach(Unit unit in giveupAttackers) {
           hexMap.popAniController.Show(hexMap.GetUnitView(unit), 
             Cons.GetTextLib().get("pop_notJoinOperation"),
-            Color.red);
+            Color.white);
           while (hexMap.popAniController.Animating) { yield return null; }
         }
         foreach(UnitPredict up in newAttackers) {
@@ -458,7 +458,7 @@ namespace MonoNS
         foreach(Unit unit in giveupDefenders) {
           hexMap.popAniController.Show(hexMap.GetUnitView(unit), 
             Cons.GetTextLib().get("pop_notJoinOperation"),
-            Color.red);
+            Color.white);
           while (hexMap.popAniController.Animating) { yield return null; }
         }
         foreach(UnitPredict up in newDefenders) {
@@ -493,7 +493,7 @@ namespace MonoNS
 // 3.1 to 4.0 - atk: (x - 1) * (0.1 - 0.125);
 // 4.0 above - atk: (x - 1) * 0.05
         if (factor <= 1) {
-          float f = 0.02f;
+          float f = 0.04f;
           if (Cons.SlimChance()) {
             f = 0.1f;
           }
@@ -501,9 +501,9 @@ namespace MonoNS
           attackerCasualty = (int)(attackerTotal * f);
         } else {
           if (attackerBigger) {
-            defenderCasualty = (int)(defenderTotal * factor * 0.02f);
+            defenderCasualty = (int)(defenderTotal * factor * 0.025f);
           } else {
-            attackerCasualty = (int)(attackerTotal * factor * 0.02f);
+            attackerCasualty = (int)(attackerTotal * factor * 0.025f);
           }
 
           if (factor > 1 && factor <= 6) {
@@ -641,11 +641,8 @@ namespace MonoNS
           // TODO
           // 1. accumulate operation result(kill+wounded vs enemy kill+wounded) for per commander for party influence update
           // 2. body cover
-          // 3. routing unit
           // 4. sourrouding
           // 6. kill general
-          // 7. general trait not justDefeated flag
-          // 8. general trait no routing(stand ground) 
 
           int morale = vicBuf[0];
           int morale1 = vicBuf[1];
@@ -694,12 +691,74 @@ namespace MonoNS
           }
 
           if (defender.chaos) {
+            defender.movementRemaining = Unit.MovementcostOnHill * 100;
             hexMap.popAniController.Show(hexMap.GetUnitView(defender), 
               Cons.GetTextLib().get("pop_chaos"),
-              Color.red);
+              Color.white);
             while (hexMap.popAniController.Animating) { yield return null; }
             hexMap.GetUnitView(defender).UpdateUnitInfo();
             // TODO routing
+            HashSet<Tile> from = new HashSet<Tile>{defender.tile};
+            int escapeDistance = 5;
+            bool moved = false;
+            while (escapeDistance > 0) {
+              moved = false;
+              foreach(Tile t in defender.tile.neighbours) {
+                if (t.Deployable(defender) && !from.Contains(t)) {
+                  escapeDistance--;
+                  from.Add(t);
+                  hexMap.unitAniController.MoveUnit(defender, t);
+                  while (hexMap.unitAniController.MoveAnimating) { yield return null; }
+                  moved = true;
+                  break;
+                }
+              }
+
+              if (!moved) {
+                // Failed to find escape tile, pick a nearby ally and clash
+                List<Unit> ally = new List<Unit>();
+                foreach(Tile t in defender.tile.neighbours) {
+                  Unit u = t.GetUnit();
+                  if (u != null && u.IsAI() == defender.IsAI()) {
+                    ally.Add(u);
+                  }
+                }
+
+                if (ally.Count > 0) {
+                  Unit clashed = ally[Util.Rand(0, ally.Count-1)];
+                  int damage = (int)(defender.rf.soldiers * 0.1f);
+                  damage = damage > clashed.rf.soldiers ? clashed.rf.soldiers : damage;
+                  int killed = (int)(damage * Util.Rand(5, 7) * 0.1f);
+                  int wounded = damage - killed;
+                  clashed.rf.soldiers -= damage;
+                  clashed.kia += killed;
+                  clashed.rf.wounded += wounded;
+                  hexMap.UpdateWound(clashed, wounded);
+                  clashed.rf.morale -= 10;
+                  // morale, movement, wounded, killed, laborKilled, disserter, attack, def, discontent
+                  int[] stats = new int[]{-10,0,wounded,killed,0,0,0,0,0};
+                  hexMap.popAniController.Show(hexMap.GetUnitView(defender), 
+                    Cons.GetTextLib().get("pop_escapeNoRout"),
+                    Color.white);
+                  while (hexMap.popAniController.Animating) { yield return null; }
+                  hexMap.popAniController.Show(hexMap.GetUnitView(clashed), 
+                    Cons.GetTextLib().get("pop_crashedByAlly"),
+                    Color.white);
+                  while (hexMap.popAniController.Animating) { yield return null; }
+                  hexMap.unitAniController.ShowEffects(clashed, stats);
+                  while (hexMap.unitAniController.ShowAnimating) { yield return null; }
+                  hexMap.unitAniController.Riot(clashed, 2);
+                  while (hexMap.unitAniController.riotAnimating) { yield return null; }
+                  if (!clashed.IsGone() && clashed.rf.soldiers <= Unit.DisbandUnitUnder) {
+                    // unit disbanded
+                    hexMap.unitAniController.DestroyUnit(clashed, DestroyType.ByDisband);
+                    while (hexMap.unitAniController.DestroyAnimating) { yield return null; }
+                  }
+                }
+                break;
+              }
+            }
+            defender.movementRemaining = 0;
           }
         } else {
           // defender win

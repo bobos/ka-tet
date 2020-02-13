@@ -118,7 +118,7 @@ namespace MonoNS
             textLib.get(
               job.type == QueueJobType.DistSupply ?
               "pop_failedToDistSupply" : "pop_failedToDistLabor"),
-            Color.red);
+            Color.white);
           while (popAniController.Animating) { yield return null; }
           continue;
         }

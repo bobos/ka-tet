@@ -190,7 +190,7 @@ namespace MonoNS
           }
           hexMap.popAniController.Show(view,
             textLib.get(unit.supply.halfFeed ? "pop_halfStarving" : "pop_starving"),
-            Color.red);
+            Color.white);
           while (hexMap.popAniController.Animating)
           {
             yield return null;
