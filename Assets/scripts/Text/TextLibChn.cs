@@ -261,7 +261,10 @@ namespace TextNS
       {"event_operationResult_theySmallWin", "小败"},
       {"event_operationResult_theyGreatWin", "大败"},
       {"event_operationResult_theyCrushingWin", "惨败"},
-
+      {"event_routingRetreatSoldierDialog", @"{0}所部溃兵: 前方猪狗, 勿挡我道啊!!!"},
+      {"event_routingImpactSoldierDialog", @"{0}所部士兵: 诸君镇定, 切莫再退了!!!"},
+      {"event_NoRetreatGeneralDialog", @"{0}: 我军已无退路, 吾辈自当向死而生!!!"},
+      {"event_NoRetreatSoldierDialog", @"{0}所部众兵士: 誓死不降!!!"},
 
       // pop out msg
       {"pop_discontent", @"不满+{0}"},
@@ -306,9 +309,10 @@ namespace TextNS
       {"pop_plainSickness", "战马平原反应"},
       {"pop_notJoinOperation", "按兵不动"},
       {"pop_joinOperation", "投入战斗"},
-      {"pop_chaos", "混乱"},
-      {"pop_escapeNoRout", "无路可逃"},
-      {"pop_crashedByAlly", "溃兵冲击"},
+      {"pop_chaos", "一溃千里"},
+      {"pop_escapeNoRout", "无路可退"},
+      {"pop_crashedByAlly", "受溃兵冲击"},
+      {"pop_noRetreatBuf", "战力翻番！"},
 
       // settlement
       {"settlement_storageLvl1", "初级粮仓"},

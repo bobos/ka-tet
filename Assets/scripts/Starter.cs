@@ -28,6 +28,8 @@ public class Starter : MonoBehaviour {
     controllers.Add(eventDialog);
     EventDialogAlt eventDialogAlt = GameObject.FindObjectOfType<EventDialogAlt>();
     controllers.Add(eventDialogAlt);
+    Dialogue dialogue = GameObject.FindObjectOfType<Dialogue>();
+    controllers.Add(dialogue);
     MouseController mouseController = GameObject.FindObjectOfType<MouseController>();
     controllers.Add(mouseController);
     WeatherGenerator weatherGenerator = GameObject.FindObjectOfType<WeatherGenerator>();

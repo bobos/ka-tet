@@ -473,6 +473,27 @@ namespace MonoNS
           }
         }
 
+        if (predict.defenders.Count == 1) {
+          bool noRetreat = true;
+          foreach (Tile t in defender.tile.neighbours) {
+            if (t.Deployable(defender)) {
+              noRetreat = false;
+              break;
+            }
+          }
+
+          if (noRetreat) {
+            predict.defenderOptimPoints = predict.defenderOptimPoints * 2;
+            hexMap.dialogue.ShowNoRetreatEvent(defender);
+            while (hexMap.dialogue.Animating) { yield return null; }
+            hexMap.popAniController.Show(hexMap.GetUnitView(defender), 
+              Cons.GetTextLib().get("pop_noRetreatBuf"),
+              Color.green);
+            while (hexMap.popAniController.Animating) { yield return null; }
+          }
+
+        }
+
         int attackerCasualty = 0;
         int defenderCasualty = 0;
         bool attackerBigger = true;
@@ -639,11 +660,10 @@ namespace MonoNS
             || (resultLevel == ResultType.Great && Cons.MostLikely())
             || resultLevel == ResultType.Crushing;
           // TODO
+          // 胜利条件 加入人员伤亡比
           // 1. accumulate operation result(kill+wounded vs enemy kill+wounded) for per commander for party influence update
           // 2. body cover
-          // 4. sourrouding
           // 6. kill general
-
           int morale = vicBuf[0];
           int morale1 = vicBuf[1];
           int discontent = vicBuf[2];
@@ -704,6 +724,10 @@ namespace MonoNS
             while (escapeDistance > 0) {
               moved = false;
               foreach(Tile t in defender.tile.neighbours) {
+                Unit u = t.GetUnit();
+                if (u != null && u.IsConcealed()) {
+                  u.DiscoveredByEnemy();
+                }
                 if (t.Deployable(defender) && !from.Contains(t)) {
                   escapeDistance--;
                   from.Add(t);
@@ -741,6 +765,8 @@ namespace MonoNS
                     Cons.GetTextLib().get("pop_escapeNoRout"),
                     Color.white);
                   while (hexMap.popAniController.Animating) { yield return null; }
+                  hexMap.dialogue.ShowRoutingImpactIncident(defender, clashed);
+                  while (hexMap.dialogue.Animating) { yield return null; }
                   hexMap.popAniController.Show(hexMap.GetUnitView(clashed), 
                     Cons.GetTextLib().get("pop_crashedByAlly"),
                     Color.white);

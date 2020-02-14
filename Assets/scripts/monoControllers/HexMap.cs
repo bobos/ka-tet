@@ -30,6 +30,7 @@ namespace MonoNS
     public InputField inputField;
     public EventDialog eventDialog;
     public EventDialogAlt eventDialogAlt;
+    public Dialogue dialogue;
     public SettlementAnimationController settlementAniController;
     public UnitAnimationController unitAniController;
     public TileAnimationController tileAniController;
@@ -135,6 +136,7 @@ namespace MonoNS
       inputField = GameObject.FindObjectOfType<InputField>();
       eventDialog = GameObject.FindObjectOfType<EventDialog>();
       eventDialogAlt = GameObject.FindObjectOfType<EventDialogAlt>();
+      dialogue = GameObject.FindObjectOfType<Dialogue>();
       settlementAniController = GameObject.FindObjectOfType<SettlementAnimationController>();
       unitAniController = GameObject.FindObjectOfType<UnitAnimationController>();
       tileAniController = GameObject.FindObjectOfType<TileAnimationController>();

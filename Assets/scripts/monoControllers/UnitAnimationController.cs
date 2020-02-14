@@ -528,16 +528,16 @@ namespace MonoNS
         while (popAniController.Animating) { yield return null; }
       }
 
-      if (wounded != 0) {
+      if (killed != 0) {
         popAniController.Show(view,
-          textLib.get("pop_wounded") + wounded,
+          textLib.get("pop_killed") + killed,
           Color.white);
         while (popAniController.Animating) { yield return null; }
       }
 
-      if (killed != 0) {
+      if (wounded != 0) {
         popAniController.Show(view,
-          textLib.get("pop_killed") + killed,
+          textLib.get("pop_wounded") + wounded,
           Color.white);
         while (popAniController.Animating) { yield return null; }
       }
