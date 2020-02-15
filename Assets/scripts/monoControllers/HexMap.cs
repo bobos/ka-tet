@@ -696,7 +696,6 @@ namespace MonoNS
 
       view.OnCreate(unit);
       unit2GO[unit] = unitGO;
-      unit.UpdateGeneralName();
       SetUnitSkin(unit);
     }
 

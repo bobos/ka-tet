@@ -69,9 +69,9 @@ namespace CourtNS
       }
       set {
         _soldiers = value < 0 ? 0 : (value > Troop.MaxNum(type) ? Troop.MaxNum(type) : value);
-        if (onFieldUnit != null) {
-          onFieldUnit.UpdateUnitInfo();
-        }
+        //if (onFieldUnit != null) {
+        //  onFieldUnit.UpdateUnitInfo();
+        //}
       }
     }
 
@@ -129,9 +129,9 @@ namespace CourtNS
 
     public void AssignGeneral(General general) {
       this.general = general;
-      if (onFieldUnit != null) {
-        onFieldUnit.UpdateGeneralName();
-      }
+      //if (onFieldUnit != null) {
+      //  onFieldUnit.UpdateGeneralName();
+      //}
     }
 
   }

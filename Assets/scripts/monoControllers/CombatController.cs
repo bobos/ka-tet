@@ -729,7 +729,7 @@ namespace MonoNS
               Cons.GetTextLib().get("pop_chaos"),
               Color.white);
             while (hexMap.popAniController.Animating) { yield return null; }
-            hexMap.GetUnitView(defender).UpdateUnitInfo();
+            //hexMap.GetUnitView(defender).UpdateUnitInfo();
             // TODO routing
             HashSet<Tile> from = new HashSet<Tile>{defender.tile};
             int escapeDistance = 5;

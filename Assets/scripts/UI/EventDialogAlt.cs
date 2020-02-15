@@ -129,7 +129,12 @@ namespace MonoNS
     public void ShowOperationEvent(OperationPredict predict, bool playerAttack) {
       btn1Clicked = btn2Clicked = false;
       Animating = true;
-      btn1.SetActive(true);
+      if (hexMap.wargameController.start) {
+        btn1.SetActive(false);
+      } else {
+        btn1.SetActive(true);
+      }
+
       if (playerAttack) {
         btn2.SetActive(true);
       } else {

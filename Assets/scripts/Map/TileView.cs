@@ -101,12 +101,10 @@ public class TileView : View
     }
     MeshRenderer[] mrs = tileGO.GetComponentsInChildren<MeshRenderer>();
     foreach(MeshRenderer mr in mrs) {
-      if (mr.name == "HexCoordLabel" || mr.name == "overlay") {
-        continue;
+      if (mr.name == "HexModel" || mr.name.StartsWith("Quad")) {
+        mr.material = mat;
       }
-      mr.material = mat;
     }
-
   }
 
   public void FloodAnimation()
@@ -116,7 +114,7 @@ public class TileView : View
   }
 
   IEnumerator CoFloodAnimation() {
-    yield return new WaitForSeconds(0.2f);
+    yield return new WaitForSeconds(0.1f);
     Animating = false;
   }
 

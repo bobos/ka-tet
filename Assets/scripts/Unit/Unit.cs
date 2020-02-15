@@ -398,7 +398,7 @@ namespace UnitNS
     {
       if (chaos) {
         chaos = false;
-        hexMap.GetUnitView(this).UpdateUnitInfo();
+        //hexMap.GetUnitView(this).UpdateUnitInfo();
       }
 
       if (concealCoolDownTurn > 0) {
@@ -690,19 +690,19 @@ namespace UnitNS
     // ==============================================================
     // ================= unit actions ===============================
     // ==============================================================
-    public void UpdateGeneralName() {
-      UnitView view = hexMap.GetUnitView(this);
-      if (view != null) {
-        view.UpdateUnitInfo();
-      }
-    }
+    //public void UpdateGeneralName() {
+    //  UnitView view = hexMap.GetUnitView(this);
+    //  if (view != null) {
+    //    view.UpdateUnitInfo();
+    //  }
+    //}
 
-    public void UpdateUnitInfo() {
-      UnitView view = hexMap.GetUnitView(this);
-      if (view != null) {
-        view.UpdateUnitInfo();
-      }
-    }
+    //public void UpdateUnitInfo() {
+    //  UnitView view = hexMap.GetUnitView(this);
+    //  if (view != null) {
+    //    view.UpdateUnitInfo();
+    //  }
+    //}
 
     public void Encamp(Tile tile)
     {

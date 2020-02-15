@@ -447,14 +447,18 @@ namespace MapTileNS
 
     public Tile Escape() {
       Unit unit = GetUnit();
+      List<Tile> tiles = new List<Tile>();
       foreach (Tile tile in neighbours)
       {
         if (tile.Deployable(unit))
         {
-          return tile;
+          tiles.Add(tile);
         }
       }
-      return null;
+      if (tiles.Count == 0) {
+        return null;
+      }
+      return tiles[Util.Rand(0, tiles.Count-1)];
     }
 
     // * PathFind interfaces *

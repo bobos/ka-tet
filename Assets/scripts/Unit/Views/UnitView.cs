@@ -39,7 +39,8 @@ namespace UnitNS
       return new Vector3(unitPosition.x - 0.5f, unitPosition.y, unitPosition.z);
     }
 
-    public void UpdateUnitInfo() {
+    void UpdateUnitInfo() {
+      unitInfoGO.transform.position = UnitInfoPosition(transform.position);
       unitInfoGO.GetComponent<UnitInfoView>().SetName(unit);
     }
 
@@ -74,7 +75,6 @@ namespace UnitNS
       mouseController.onUnitSelect -= OnUnitSelect;
       mouseController.onModeQuit -= OnModeQuit;
       mouseController.onUnitDeselect -= OnUnitDeselect;
-      //Destroy(nameGO);
       Destroy(unitInfoGO);
     }
 
@@ -166,19 +166,14 @@ namespace UnitNS
     /// </summary>
     void Update()
     {
+      UpdateUnitInfo();
       if (!Animating) { return; }
       Vector3 originPosition = this.transform.position;
       // NOTE: this point to the gameobject not the component
       this.transform.position = Vector3.SmoothDamp(originPosition, newPosition, ref currentVelocity, 0.1f);
-      //nameGO.transform.position = Vector3.SmoothDamp(originPosition, newPosition, ref currentVelocity, 0.1f);
-      unitInfoGO.transform.position = Vector3.SmoothDamp(originPosition, newPosition, ref currentVelocity, 0.1f);
+      //unitInfoGO.transform.position = Vector3.SmoothDamp(originPosition, newPosition, ref currentVelocity, 0.1f);
       if (Vector3.Distance(this.transform.position, newPosition) < 0.1f)
       {
-        //if (viewActivated) {
-        //  ToggleUnitInfo(true);
-        //}
-        //nameGO.transform.position = NamePosition(newPosition);
-        unitInfoGO.transform.position = UnitInfoPosition(newPosition);
         Animating = false;
       }
     }

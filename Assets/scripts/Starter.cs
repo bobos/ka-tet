@@ -88,7 +88,7 @@ public class Starter : MonoBehaviour {
     StartButton.SetActive(false);
 
     // TODO build dam
-    Tile dam = hexMap.GetTile(15, 15);
+    Tile dam = hexMap.GetTile(16, 15);
     dam.BuildDam();
 
     // * tactical phase starts *
