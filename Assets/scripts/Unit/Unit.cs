@@ -96,11 +96,12 @@ namespace UnitNS
       farmDestroy = new FarmDestroy(this);
     }
 
-    public void CloneInit(float disarmorDefDebuf, float newGeneralDebuf, Supply supply, PlainSickness plainSickness) {
+    public void CloneInit(float disarmorDefDebuf, float newGeneralDebuf, Supply supply, PlainSickness plainSickness, WarWeary warWeary) {
       this.disarmorDefDebuf = disarmorDefDebuf;
       this.newGeneralDebuf = newGeneralDebuf;
       this.supply = supply;
       this.plainSickness = plainSickness;
+      this.warWeary = warWeary;
     }
 
     public void SpawnOnMap() {
@@ -621,7 +622,7 @@ namespace UnitNS
 
     float GetBuff()
     {
-      return GetStarvingBuf() + GetNewGeneralBuf() + GetChaosBuf();
+      return GetStarvingBuf() + GetNewGeneralBuf() + GetChaosBuf() + GetWarwearyBuf();
     }
 
     float newGeneralDebuf = 0f;
@@ -637,6 +638,11 @@ namespace UnitNS
     public float GetStarvingBuf()
     {
       return IsHungry() ? -0.3f : 0f;
+    }
+
+    public float GetWarwearyBuf()
+    {
+      return warWeary.GetBuf();
     }
 
     public float GetChaosBuf() {

@@ -8,6 +8,10 @@
       this.unit = unit;
     }
 
+    public float GetBuf() {
+      return IsWarWeary() ? -0.7f : 0;
+    }
+
     public bool IsWarWeary() {
       return unit.type != Type.Scout && unit.rf.morale < unit.GetRetreatThreshold();
     }

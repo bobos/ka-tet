@@ -13,11 +13,11 @@ namespace  UnitNS
 
     public static Unit Create(bool clone, Troop troop, Tile tile, int supply, State state = State.Stand, 
                     int kia = 0, int mia = 0, int movement = -1, float disarmorDefDebuf = 0f,
-                    float newGenBuf = 0f, Supply theSupply = null, PlainSickness plainSickness = null) {
+                    float newGenBuf = 0f, Supply theSupply = null, PlainSickness plainSickness = null, WarWeary warWeary = null) {
       Unit unit = new Cavalry(clone, troop, tile, supply, state, kia, mia, movement);
       unit.Init();
       if (clone) {
-        unit.CloneInit(unit.disarmorDefDebuf, unit.GetNewGeneralBuf(), theSupply, plainSickness);
+        unit.CloneInit(unit.disarmorDefDebuf, unit.GetNewGeneralBuf(), theSupply, plainSickness, warWeary);
       }
       return unit;
     }
@@ -41,7 +41,7 @@ namespace  UnitNS
     protected override Unit Clone()
     {
       return Create(true, rf, tile, supply.supply, state, kia, mia, movementRemaining,
-        disarmorDefDebuf, GetNewGeneralBuf(), supply, plainSickness);
+        disarmorDefDebuf, GetNewGeneralBuf(), supply, plainSickness, warWeary);
     }
 
     protected override bool Concealable() {

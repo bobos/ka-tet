@@ -194,6 +194,7 @@ namespace MonoNS
       + "% 饥饿惩罚:" + unit.GetStarvingBuf() * 100
       + "% 整合度惩罚:" + unit.GetNewGeneralBuf() * 100
       + "% 混乱惩罚:" + unit.GetChaosBuf() * 100
+      + "% 厌战惩罚:" + unit.GetWarwearyBuf() * 100
 
       + "%\n单兵攻击:" + unit.atk + "\n进攻加成:\n"
       + " 等级加成:" + unit.rf.atkLvlBuf * 100

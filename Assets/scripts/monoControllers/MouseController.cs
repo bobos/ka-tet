@@ -108,7 +108,7 @@ namespace MonoNS
     public bool nearWater = false;
     public List<Unit> nearbyEnemey = null;
 
-    void PrepareUnitSelection() {
+    void ResetUnitSelection() {
       nearEnemySettlement = null;
       nearMySettlement = null;
       nearDam = null;
@@ -118,7 +118,10 @@ namespace MonoNS
       nearWater = false;
       inCampField = null;
       nearbyEnemey = new List<Unit>();
+    }
 
+    void PrepareUnitSelection() {
+      ResetUnitSelection();
       Settlement s = null;
       if (tileUnderMouse.IsCampable()) {
         inCampField = tileUnderMouse;
@@ -450,13 +453,6 @@ namespace MonoNS
             transferedSettlement = null;
             hexMap.inputField.DeactivateInput();
           }
-          if (mouseMode == mode.attack) {
-            msgBox.Show("");
-            foreach(Unit u in nearbyEnemey) {
-              hexMap.SetUnitSkin(u);
-            }
-            hexMap.combatController.CancelOperation();
-          }
           onModeQuit(selectedUnit);
         }
       }
@@ -473,6 +469,31 @@ namespace MonoNS
           hexMap.inputField.DeactivateInput();
         }
       }
+      ResetUpdateFunc();
+    }
+
+    public void EscapeOnOperationCommence()
+    {
+      msgBox.Show("");
+      foreach(Unit u in nearbyEnemey) {
+        if (u != null) {
+          hexMap.SetUnitSkin(u);
+        }
+      }
+      onUnitDeselect(selectedUnit);
+      selectedUnit = null;
+      ResetUnitSelection();
+      ResetUpdateFunc();
+    }
+
+    public void EscapeOnOperationCancel()
+    {
+      msgBox.Show("");
+      foreach(Unit u in nearbyEnemey) {
+        hexMap.SetUnitSkin(u);
+      }
+      hexMap.combatController.CancelOperation();
+      onModeQuit(selectedUnit);
       ResetUpdateFunc();
     }
 

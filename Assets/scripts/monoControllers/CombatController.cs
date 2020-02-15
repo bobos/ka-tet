@@ -211,6 +211,12 @@ namespace MonoNS
         }
       }
 
+      CalculateWinChance(predict);
+      this.predict = predict;
+      return predict;
+    }
+
+    void CalculateWinChance(OperationPredict predict) {
       if (predict.defenderOptimPoints >= predict.attackerOptimPoints) {
         predict.sugguestedResult = new OperationGeneralResult(0);
       } else if (predict.attackerOptimPoints >= (int)(predict.defenderOptimPoints * 1.5f)) {
@@ -224,9 +230,6 @@ namespace MonoNS
       } else {
         predict.sugguestedResult = new OperationGeneralResult(1);
       }
-
-      this.predict = predict;
-      return predict;
     }
 
     int GetJoinPossibility(Unit unit1, Unit unit2) {
@@ -391,6 +394,10 @@ namespace MonoNS
       hexMap.eventDialogAlt.ShowOperationEvent(predict, !attacker.IsAI());
       while (hexMap.eventDialogAlt.Animating) { yield return null; };
       if (hexMap.eventDialogAlt.btn1Clicked) {
+      // TODO: uncomment
+      //if (!attacker.IsAI()) {
+        hexMap.mouseController.EscapeOnOperationCommence();
+      //}
         int defenderTotal = 0;
         int attackerTotal = 0;
         int attackerInfTotal = 0;
@@ -482,7 +489,8 @@ namespace MonoNS
             }
           }
 
-          if (noRetreat) {
+          // TODO: apply general trait to increase the chance
+          if (noRetreat && Cons.FiftyFifty()) {
             predict.defenderOptimPoints = predict.defenderOptimPoints * 2;
             hexMap.dialogue.ShowNoRetreatEvent(defender);
             while (hexMap.dialogue.Animating) { yield return null; }
@@ -491,9 +499,10 @@ namespace MonoNS
               Color.green);
             while (hexMap.popAniController.Animating) { yield return null; }
           }
-
         }
+        CalculateWinChance(predict);
 
+        // combat starts
         int attackerCasualty = 0;
         int defenderCasualty = 0;
         bool attackerBigger = true;
@@ -529,46 +538,52 @@ namespace MonoNS
 
           if (factor > 1 && factor <= 6) {
             resultLevel = ResultType.Small;
+            int modifier = Util.Rand(5, 6);
             if (attackerBigger) {
-              attackerCasualty = (int)(defenderCasualty * Util.Rand(5, 6) * 0.1f);
+              attackerCasualty = (int)(defenderCasualty * modifier * 0.1f);
             } else {
-              defenderCasualty = (int)(attackerCasualty * Util.Rand(5, 6) * 0.1f);
+              defenderCasualty = (int)(attackerCasualty * modifier * 0.1f);
             }
           }
 
           if (factor > 6 && factor <= 20) {
-            resultLevel = Cons.EvenChance() ? ResultType.Great : ResultType.Small;
+            int modifier = Util.Rand(25, 40);
             if (attackerBigger) {
-              attackerCasualty = (int)(defenderCasualty * Util.Rand(25, 40) * 0.01f);
+              attackerCasualty = (int)(defenderCasualty * modifier* 0.01f);
             } else {
-              defenderCasualty = (int)(attackerCasualty * Util.Rand(25, 40) * 0.01f);
+              defenderCasualty = (int)(attackerCasualty * modifier * 0.01f);
             }
+            resultLevel = modifier > 35 ? ResultType.Small : ResultType.Great;
           }
 
           if (factor > 20 && factor <= 30) {
+            int modifier = Util.Rand(125, 200);
             resultLevel = Cons.EvenChance() ? ResultType.Crushing : ResultType.Great;
             if (attackerBigger) {
-              attackerCasualty = (int)(defenderCasualty * Util.Rand(125, 200) * 0.001f);
+              attackerCasualty = (int)(defenderCasualty * modifier * 0.001f);
             } else {
-              defenderCasualty = (int)(attackerCasualty * Util.Rand(125, 200) * 0.001f);
+              defenderCasualty = (int)(attackerCasualty * modifier * 0.001f);
             }
+            resultLevel = modifier > 185 ? ResultType.Great : ResultType.Crushing;
           }
 
           if (factor > 30 && factor <= 40) {
-            resultLevel = Cons.HighlyLikely() ? ResultType.Crushing : ResultType.Great;
+            float modifier = Util.Rand(100, 125) * 0.001f;
+            resultLevel = ResultType.Crushing;
             if (attackerBigger) {
-              attackerCasualty = (int)(defenderCasualty * Util.Rand(100, 125) * 0.001f);
+              attackerCasualty = (int)(defenderCasualty * modifier);
             } else {
-              defenderCasualty = (int)(attackerCasualty * Util.Rand(100, 125) * 0.001f);
+              defenderCasualty = (int)(attackerCasualty * modifier);
             }
           }
 
           if (factor > 40) {
+            float modifier = 0.005f;
             resultLevel = ResultType.Crushing;
             if (attackerBigger) {
-              attackerCasualty = (int)(defenderCasualty * 0.05f);
+              attackerCasualty = (int)(defenderCasualty * modifier);
             } else {
-              defenderCasualty = (int)(attackerCasualty * 0.05f);
+              defenderCasualty = (int)(attackerCasualty * modifier);
             }
           }
         }
@@ -652,15 +667,13 @@ namespace MonoNS
         while(hexMap.eventDialogAlt.Animating) { yield return null; }
         CancelOperation();
 
+        // Aftermath
         int[] vicBuf = GetVicBuf(resultLevel);
         int[] dftBuf = GetDftBuf(resultLevel);
         if (atkWin) {
           // TODO: general trait apply to stop chaos 
-          defender.chaos = (resultLevel == ResultType.Small && Cons.EvenChance())
-            || (resultLevel == ResultType.Great && Cons.MostLikely())
-            || resultLevel == ResultType.Crushing;
+          defender.chaos = (resultLevel == ResultType.Great && Cons.HighlyLikely()) || resultLevel == ResultType.Crushing;
           // TODO
-          // 胜利条件 加入人员伤亡比
           // 1. accumulate operation result(kill+wounded vs enemy kill+wounded) for per commander for party influence update
           // 2. body cover
           // 6. kill general
@@ -839,13 +852,12 @@ namespace MonoNS
         Tile tile = atkWin ? defender.tile : attacker.tile;
         tile.deadZone.Occur(deadToll);
       } else {
-        CancelOperation();
-      }
       // TODO: uncomment
       //if (!attacker.IsAI()) {
-        hexMap.mouseController.Escape();
+        hexMap.mouseController.EscapeOnOperationCancel();
       //}
-      hexMap.unitSelectionPanel.ToggleButtons(true, attacker);
+        CancelOperation();
+      }
       commenceOpAnimating = false;
     }
 
