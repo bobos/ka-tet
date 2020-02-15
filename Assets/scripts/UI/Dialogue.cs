@@ -42,63 +42,71 @@ namespace MonoNS
       }
       if (Input.GetMouseButtonUp(0)) {
         if (phase == 1) {
-          ShowRoutingImpactIncidentNext();
+          DialogNext();
         } else if (phase == 2) {
-          ShowRoutingImpactIncidentFinal();
-        } else if (phase == 3) {
-          ShowNoRetreatEventNext();
-        } else if (phase == 4) {
-          ShowNoRetreatEventFinal();
+          DialogEnd();
         }
       }
     }
 
+    string leftCacheDialog = "";
+    string rightCacheDialog = "";
     public void ShowRoutingImpactIncident(Unit routingUnit, Unit impactedUnit) {
       phase = 1;
       Animating = true;
       self.SetActive(true);
+      right.SetActive(true);
+      left.SetActive(true);
+
       leftImg.sprite = routingSoldier;
-      leftText.text = System.String.Format(textLib.get("event_routingRetreatSoldierDialog"), routingUnit.GeneralName());
+      leftText.text = "";
+      leftCacheDialog = System.String.Format(textLib.get("event_routingRetreatSoldierDialog"), routingUnit.GeneralName());
       rightImg.sprite = scaredSoldier;
       rightText.text = System.String.Format(textLib.get("event_routingImpactSoldierDialog"), impactedUnit.GeneralName());
-      right.SetActive(true);
-      left.SetActive(false);
     }
 
-    void ShowRoutingImpactIncidentNext() {
+    void DialogNext() {
       phase = 2;
-      left.SetActive(true);
-      right.SetActive(false);
+      if (leftCacheDialog != "") {
+        leftText.text = leftCacheDialog;
+      } else {
+        rightText.text = rightCacheDialog;
+      }
     }
 
-    void ShowRoutingImpactIncidentFinal() {
+    void DialogEnd() {
       self.SetActive(false);
       Animating = false;
       phase = 0;
+      leftCacheDialog = rightCacheDialog = "";
     }
 
     public void ShowNoRetreatEvent(Unit defender) {
-      phase = 3;
+      phase = 1;
       Animating = true;
       self.SetActive(true);
+      right.SetActive(true);
+      left.SetActive(true);
+
       leftImg.sprite = defender.IsAI() ? AttackGeneral : DefenderGeneral;
       leftText.text = System.String.Format(textLib.get("event_NoRetreatGeneralDialog"), defender.GeneralName());
       rightImg.sprite = normalSoldier;
-      rightText.text = System.String.Format(textLib.get("event_NoRetreatSoldierDialog"), defender.GeneralName());
-      right.SetActive(false);
-      left.SetActive(true);
+      rightCacheDialog = System.String.Format(textLib.get("event_NoRetreatSoldierDialog"), defender.GeneralName());
+      rightText.text = "";
     }
 
-    void ShowNoRetreatEventNext() {
-      phase = 4;
-      left.SetActive(false);
+    public void ShowRemoveHelmet(Unit unit, bool allowed) {
+      phase = 1;
+      Animating = true;
+      self.SetActive(true);
       right.SetActive(true);
-    }
+      left.SetActive(true);
 
-    void ShowNoRetreatEventFinal() {
-      self.SetActive(false);
-      Animating = false;
-      phase = 0;
+      leftImg.sprite = unit.IsAI() ? AttackGeneral : DefenderGeneral;
+      leftCacheDialog = System.String.Format(textLib.get(allowed ? "event_RemoveAllowedGeneralDialog": "event_RemoveDisallowedGeneralDialog"), unit.GeneralName());
+      leftText.text = "";
+      rightImg.sprite = normalSoldier;
+      rightText.text = System.String.Format(textLib.get("event_RemoveHelmetSoldierDialog"), unit.Name());
     }
 
   }

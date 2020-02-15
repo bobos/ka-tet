@@ -188,9 +188,6 @@ namespace TextNS
       {"event_interceptFailed", @"{0}所部斥候伏击了路过的运粮队，被护卫士兵击退，{0}所部战死{3}人，伤{2}人，士气下降{1}点"},
       {"event_supplyRouteBlocked_title", "补给线阻断"},
       {"event_supplyRouteBlocked", @"我军{0}与{1}之间的所有补给线遭到敌军切断，请立即派兵驱逐补给线上敌军以恢复两地交通补给！"},
-      {"event_disarmor_title", "酷热难当"},
-      {"event_disarmor", @"酷暑连日，{1}士兵终日顶盔贯甲行军备战已致多人中暑晕厥，军中抱怨者甚，有士卒恳求只着毡帽上身免披铁甲以解暑热，遭{0}厉斥，部队不满+{2}"},
-      {"event_disarmor1", @"酷暑连日，{1}士兵终日顶盔贯甲行军备战已致多人中暑晕厥，军中抱怨者甚，有士卒恳求只着毡帽上身免披铁甲以解暑热，{0}许之，部队防御下降{2}%"},
       {"event_riot_title", "部队哗变"},
       {"event_riot", @"{0}将军所部{1}因军中积怨深厚，发生哗变，部队士气下降{2}！"},
       {"event_generalExecuted_title", "死亡"},
@@ -265,6 +262,9 @@ namespace TextNS
       {"event_routingImpactSoldierDialog", @"{0}所部士兵: 诸君镇定, 切莫再退了!!!"},
       {"event_NoRetreatGeneralDialog", @"{0}: 我军已无退路, 吾辈自当向死而生!!!"},
       {"event_NoRetreatSoldierDialog", @"{0}所部众兵士: 誓死不降!!!"},
+      {"event_RemoveHelmetSoldierDialog", @"{0}兵士: 夏日炎炎，我军终日披挂铁盔铁甲行军备战，行伍之中已有多人中暑晕厥，军中抱怨者甚，恳请将军准许军中将士只着毡帽免戴铁胄以解暑热!"},
+      {"event_RemoveAllowedGeneralDialog", @"{0}: 此事关军心，告诸将士，我许卿等以便宜行事!"},
+      {"event_RemoveDisallowedGeneralDialog", @"{0}: 盔者乃防具之首, 岂可轻易取走耶? 有再提此事者，我必斫掉其狗头使其再无顶盔之苦恼!!"},
 
       // pop out msg
       {"pop_discontent", @"不满+{0}"},

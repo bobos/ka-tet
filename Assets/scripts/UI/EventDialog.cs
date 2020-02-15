@@ -47,7 +47,6 @@ namespace MonoNS
     public Sprite CampLost;
     public Sprite CityLost;
     public Sprite Defeated;
-    public Sprite Disarmor;
     public Sprite EmptySettlement;
     public Sprite Resigned;
     public Sprite GeneralExecuted;
@@ -86,8 +85,6 @@ namespace MonoNS
       InsufficientSupply,
       InsufficientLabor,
       InsufficientSupplyLabor,
-      Disarmor,
-      Disarmor1,
       UnitConflict,
       AltitudeSickness,
       PlainSickness,
@@ -367,20 +364,6 @@ namespace MonoNS
         description.text = System.String.Format(textLib.get("event_farmDestroyed"),
           unit.GeneralName(), unit.rf.general.party.Name(), argu1);
         image.sprite = GeneralSwapped;
-      }
-
-      if (name == EventName.Disarmor) {
-        title.text = textLib.get("event_disarmor_title");
-        description.text = System.String.Format(textLib.get("event_disarmor"),
-          unit.GeneralName(), unit.Name(), argu1);
-        image.sprite = Disarmor;
-      }
-
-      if (name == EventName.Disarmor1) {
-        title.text = textLib.get("event_disarmor_title");
-        description.text = System.String.Format(textLib.get("event_disarmor1"),
-          unit.GeneralName(), unit.Name(), argu1);
-        image.sprite = Disarmor;
       }
 
       if (name == EventName.UnderSiege) {

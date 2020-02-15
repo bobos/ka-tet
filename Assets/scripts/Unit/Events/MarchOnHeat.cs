@@ -8,10 +8,10 @@
     }
 
     public int Occur() {
-      if (unit.type == Type.Scout || unit.IsHillLander()
+      if (unit.IsCavalry() || unit.IsHillLander()
       || Cons.IsWind(unit.hexMap.windGenerator.current) || Cons.IsGale(unit.hexMap.windGenerator.current)
       ||!Cons.IsHeat(unit.hexMap.weatherGenerator.currentWeather)
-      || unit.tile.waterBound || unit.IsCamping()) {
+      || unit.IsCamping()) {
         return 0;
       }
       if (Cons.FairChance()) {

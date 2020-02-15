@@ -333,19 +333,17 @@ namespace MonoNS
         int ret = unit.armorRemEvent.Occur();
         if(ret != 0) {
           if (ret < 0) {
-            int discontent = -ret;
             // disarmor not allowed
-            eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.Disarmor, unit,
-              null, discontent));
-            while (eventDialog.Animating) { yield return null; }
+            int discontent = -ret;
+            hexMap.dialogue.ShowRemoveHelmet(unit, false);
+            while (hexMap.dialogue.Animating) { yield return null; }
             Riot(unit, discontent);
             while (riotAnimating) { yield return null; }
           } else {
             // disarmor allowed
             int defReduce = ret;
-            eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.Disarmor1, unit,
-              null, defReduce));
-            while (eventDialog.Animating) { yield return null; }
+            hexMap.dialogue.ShowRemoveHelmet(unit, true);
+            while (hexMap.dialogue.Animating) { yield return null; }
             unit.disarmorDefDebuf = defReduce * 0.01f; 
           }
         }

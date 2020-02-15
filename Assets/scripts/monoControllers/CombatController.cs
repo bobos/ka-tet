@@ -490,7 +490,7 @@ namespace MonoNS
           }
 
           // TODO: apply general trait to increase the chance
-          if (noRetreat && Cons.FiftyFifty()) {
+          if (noRetreat && (predict.attackerOptimPoints > (int)(predict.defenderOptimPoints * 1.5f)) && Cons.FiftyFifty()) {
             predict.defenderOptimPoints = predict.defenderOptimPoints * 2;
             hexMap.dialogue.ShowNoRetreatEvent(defender);
             while (hexMap.dialogue.Animating) { yield return null; }

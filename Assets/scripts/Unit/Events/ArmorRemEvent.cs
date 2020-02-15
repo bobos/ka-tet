@@ -9,8 +9,7 @@
     }
 
     public int Occur() {
-      if (unit.type != Type.Scout && !unit.IsAI() && !unit.IsHillLander() && !fired
-        && !unit.tile.waterBound && unit.IsOnField() && Cons.TinyChance()) {
+      if (unit.rf.rank == Cons.rookie && !unit.IsAI() && !unit.IsHillLander() && !fired && unit.IsOnField() && Cons.FiftyFifty()) {
         // TODO apply general trait
         fired = true;
         return Cons.FiftyFifty() ? Discontent() : DefReduce();
@@ -19,7 +18,7 @@
     }
 
     int DefReduce() {
-      return 25;
+      return 30;
     } 
 
     int Discontent() {
