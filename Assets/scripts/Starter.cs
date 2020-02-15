@@ -90,8 +90,6 @@ public class Starter : MonoBehaviour {
     // TODO build dam
     Tile dam = hexMap.GetTile(15, 15);
     dam.BuildDam();
-    dam = hexMap.GetTile(16, 16);
-    dam.BuildDam();
 
     // * tactical phase starts *
     Tile strategyBase = hexMap.GetTile(1, 1);

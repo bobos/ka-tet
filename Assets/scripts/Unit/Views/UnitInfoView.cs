@@ -20,14 +20,14 @@ namespace UnitNS
         + "[" + unit.rf.general.party.Name() + "]"
         + "\n";
       textMesh.text = title + unit.rf.province.Name() + "-" + unit.rf.rank.Name() + "[" + unit.rf.soldiers + "]";
-      textMesh.fontSize = 60;
+      textMesh.fontSize = 50;
       textMesh.color = color;
     }
 
     public void SetStr(string str, Color color) {
       TextMesh textMesh = this.transform.GetComponent<TextMesh>();
       textMesh.text = str;
-      textMesh.fontSize = 60;
+      textMesh.fontSize = 50;
       textMesh.color = color;
     }
     

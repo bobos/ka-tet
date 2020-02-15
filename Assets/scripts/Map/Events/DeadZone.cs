@@ -22,7 +22,7 @@
       }
 
       DecompositionCntDown--;
-      if (DecompositionCntDown < 1)
+      if (DecompositionCntDown == 0)
       {
         // TODO: contribute corpseNum to global sickness point
         corpseNum = 0;

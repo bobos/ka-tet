@@ -6,7 +6,7 @@ namespace UnitNS
   
     // Use this for initialization
     float timer = 0.0f;
-    float textSpeed = 2.5f;
+    float textSpeed = 3f;
     void Start () { 
     }
 

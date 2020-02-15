@@ -26,7 +26,7 @@ public class TileView : View
     GameObject tileGO = gameObject;
     string txt = "";
     if (tile.deadZone != null && tile.deadZone.DecompositionCntDown > 0) {
-      txt = "☠☠☠☠☠\n";
+      txt = "☠☠☠☠\n";
     }
     if (tile.vantagePoint) {
       txt += "Vat\n";

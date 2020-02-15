@@ -228,10 +228,10 @@ namespace MonoNS
         + unit.unitAttack * 0.001f;
       defense.text = "防御: " + (isPreflight ? mouseController.selectedUnit.unitDefence * 0.001f + " -> " : "")
         + unit.unitDefence * 0.001f;
-      string stateStr = unit.tile.sieged ? "围城中" : ""; 
-      stateStr += unit.IsWarWeary() ? " 士气低落" : "";
-      stateStr += " " + unit.GetDiscontent();
-      stateStr += unit.IsHungry() ? (unit.IsStarving() ? " 饥饿" : " 半饥饿") : "";
+      string stateStr = unit.tile.sieged ? "围城中 " : ""; 
+      stateStr += unit.IsWarWeary() ? "士气低落 " : "";
+      stateStr += unit.GetDiscontent() + " ";
+      stateStr += unit.IsHungry() ? (unit.IsStarving() ? "饥饿 " : "半饥饿 ") : "";
       stateStr += unit.GetStateName();
       int desserter = unit.IsStarving() ? unit.GetStarvingDessertNum() : 0;
       int killed = unit.IsStarving() ? unit.GetStarvingKillNum() : 0;
