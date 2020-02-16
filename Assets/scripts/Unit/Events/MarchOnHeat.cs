@@ -15,7 +15,7 @@
         return 0;
       }
       if (Cons.FairChance()) {
-        return 1;
+        return 2;
       }
       return 0;
     }

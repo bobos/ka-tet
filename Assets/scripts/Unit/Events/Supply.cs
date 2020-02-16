@@ -81,7 +81,7 @@
       int neededHalf = MinSupplyNeeded();
       if (supply < neededHalf) {
         supply = 0;
-        int moraleReduce = -8;
+        int moraleReduce = -10;
         unit.rf.morale += moraleReduce;
         int miaNum = GetStarvingDessertNum();
         unit.mia += miaNum;

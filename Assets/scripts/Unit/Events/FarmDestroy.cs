@@ -18,21 +18,19 @@ namespace UnitNS
     public FarmDestryResult Occur() {
       FarmDestryResult result = new FarmDestryResult();
       if (unit.type != Type.Scout && unit.tile.field == FieldType.Village
-        && (Cons.IsSpring(unit.hexMap.weatherGenerator.season)
-           || Cons.IsSummer(unit.hexMap.weatherGenerator.season))) {
+        && !Cons.IsWinter(unit.hexMap.weatherGenerator.season)) {
         if (unit.hexMap.IsAttackSide(unit.IsAI())) {
           result.destroyed = true;
-        } else if (!unit.IsAI() && !unit.IsHillLander()) {
-          if (Cons.FiftyFifty()) {
-            result.destroyed = true;
-            if(!Util.eq<CourtNS.Party>(unit.rf.general.party, unit.hexMap.warProvince.ownerParty)) {
-              // only affect players
-              CourtNS.Party.Relation relation = unit.rf.general.party.GetRelation();
-              if ((relation == CourtNS.Party.Relation.tense && Cons.FiftyFifty()) ||
+        } else if (!unit.IsAI() && Cons.FiftyFifty()) {
+          result.destroyed = true;
+          if(!Util.eq<CourtNS.Party>(unit.rf.general.party, unit.hexMap.warProvince.ownerParty)) {
+            // only affect players
+            CourtNS.Party.Relation relation = unit.rf.general.party.GetRelation();
+            if ((relation == CourtNS.Party.Relation.normal && Cons.FairChance()) ||
+              (relation == CourtNS.Party.Relation.tense && Cons.FiftyFifty()) ||
               relation == CourtNS.Party.Relation.xTense && Cons.HighlyLikely()) {
-                result.discontent = Util.Rand(2,3);
-                result.influence = 50;
-              }
+              result.discontent = Util.Rand(2,4);
+              result.influence = 50;
             }
           }
         }

@@ -20,7 +20,7 @@ namespace UnitNS
     public const int MovementcostOnPlain = 20;
     public const int MovementcostOnPlainRoad = 15;
     public const int MovementCostOnUnaccesible = -1;
-    public const int DisbandUnitUnder = 50;
+    public const int DisbandUnitUnder = 100;
 
     public const int L1Visibility = 3;
     public const int L2Visibility = 5;

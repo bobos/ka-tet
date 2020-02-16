@@ -49,8 +49,13 @@ namespace MapTileNS
       if (terrian == TerrianType.Water) {
         poision = new Poision(this);
       }
-      if (field == FieldType.Wild && Util.eq<Region>(hexMap.warProvince.region, Cons.lowLand)) {
-        epidemic = new Epidemic(this);
+      if (field == FieldType.Wild) {
+        if (Util.eq<Region>(hexMap.warProvince.region, Cons.plain) && Cons.FiftyFifty()) {
+          epidemic = new Epidemic(this);
+        } else if (Util.eq<Region>(hexMap.warProvince.region, Cons.lowLand)) {
+          epidemic = new Epidemic(this);
+        }
+        //TODO poison horse
       }
 
       if (flood != null || wildFire != null || epidemic != null || deadZone != null) {

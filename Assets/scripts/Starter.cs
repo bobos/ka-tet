@@ -116,7 +116,6 @@ public class Starter : MonoBehaviour {
     // for HeJian
     Cons.Pigeon.counterParty = Cons.Eagle;
     Cons.Eagle.counterParty = Cons.Pigeon;
-    Cons.Pigeon.influence = 100;
 
     // init generals
     General liubei = new General("g_liubei", "g_liubei_d", Cons.middleEarth, new Traits[0]); 
@@ -133,9 +132,15 @@ public class Starter : MonoBehaviour {
     General caocao = new General("g_caocao", "g_caocao_d", Cons.riverNorth, new Traits[0]); 
     General xuchu = new General("g_xuchu", "g_xuchu_d", Cons.riverNorth, new Traits[0]); 
     General abc = new General("g_abc", "g_abc", Cons.riverNorth, new Traits[0]); 
+    General x1 = new General("g_x1", "g_1", Cons.riverNorth, new Traits[0]); 
+    General x2 = new General("g_x2", "g_1", Cons.riverNorth, new Traits[0]); 
+    General x3 = new General("g_x3", "g_1", Cons.riverNorth, new Traits[0]); 
     caocao.JoinFaction(Cons.Liang, Cons.Tiger);
     xuchu.JoinFaction(Cons.Liang, Cons.Tiger);
     abc.JoinFaction(Cons.Liang, Cons.Tiger);
+    x1.JoinFaction(Cons.Liang, Cons.Tiger);
+    x2.JoinFaction(Cons.Liang, Cons.Tiger);
+    x3.JoinFaction(Cons.Liang, Cons.Tiger);
 
     // step 3, assign general to units
     liubei.Assign(hexMap,
@@ -152,13 +157,22 @@ public class Starter : MonoBehaviour {
     );
 
     caocao.Assign(hexMap,
-      new Troop(7000, Cons.Liang, Cons.riverNorth, Type.Infantry, Cons.elite)
+      new Troop(7000, Cons.Liang, Cons.riverSouth, Type.Infantry, Cons.elite)
     );
     xuchu.Assign(hexMap,
-      new Troop(3000, Cons.Liang, Cons.farWest, Type.Cavalry, Cons.elite)
+      new Troop(3000, Cons.Liang, Cons.middleEarth, Type.Cavalry, Cons.elite)
     );
     abc.Assign(hexMap,
-      new Troop(5000, Cons.Liang, Cons.riverNorth, Type.Infantry, Cons.veteran)
+      new Troop(5000, Cons.Liang, Cons.riverSouth, Type.Infantry, Cons.veteran)
+    );
+    x1.Assign(hexMap,
+      new Troop(1500, Cons.Liang, Cons.middleEarth, Type.Cavalry, Cons.rookie)
+    );
+    x2.Assign(hexMap,
+      new Troop(10000, Cons.Liang, Cons.riverSouth, Type.Infantry, Cons.rookie)
+    );
+    x3.Assign(hexMap,
+      new Troop(200, Cons.Liang, Cons.middleEarth, Type.Scout, Cons.norank)
     );
 
     // step 4, on field assignment
@@ -195,9 +209,12 @@ public class Starter : MonoBehaviour {
 
     // * AI *
     //caocao.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(1, 1), 0, 6000);
-    caocao.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(26, 15), 6000, 6000);
+    caocao.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(26, 15), 70000, 6000);
     abc.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(25, 16), 6000, 2000);
     xuchu.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(27, 15), 3000);
+    x1.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(24, 15), 3000);
+    x2.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(24, 17), 10000, 1000);
+    x3.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(24, 16), 1000);
     //xuchu.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(2, 1), 0);
     SettlementMgr.Ready4Refresh = true;
     FoW.Init(hexMap);

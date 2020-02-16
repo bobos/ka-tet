@@ -15,7 +15,6 @@ namespace UnitNS
       if (!Util.eq<Region>(unit.hexMap.warProvince.region, Cons.upLand) ||
        Util.eq<Region>(unit.rf.province.region, Cons.upLand) ||
        unit.type == Type.Scout ||
-       unit.IsHillLander() ||
        triggered ||
        (unit.GetStaminaLevel() != StaminaLvl.Exhausted &&
         unit.GetStaminaLevel() != StaminaLvl.Tired)) {

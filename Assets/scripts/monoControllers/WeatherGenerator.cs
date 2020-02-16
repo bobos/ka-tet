@@ -70,7 +70,7 @@ namespace MonoNS
       if (Cons.IsSpring(season))
       {
         // clear sky for most of Spring time
-        if (luckNum < 6)
+        if (luckNum < 5)
         {
           return Cons.cloudy;
         } else if (luckNum < 9) {
@@ -137,15 +137,15 @@ namespace MonoNS
       }
       else if (Cons.IsRain(weather))
       {
-        return Util.Rand(1, 6);
+        return Util.Rand(1, 5);
       }
       else if (Cons.IsHeavyRain(weather))
       {
-        return Util.Rand(1, 3);
+        return Util.Rand(1, 1);
       }
       else if (Cons.IsHeat(weather))
       {
-        return Util.Rand(1, 4);
+        return Util.Rand(1, 2);
       }
       else if (Cons.IsDry(weather))
       {

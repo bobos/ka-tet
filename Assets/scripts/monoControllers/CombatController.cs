@@ -29,6 +29,7 @@ namespace MonoNS
     public int dead = 0;
     public int wounded = 0;
     public int laborDead = 0;
+    public int leastNum = 0;
   }
 
   public class OperationPredict {
@@ -217,18 +218,18 @@ namespace MonoNS
     }
 
     void CalculateWinChance(OperationPredict predict) {
-      if (predict.defenderOptimPoints >= predict.attackerOptimPoints) {
-        predict.sugguestedResult = new OperationGeneralResult(0);
-      } else if (predict.attackerOptimPoints >= (int)(predict.defenderOptimPoints * 1.5f)) {
+      if (predict.attackerOptimPoints >= (int)(predict.defenderOptimPoints * 1.8)) {
         predict.sugguestedResult = new OperationGeneralResult(10);
-      } else if (predict.attackerOptimPoints >= (int)(predict.defenderOptimPoints * 1.4f)) {
+      } else if (predict.attackerOptimPoints >= (int)(predict.defenderOptimPoints * 1.6)) {
         predict.sugguestedResult = new OperationGeneralResult(8);
+      } else if (predict.attackerOptimPoints >= (int)(predict.defenderOptimPoints * 1.4f)) {
+        predict.sugguestedResult = new OperationGeneralResult(6);
       } else if (predict.attackerOptimPoints >= (int)(predict.defenderOptimPoints * 1.3f)) {
-        predict.sugguestedResult = new OperationGeneralResult(5);
+        predict.sugguestedResult = new OperationGeneralResult(2);
       } else if (predict.attackerOptimPoints >= (int)(predict.defenderOptimPoints * 1.2f)) {
-        predict.sugguestedResult = new OperationGeneralResult(3);
-      } else {
         predict.sugguestedResult = new OperationGeneralResult(1);
+      } else {
+        predict.sugguestedResult = new OperationGeneralResult(0);
       }
     }
 
@@ -276,11 +277,17 @@ namespace MonoNS
     }
 
     void AllocateCasualty(int total, List<UnitPredict> units) {
+      foreach(UnitPredict up in units) {
+        up.leastNum = (int)(up.unit.rf.soldiers * (up.unit.IsCavalry() ? 0.2f : 0.12f)); 
+      }
+
       while (total > 0) {
+        int dryUnits = 0;
         foreach(UnitPredict up in units) {
           Unit unit = up.unit;
 
-          if (unit.rf.soldiers == 0) {
+          if (unit.rf.soldiers <= up.leastNum) {
+            dryUnits++;
             continue;
           }
 
@@ -297,6 +304,7 @@ namespace MonoNS
               total = 0;
               break;
             }
+            dryUnits++;
             continue;
           }
 
@@ -306,6 +314,7 @@ namespace MonoNS
             up.laborDead += unit.labor;
             unit.rf.soldiers = 0;
             unit.labor = 0;
+            dryUnits++;
             continue;
           }
 
@@ -342,6 +351,9 @@ namespace MonoNS
             }
           }
         }
+        if (dryUnits == units.Count) {
+          break;
+        }
       }
     }
 
@@ -354,29 +366,29 @@ namespace MonoNS
 
     int[] GetVicBuf(ResultType type) {
       if (type == ResultType.Close) {
-        return new int[]{1, 0, -1};
+        return new int[]{-4, -3, 1};
       }
       if (type == ResultType.Small) {
-        return new int[]{2, 1, -2};
+        return new int[]{0, 0, 0};
       }
       if (type == ResultType.Great) {
-        return new int[]{3, 2, -3};
+        return new int[]{1, 0, -2};
       }
-      return new int[]{4, 2, -4};
+      return new int[]{2, 1, -3};
     }
 
     // initiatorMorale, supporterMorale, initiatorDiscontent
     int[] GetDftBuf(ResultType type) {
       if (type == ResultType.Close) {
-        return new int[]{-10, -3, 0};
+        return new int[]{-15, -10, 1};
       }
       if (type == ResultType.Small) {
-        return new int[]{-15, -5, 1};
+        return new int[]{-20, -15, 2};
       }
       if (type == ResultType.Great) {
-        return new int[]{-20, -10, 3};
+        return new int[]{-25, -20, 4};
       }
-      return new int[]{-30, -20, 8};
+      return new int[]{-30, -25, 8};
     }
 
     public bool commenceOpAnimating = false;
@@ -508,37 +520,40 @@ namespace MonoNS
         bool attackerBigger = true;
         int factor = 0;
         ResultType resultLevel = ResultType.Close;
+        predict.attackerOptimPoints = predict.attackerOptimPoints <= 0 ? 1 : predict.attackerOptimPoints;
+        predict.defenderOptimPoints = predict.defenderOptimPoints <= 0 ? 1 : predict.defenderOptimPoints;
+
         if (predict.attackerOptimPoints > predict.defenderOptimPoints) {
-          factor = (int)((predict.attackerOptimPoints / predict.defenderOptimPoints) * 10) - 10;
+          factor = (int)((predict.attackerOptimPoints / predict.defenderOptimPoints) * 10) - 12;
+          factor = factor < 0 ? 0 : factor;
         } else {
           attackerBigger = false;
           factor = (int)((predict.defenderOptimPoints / predict.attackerOptimPoints) * 10) - 10;
         }
         factor = factor > 95 ? 95 : factor;
 
-// 1.0 to 1.1 - 0.01(both)
-// 1.2 to 1.6 - def: x - 1, atk: (x -1) * (0.5 - 0.6)   
-// 1.7 to 2.0 - atk: (x - 1) * (0.25 - 0.4)
-// 2.1 to 3.0 - atk: (x - 1) * (0.125 - 0.2)
-// 3.1 to 4.0 - atk: (x - 1) * (0.1 - 0.125);
-// 4.0 above - atk: (x - 1) * 0.05
-        if (factor <= 1) {
-          float f = 0.04f;
+        int dice = Util.Rand(1, 10);
+        bool atkWin = dice <= predict.sugguestedResult.chance;
+// 1.0 to 1.3 - 0.01(both)
+// 1.4 to 1.8 - def: x - 1.2, atk: (x -1) * (0.5 - 0.6)   
+// 1.9 to 2.2 - atk: (x - 1.2) * (0.25 - 0.4)
+        if (factor <= 1 || (!atkWin && attackerBigger)) {
+          float m = 0.04f;
           if (Cons.SlimChance()) {
-            f = 0.1f;
+            m = 0.1f;
           }
-          defenderCasualty = (int)(defenderTotal * f);
-          attackerCasualty = (int)(attackerTotal * f);
+          defenderCasualty = (int)(defenderTotal * m);
+          attackerCasualty = (int)(attackerTotal * m);
         } else {
           if (attackerBigger) {
-            defenderCasualty = (int)(defenderTotal * factor * 0.025f);
+            defenderCasualty = (int)(defenderTotal * factor * 0.02f);
           } else {
-            attackerCasualty = (int)(attackerTotal * factor * 0.025f);
+            attackerCasualty = (int)(attackerTotal * factor * 0.02f);
           }
 
           if (factor > 1 && factor <= 6) {
             resultLevel = ResultType.Small;
-            int modifier = Util.Rand(5, 6);
+            int modifier = Util.Rand(4, 5);
             if (attackerBigger) {
               attackerCasualty = (int)(defenderCasualty * modifier * 0.1f);
             } else {
@@ -546,29 +561,31 @@ namespace MonoNS
             }
           }
 
-          if (factor > 6 && factor <= 20) {
-            int modifier = Util.Rand(25, 40);
+          if (factor > 6 && factor <= 18) {
+            int modifier = Util.Rand(3, 4);
             if (attackerBigger) {
-              attackerCasualty = (int)(defenderCasualty * modifier* 0.01f);
+              attackerCasualty = (int)(defenderCasualty * modifier* 0.1f);
             } else {
-              defenderCasualty = (int)(attackerCasualty * modifier * 0.01f);
+              defenderCasualty = (int)(attackerCasualty * modifier * 0.1f);
             }
             resultLevel = modifier > 35 ? ResultType.Small : ResultType.Great;
           }
 
-          if (factor > 20 && factor <= 30) {
-            int modifier = Util.Rand(125, 200);
+          if (factor > 18 && factor <= 28) {
+            // 4 times
+            int modifier = Util.Rand(2, 3);
             resultLevel = Cons.EvenChance() ? ResultType.Crushing : ResultType.Great;
             if (attackerBigger) {
-              attackerCasualty = (int)(defenderCasualty * modifier * 0.001f);
+              attackerCasualty = (int)(defenderCasualty * modifier * 0.1f);
             } else {
-              defenderCasualty = (int)(attackerCasualty * modifier * 0.001f);
+              defenderCasualty = (int)(attackerCasualty * modifier * 0.1f);
             }
             resultLevel = modifier > 185 ? ResultType.Great : ResultType.Crushing;
           }
 
-          if (factor > 30 && factor <= 40) {
-            float modifier = Util.Rand(100, 125) * 0.001f;
+          if (factor > 28 && factor <= 38) {
+            // 5 times
+            float modifier = Util.Rand(1, 2) * 0.1f;
             resultLevel = ResultType.Crushing;
             if (attackerBigger) {
               attackerCasualty = (int)(defenderCasualty * modifier);
@@ -577,8 +594,8 @@ namespace MonoNS
             }
           }
 
-          if (factor > 40) {
-            float modifier = 0.005f;
+          if (factor > 38) {
+            float modifier = 0.05f;
             resultLevel = ResultType.Crushing;
             if (attackerBigger) {
               attackerCasualty = (int)(defenderCasualty * modifier);
@@ -621,7 +638,7 @@ namespace MonoNS
         }
 
         foreach(UnitPredict up in predict.defenders) {
-          up.unit.movementRemaining -= (Unit.ActionCost -10);
+          up.unit.movementRemaining -= (int)(Unit.ActionCost/2);
           if (up.unit.IsCavalry()) {
             defenderCavDead += up.dead;
             defenderCavWnd += up.wounded;
@@ -654,8 +671,6 @@ namespace MonoNS
           }
         }
 
-        int dice = Util.Rand(1, 10);
-        bool atkWin = dice <= predict.sugguestedResult.chance;
         int capturedHorse = (int)((atkWin ? defenderCavDead : attackerCavDead) * 0.2f);
         hexMap.CaptureHorse(atkWin ? attacker : defender, capturedHorse);
 

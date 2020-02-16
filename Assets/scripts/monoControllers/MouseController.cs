@@ -123,11 +123,12 @@ namespace MonoNS
     void PrepareUnitSelection() {
       ResetUnitSelection();
       Settlement s = null;
-      if (tileUnderMouse.IsCampable()) {
-        inCampField = tileUnderMouse;
+      Tile t = selectedUnit.tile;
+      if (t.IsCampable()) {
+        inCampField = t;
       }
 
-      foreach(Tile tile in tileUnderMouse.neighbours) {
+      foreach(Tile tile in t.neighbours) {
         if (tile.settlement != null) {
           s = tile.settlement;
         }

@@ -5,7 +5,7 @@ namespace UnitNS
 {
   public class Scout : Unit
   {
-    public const int MaxTroopNum = 200;
+    public const int MaxTroopNum = 250;
 
     public static Unit Create(bool clone, Troop troop, Tile tile, int supply, State state = State.Stand, 
                     int kia = 0, int mia = 0, int movement = -1, float disarmorDefDebuf = 0f,

@@ -51,7 +51,7 @@ namespace UnitNS
       relation == CourtNS.Party.Relation.xTense && Cons.EvenChance()) {
         happened = true;
         target.unitConflict.happened = true;
-        result.discontent = Util.Rand(2,4);
+        result.discontent = Util.Rand(3,5);
         result.unit1 = unit;
         result.unit2 = target;
 

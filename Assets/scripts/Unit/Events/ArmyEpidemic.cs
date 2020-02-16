@@ -24,8 +24,11 @@ namespace UnitNS
     }
 
     public int Occur() {
-      lastTurns += GetLastTurns();
-      return 1;
+      if (unit.type != Type.Scout && !unit.IsHeatSicknessAffected()) {
+        lastTurns += GetLastTurns();
+        return 3;
+      }
+      return 0;
     }
 
     public void Destroy() {}
@@ -39,7 +42,7 @@ namespace UnitNS
       if (IsValid())
       {
         lastTurns--;
-        int morale = -1;
+        int morale = -5;
         effects[0] = morale;
         unit.rf.morale += morale;
         int woundedNum = GetEffectNum();
@@ -80,7 +83,7 @@ namespace UnitNS
     }
 
     int GetLastTurns() {
-      return Util.Rand(3, 8);
+      return Util.Rand(2, 4);
     }
 
   }

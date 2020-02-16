@@ -23,10 +23,6 @@
 
     public int[] Apply() {
       int[] effects = new int[9]{0,0,0,0,0,0,0,0,0};
-      int morale = -1;
-      effects[0] = morale;
-      unit.rf.morale += morale;
-
       int miaNum = GetWarWearyDissertNum();
       effects[5] = miaNum;
       unit.mia += miaNum;
