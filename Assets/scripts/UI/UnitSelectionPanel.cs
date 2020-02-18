@@ -133,18 +133,18 @@ namespace MonoNS
         }
       }
 
-      if (unit.type == Type.Scout) {
+      if (unit.type == Type.Infantry) {
         if (mouseController.nearDam != null) {
           SabotageButton.SetActive(true);
         }
+      }
 
-        if (mouseController.nearFire != null) {
-          FireButton.SetActive(true);
-        }
+      if (mouseController.nearFire != null) {
+        FireButton.SetActive(true);
+      }
 
-        if (mouseController.nearWater) {
-          DefendButton.SetActive(true);
-        }
+      if (mouseController.nearWater) {
+        DefendButton.SetActive(true);
       }
 
       if (unit.type == Type.Infantry) {
@@ -183,6 +183,19 @@ namespace MonoNS
       RefreshButtons(unit);
     }
 
+    string GetCombatpointRate(int cp) {
+      int remaining = cp % 10;
+      int stars = (int)((cp-remaining) / 10);
+      string rate = "";
+      while (stars-- > 0) {
+        rate += "★";
+      }
+      if (remaining != 0) {
+        rate += "☆";
+      }
+      return rate;
+    }
+
     public void OnUnitSelect(Unit unit)
     {
       self.SetActive(true);
@@ -190,31 +203,19 @@ namespace MonoNS
 
       // set attack, defense details
       string details = 
-      "基本加成\n"
-      + "% 饥饿惩罚:" + unit.GetStarvingBuf() * 100
-      + "% 整合度惩罚:" + unit.GetNewGeneralBuf() * 100
-      + "% 混乱惩罚:" + unit.GetChaosBuf() * 100
-      + "% 厌战惩罚:" + unit.GetWarwearyBuf() * 100
-
-      + "%\n单兵攻击:" + unit.atk + "\n进攻加成:\n"
-      + " 等级加成:" + unit.rf.atkLvlBuf * 100
-      + "% 地形加成:" + unit.vantage.AtkBuf() * 100
-      + "% 气候加成:" + unit.weatherEffect.AtkBuf() * 100
-      +
-      (unit.plainSickness.affected ? ("% 平原反应惩罚:" + unit.plainSickness.atkDebuf * 100) : "")
-      + "%\n 总计进攻加成:" +
-      (unit.GetStarvingBuf() + unit.GetNewGeneralBuf()
-       + unit.rf.atkLvlBuf + unit.vantage.AtkBuf() + unit.weatherEffect.AtkBuf())*100
-      + "%\n"
-
-      + "单兵防御:" + unit.def + "\n防御加成:\n"
-      + " 等级加成:" + unit.rf.defLvlBuf * 100
-      + "% 地形加成:" + unit.vantage.DefBuf() * 100
-      + "% 免胄惩罚:" + unit.disarmorDefDebuf * 100
-      + "%\n 总计防御加成:" +
-      (unit.GetStarvingBuf() + unit.GetNewGeneralBuf() + unit.rf.defLvlBuf + unit.vantage.DefBuf())*100
-      + "%\n"
-      + "有效兵力:" + unit.vantage.GetEffective();
+      "惩罚:\n"
+      + "饥饿惩罚:" + unit.GetStarvingBuf() * 100
+      + "%\n整合度惩罚:" + unit.GetNewGeneralBuf() * 100
+      + "%\n混乱惩罚:" + unit.GetChaosBuf() * 100
+      + "%\n厌战惩罚:" + unit.GetWarwearyBuf() * 100
+      + "%\n无胄惩罚:" + unit.disarmorDefDebuf * 100
+      + "%\n平原反应:" + unit.plainSickness.debuf * 100
+      + "%\n疲惫惩罚:" + unit.GetStaminaDebuf(false) * 100
+      + "%\n加成:\n"
+      + "等级加成:" + unit.rf.lvlBuf * 100
+      + "%\n地形加成:" + unit.vantage.Buf() * 100
+      + "%\n总计加成:" + (unit.GetBuff() + unit.GetStaminaDebuf(false)) *100 + "%\n\n"
+      + "有效作战人数:" + unit.vantage.GetEffective();
       hexMap.hoverInfo.Show(details);
 
       title.text = unit.GeneralName();
@@ -224,10 +225,9 @@ namespace MonoNS
       slots.text = "粮草: " + unit.supply.supply + "石" + " 可维持" + unit.slots + "/" + unit.GetMaxSupplySlots() + "回合" + " 每回合消耗:" + unit.supply.SupplyNeededPerTurn() + "石";
       num.text = unit.Name() + "[兵:" + unit.rf.soldiers + "/伤:" + unit.rf.wounded + "/亡:" + unit.kia + "/逃:" + unit.mia + "/役:" + unit.labor + "]";
       morale.text = "士气: " + unit.rf.morale;
-      offense.text = "攻击: " + (isPreflight ? mouseController.selectedUnit.unitAttack * 0.001f + " -> " : "")
-        + unit.unitAttack * 0.001f;
-      defense.text = "防御: " + (isPreflight ? mouseController.selectedUnit.unitDefence * 0.001f + " -> " : "")
-        + unit.unitDefence * 0.001f;
+      offense.text = "单兵战斗力: " + GetCombatpointRate(unit.cp);
+      defense.text = "部队战斗力: " + (isPreflight ? mouseController.selectedUnit.unitReferenceCombatPoint * 0.0001f + " -> " : "")
+        + unit.unitReferenceCombatPoint * 0.0001f;
       string stateStr = unit.tile.sieged ? "围城中 " : ""; 
       stateStr += unit.IsWarWeary() ? "士气低落 " : "";
       stateStr += unit.GetDiscontent() + " ";
@@ -282,15 +282,12 @@ namespace MonoNS
          "骑兵: " + stat.numOfCavalryUnit + "都\n" +
          "  战兵: " + stat.numOfCavalry + " 伤: " + stat.numOfCavalryWound +
          " 亡: " + stat.numOfCavalryDead + "\n" +
-         "斥候: " + stat.numOfScoutUnit + "队\n" +
-         "  战兵: " + stat.numOfScout + " 伤: " + stat.numOfScoutWound +
-         " 亡: " + stat.numOfScoutDead + "\n" +
          "兵役: " + labor + " 亡: " +
          (wp.attackside ? hexMap.settlementMgr.attackerLaborDead : hexMap.settlementMgr.defenderLaborDead) + "\n" + 
          "控制城市: " + count + "\n" +  
-         "总计: 战兵 " + (stat.numOfInfantry + stat.numOfCavalry + stat.numOfScout) +
-         " 伤 " + (stat.numOfInfantryWound + stat.numOfCavalryWound + stat.numOfScoutWound) +
-         " 亡 " + (stat.numOfInfantryDead + stat.numOfCavalryDead + stat.numOfScoutDead) + "\n";
+         "总计: 战兵 " + (stat.numOfInfantry + stat.numOfCavalry) +
+         " 伤 " + (stat.numOfInfantryWound + stat.numOfCavalryWound) +
+         " 亡 " + (stat.numOfInfantryDead + stat.numOfCavalryDead) + "\n";
 
         if (!wp.attackside) {
           info += "平民死亡: \n" + "  男: " + hexMap.settlementMgr.totalMaleDead +

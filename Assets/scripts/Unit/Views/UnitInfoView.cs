@@ -14,7 +14,7 @@ namespace UnitNS
       Color color = unit.hexMap.GetWarParty(unit).attackside ? Color.yellow : Color.white;
       string title = (unit.chaos ? "☠" : "")
         + "\n"
-        + (unit.IsCavalry() ? (unit.type == Type.Scout ? "♘" : "♞") : "♜")
+        + (unit.IsCavalry() ? "♞" : "♜")
         + (unit.hexMap.wargameController.start ? "[推演]\n" : "")
         + unit.GeneralName()
         + "[" + unit.rf.general.party.Name() + "]"

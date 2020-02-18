@@ -13,10 +13,6 @@
 
     public int[] Apply() {
       int[] effects = new int[9]{0,0,0,0,0,0,0,0,0};
-      if (unit.type == Type.Scout) {
-        return effects;
-      }
-
       if (Cons.IsHeavyRain(unit.hexMap.weatherGenerator.currentWeather)) {
         int movement = (int)(unit.movementRemaining / (-2));
         unit.movementRemaining += movement;
@@ -79,17 +75,5 @@
       }
       return effects;
     }
-
-    public float AtkBuf() {
-      if (Cons.IsHeavyRain(unit.hexMap.weatherGenerator.currentWeather)) {
-        return -0.5f;
-      }
-      if (Cons.IsRain(unit.hexMap.weatherGenerator.currentWeather)) {
-        return -0.2f;
-      }
-      return 0f;
-
-    }
-
   }
 }

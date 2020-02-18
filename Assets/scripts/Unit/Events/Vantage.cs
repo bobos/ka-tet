@@ -11,48 +11,25 @@
       this.unit = unit;
     }
 
-    public float AtkBuf() {
+    public float Buf() {
       if (unit.IsCamping()) {
         if (unit.IsCavalry()) {
           return -0.3f;
         }
-        return unit.tile.settlement.wall.defensePoint * 0.0025f;
+        return unit.tile.settlement.wall.defensePoint * 0.005f;
       }
 
       if (unit.tile.terrian == MapTileNS.TerrianType.Hill) {
         if (unit.tile.vantagePoint) {
-          return 0.3f;
+          return 0.2f;
         }
 
         if (unit.IsCavalry()) {
           // cavary debuf on hill
           return -0.2f;
         }
-        return 0.2f;
       }
 
-      if (unit.tile.terrian == MapTileNS.TerrianType.Plain) {
-        if (unit.IsCavalry()) {
-          return 0.2f;
-        }
-        return 0f;
-      }
-
-      return 0f;
-    }
-
-    public float DefBuf() {
-      if (unit.IsCamping()) {
-        return unit.tile.settlement.wall.defensePoint * 0.005f;
-      }
-      if (unit.tile.terrian == MapTileNS.TerrianType.Hill) {
-        if (unit.tile.vantagePoint) {
-          return 0.3f;
-        }
-        if (!unit.IsCavalry()) {
-          return 0.2f;
-        }
-      }
       return 0f;
     }
 

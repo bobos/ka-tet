@@ -8,6 +8,7 @@ namespace  UnitNS
   {
     public const int BaseSlots = 3;
     public const int MaxTroopNum = 15000;
+    public const int MinTroopNum = 800;
 
     public static Unit Create(bool clone, Troop troop, Tile tile, int supply, int labor, State state = State.Stand, 
                     int kia = 0, int mia = 0, int movement = -1, float disarmorDefDebuf = 0f,

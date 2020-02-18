@@ -18,7 +18,7 @@
     }
 
     int DefReduce() {
-      return 30;
+      return 20;
     } 
 
     int Discontent() {

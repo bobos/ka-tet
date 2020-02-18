@@ -25,26 +25,24 @@ namespace CourtNS
     public Type type;
     int _morale;
     int _soldiers;
-    public int atkCore;
-    public int defCore;
-    public int movCore;
+    public int combatPoint;
+    public int movementPoint;
     public Rank rank;
     public Level level = new Level();
     TroopState state;
 
     public static int MaxNum(Type type) {
-      return type == Type.Cavalry ? Cavalry.MaxTroopNum : (type == Type.Infantry ? Infantry.MaxTroopNum : Scout.MaxTroopNum);
+      return type == Type.Cavalry ? Cavalry.MaxTroopNum : Infantry.MaxTroopNum;
     }
 
     public Troop(int soldiers, Faction faction, Province province, Type type, Rank rank) {
-      this.rank = type == Type.Scout ? Cons.norank : rank;
+      this.rank = rank;
       this.type = type;
       this.soldiers = soldiers;
       this.faction = faction;
       name = province.AssignLegionName(type);
-      atkCore = province.region.Atk(type);
-      defCore = province.region.Def(type);
-      movCore = province.region.Mov(type);
+      combatPoint = province.region.CombatPoint(type);
+      movementPoint = province.region.Mov(type);
       morale = province.region.Will();
       this.province = province;
       state = TroopState.Idle;
@@ -69,27 +67,18 @@ namespace CourtNS
       }
       set {
         _soldiers = value < 0 ? 0 : (value > Troop.MaxNum(type) ? Troop.MaxNum(type) : value);
-        //if (onFieldUnit != null) {
-        //  onFieldUnit.UpdateUnitInfo();
-        //}
       }
     }
 
-    public float atkLvlBuf {
+    public float lvlBuf {
       get {
-        return rank.AtkBuf(morale);
-      }
-    }
-
-    public float defLvlBuf {
-      get {
-        return rank.DefBuf(morale);
+        return rank.Buf(morale);
       }
     }
 
     public int mov {
       get {
-        return movCore;
+        return movementPoint;
       }
     }
 
@@ -108,10 +97,8 @@ namespace CourtNS
       state = TroopState.OnField;
       if(type == Type.Cavalry) {
         onFieldUnit = Cavalry.Create(false, this, deploymentTile, supply);
-      } else if (type == Type.Infantry) {
-        onFieldUnit = Infantry.Create(false, this, deploymentTile, supply, labor);
       } else {
-        onFieldUnit = Scout.Create(false, this, deploymentTile, supply);
+        onFieldUnit = Infantry.Create(false, this, deploymentTile, supply, labor);
       }
       return true;
     }

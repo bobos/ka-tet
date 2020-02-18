@@ -134,20 +134,18 @@ public class Starter : MonoBehaviour {
     General abc = new General("g_abc", "g_abc", Cons.riverNorth, new Traits[0]); 
     General x1 = new General("g_x1", "g_1", Cons.riverNorth, new Traits[0]); 
     General x2 = new General("g_x2", "g_1", Cons.riverNorth, new Traits[0]); 
-    General x3 = new General("g_x3", "g_1", Cons.riverNorth, new Traits[0]); 
     caocao.JoinFaction(Cons.Liang, Cons.Tiger);
     xuchu.JoinFaction(Cons.Liang, Cons.Tiger);
     abc.JoinFaction(Cons.Liang, Cons.Tiger);
     x1.JoinFaction(Cons.Liang, Cons.Tiger);
     x2.JoinFaction(Cons.Liang, Cons.Tiger);
-    x3.JoinFaction(Cons.Liang, Cons.Tiger);
 
     // step 3, assign general to units
     liubei.Assign(hexMap,
       new Troop(5000, Cons.HeJian, Cons.riverRun, Type.Infantry, Cons.elite)
     );
     zhaoyun.Assign(hexMap,
-      new Troop(250, Cons.HeJian, Cons.riverRun, Type.Scout, Cons.norank)
+      new Troop(3000, Cons.HeJian, Cons.riverRun, Type.Infantry, Cons.veteran)
     );
     guanyu.Assign(hexMap,
       new Troop(1500, Cons.HeJian, Cons.middleEarth, Type.Infantry, Cons.rookie)
@@ -170,9 +168,6 @@ public class Starter : MonoBehaviour {
     );
     x2.Assign(hexMap,
       new Troop(10000, Cons.Liang, Cons.riverSouth, Type.Infantry, Cons.rookie)
-    );
-    x3.Assign(hexMap,
-      new Troop(200, Cons.Liang, Cons.middleEarth, Type.Scout, Cons.norank)
     );
 
     // step 4, on field assignment
@@ -203,7 +198,7 @@ public class Starter : MonoBehaviour {
 
     // after settlement created, general enters campaign
     liubei.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(27, 18), 0, 5000);
-    zhaoyun.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(28, 18), 0);
+    zhaoyun.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(28, 18), 30000, 300);
     guanyu.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(27, 17), 0, 15000);
     zhangfei.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(28, 17), 0);
 
@@ -214,7 +209,6 @@ public class Starter : MonoBehaviour {
     xuchu.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(27, 15), 3000);
     x1.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(24, 15), 3000);
     x2.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(24, 17), 10000, 1000);
-    x3.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(24, 16), 1000);
     //xuchu.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(2, 1), 0);
     SettlementMgr.Ready4Refresh = true;
     FoW.Init(hexMap);

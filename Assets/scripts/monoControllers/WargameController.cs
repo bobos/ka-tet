@@ -35,18 +35,6 @@ namespace MonoNS {
       CancelBtn.SetActive(false);
     }
 
-    void ToggleScouts(bool disable) {
-      foreach(Unit unit in hexMap.GetWarParty().GetUnits()) {
-        if (unit.type == Type.Scout) {
-          if (disable) {
-            hexMap.DarkenUnit(unit);
-          } else {
-            hexMap.SetUnitSkin(unit);
-          }
-        }
-      }
-    }
-
     public void StartWargame() {
       start = true;
       WargameBtn.SetActive(false);
@@ -54,7 +42,6 @@ namespace MonoNS {
       CancelBtn.SetActive(true);
       unitList = new List<WargameUnit>();
       visibleArea = FieldNS.FoW.Get().GetVisibleArea();
-      ToggleScouts(true);
     }
 
     void Quit() {
@@ -62,7 +49,6 @@ namespace MonoNS {
       WargameBtn.SetActive(true);
       CommitBtn.SetActive(false);
       CancelBtn.SetActive(false);
-      ToggleScouts(false);
       hexMap.CleanLines();
     }
 

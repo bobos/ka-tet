@@ -218,7 +218,7 @@ namespace MonoNS
       WarParty party = isAI ? GetPlayerParty() : GetAIParty();
       foreach (Unit u in party.GetUnits())
       {
-        if (type == 2 && u.type == Type.Scout) {
+        if (type == 2) {
           continue;
         }
 
@@ -601,7 +601,7 @@ namespace MonoNS
       HashSet<Tile> spotWarningRange = unit != null && unit.IsConcealed()
         ? GetRangeForDiscoveryWarning(unit.IsAI()) : null;
       HashSet<Tile> guardWarningRange = unit != null ? GetRangeForGuardCheck(unit.IsAI()) : null;
-      Tile[] visible = unit != null && unit.type != Type.Scout ? unit.GetVisibleArea() : null;
+      Tile[] visible = unit != null ? unit.GetVisibleArea() : null;
       foreach (Tile tile in tiles)
       {
         Material mat = null;
@@ -611,7 +611,7 @@ namespace MonoNS
           if (unit != null && unit.IsConcealed() && spotWarningRange.Contains(tile)) {
             mat = WarningMat;
           }
-          if (unit.type != Type.Scout && guardWarningRange.Contains(tile)) {
+          if (guardWarningRange.Contains(tile)) {
             bool found = false;
             foreach (Tile t in visible) {
               if (Util.eq<Tile>(tile, t)) {

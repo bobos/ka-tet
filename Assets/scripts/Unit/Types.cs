@@ -3,8 +3,7 @@
   public enum Type
   {
     Cavalry,
-    Infantry,
-    Scout
+    Infantry
   }
 
   public enum State

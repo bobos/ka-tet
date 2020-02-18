@@ -10,14 +10,9 @@ namespace CourtNS
     public abstract string Name();
     public abstract string Description();
     public List<Region> UncomfortableRegions = new List<Region>();
-    // Min atk or def point must be x * 0.05f = 1 --> 20
-    public abstract int Atk(Type unitType);
-    public abstract int Def(Type unitType);
+    public abstract int CombatPoint(Type unitType);
     public int Mov(Type unitType)
     {
-      if (unitType == Type.Scout) {
-        return 200;
-      }
       return 100;
     }
     public abstract int Will();
@@ -38,22 +33,11 @@ namespace CourtNS
       return textLib.get("region_upland_description");
     }
 
-    public override int Atk(Type unitType)
+    public override int CombatPoint(Type unitType)
     {
       if (unitType == Type.Infantry)
-        return 2;
-      if (unitType == Type.Scout)
-        return 5;
-      return 5;
-    }
-
-    public override int Def(Type unitType)
-    {
-      if (unitType == Type.Infantry)
-        return 1;
-      if (unitType == Type.Scout)
-        return 4;
-      return 5;
+        return 10;
+      return 50;
     }
 
     public override int Will()
@@ -85,22 +69,11 @@ namespace CourtNS
       return textLib.get("region_plain_description");
     }
 
-    public override int Atk(Type unitType)
+    public override int CombatPoint(Type unitType)
     {
       if (unitType == Type.Infantry)
-        return 2;
-      if (unitType == Type.Scout)
-        return 5;
-      return 4;
-    }
-
-    public override int Def(Type unitType)
-    {
-      if (unitType == Type.Infantry)
-        return 2;
-      if (unitType == Type.Scout)
-        return 3;
-      return 4;
+        return 15;
+      return 45;
     }
 
     public override int Will()
@@ -115,7 +88,7 @@ namespace CourtNS
 
     public override int ExtraSupplySlot()
     {
-      return 1;
+      return 0;
     }
   }
 
@@ -132,22 +105,11 @@ namespace CourtNS
       return textLib.get("region_lowland_description");
     }
 
-    public override int Atk(Type unitType)
+    public override int CombatPoint(Type unitType)
     {
       if (unitType == Type.Infantry)
-        return 1;
-      if (unitType == Type.Scout)
-        return 5;
-      return 4;
-    }
-
-    public override int Def(Type unitType)
-    {
-      if (unitType == Type.Infantry)
-        return 1;
-      if (unitType == Type.Scout)
-        return 3;
-      return 4;
+        return 10;
+      return 45;
     }
 
     public override int Will()
@@ -179,22 +141,11 @@ namespace CourtNS
       return textLib.get("region_hillland_description");
     }
 
-    public override int Atk(Type unitType)
+    public override int CombatPoint(Type unitType)
     {
       if (unitType == Type.Infantry)
-        return 2;
-      if (unitType == Type.Scout)
-        return 5;
-      return 4;
-    }
-
-    public override int Def(Type unitType)
-    {
-      if (unitType == Type.Infantry)
-        return 3;
-      if (unitType == Type.Scout)
-        return 3;
-      return 4;
+        return 15;
+      return 45;
     }
 
     public override int Will()
@@ -226,22 +177,11 @@ namespace CourtNS
       return textLib.get("region_grassland_description");
     }
 
-    public override int Atk(Type unitType)
+    public override int CombatPoint(Type unitType)
     {
       if (unitType == Type.Infantry)
-        return 2;
-      if (unitType == Type.Scout)
-        return 5;
-      return 5;
-    }
-
-    public override int Def(Type unitType)
-    {
-      if (unitType == Type.Infantry)
-        return 1;
-      if (unitType == Type.Scout)
-        return 3;
-      return 4;
+        return 10;
+      return 50;
     }
 
     public override int Will()
@@ -256,7 +196,7 @@ namespace CourtNS
 
     public override int ExtraSupplySlot()
     {
-      return 0;
+      return 1;
     }
   }
 

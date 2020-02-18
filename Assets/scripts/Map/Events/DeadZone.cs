@@ -58,7 +58,7 @@
     }
 
     public bool Apply(UnitNS.Unit unit) {
-      return DecompositionCntDown > 0 && unit != null && unit.type != UnitNS.Type.Scout &&
+      return DecompositionCntDown > 0 && unit != null &&
         !unit.epidemic.IsValid() && Cons.FiftyFifty();
     }
   }

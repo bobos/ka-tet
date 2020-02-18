@@ -142,8 +142,7 @@ namespace MonoNS
       if(tile.epidemic != null && tile.epidemic.OnWeatherChange(weather)) {
         // epidemic triggered
         Unit unit = tile.GetUnit();
-        if (unit.type != Type.Scout && !unit.IsHeatSicknessAffected() &&
-        !Util.eq<Region>(unit.rf.province.region, Cons.lowLand)) {
+        if (!unit.IsHeatSicknessAffected() && !Util.eq<Region>(unit.rf.province.region, Cons.lowLand)) {
           eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.Epidemic, unit, null));
           while (eventDialog.Animating) { yield return null; }
           unitAniController.Riot(unit, unit.epidemic.Occur());

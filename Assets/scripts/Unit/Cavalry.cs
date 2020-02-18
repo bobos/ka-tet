@@ -8,7 +8,7 @@ namespace  UnitNS
     public const int BaseSlots = Infantry.BaseSlots + 2;
     public const float MovementCostModifierOnHill = 1.5f;
     public const float MovementCostModifierOnPlainOrRoad = 0.7f;
-    public const int MinTroopNum = 250;
+    public const int MinTroopNum = 300;
     public const int MaxTroopNum = 2000;
 
     public static Unit Create(bool clone, Troop troop, Tile tile, int supply, State state = State.Stand, 

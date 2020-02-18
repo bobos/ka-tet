@@ -8,8 +8,7 @@
     }
 
     public int Occur() {
-      if (unit.GetStaminaLevel() == StaminaLvl.Exhausted && unit.type != Type.Scout
-        && Cons.SlimChance()) {
+      if (unit.GetStaminaLevel() == StaminaLvl.Exhausted && Cons.SlimChance()) {
         return 3;
       }
       return 0;

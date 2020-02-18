@@ -125,7 +125,6 @@ public class Cons {
     return textLib;
   }
 
-  public static UnitNS.Rank norank = new UnitNS.Norank();
   public static UnitNS.Rank rookie = new UnitNS.Rookie();
   public static UnitNS.Rank veteran = new UnitNS.Veteran();
   public static UnitNS.Rank elite = new UnitNS.Elite();

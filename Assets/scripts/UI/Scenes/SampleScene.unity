@@ -4848,6 +4848,8 @@ MonoBehaviour:
     type: 3}
   CavalryPrefab: {fileID: 1684031216514598, guid: bc217d72285d541e68de63aaf7b5fc63,
     type: 3}
+  ScoutPrefab: {fileID: 2653454548479284038, guid: 29f7c417a7fa6a2429dd7263303f140e,
+    type: 3}
   HexPrefab: {fileID: 1123697764883644, guid: 69a97392171eb429b9ad2211f772f443, type: 3}
   HighGroundPrefab: {fileID: 1230771843980290, guid: 878b1ed0419a846caab8f2abfe40bf5a,
     type: 3}

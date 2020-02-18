@@ -20,10 +20,10 @@ namespace UnitNS
     public const int MovementcostOnPlain = 20;
     public const int MovementcostOnPlainRoad = 15;
     public const int MovementCostOnUnaccesible = -1;
-    public const int DisbandUnitUnder = 100;
+    public const int DisbandUnitUnder = 50;
 
     public const int L1Visibility = 3;
-    public const int L2Visibility = 5;
+    public const int L2Visibility = 4;
     public const int L1DiscoverRange = 1; // under 2000
     public const int L2DiscoverRange = 2; // > 4000
     public const int ConcealCoolDownIn = 3;
@@ -369,7 +369,7 @@ namespace UnitNS
 
     public Tile[] GetVisibleArea() {
       int v = L1Visibility;
-      if (type == Type.Scout) {
+      if (IsCavalry()) {
         v = L2Visibility;
       }
       return tile.GetNeighboursWithinRange<Tile>(v, (Tile _tile) => true);
@@ -581,38 +581,25 @@ namespace UnitNS
     // ================= buff & debuff ==============================
     // ==============================================================
     public float disarmorDefDebuf = 0;
-    public int def
+    public int cp
     {
       get
       {
-        return rf.defCore;
-      }
-    }
-    public int atk
-    {
-      get
-      {
-        return rf.atkCore;
+        return rf.combatPoint;
       }
     }
 
-    public int unitAttack {
+    public int unitCombatPoint {
       get {
-        int total = vantage.TotalPoints(atk);
-        total = (int)(total + total * (
-          GetBuff() + vantage.AtkBuf() + weatherEffect.AtkBuf() - plainSickness.atkDebuf + rf.atkLvlBuf
-        ));
+        int total = vantage.TotalPoints(cp);
+        total = (int)(total + total * GetBuff());
         return total < 0 ? 0 : total;
       }
     }
 
-    public int unitDefence {
+    public int unitReferenceCombatPoint {
       get {
-        int total = vantage.TotalPoints(def);
-        total = (int)(total + total * (
-        GetBuff() + vantage.DefBuf() + rf.defLvlBuf - disarmorDefDebuf
-        ));
-        return total < 0 ? 0 : total;
+        return (int)(unitCombatPoint * (1 + GetStaminaDebuf(false)));
       }
     }
 
@@ -620,9 +607,19 @@ namespace UnitNS
       return unitPoisioned.Poision();
     }
 
-    float GetBuff()
+    public float GetBuff()
     {
-      return GetStarvingBuf() + GetNewGeneralBuf() + GetChaosBuf() + GetWarwearyBuf();
+      return GetStarvingBuf() + GetNewGeneralBuf() + GetChaosBuf() + GetWarwearyBuf() + vantage.Buf() - plainSickness.debuf + rf.lvlBuf - disarmorDefDebuf;
+    }
+
+    public float GetStaminaDebuf(bool asMainDefender) {
+      if (GetStaminaLevel() == StaminaLvl.Tired) {
+        return -0.3f;
+      } else if (GetStaminaLevel() == StaminaLvl.Exhausted) {
+        return asMainDefender ? -0.5f : -1f;
+      } else {
+         return 0f;
+      }
     }
 
     float newGeneralDebuf = 0f;

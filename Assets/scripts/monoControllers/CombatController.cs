@@ -47,7 +47,6 @@ namespace MonoNS
     {
       base.PreGameInit(hexMap, me);
       mouseController = hexMap.mouseController;
-      mouseController.onUnitAttack += OnUnitAttack;
       actionController = hexMap.actionController;
       actionController.actionDone += ActionDone;
       msgBox = hexMap.msgBox;
@@ -64,14 +63,8 @@ namespace MonoNS
     List<Unit> supportAttackers; 
     List<Unit> supportDefenders;
 
-    int GetEffectiveForcePercentage(Unit unit) {
-      if (unit.GetStaminaLevel() == StaminaLvl.Tired) {
-        return 70;
-      } else if (unit.GetStaminaLevel() == StaminaLvl.Exhausted) {
-        return 0;
-      } else {
-         return 100;
-      }
+    int GetEffectiveForcePercentage(Unit unit, bool asMainDefender) {
+      return (int)(1 + unit.GetStaminaDebuf(asMainDefender));
     }
 
     void SetGaleVantage(Unit unit, Unit target, UnitPredict predict) {
@@ -148,7 +141,7 @@ namespace MonoNS
 
       foreach (Tile tile in targetUnit.tile.neighbours) {
         Unit u = tile.GetUnit();
-        if (u == null || u.type == Type.Scout) {
+        if (u == null) {
           continue;
         }
 
@@ -166,11 +159,11 @@ namespace MonoNS
       OperationPredict predict = new OperationPredict();
       UnitPredict unitPredict = new UnitPredict();
       unitPredict.unit = attacker;
-      unitPredict.percentOfEffectiveForce = GetEffectiveForcePercentage(attacker);
+      unitPredict.percentOfEffectiveForce = GetEffectiveForcePercentage(attacker, false);
       unitPredict.joinPossibility = 100;
       SetGaleVantage(attacker, defender, unitPredict);
       // TODO:tmp morale buff from commander
-      unitPredict.operationPoint = (int)(attacker.unitAttack * unitPredict.percentOfEffectiveForce * 0.01f);
+      unitPredict.operationPoint = (int)(attacker.unitCombatPoint * unitPredict.percentOfEffectiveForce * 0.01f);
       predict.attackers.Add(unitPredict);
       predict.attackerOptimPoints += unitPredict.operationPoint;
       hexMap.ShowAttackArrow(attacker, targetUnit, unitPredict);
@@ -178,10 +171,10 @@ namespace MonoNS
       foreach(Unit unit in supportAttackers) {
         unitPredict = new UnitPredict();
         unitPredict.unit = unit;
-        unitPredict.percentOfEffectiveForce = GetEffectiveForcePercentage(unit);
+        unitPredict.percentOfEffectiveForce = GetEffectiveForcePercentage(unit, false);
         SetGaleVantage(unit, defender, unitPredict);
         unitPredict.joinPossibility = GetJoinPossibility(unit, attacker);
-        unitPredict.operationPoint = (int)(unit.unitAttack * unitPredict.percentOfEffectiveForce * 0.01f);
+        unitPredict.operationPoint = (int)(unit.unitCombatPoint * unitPredict.percentOfEffectiveForce * 0.01f);
         predict.attackers.Add(unitPredict);
         predict.attackerOptimPoints += unitPredict.operationPoint;
         hexMap.ShowAttackArrow(unit, targetUnit, unitPredict);
@@ -190,11 +183,9 @@ namespace MonoNS
       // defenders
       unitPredict = new UnitPredict();
       unitPredict.unit = defender;
-      unitPredict.percentOfEffectiveForce = GetEffectiveForcePercentage(defender);
-      // Exausted defense drop 50%
-      unitPredict.percentOfEffectiveForce = unitPredict.percentOfEffectiveForce == 0 ? 50 : unitPredict.percentOfEffectiveForce;
+      unitPredict.percentOfEffectiveForce = GetEffectiveForcePercentage(defender, true);
       unitPredict.joinPossibility = 100;
-      unitPredict.operationPoint = (int)(defender.unitDefence * unitPredict.percentOfEffectiveForce * 0.01f);
+      unitPredict.operationPoint = (int)(defender.unitCombatPoint * unitPredict.percentOfEffectiveForce * 0.01f * (defender.IsCavalry() ? 1 : 1.5f));
       predict.defenders.Add(unitPredict);
       predict.defenderOptimPoints += unitPredict.operationPoint;
       hexMap.ShowDefenderStat(defender, unitPredict);
@@ -202,9 +193,9 @@ namespace MonoNS
       foreach(Unit unit in supportDefenders) {
         unitPredict = new UnitPredict();
         unitPredict.unit = unit;
-        unitPredict.percentOfEffectiveForce = GetEffectiveForcePercentage(unit);
+        unitPredict.percentOfEffectiveForce = GetEffectiveForcePercentage(unit, false);
         unitPredict.joinPossibility = GetJoinPossibility(unit, targetUnit);
-        unitPredict.operationPoint = (int)(unit.unitDefence * unitPredict.percentOfEffectiveForce * 0.01f);
+        unitPredict.operationPoint = (int)(unit.unitCombatPoint * unitPredict.percentOfEffectiveForce * 0.01f * (unit.IsCavalry() ? 1 : 1.5f));
         predict.defenders.Add(unitPredict);
         predict.defenderOptimPoints += unitPredict.operationPoint;
         if (!Util.eq<Unit>(unit, targetUnit)) {
@@ -218,18 +209,12 @@ namespace MonoNS
     }
 
     void CalculateWinChance(OperationPredict predict) {
-      if (predict.attackerOptimPoints >= (int)(predict.defenderOptimPoints * 1.8)) {
+      if (predict.attackerOptimPoints > (int)(predict.defenderOptimPoints * 1.14)) {
         predict.sugguestedResult = new OperationGeneralResult(10);
-      } else if (predict.attackerOptimPoints >= (int)(predict.defenderOptimPoints * 1.6)) {
-        predict.sugguestedResult = new OperationGeneralResult(8);
-      } else if (predict.attackerOptimPoints >= (int)(predict.defenderOptimPoints * 1.4f)) {
-        predict.sugguestedResult = new OperationGeneralResult(6);
-      } else if (predict.attackerOptimPoints >= (int)(predict.defenderOptimPoints * 1.3f)) {
-        predict.sugguestedResult = new OperationGeneralResult(2);
-      } else if (predict.attackerOptimPoints >= (int)(predict.defenderOptimPoints * 1.2f)) {
-        predict.sugguestedResult = new OperationGeneralResult(1);
-      } else {
+      } else if (predict.defenderOptimPoints > (int)(predict.attackerOptimPoints * 1.14)) {
         predict.sugguestedResult = new OperationGeneralResult(0);
+      } else {
+        predict.sugguestedResult = new OperationGeneralResult(5);
       }
     }
 
@@ -276,7 +261,7 @@ namespace MonoNS
       }
     }
 
-    void AllocateCasualty(int total, List<UnitPredict> units) {
+    int AllocateCasualty(int total, List<UnitPredict> units) {
       foreach(UnitPredict up in units) {
         up.leastNum = (int)(up.unit.rf.soldiers * (up.unit.IsCavalry() ? 0.2f : 0.12f)); 
       }
@@ -341,7 +326,7 @@ namespace MonoNS
           }
 
           // elite
-          if (unit.rf.rank.Level() == 3 || unit.rf.rank.Level() == -1) {
+          if (unit.rf.rank.Level() == 3) {
             if (!unit.IsCavalry()) {
               total -= 3;
               Helper(up, 3, 1);
@@ -355,6 +340,7 @@ namespace MonoNS
           break;
         }
       }
+      return total;
     }
 
     public enum ResultType {
@@ -524,8 +510,7 @@ namespace MonoNS
         predict.defenderOptimPoints = predict.defenderOptimPoints <= 0 ? 1 : predict.defenderOptimPoints;
 
         if (predict.attackerOptimPoints > predict.defenderOptimPoints) {
-          factor = (int)((predict.attackerOptimPoints / predict.defenderOptimPoints) * 10) - 12;
-          factor = factor < 0 ? 0 : factor;
+          factor = (int)((predict.attackerOptimPoints / predict.defenderOptimPoints) * 10) - 10;
         } else {
           attackerBigger = false;
           factor = (int)((predict.defenderOptimPoints / predict.attackerOptimPoints) * 10) - 10;
@@ -537,21 +522,24 @@ namespace MonoNS
 // 1.0 to 1.3 - 0.01(both)
 // 1.4 to 1.8 - def: x - 1.2, atk: (x -1) * (0.5 - 0.6)   
 // 1.9 to 2.2 - atk: (x - 1.2) * (0.25 - 0.4)
-        if (factor <= 1 || (!atkWin && attackerBigger)) {
+        if (factor <= 1) {
           float m = 0.04f;
+          float m1 = 0.035f;
           if (Cons.SlimChance()) {
             m = 0.1f;
+            m = 0.95f;
           }
-          defenderCasualty = (int)(defenderTotal * m);
-          attackerCasualty = (int)(attackerTotal * m);
+          defenderCasualty = (int)(defenderTotal * (attackerBigger ? m : m1));
+          attackerCasualty = (int)(attackerTotal * (attackerBigger ? m1 : m));
         } else {
           if (attackerBigger) {
-            defenderCasualty = (int)(defenderTotal * factor * 0.02f);
+            defenderCasualty = (int)(defenderTotal * factor * 0.025f);
           } else {
-            attackerCasualty = (int)(attackerTotal * factor * 0.02f);
+            attackerCasualty = (int)(attackerTotal * factor * 0.025f);
           }
 
-          if (factor > 1 && factor <= 6) {
+          if (factor > 1 && factor <= 4) {
+            // 2x odds
             resultLevel = ResultType.Small;
             int modifier = Util.Rand(4, 5);
             if (attackerBigger) {
@@ -561,7 +549,8 @@ namespace MonoNS
             }
           }
 
-          if (factor > 6 && factor <= 18) {
+          if (factor > 4 && factor <= 10) {
+            // 3x odds
             int modifier = Util.Rand(3, 4);
             if (attackerBigger) {
               attackerCasualty = (int)(defenderCasualty * modifier* 0.1f);
@@ -571,8 +560,8 @@ namespace MonoNS
             resultLevel = modifier > 35 ? ResultType.Small : ResultType.Great;
           }
 
-          if (factor > 18 && factor <= 28) {
-            // 4 times
+          if (factor > 10 && factor <= 16) {
+            // 4x odds
             int modifier = Util.Rand(2, 3);
             resultLevel = Cons.EvenChance() ? ResultType.Crushing : ResultType.Great;
             if (attackerBigger) {
@@ -583,8 +572,8 @@ namespace MonoNS
             resultLevel = modifier > 185 ? ResultType.Great : ResultType.Crushing;
           }
 
-          if (factor > 28 && factor <= 38) {
-            // 5 times
+          if (factor > 16 && factor <= 24) {
+            // 5x odds
             float modifier = Util.Rand(1, 2) * 0.1f;
             resultLevel = ResultType.Crushing;
             if (attackerBigger) {
@@ -594,7 +583,7 @@ namespace MonoNS
             }
           }
 
-          if (factor > 38) {
+          if (factor > 24) {
             float modifier = 0.05f;
             resultLevel = ResultType.Crushing;
             if (attackerBigger) {
@@ -608,8 +597,8 @@ namespace MonoNS
         attackerCasualty = attackerCasualty > attackerTotal ? attackerTotal : attackerCasualty;
         defenderCasualty = defenderCasualty > defenderTotal ? defenderTotal : defenderCasualty;
 
-        AllocateCasualty(defenderCasualty, predict.defenders);
-        AllocateCasualty(attackerCasualty, predict.attackers);
+        defenderCasualty = defenderCasualty - AllocateCasualty(defenderCasualty, predict.defenders);
+        attackerCasualty = attackerCasualty - AllocateCasualty(attackerCasualty, predict.attackers);
 
         List<UnitPredict> all = new List<UnitPredict>();
         int attackerInfDead = 0;
@@ -903,73 +892,6 @@ namespace MonoNS
         }
       }
       return known;
-    }
-
-    public void OnUnitAttack(Unit[] punchers, Unit receiver)
-    {
-      int def = receiver.def;
-      string msg = "";
-      if (punchers.Length == 1)
-      {
-        int hit = punchers[0].atk - def;
-        if (hit <= 0)
-        {
-          hit = 1;
-        }
-        int reduced = hit * 100;
-        int moraleHit = hit * 2;
-        receiver.rf.soldiers -= reduced;
-        receiver.rf.morale -= moraleHit;
-
-        msg += punchers[0].GeneralName() + " killed " + reduced + " soldiers of " + receiver.GeneralName() + "!\n";
-
-        msg += receiver.GeneralName() + " killed " + (int)(reduced / 8) + "soldiers of " + punchers[0].GeneralName() + "\n";
-        punchers[0].rf.soldiers -= (int)(reduced / 8);
-
-        // TODO: punish the morale after severly reduced
-        if (receiver.rf.soldiers <= 0)
-        {
-          msg += receiver.GeneralName() + " is destroyed!\n";
-          punchers[0].rf.morale += 30;
-          punchers[0].rf.morale = punchers[0].rf.morale > 100 ? 100 : punchers[0].rf.morale;
-          msg += punchers[0].GeneralName() + "'s morale increased 30\n";
-          receiver.attackReaction = Reaction.Disband;
-        }
-        else
-        {
-          msg += receiver.GeneralName() + "'s morale decreased to " + moraleHit + "\n";
-          receiver.attackReaction = Reaction.Stand;
-          if (receiver.rf.morale <= 0)
-          {
-            receiver.attackReaction = Reaction.Rout;
-          }
-        }
-
-        if (punchers[0].rf.soldiers <= 0)
-        {
-          msg += punchers[0].Name() + " is destroyed!\n";
-          punchers[0].attackReaction = Reaction.Disband;
-        }
-        else
-        {
-          if (punchers[0].IsCavalry())
-          {
-            punchers[0].movementRemaining -= 1;
-            if (punchers[0].movementRemaining < 0) punchers[0].movementRemaining = 0;
-          }
-          else
-          {
-            punchers[0].movementRemaining = -1;
-          }
-        }
-      }
-      if (!actionController.DoAction(receiver, punchers, null, ActionController.actionName.ATTACK))
-      {
-        Debug.LogError("Failed to perform attack, try again!");
-        return;
-      }
-      msgBox.Show(msg);
-      // TODO: calculate hit points, and set reaction on receiver(retreat, set effect etc.)
     }
 
   }

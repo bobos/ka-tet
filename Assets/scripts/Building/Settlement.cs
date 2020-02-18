@@ -285,25 +285,26 @@ public abstract class Settlement: DataModel
     hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.LaborReached, null, to, amount));
   }
 
+  // TODO: rework the supply system then remove this logic
   int[] InterceptResult(Unit enemy) {
     int[] result = new int[]{0, 0, 0};
     // TODO: general trait gaining
-    if (enemy.rf.soldiers >= Util.Rand(Unit.DisbandUnitUnder, Scout.MaxTroopNum + 2) &&
+    if (enemy.rf.soldiers >= Util.Rand(Unit.DisbandUnitUnder, 100) &&
         enemy.rf.morale >= Util.Rand(45, 65)) {
       result[0] = 1;
       if (Cons.FairChance()) {
-        result[1] = Util.Rand(1, 10);
+        result[1] = Util.Rand(1, 7);
         if (Cons.SlimChance()) {
           // killed
-          result[2] = Util.Rand(1, 8);
+          result[2] = Util.Rand(1, 5);
         }
       }
       enemy.rf.morale += Cons.InterceptMoraleImpact;
     } else {
       if (Cons.HighlyLikely()) {
-        result[1] = Util.Rand(10, 30);
+        result[1] = Util.Rand(5, 15);
         if (Cons.MostLikely()) {
-          result[2] = Util.Rand(5, 20);
+          result[2] = Util.Rand(3, 10);
         }
       }
       enemy.rf.morale -= Cons.InterceptMoraleImpact * 2;

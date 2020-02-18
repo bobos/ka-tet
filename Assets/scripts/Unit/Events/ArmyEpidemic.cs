@@ -24,7 +24,7 @@ namespace UnitNS
     }
 
     public int Occur() {
-      if (unit.type != Type.Scout && !unit.IsHeatSicknessAffected()) {
+      if (!unit.IsHeatSicknessAffected()) {
         lastTurns += GetLastTurns();
         return 3;
       }

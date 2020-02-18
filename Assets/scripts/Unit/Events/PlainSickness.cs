@@ -5,7 +5,7 @@ namespace UnitNS
   public class PlainSickness
   {
     Unit unit;
-    public float atkDebuf = 0;
+    public float debuf = 0;
     public float moveDebuf = 0;
     public bool happened = false;
     public bool affected = false;
@@ -25,7 +25,7 @@ namespace UnitNS
       happened = true;
       if (Cons.FiftyFifty()) {
         affected = true;
-        atkDebuf = moveDebuf = 0.3f;
+        debuf = moveDebuf = 0.3f;
         return 2;
       }
 

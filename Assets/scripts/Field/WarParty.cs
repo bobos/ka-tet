@@ -9,16 +9,12 @@ namespace FieldNS
   {
     public int numOfInfantryUnit;
     public int numOfCavalryUnit;
-    public int numOfScoutUnit;
     public int numOfInfantry;
     public int numOfCavalry;
-    public int numOfScout;
     public int numOfInfantryDead;
     public int numOfCavalryDead;
-    public int numOfScoutDead;
     public int numOfInfantryWound;
     public int numOfCavalryWound;
-    public int numOfScoutWound;
     public int numOfLabor;
   }
 
@@ -37,7 +33,6 @@ namespace FieldNS
     public List<FieldParty> fieldParties = new List<FieldParty>();
     public int infantryWounded;
     public int cavalryWounded;
-    public int scoutWounded;
     public Faction faction;
 
     public bool isAI { get; private set; }
@@ -56,9 +51,6 @@ namespace FieldNS
       }
       if (unit.type == Type.Cavalry) {
         cavalryWounded += num;
-      }
-      if (unit.type == Type.Scout) {
-        scoutWounded += num;
       }
     }
 
@@ -95,7 +87,6 @@ namespace FieldNS
       WarPartyStat stat = new WarPartyStat();
       stat.numOfInfantryWound = infantryWounded;
       stat.numOfCavalryWound = cavalryWounded;
-      stat.numOfScoutWound = scoutWounded;
 
       foreach (Unit unit in units)
       {
@@ -114,14 +105,6 @@ namespace FieldNS
           if (!unit.IsGone()) {
             stat.numOfCavalry += unit.rf.soldiers;
             stat.numOfCavalryUnit++;
-          }
-        }
-
-        if (unit.type == Type.Scout) {
-          stat.numOfScoutDead += totalDead;
-          if (!unit.IsGone()) {
-            stat.numOfScout += unit.rf.soldiers;
-            stat.numOfScoutUnit++;
           }
         }
       }

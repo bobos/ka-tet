@@ -23,7 +23,7 @@
     }
 
     public bool Poision() {
-      if (unit.type == Type.Scout || poisioned) {
+      if (poisioned) {
         return false;
       }
       poisioned = true;
