@@ -64,7 +64,7 @@ namespace MonoNS
     List<Unit> supportDefenders;
 
     int GetEffectiveForcePercentage(Unit unit, bool asMainDefender) {
-      return (int)(1 + unit.GetStaminaDebuf(asMainDefender));
+      return (int)((1 + unit.GetStaminaDebuf(asMainDefender)) * 100);
     }
 
     void SetGaleVantage(Unit unit, Unit target, UnitPredict predict) {
@@ -352,7 +352,7 @@ namespace MonoNS
 
     int[] GetVicBuf(ResultType type) {
       if (type == ResultType.Close) {
-        return new int[]{-4, -3, 1};
+        return new int[]{-1, 0, 1};
       }
       if (type == ResultType.Small) {
         return new int[]{0, 0, 0};
@@ -726,83 +726,6 @@ namespace MonoNS
             hexMap.unitAniController.ShowEffects(unit, stats);
             while (hexMap.unitAniController.ShowAnimating) { yield return null; }
           }
-
-          if (defender.chaos) {
-            defender.movementRemaining = Unit.MovementcostOnHill * 100;
-            hexMap.popAniController.Show(hexMap.GetUnitView(defender), 
-              Cons.GetTextLib().get("pop_chaos"),
-              Color.white);
-            while (hexMap.popAniController.Animating) { yield return null; }
-            //hexMap.GetUnitView(defender).UpdateUnitInfo();
-            // TODO routing
-            HashSet<Tile> from = new HashSet<Tile>{defender.tile};
-            int escapeDistance = 5;
-            bool moved = false;
-            while (escapeDistance > 0) {
-              moved = false;
-              foreach(Tile t in defender.tile.neighbours) {
-                Unit u = t.GetUnit();
-                if (u != null && u.IsConcealed()) {
-                  u.DiscoveredByEnemy();
-                }
-                if (t.Deployable(defender) && !from.Contains(t)) {
-                  escapeDistance--;
-                  from.Add(t);
-                  hexMap.unitAniController.MoveUnit(defender, t);
-                  while (hexMap.unitAniController.MoveAnimating) { yield return null; }
-                  moved = true;
-                  break;
-                }
-              }
-
-              if (!moved) {
-                // Failed to find escape tile, pick a nearby ally and clash
-                List<Unit> ally = new List<Unit>();
-                foreach(Tile t in defender.tile.neighbours) {
-                  Unit u = t.GetUnit();
-                  if (u != null && u.IsAI() == defender.IsAI()) {
-                    ally.Add(u);
-                  }
-                }
-
-                if (ally.Count > 0) {
-                  Unit clashed = ally[Util.Rand(0, ally.Count-1)];
-                  int damage = (int)(defender.rf.soldiers * 0.1f);
-                  damage = damage > clashed.rf.soldiers ? clashed.rf.soldiers : damage;
-                  int killed = (int)(damage * Util.Rand(5, 7) * 0.1f);
-                  int wounded = damage - killed;
-                  clashed.rf.soldiers -= damage;
-                  clashed.kia += killed;
-                  clashed.rf.wounded += wounded;
-                  hexMap.UpdateWound(clashed, wounded);
-                  clashed.rf.morale -= 10;
-                  // morale, movement, wounded, killed, laborKilled, disserter, attack, def, discontent
-                  int[] stats = new int[]{-10,0,wounded,killed,0,0,0,0,0};
-                  hexMap.popAniController.Show(hexMap.GetUnitView(defender), 
-                    Cons.GetTextLib().get("pop_escapeNoRout"),
-                    Color.white);
-                  while (hexMap.popAniController.Animating) { yield return null; }
-                  hexMap.dialogue.ShowRoutingImpactIncident(defender, clashed);
-                  while (hexMap.dialogue.Animating) { yield return null; }
-                  hexMap.popAniController.Show(hexMap.GetUnitView(clashed), 
-                    Cons.GetTextLib().get("pop_crashedByAlly"),
-                    Color.white);
-                  while (hexMap.popAniController.Animating) { yield return null; }
-                  hexMap.unitAniController.ShowEffects(clashed, stats);
-                  while (hexMap.unitAniController.ShowAnimating) { yield return null; }
-                  hexMap.unitAniController.Riot(clashed, 2);
-                  while (hexMap.unitAniController.riotAnimating) { yield return null; }
-                  if (!clashed.IsGone() && clashed.rf.soldiers <= Unit.DisbandUnitUnder) {
-                    // unit disbanded
-                    hexMap.unitAniController.DestroyUnit(clashed, DestroyType.ByDisband);
-                    while (hexMap.unitAniController.DestroyAnimating) { yield return null; }
-                  }
-                }
-                break;
-              }
-            }
-            defender.movementRemaining = 0;
-          }
         } else {
           // defender win
           int morale = vicBuf[0];
@@ -855,6 +778,101 @@ namespace MonoNS
           + defenderInfDead + defenderCavDead + defenderLaborDead;
         Tile tile = atkWin ? defender.tile : attacker.tile;
         tile.deadZone.Occur(deadToll);
+
+        // affected all allies
+        Unit loser = atkWin ? defender : attacker;
+        HashSet<Unit> supporters = new HashSet<Unit>();
+        foreach(UnitPredict up in atkWin ? predict.defenders : predict.attackers) {
+          supporters.Add(up.unit);
+        }
+        foreach(Tile t in loser.tile.GetNeighboursWithinRange<Tile>(4, (Tile tt) => true)) {
+          Unit unit = t.GetUnit();
+          if (unit != null && unit.IsAI() == loser.IsAI() && !supporters.Contains(unit)) {
+            int drop = -3;
+            int[] stats = new int[]{drop,0,0,0,0,0,0,0,0};
+            unit.rf.morale += drop;
+            if (unit.IsShowingAnimation()) {
+              hexMap.unitAniController.ShowEffects(unit, stats);
+              while (hexMap.unitAniController.ShowAnimating) { yield return null; }
+            }
+          }
+        }
+
+        loser.movementRemaining = Unit.MovementcostOnHill * 100;
+        // TODO: apply general trait to calmdown
+        hexMap.popAniController.Show(hexMap.GetUnitView(loser), 
+         loser.chaos ? Cons.GetTextLib().get("pop_chaos") : Cons.GetTextLib().get("pop_retreat"),
+         Color.white);
+        while (hexMap.popAniController.Animating) { yield return null; }
+        HashSet<Tile> from = new HashSet<Tile>{loser.tile};
+        int escapeDistance = 5;
+        bool moved = false;
+        while (escapeDistance > 0) {
+          moved = false;
+          foreach(Tile t in loser.tile.neighbours) {
+            Unit u = t.GetUnit();
+            if (u != null && u.IsConcealed()) {
+              u.DiscoveredByEnemy();
+            }
+            if (t.Deployable(loser) && !from.Contains(t)) {
+              escapeDistance--;
+              from.Add(t);
+              hexMap.unitAniController.MoveUnit(loser, t);
+              while (hexMap.unitAniController.MoveAnimating) { yield return null; }
+              moved = true;
+              break;
+            }
+          }
+
+          if (!moved) {
+            // Failed to find escape tile
+            if (loser.chaos) {
+              List<Unit> ally = new List<Unit>();
+              foreach(Tile t in loser.tile.neighbours) {
+                Unit u = t.GetUnit();
+                if (u != null && u.IsAI() == loser.IsAI()) {
+                  ally.Add(u);
+                }
+              }
+
+              if (ally.Count > 0) {
+                Unit clashed = ally[Util.Rand(0, ally.Count-1)];
+                int damage = (int)(loser.rf.soldiers * 0.1f);
+                damage = damage > clashed.rf.soldiers ? clashed.rf.soldiers : damage;
+                int killed = (int)(damage * Util.Rand(5, 7) * 0.1f);
+                int wounded = damage - killed;
+                clashed.rf.soldiers -= damage;
+                clashed.kia += killed;
+                clashed.rf.wounded += wounded;
+                hexMap.UpdateWound(clashed, wounded);
+                clashed.rf.morale -= 10;
+                // morale, movement, wounded, killed, laborKilled, disserter, attack, def, discontent
+                int[] stats = new int[]{-10,0,wounded,killed,0,0,0,0,0};
+                hexMap.popAniController.Show(hexMap.GetUnitView(loser), 
+                  Cons.GetTextLib().get("pop_escapeNoRout"),
+                  Color.white);
+                while (hexMap.popAniController.Animating) { yield return null; }
+                hexMap.dialogue.ShowRoutingImpactIncident(loser, clashed);
+                while (hexMap.dialogue.Animating) { yield return null; }
+                hexMap.popAniController.Show(hexMap.GetUnitView(clashed), 
+                  Cons.GetTextLib().get("pop_crashedByAlly"),
+                  Color.white);
+                while (hexMap.popAniController.Animating) { yield return null; }
+                hexMap.unitAniController.ShowEffects(clashed, stats);
+                while (hexMap.unitAniController.ShowAnimating) { yield return null; }
+                hexMap.unitAniController.Riot(clashed, 2);
+                while (hexMap.unitAniController.riotAnimating) { yield return null; }
+                if (!clashed.IsGone() && clashed.rf.soldiers <= Unit.DisbandUnitUnder) {
+                  // unit disbanded
+                  hexMap.unitAniController.DestroyUnit(clashed, DestroyType.ByDisband);
+                  while (hexMap.unitAniController.DestroyAnimating) { yield return null; }
+                }
+              }
+            }
+            break;
+          }
+        }
+        loser.movementRemaining = 0;
       } else {
       // TODO: uncomment
       //if (!attacker.IsAI()) {

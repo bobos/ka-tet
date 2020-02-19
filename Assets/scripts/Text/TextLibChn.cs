@@ -313,6 +313,7 @@ namespace TextNS
       {"pop_escapeNoRout", "无路可退"},
       {"pop_crashedByAlly", "受溃兵冲击"},
       {"pop_noRetreatBuf", "战力翻番！"},
+      {"pop_retreat", "撤退!"},
 
       // settlement
       {"settlement_storageLvl1", "初级粮仓"},
