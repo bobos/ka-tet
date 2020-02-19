@@ -214,7 +214,7 @@ namespace MonoNS
       } else if (predict.defenderOptimPoints > (int)(predict.attackerOptimPoints * 1.14)) {
         predict.sugguestedResult = new OperationGeneralResult(0);
       } else {
-        predict.sugguestedResult = new OperationGeneralResult(5);
+        predict.sugguestedResult = new OperationGeneralResult(3);
       }
     }
 
