@@ -39,8 +39,6 @@ Game Tips:
 29. 为三缺一，否则战力凡凡
 
 部队交换位置
-move through unit
-cavary needed??
 
 6只部队一个主帅，12只部队2个主帅, 12只以上3个主帅, 主帅负责制作作战计划，负责发起operation
 隐藏属性

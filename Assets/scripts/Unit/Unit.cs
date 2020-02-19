@@ -22,8 +22,8 @@ namespace UnitNS
     public const int MovementCostOnUnaccesible = -1;
     public const int DisbandUnitUnder = 50;
 
-    public const int L1Visibility = 3;
-    public const int L2Visibility = 4;
+    public const int L1Visibility = 4;
+    public const int L2Visibility = 5;
     public const int L1DiscoverRange = 1; // under 2000
     public const int L2DiscoverRange = 2; // > 4000
     public const int ConcealCoolDownIn = 3;
@@ -724,7 +724,7 @@ namespace UnitNS
       SetState(State.Stand);
     }
 
-    bool AfterMoveUpdate(List<Unit> knownUnit) {
+    bool AfterMoveUpdate(List<Unit> knownUnit, bool allyOnTile) {
       bool continueMoving = true;
 
       if (IsConcealed() && hexMap.GetRangeForDiscoveryCheck(this.IsAI()).Contains(tile)) {
@@ -740,6 +740,11 @@ namespace UnitNS
         }
       }
 
+      if (stopAtNextMove) {
+        stopAtNextMove = false;
+        return false;
+      }
+
       // Unit should stop once spots new enemy
       foreach(Tile t in GetVisibleArea()) {
         Unit u = t.GetUnit();
@@ -748,22 +753,30 @@ namespace UnitNS
         }
       }
 
+      if (!continueMoving && allyOnTile) {
+        stopAtNextMove = true;
+        continueMoving = true;
+      }
+
       return continueMoving;
     }
 
+    bool stopAtNextMove = false;
     public bool DoMove(Tile toTile = null)
     {
-      if (movementRemaining <= 0) {
-        return false;
-      }
-
       Tile next = null;
       if (toTile != null) {
         path = null;
         next = toTile;
       } else if (path != null && path.Count > 0) {
-        next = path.Peek();
+        //next = path.Peek();
+        next = path.Dequeue();
       } else {
+        return false;
+      }
+
+/*
+      if (movementRemaining <= 0) {
         return false;
       }
 
@@ -785,13 +798,15 @@ namespace UnitNS
       {
         return false;
       }
-
+*/
+      int takenMovement = CostToEnterTile(next, PathFind.Mode.Normal);
       List<Unit> knownUnits = hexMap.combatController.GetKnownEnemies();
       movementRemaining -= takenMovement;
       // remove the sieging of the previous tile
       tile.sieged = false;
+      bool allyOnTile = next.GetUnit() != null;
       SetTile(next);
-      return AfterMoveUpdate(knownUnits);
+      return AfterMoveUpdate(knownUnits, allyOnTile);
     }
 
     public void SetWargameTile(Tile h) {
@@ -840,7 +855,7 @@ namespace UnitNS
       }
 
       foreach (Tile tile in GetPureAccessibleTiles()) {
-        if (visible.Contains(tile)) {
+        if (visible.Contains(tile) && tile.GetUnit() == null) {
           area.Add(tile);
         }
       }
@@ -876,6 +891,10 @@ namespace UnitNS
     // movement pathfind
     public Tile[] FindPath(Tile target)
     {
+      if (target.GetUnit() != null) {
+        return new Tile[]{};
+      }
+
       return PFTile2Tile(PathFinder.FindPath(tile, target, this));
     }
 

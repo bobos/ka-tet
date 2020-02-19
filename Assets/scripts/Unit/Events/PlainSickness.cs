@@ -23,7 +23,7 @@ namespace UnitNS
       }
 
       happened = true;
-      if (Cons.FiftyFifty()) {
+      if (Cons.FairChance()) {
         affected = true;
         debuf = moveDebuf = 0.3f;
         return 2;

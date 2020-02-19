@@ -308,31 +308,23 @@ namespace MapTileNS
       //  return Unit.MovementcostOnPlain;
       //}
       Unit u = GetUnit();
+      int mov = movementCost;
       if (u != null)
       {
-        if (mode == Mode.Normal) {
-          // normal path find and access range
-          if (u.IsAI() == unit.IsAI()) {
-            return Unit.MovementCostOnUnaccesible;
-          } else {
-            if (!u.IsConcealed()) {
-              return Unit.MovementCostOnUnaccesible;
-            }
-          }
+        if (u.IsAI() != unit.IsAI()) {
+          return Unit.MovementCostOnUnaccesible;
+        } else {
+          mov = Unit.MovementcostOnHillRoad;
         }
       }
 
-      int ret;
+      int ret = mov;
       if (unit.IsCavalry())
       {
         // apply movement modifier for calvary unit
-        ret = (int)(movementCost * (
+        ret = (int)(mov * (
           (terrian == TerrianType.Plain || field == FieldType.Road) ?
           Cavalry.MovementCostModifierOnPlainOrRoad : Cavalry.MovementCostModifierOnHill));
-      }
-      else
-      {
-        ret = movementCost;
       }
 
       if (vantagePoint) {
@@ -446,7 +438,7 @@ namespace MapTileNS
       {
         return null;
       }
-      // just in case of wargame, there is hidden unit on the tile so war game unit will be last one
+      // just in case of wargame, there is hidden unit on the tile, or in case there is an unit moving through so war game unit will be last one
       return units.Last();
     }
 
