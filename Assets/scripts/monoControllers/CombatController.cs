@@ -211,10 +211,8 @@ namespace MonoNS
     void CalculateWinChance(OperationPredict predict) {
       if (predict.attackerOptimPoints > (int)(predict.defenderOptimPoints * 1.14)) {
         predict.sugguestedResult = new OperationGeneralResult(10);
-      } else if (predict.defenderOptimPoints > (int)(predict.attackerOptimPoints * 1.14)) {
-        predict.sugguestedResult = new OperationGeneralResult(0);
       } else {
-        predict.sugguestedResult = new OperationGeneralResult(3);
+        predict.sugguestedResult = new OperationGeneralResult(0);
       }
     }
 
@@ -276,7 +274,7 @@ namespace MonoNS
             continue;
           }
 
-          if (total < 10) {
+          if (total < 20) {
             if (unit.rf.soldiers < total) {
               total -= unit.rf.soldiers;
               up.dead += unit.rf.soldiers;
@@ -293,7 +291,7 @@ namespace MonoNS
             continue;
           }
 
-          if (unit.rf.soldiers < 10) {
+          if (unit.rf.soldiers < 20) {
             total -= unit.rf.soldiers;
             up.dead += unit.rf.soldiers;
             up.laborDead += unit.labor;
@@ -306,33 +304,33 @@ namespace MonoNS
           // rookie
           if (unit.rf.rank.Level() == 1) {
             if (!unit.IsCavalry()) {
-              total -= 10;
-              Helper(up, 10, 1);
+              total -= 20;
+              Helper(up, 20, 2);
             } else {
-              total -= 3;
-              Helper(up, 3, 1);
+              total -= 8;
+              Helper(up, 8, 2);
             }
           }
 
           // veteran
           if (unit.rf.rank.Level() == 2) {
             if (!unit.IsCavalry()) {
-              total -= 5;
-              Helper(up, 5, 1);
+              total -= 10;
+              Helper(up, 10, 2);
             } else {
-              total -= 2;
-              Helper(up, 2, 1);
+              total -= 5;
+              Helper(up, 5, 2);
             }
           }
 
           // elite
           if (unit.rf.rank.Level() == 3) {
             if (!unit.IsCavalry()) {
-              total -= 3;
-              Helper(up, 3, 1);
+              total -= 5;
+              Helper(up, 5, 2);
             } else {
-              total -= 1;
-              Helper(up, 1, 1);
+              total -= 3;
+              Helper(up, 3, 2);
             }
           }
         }
@@ -352,7 +350,7 @@ namespace MonoNS
 
     int[] GetVicBuf(ResultType type) {
       if (type == ResultType.Close) {
-        return new int[]{-1, 0, 1};
+        return new int[]{-1, 0, 0};
       }
       if (type == ResultType.Small) {
         return new int[]{0, 0, 0};
@@ -366,15 +364,15 @@ namespace MonoNS
     // initiatorMorale, supporterMorale, initiatorDiscontent
     int[] GetDftBuf(ResultType type) {
       if (type == ResultType.Close) {
-        return new int[]{-15, -10, 1};
+        return new int[]{-20, -15, 1};
       }
       if (type == ResultType.Small) {
-        return new int[]{-20, -15, 2};
+        return new int[]{-25, -20, 2};
       }
       if (type == ResultType.Great) {
-        return new int[]{-25, -20, 4};
+        return new int[]{-30, -25, 4};
       }
-      return new int[]{-30, -25, 8};
+      return new int[]{-40, -30, 8};
     }
 
     public bool commenceOpAnimating = false;
@@ -527,7 +525,7 @@ namespace MonoNS
           float m1 = 0.035f;
           if (Cons.SlimChance()) {
             m = 0.1f;
-            m = 0.95f;
+            m = 0.095f;
           }
           defenderCasualty = (int)(defenderTotal * (attackerBigger ? m : m1));
           attackerCasualty = (int)(attackerTotal * (attackerBigger ? m1 : m));

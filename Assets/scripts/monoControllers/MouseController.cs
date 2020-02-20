@@ -558,10 +558,6 @@ namespace MonoNS
       if (tileUnderMouse.IsThereConcealedEnemy(!hexMap.turnController.playerTurn)) {
         u = null;
       }
-      if (u != null && hexMap.wargameController.start)
-      {
-        u = null;
-      }
 
       if (mouseMode == mode.attack) {
         if(u != null && u.IsAI() != selectedUnit.IsAI()) {
