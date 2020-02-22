@@ -5,7 +5,7 @@ namespace  UnitNS
 {
   public class Cavalry : Unit
   {
-    public const int BaseSlots = Infantry.BaseSlots + 2;
+    public const int BaseSlots = Infantry.BaseSlots + 3;
     public const float MovementCostModifierOnHill = 1.5f;
     public const float MovementCostModifierOnPlainOrRoad = 0.7f;
     public const int MinTroopNum = 300;

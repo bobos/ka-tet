@@ -218,10 +218,6 @@ namespace MonoNS
       WarParty party = isAI ? GetPlayerParty() : GetAIParty();
       foreach (Unit u in party.GetUnits())
       {
-        if (type == 2) {
-          continue;
-        }
-
         foreach(Tile t in (type == 0 || type == 1) ? u.GetScoutArea() : u.tile.neighbours) {
           if (type == 0 && u.IsConcealed()) {
             continue;
@@ -691,9 +687,7 @@ namespace MonoNS
       GameObject unitInfoGO = (GameObject)Instantiate(UnitInfoPrefab,
           unitInfoPosition,
           Quaternion.identity, tileGO.transform);
-      unitInfoGO.GetComponent<UnitInfoView>().SetName(unit);
       view.unitInfoGO = unitInfoGO;
-
       view.OnCreate(unit);
       unit2GO[unit] = unitGO;
       SetUnitSkin(unit);

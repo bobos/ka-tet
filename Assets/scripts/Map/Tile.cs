@@ -313,8 +313,6 @@ namespace MapTileNS
       {
         if (u.IsAI() != unit.IsAI()) {
           return Unit.MovementCostOnUnaccesible;
-        } else {
-          mov = Unit.MovementcostOnHillRoad;
         }
       }
 
@@ -344,7 +342,7 @@ namespace MapTileNS
             cnt++;
           }
         }
-        ret = ret + (int)(ret * cnt * 0.5f);
+        ret = ret + (int)(ret * cnt);
       }
 
       return ret > 0 ? ret : Unit.MovementCostOnUnaccesible;

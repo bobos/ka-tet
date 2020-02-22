@@ -330,6 +330,9 @@ namespace TextNS
       {"operation_success_chance", @"胜算{0}成"},
       {"misc_windAdvantage", "背风面"},
       {"misc_windDisadvantage", "迎风面"},
+      {"misc_hundredThousand", "万"},
+      {"misc_thousand", "千"},
+      {"misc_hundred", "百"},
 
       };
     }

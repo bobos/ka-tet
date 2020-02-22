@@ -54,6 +54,34 @@ namespace MonoNS
       self.SetActive(false);
     }
 
+    string GetResultStr(bool playerWin, CombatController.ResultType result) {
+      string finalResult = "";
+      if (playerWin) {
+        // player win
+        if (result == CombatController.ResultType.Close) {
+          finalResult = "event_operationResult_weCloseWin";
+        } else if (result == CombatController.ResultType.Small) {
+          finalResult = "event_operationResult_weSmallWin";
+        } else if (result == CombatController.ResultType.Great) {
+          finalResult = "event_operationResult_weGreatWin";
+        } else {
+          finalResult = "event_operationResult_weCrushingWin";
+        }
+      } else {
+        if (result == CombatController.ResultType.Close) {
+          finalResult = "event_operationResult_theyCloseWin";
+        } else if (result == CombatController.ResultType.Small) {
+          finalResult = "event_operationResult_theySmallWin";
+        } else if (result == CombatController.ResultType.Great) {
+          finalResult = "event_operationResult_theyGreatWin";
+        } else {
+          finalResult = "event_operationResult_theyCrushingWin";
+        }
+      }
+
+      return textLib.get(finalResult);
+    }
+
     public void ShowOperationResult(CombatController.ResultType result, bool attackerWin, bool playerAttack,
       int atkInfTotal, int atkCavTotal, int defInfTotal, int defCavTotal,
       int atkInfDead, int atkInfWnd, int atkLaborDead, int atkCavDead, int atkCavWnd,
@@ -99,31 +127,7 @@ namespace MonoNS
         rightDescription.text += horseCapture;
       }
 
-      string finalResult;
-      if (attackerWin == playerAttack) {
-        // player win
-        if (result == CombatController.ResultType.Close) {
-          finalResult = "event_operationResult_weCloseWin";
-        } else if (result == CombatController.ResultType.Small) {
-          finalResult = "event_operationResult_weSmallWin";
-        } else if (result == CombatController.ResultType.Great) {
-          finalResult = "event_operationResult_weGreatWin";
-        } else {
-          finalResult = "event_operationResult_weCrushingWin";
-        }
-      } else {
-        if (result == CombatController.ResultType.Close) {
-          finalResult = "event_operationResult_theyCloseWin";
-        } else if (result == CombatController.ResultType.Small) {
-          finalResult = "event_operationResult_theySmallWin";
-        } else if (result == CombatController.ResultType.Great) {
-          finalResult = "event_operationResult_theyGreatWin";
-        } else {
-          finalResult = "event_operationResult_theyCrushingWin";
-        }
-      }
-
-      middleDescription.text = textLib.get(finalResult);
+      middleDescription.text = GetResultStr(attackerWin == playerAttack, result);
     }
 
     public void ShowOperationEvent(OperationPredict predict, bool playerAttack) {
@@ -192,15 +196,17 @@ namespace MonoNS
         textLib.get("event_operationDetail_unit") + ":\n" + atkSerial + "\n" +
         textLib.get("event_operationDetail_inf") + ": " + atkInf + "\n" +
         textLib.get("event_operationDetail_cav") + ": " + atkCav + "\n" +
-        textLib.get("event_operationDetail_total") + ": " + predict.attackerOptimPoints * 0.001f;
+        textLib.get("event_operationDetail_total") + ": " + UnitInfoView.Shorten(predict.attackerOptimPoints);
 
       rightDescription.text = textLib.get("event_operationDetail_gen") + ":\n" + defGenerals + "\n" +
         textLib.get("event_operationDetail_unit") + ":\n" + defSerial + "\n" +
         textLib.get("event_operationDetail_inf") + ": " + defInf + "\n" +
         textLib.get("event_operationDetail_cav") + ": " + defCav + "\n" +
-        textLib.get("event_operationDetail_total") + ": " + predict.defenderOptimPoints * 0.001f;
+        textLib.get("event_operationDetail_total") + ": " + UnitInfoView.Shorten(predict.defenderOptimPoints);
 
       middleDescription.text = textLib.get("event_possibleVictRate_" + predict.sugguestedResult.chance);
+      bool attackWin = predict.sugguestedResult.chance > 0;
+      middleDescription.text += "\n" + GetResultStr(attackWin == playerAttack, predict.suggestedResultType);
       if (playerAttack) {
         middleDescription.text += "\n" + textLib.get("event_confirmAttack");
       }

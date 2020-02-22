@@ -204,8 +204,7 @@ namespace MonoNS
       // set attack, defense details
       string details = 
       "惩罚:\n"
-      + "饥饿惩罚:" + unit.GetStarvingBuf() * 100
-      + "%\n整合度惩罚:" + unit.GetNewGeneralBuf() * 100
+      + "整合度惩罚:" + unit.GetNewGeneralBuf() * 100
       + "%\n混乱惩罚:" + unit.GetChaosBuf() * 100
       + "%\n厌战惩罚:" + unit.GetWarwearyBuf() * 100
       + "%\n无胄惩罚:" + unit.disarmorDefDebuf * 100
@@ -226,8 +225,7 @@ namespace MonoNS
       num.text = unit.Name() + "[兵:" + unit.rf.soldiers + "/伤:" + unit.rf.wounded + "/亡:" + unit.kia + "/逃:" + unit.mia + "/役:" + unit.labor + "]";
       morale.text = "士气: " + unit.rf.morale;
       offense.text = "单兵战斗力: " + GetCombatpointRate(unit.cp);
-      defense.text = "部队战斗力: " + (isPreflight ? mouseController.selectedUnit.unitReferenceCombatPoint * 0.0001f + " -> " : "")
-        + unit.unitReferenceCombatPoint * 0.0001f;
+      defense.text = "部队战斗力: " + unit.unitCombatPoint;
       string stateStr = unit.tile.sieged ? "围城中 " : ""; 
       stateStr += unit.IsWarWeary() ? "士气低落 " : "";
       stateStr += unit.GetDiscontent() + " ";
@@ -274,6 +272,24 @@ namespace MonoNS
           labor += s.labor;
           count++;
         }
+        int attackerCP = 0;
+        int defenderCP = 0;
+        WarParty wp1 = hexMap.GetAIParty();
+        foreach(Unit u in wp1.GetUnits()) {
+          if (wp1.attackside) {
+            attackerCP += u.unitPureCombatPoint;
+          } else {
+            defenderCP += u.unitPureDefendCombatPoint;
+          }
+        }
+        wp1 = hexMap.GetPlayerParty();
+        foreach(Unit u in wp1.GetUnits()) {
+          if (wp1.attackside) {
+            attackerCP += u.unitPureCombatPoint;
+          } else {
+            defenderCP += u.unitPureDefendCombatPoint;
+          }
+        }
 
         string info =
          "步兵: " + stat.numOfInfantryUnit + "都\n" +
@@ -296,6 +312,7 @@ namespace MonoNS
         }
 
         info += "党派关系： " + wp.faction.GetParties()[0].GetRelationDescription();
+        info += "\n\n攻方: " + UnitInfoView.Shorten(attackerCP) + " VS 守方: " + UnitInfoView.Shorten(defenderCP);
         hexMap.hoverInfo.Show(info);
         return;
       }

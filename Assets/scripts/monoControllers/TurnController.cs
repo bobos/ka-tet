@@ -256,17 +256,17 @@ namespace MonoNS
           WarParty atkParty = playerParty.attackside ? playerParty : aiParty;
           WarParty defParty = playerParty.attackside ? aiParty : playerParty;
           foreach (Unit unit in atkParty.GetUnits()) {
-            // drop 1 morale point for attack units per turn
+            // drop 5 morale point for attack units per turn
             if (unit.rf.morale >= Rank.MoralePunishLine) {
-              unit.rf.morale -= 1;
+              unit.rf.morale -= 4;
             }
           }
 
           if ((turnNum % 2) != 0) {
             foreach(Unit unit in defParty.GetUnits()) {
-              // drop 1 morale point for defense side on odd turn
+              // drop 5 morale point for defense side on odd turn
               if (unit.rf.morale >= Rank.MoralePunishLine) {
-                unit.rf.morale -= 1;
+                unit.rf.morale -= 4;
               }
             }
           }

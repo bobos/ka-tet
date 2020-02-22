@@ -443,7 +443,7 @@ public abstract class Settlement: DataModel
   }
 
   public int CalcNeededLabor(int supply) {
-    return (int)(supply / 10);
+    return (int)(supply * Infantry.MinLabor);
   }
 
   public int CalcSupplyCanProvide(int labor) {

@@ -42,7 +42,7 @@ namespace UnitNS
       if (IsValid())
       {
         lastTurns--;
-        int morale = -5;
+        int morale = -10;
         effects[0] = morale;
         unit.rf.morale += morale;
         int woundedNum = GetEffectNum();
@@ -83,7 +83,7 @@ namespace UnitNS
     }
 
     int GetLastTurns() {
-      return Util.Rand(2, 4);
+      return Util.Rand(2, 3);
     }
 
   }

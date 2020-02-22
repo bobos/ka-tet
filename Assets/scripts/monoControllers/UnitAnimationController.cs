@@ -127,13 +127,6 @@ namespace MonoNS
         Riot(unit, ret.discontent);
         while (riotAnimating) { yield return null; }
       }
-      if (unit.tile.deadZone.Apply(unit)) {
-        // epimedic caused by decomposing corpse
-        eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.Epidemic, unit, null));
-        while (eventDialog.Animating) { yield return null; }
-        Riot(unit, unit.epidemic.Occur());
-        while (riotAnimating) { yield return null; }
-      }
       // stash event
       // hexMap.eventStasher.Add(unit.rf.general, MonoNS.EventDialog.EventName.FarmDestroyed);
 
@@ -261,6 +254,14 @@ namespace MonoNS
         }
         ShowEffects(unit, unit.unitPoisioned.Apply());
         while (ShowAnimating) { yield return null; }
+      }
+
+      if (unit.tile.deadZone.Apply(unit)) {
+        // epimedic caused by decomposing corpse
+        eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.Epidemic, unit, null));
+        while (eventDialog.Animating) { yield return null; }
+        Riot(unit, unit.epidemic.Occur());
+        while (riotAnimating) { yield return null; }
       }
 
       hexMap.cameraKeyboardController.EnableCamera();

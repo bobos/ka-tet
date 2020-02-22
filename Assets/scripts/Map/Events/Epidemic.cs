@@ -12,9 +12,7 @@ namespace MapTileNS
     public bool OnWeatherChange(Weather weather)
     {
       if (tile.field != FieldType.Wild || !Cons.IsHeavyRain(weather)) { return false; }
-      if (((Cons.IsSpring(tile.weatherGenerator.season) && Cons.FairChance())
-          || (Cons.IsSummer(tile.weatherGenerator.season) && Cons.FairChance()))
-          && tile.GetUnit() != null)
+      if (Cons.IsSummer(tile.weatherGenerator.season) && Cons.SlimChance() && tile.GetUnit() != null)
       {
         return true;
       }

@@ -3,10 +3,9 @@
   public class Vantage
   {
     Unit unit;
-    const int MaxEffectiveNumOnPlain = 10000;
-    const int MaxEffectiveNumOnHill = 5000;
+    const int MaxEffectiveNum = 10000;
     const int LeastEffectiveNum = 2000;
-    const int MaxEffectiveNum4Move = 11000;
+    const int MaxEffectiveNum4Move = 12000;
     public Vantage(Unit unit) {
       this.unit = unit;
     }
@@ -35,47 +34,39 @@
 
     public int TotalPoints(int pointPerSoldier) {
       int effective = GetEffectiveNum();
-      int exceeded = unit.rf.soldiers - effective;
-      if (exceeded <= 0) {
-        return unit.rf.soldiers * pointPerSoldier; 
+      if (unit.rf.soldiers > effective) {
+        return effective * pointPerSoldier;
+      } else {
+        return unit.rf.soldiers * pointPerSoldier;
       }
-      int point = effective * pointPerSoldier;
-      int step = 100;
-      while(step > 0) {
-        step -= 2;
-        int remaining = exceeded - 100;
-        if (remaining > 0) {
-          int addedPoint = (int)(100 * step * pointPerSoldier * 0.01f);
-          point += addedPoint < 0 ? 0 : addedPoint;
-          exceeded = remaining;
-        } else {
-          int addedPoint = (int)(exceeded * step * pointPerSoldier * 0.01f);
-          point += addedPoint < 0 ? 0 : addedPoint;
-          break;
-        }
-      }
-      return point;
+      //int exceeded = unit.rf.soldiers - effective;
+      //if (exceeded <= 0) {
+      //  return unit.rf.soldiers * pointPerSoldier; 
+      //}
+      //int point = effective * pointPerSoldier;
+      //int step = 100;
+      //while(step > 0) {
+      //  step -= 2;
+      //  int remaining = exceeded - 100;
+      //  if (remaining > 0) {
+      //    int addedPoint = (int)(100 * step * pointPerSoldier * 0.01f);
+      //    point += addedPoint < 0 ? 0 : addedPoint;
+      //    exceeded = remaining;
+      //  } else {
+      //    int addedPoint = (int)(exceeded * step * pointPerSoldier * 0.01f);
+      //    point += addedPoint < 0 ? 0 : addedPoint;
+      //    break;
+      //  }
+      //}
+      //return point;
     }
 
     public int MovementPoint(int point) {
-      int exceeded = unit.GetTotalNum() - MaxEffectiveNum4Move;
-      if (exceeded <= 0) {
-        return point;
-      }
-      int remaining = exceeded % 100;
-      float reduce = ((exceeded - remaining) / 100) * 0.01f + (remaining > 0 ? 0.01f : 0f);
-      reduce = reduce > 0.5f ? 0.5f : reduce;
-      return point - (int)(point * reduce);
+      return unit.GetTotalNum() > MaxEffectiveNum4Move ? (int)(point * 0.8f) : point;
     }
 
     int GetEffectiveNum() {
-      int normalEffectiveNum = 0;
-      if (unit.IsCamping() || unit.tile.terrian == MapTileNS.TerrianType.Hill) {
-        normalEffectiveNum = MaxEffectiveNumOnHill;
-      } else {
-        normalEffectiveNum = MaxEffectiveNumOnPlain;
-      }
-      return normalEffectiveNum - (int)((normalEffectiveNum - LeastEffectiveNum) * Rank.GetMoralePunish(unit.rf.morale));
+      return MaxEffectiveNum - (int)((MaxEffectiveNum - LeastEffectiveNum) * Rank.GetMoralePunish(unit.rf.morale));
     }
 
     public int GetEffective() {

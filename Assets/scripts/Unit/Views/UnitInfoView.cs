@@ -1,4 +1,5 @@
 ﻿using CourtNS;
+using MapTileNS;
 using UnityEngine;
 
 namespace UnitNS
@@ -9,7 +10,42 @@ namespace UnitNS
     void Start () {
     }
   
+    public static string Shorten(int num) {
+      int numUnit = 1000;
+      if (num < numUnit) {
+        return (int)(num / 100) + Cons.GetTextLib().get("misc_hundred");
+      }
+
+      string ret = "";
+      int remaining = num % numUnit;
+      int h = (int)(remaining / 100);
+      int t = (num - remaining) / numUnit;
+      if (t >= 10) {
+        int ht = t;
+        t = t % 10;
+        ht = (ht - t) / 10;
+        ret = ht + Cons.GetTextLib().get("misc_hundredThousand");
+      }
+
+      if(t > 0) {
+        ret += t + Cons.GetTextLib().get("misc_thousand");
+      }
+
+      if (h > 0) {
+        ret += h + Cons.GetTextLib().get("misc_hundred");
+      }
+      return ret;
+    }
+
     public void SetName(Unit unit) {
+      int totalDefendPoint = unit.GetUnitDefendCombatPoint(true);
+      foreach(Tile tile in unit.tile.neighbours) {
+        Unit u = tile.GetUnit();
+        if (u != null && u.IsAI() == unit.IsAI()) {
+          totalDefendPoint += u.GetUnitDefendCombatPoint(false);
+        }
+      }
+
       TextMesh textMesh = this.transform.GetComponent<TextMesh>();
       Color color = unit.hexMap.GetWarParty(unit).attackside ? Color.yellow : Color.white;
       string title = (unit.chaos ? "☠" : "")
@@ -19,7 +55,10 @@ namespace UnitNS
         + unit.GeneralName()
         + "[" + unit.rf.general.party.Name() + "]"
         + "\n";
-      textMesh.text = title + unit.rf.province.Name() + "-" + unit.rf.rank.Name() + "[" + unit.rf.soldiers + "]";
+      textMesh.text = title + unit.rf.province.Name() + "-" + unit.rf.rank.Name()
+        + "[" + unit.rf.soldiers + "]\n"
+        + Shorten(unit.GetUnitAttackCombatPoint()) + "/" + Shorten(unit.unitPureCombatPoint) + "\n"
+        + "♟" + Shorten(totalDefendPoint) + "♙" + Shorten(unit.unitPureDefendCombatPoint);
       textMesh.fontSize = 50;
       textMesh.color = color;
     }

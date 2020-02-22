@@ -142,26 +142,26 @@ public class Starter : MonoBehaviour {
 
     // step 3, assign general to units
     liubei.Assign(hexMap,
-      new Troop(5000, Cons.HeJian, Cons.riverRun, Type.Infantry, Cons.elite)
+      new Troop(8000, Cons.HeJian, Cons.riverRun, Type.Infantry, Cons.elite)
     );
     zhaoyun.Assign(hexMap,
-      new Troop(3000, Cons.HeJian, Cons.riverRun, Type.Infantry, Cons.veteran)
+      new Troop(4000, Cons.HeJian, Cons.riverRun, Type.Infantry, Cons.veteran)
     );
     guanyu.Assign(hexMap,
-      new Troop(1500, Cons.HeJian, Cons.middleEarth, Type.Infantry, Cons.rookie)
+      new Troop(4000, Cons.HeJian, Cons.middleEarth, Type.Infantry, Cons.rookie)
     );
     zhangfei.Assign(hexMap,
-      new Troop(1500, Cons.HeJian, Cons.riverWest, Type.Cavalry, Cons.rookie)
+      new Troop(2000, Cons.HeJian, Cons.riverWest, Type.Cavalry, Cons.veteran)
     );
 
     caocao.Assign(hexMap,
-      new Troop(7000, Cons.Liang, Cons.riverSouth, Type.Infantry, Cons.elite)
+      new Troop(10000, Cons.Liang, Cons.riverSouth, Type.Infantry, Cons.elite)
     );
     xuchu.Assign(hexMap,
-      new Troop(3000, Cons.Liang, Cons.middleEarth, Type.Cavalry, Cons.elite)
+      new Troop(2000, Cons.Liang, Cons.middleEarth, Type.Cavalry, Cons.elite)
     );
     abc.Assign(hexMap,
-      new Troop(5000, Cons.Liang, Cons.riverSouth, Type.Infantry, Cons.veteran)
+      new Troop(8000, Cons.Liang, Cons.riverSouth, Type.Infantry, Cons.veteran)
     );
     x1.Assign(hexMap,
       new Troop(1500, Cons.Liang, Cons.middleEarth, Type.Cavalry, Cons.rookie)
@@ -197,15 +197,15 @@ public class Starter : MonoBehaviour {
     settlementMgr.BuildRoad(camp2, city);
 
     // after settlement created, general enters campaign
-    liubei.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(27, 18), 0, 5000);
-    zhaoyun.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(28, 18), 30000, 300);
-    guanyu.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(27, 17), 0, 15000);
+    liubei.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(27, 18), 0, 4000);
+    zhaoyun.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(28, 18), 30000, 2000);
+    guanyu.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(27, 17), 0, 200);
     zhangfei.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(28, 17), 0);
 
     // * AI *
     //caocao.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(1, 1), 0, 6000);
-    caocao.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(26, 15), 70000, 6000);
-    abc.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(25, 16), 6000, 2000);
+    caocao.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(26, 15), 70000, 5000);
+    abc.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(25, 16), 6000, 4000);
     xuchu.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(27, 15), 3000);
     x1.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(24, 15), 3000);
     x2.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(24, 17), 10000, 1000);

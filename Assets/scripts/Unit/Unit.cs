@@ -15,6 +15,7 @@ namespace UnitNS
     protected abstract Unit Clone();
 
     public const int ActionCost = 40; // For actions like: attack
+    public const int DefenceCost = 15;
     public const int MovementcostOnHill = 25;
     public const int MovementcostOnHillRoad = 20;
     public const int MovementcostOnPlain = 20;
@@ -515,7 +516,7 @@ namespace UnitNS
       return (int)(
         // ghost unit doesnt have vantage
         (vantage != null ? vantage.MovementPoint(rf.mov) : rf.mov) *
-        (IsHungry() ? 0.5f : 1) *
+        (IsHungry() ? 0.4f : 1) *
         (plainSickness != null && plainSickness.affected ? (1 - plainSickness.moveDebuf) : 1) *
         (IsSick() ? 0.5f : 1));
     }
@@ -592,14 +593,31 @@ namespace UnitNS
     public int unitCombatPoint {
       get {
         int total = vantage.TotalPoints(cp);
-        total = (int)(total + total * GetBuff());
+        total = (int)((total + total * GetBuff()) * 0.1f);
         return total < 0 ? 0 : total;
       }
     }
 
-    public int unitReferenceCombatPoint {
+    public int GetUnitAttackCombatPoint() {
+      return (int)(unitCombatPoint * (1 + GetStaminaDebuf(false)));
+    }
+
+    public int GetUnitDefendCombatPoint(bool asMainDefender) {
+      return (int)((IsCavalry() ? unitCombatPoint : (int)(unitCombatPoint * CombatController.DefendModifier))
+                   * (1 + GetStaminaDebuf(asMainDefender)));
+    }
+
+    public int unitPureCombatPoint {
       get {
-        return (int)(unitCombatPoint * (1 + GetStaminaDebuf(false)));
+        int total = vantage.TotalPoints(cp);
+        total = (int)((total + total * rf.lvlBuf) * 0.1f);
+        return total < 0 ? 0 : total;
+      }
+    }
+
+    public int unitPureDefendCombatPoint {
+      get {
+        return IsCavalry() ? unitPureCombatPoint : (int)(unitPureCombatPoint * CombatController.DefendModifier);
       }
     }
 
@@ -609,7 +627,7 @@ namespace UnitNS
 
     public float GetBuff()
     {
-      return GetStarvingBuf() + GetNewGeneralBuf() + GetChaosBuf() + GetWarwearyBuf() + vantage.Buf() - plainSickness.debuf + rf.lvlBuf - disarmorDefDebuf;
+      return GetNewGeneralBuf() + GetChaosBuf() + GetWarwearyBuf() + vantage.Buf() - plainSickness.debuf + rf.lvlBuf - disarmorDefDebuf;
     }
 
     public float GetStaminaDebuf(bool asMainDefender) {
@@ -630,11 +648,6 @@ namespace UnitNS
 
     public float GetNewGeneralBuf() {
       return newGeneralDebuf;
-    }
-
-    public float GetStarvingBuf()
-    {
-      return IsHungry() ? -0.3f : 0f;
     }
 
     public float GetWarwearyBuf()

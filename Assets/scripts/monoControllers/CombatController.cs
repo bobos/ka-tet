@@ -38,10 +38,12 @@ namespace MonoNS
     public int attackerOptimPoints = 0;
     public int defenderOptimPoints = 0;
     public OperationGeneralResult sugguestedResult;
+    public CombatController.ResultType suggestedResultType;
   }
 
   public class CombatController : BaseController
   {
+    public const float DefendModifier = 1.5f;
 
     public override void PreGameInit(HexMap hexMap, BaseController me)
     {
@@ -163,7 +165,7 @@ namespace MonoNS
       unitPredict.joinPossibility = 100;
       SetGaleVantage(attacker, defender, unitPredict);
       // TODO:tmp morale buff from commander
-      unitPredict.operationPoint = (int)(attacker.unitCombatPoint * unitPredict.percentOfEffectiveForce * 0.01f);
+      unitPredict.operationPoint = attacker.GetUnitAttackCombatPoint();
       predict.attackers.Add(unitPredict);
       predict.attackerOptimPoints += unitPredict.operationPoint;
       hexMap.ShowAttackArrow(attacker, targetUnit, unitPredict);
@@ -174,7 +176,7 @@ namespace MonoNS
         unitPredict.percentOfEffectiveForce = GetEffectiveForcePercentage(unit, false);
         SetGaleVantage(unit, defender, unitPredict);
         unitPredict.joinPossibility = GetJoinPossibility(unit, attacker);
-        unitPredict.operationPoint = (int)(unit.unitCombatPoint * unitPredict.percentOfEffectiveForce * 0.01f);
+        unitPredict.operationPoint = unit.GetUnitAttackCombatPoint();
         predict.attackers.Add(unitPredict);
         predict.attackerOptimPoints += unitPredict.operationPoint;
         hexMap.ShowAttackArrow(unit, targetUnit, unitPredict);
@@ -185,7 +187,7 @@ namespace MonoNS
       unitPredict.unit = defender;
       unitPredict.percentOfEffectiveForce = GetEffectiveForcePercentage(defender, true);
       unitPredict.joinPossibility = 100;
-      unitPredict.operationPoint = (int)(defender.unitCombatPoint * unitPredict.percentOfEffectiveForce * 0.01f * (defender.IsCavalry() ? 1 : 1.5f));
+      unitPredict.operationPoint = defender.GetUnitDefendCombatPoint(true);
       predict.defenders.Add(unitPredict);
       predict.defenderOptimPoints += unitPredict.operationPoint;
       hexMap.ShowDefenderStat(defender, unitPredict);
@@ -195,7 +197,7 @@ namespace MonoNS
         unitPredict.unit = unit;
         unitPredict.percentOfEffectiveForce = GetEffectiveForcePercentage(unit, false);
         unitPredict.joinPossibility = GetJoinPossibility(unit, targetUnit);
-        unitPredict.operationPoint = (int)(unit.unitCombatPoint * unitPredict.percentOfEffectiveForce * 0.01f * (unit.IsCavalry() ? 1 : 1.5f));
+        unitPredict.operationPoint = unit.GetUnitDefendCombatPoint(false);
         predict.defenders.Add(unitPredict);
         predict.defenderOptimPoints += unitPredict.operationPoint;
         if (!Util.eq<Unit>(unit, targetUnit)) {
@@ -209,7 +211,22 @@ namespace MonoNS
     }
 
     void CalculateWinChance(OperationPredict predict) {
-      if (predict.attackerOptimPoints > (int)(predict.defenderOptimPoints * 1.14)) {
+      int bigger = predict.attackerOptimPoints > predict.defenderOptimPoints ? predict.attackerOptimPoints : predict.defenderOptimPoints;
+      int smaller = predict.attackerOptimPoints > predict.defenderOptimPoints ? predict.defenderOptimPoints : predict.attackerOptimPoints;
+      float odds = bigger / smaller;
+      if (odds <= 1.4f) {
+        // 1 - 2x odds
+        predict.suggestedResultType = ResultType.Close;
+      } else if (odds <= 2.4f) {
+        // 2x - 3.5x
+        predict.suggestedResultType = ResultType.Small;
+      } else if (odds <= 4) {
+        // 3.5x - 6x
+        predict.suggestedResultType = ResultType.Great;
+      } else {
+        predict.suggestedResultType = ResultType.Crushing;
+      }
+      if (predict.attackerOptimPoints > predict.defenderOptimPoints) {
         predict.sugguestedResult = new OperationGeneralResult(10);
       } else {
         predict.sugguestedResult = new OperationGeneralResult(0);
@@ -350,7 +367,7 @@ namespace MonoNS
 
     int[] GetVicBuf(ResultType type) {
       if (type == ResultType.Close) {
-        return new int[]{-1, 0, 0};
+        return new int[]{-2, -1, 0};
       }
       if (type == ResultType.Small) {
         return new int[]{0, 0, 0};
@@ -364,10 +381,10 @@ namespace MonoNS
     // initiatorMorale, supporterMorale, initiatorDiscontent
     int[] GetDftBuf(ResultType type) {
       if (type == ResultType.Close) {
-        return new int[]{-20, -15, 1};
+        return new int[]{-5, -3, 1};
       }
       if (type == ResultType.Small) {
-        return new int[]{-25, -20, 2};
+        return new int[]{-20, -15, 2};
       }
       if (type == ResultType.Great) {
         return new int[]{-30, -25, 4};
@@ -503,7 +520,7 @@ namespace MonoNS
         int defenderCasualty = 0;
         bool attackerBigger = true;
         int factor = 0;
-        ResultType resultLevel = ResultType.Close;
+        ResultType resultLevel = predict.suggestedResultType;
         predict.attackerOptimPoints = predict.attackerOptimPoints <= 0 ? 1 : predict.attackerOptimPoints;
         predict.defenderOptimPoints = predict.defenderOptimPoints <= 0 ? 1 : predict.defenderOptimPoints;
 
@@ -520,7 +537,8 @@ namespace MonoNS
 // 1.0 to 1.3 - 0.01(both)
 // 1.4 to 1.8 - def: x - 1.2, atk: (x -1) * (0.5 - 0.6)   
 // 1.9 to 2.2 - atk: (x - 1.2) * (0.25 - 0.4)
-        if (factor <= 1) {
+        if (resultLevel == ResultType.Close) {
+          // 1 - 2x odds
           float m = 0.04f;
           float m1 = 0.035f;
           if (Cons.SlimChance()) {
@@ -536,10 +554,9 @@ namespace MonoNS
             attackerCasualty = (int)(attackerTotal * factor * 0.025f);
           }
 
-          if (factor > 1 && factor <= 4) {
-            // 2x odds
-            resultLevel = ResultType.Small;
-            int modifier = Util.Rand(4, 5);
+          if (resultLevel == ResultType.Small) {
+            // 2x - 3.5x
+            int modifier = Util.Rand(5, 6);
             if (attackerBigger) {
               attackerCasualty = (int)(defenderCasualty * modifier * 0.1f);
             } else {
@@ -547,47 +564,33 @@ namespace MonoNS
             }
           }
 
-          if (factor > 4 && factor <= 10) {
-            // 3x odds
+          if (resultLevel == ResultType.Great) {
+            // 3.5x - 6x
             int modifier = Util.Rand(3, 4);
             if (attackerBigger) {
               attackerCasualty = (int)(defenderCasualty * modifier* 0.1f);
             } else {
               defenderCasualty = (int)(attackerCasualty * modifier * 0.1f);
             }
-            resultLevel = modifier > 35 ? ResultType.Small : ResultType.Great;
           }
 
-          if (factor > 10 && factor <= 16) {
-            // 4x odds
-            int modifier = Util.Rand(2, 3);
-            resultLevel = Cons.EvenChance() ? ResultType.Crushing : ResultType.Great;
-            if (attackerBigger) {
-              attackerCasualty = (int)(defenderCasualty * modifier * 0.1f);
+          if (resultLevel == ResultType.Crushing) {
+            if (factor < 44) {
+              // 6x - 8x odds
+              int modifier = Util.Rand(1, 2);
+              if (attackerBigger) {
+                attackerCasualty = (int)(defenderCasualty * modifier * 0.1f);
+              } else {
+                defenderCasualty = (int)(attackerCasualty * modifier * 0.1f);
+              }
             } else {
-              defenderCasualty = (int)(attackerCasualty * modifier * 0.1f);
-            }
-            resultLevel = modifier > 185 ? ResultType.Great : ResultType.Crushing;
-          }
-
-          if (factor > 16 && factor <= 24) {
-            // 5x odds
-            float modifier = Util.Rand(1, 2) * 0.1f;
-            resultLevel = ResultType.Crushing;
-            if (attackerBigger) {
-              attackerCasualty = (int)(defenderCasualty * modifier);
-            } else {
-              defenderCasualty = (int)(attackerCasualty * modifier);
-            }
-          }
-
-          if (factor > 24) {
-            float modifier = 0.05f;
-            resultLevel = ResultType.Crushing;
-            if (attackerBigger) {
-              attackerCasualty = (int)(defenderCasualty * modifier);
-            } else {
-              defenderCasualty = (int)(attackerCasualty * modifier);
+              // 8x larger
+              float modifier = 0.05f;
+              if (attackerBigger) {
+                attackerCasualty = (int)(defenderCasualty * modifier);
+              } else {
+                defenderCasualty = (int)(attackerCasualty * modifier);
+              }
             }
           }
         }
@@ -625,7 +628,7 @@ namespace MonoNS
         }
 
         foreach(UnitPredict up in predict.defenders) {
-          up.unit.movementRemaining -= (int)(Unit.ActionCost/2);
+          up.unit.movementRemaining -= Unit.DefenceCost;
           if (up.unit.IsCavalry()) {
             defenderCavDead += up.dead;
             defenderCavWnd += up.wounded;
@@ -674,7 +677,9 @@ namespace MonoNS
         int[] dftBuf = GetDftBuf(resultLevel);
         if (atkWin) {
           // TODO: general trait apply to stop chaos 
-          defender.chaos = (resultLevel == ResultType.Great && Cons.HighlyLikely()) || resultLevel == ResultType.Crushing;
+          defender.chaos = (
+            resultLevel == ResultType.Small && Cons.SlimChance() ||
+            resultLevel == ResultType.Great && Cons.HighlyLikely()) || resultLevel == ResultType.Crushing;
           // TODO
           // 1. accumulate operation result(kill+wounded vs enemy kill+wounded) for per commander for party influence update
           // 2. body cover

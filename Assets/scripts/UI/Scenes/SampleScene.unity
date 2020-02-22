@@ -1417,8 +1417,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 40.9, y: -179}
-  m_SizeDelta: {x: 377.9, y: 65.8}
+  m_AnchoredPosition: {x: 40.9, y: -184.2}
+  m_SizeDelta: {x: 377.9, y: 55.4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &308377015
 MonoBehaviour:
@@ -1441,12 +1441,12 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 30
+    m_FontSize: 20
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 0
     m_MaxSize: 40
-    m_Alignment: 4
+    m_Alignment: 1
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
@@ -4847,8 +4847,6 @@ MonoBehaviour:
   InfantryPrefab: {fileID: 1193126689161024, guid: 0386ac77b565f4917b9b36912b098329,
     type: 3}
   CavalryPrefab: {fileID: 1684031216514598, guid: bc217d72285d541e68de63aaf7b5fc63,
-    type: 3}
-  ScoutPrefab: {fileID: 2653454548479284038, guid: 29f7c417a7fa6a2429dd7263303f140e,
     type: 3}
   HexPrefab: {fileID: 1123697764883644, guid: 69a97392171eb429b9ad2211f772f443, type: 3}
   HighGroundPrefab: {fileID: 1230771843980290, guid: 878b1ed0419a846caab8f2abfe40bf5a,
