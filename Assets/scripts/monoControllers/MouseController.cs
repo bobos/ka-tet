@@ -120,7 +120,7 @@ namespace MonoNS
       nearbyEnemey = new List<Unit>();
     }
 
-    void PrepareUnitSelection() {
+    public void PrepareUnitSelection() {
       ResetUnitSelection();
       Settlement s = null;
       Tile t = selectedUnit.tile;
@@ -578,7 +578,7 @@ namespace MonoNS
           return;
         }
 
-        if (s != null && s.owner.isAI != selectedUnit.IsAI()) {
+        if (hexMap.settlementViewPanel.selectedUnit == null && s != null && s.owner.isAI != selectedUnit.IsAI()) {
           targetSettlement = s;
           return;
         }
@@ -659,9 +659,9 @@ namespace MonoNS
           }
         }
 
-        if (targetUnit != null) {
+        if (targetUnit != null || targetSettlement != null) {
           msgBox.Show("");
-          hexMap.combatController.StartOperation(selectedUnit, targetUnit);
+          hexMap.combatController.StartOperation(selectedUnit, targetUnit, targetSettlement);
           hexMap.actionController.commenceOperation();
         }
       } else if (!Util.eq<Tile>(tileUnderMouse, selectedUnit.tile))

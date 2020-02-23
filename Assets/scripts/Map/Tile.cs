@@ -342,7 +342,7 @@ namespace MapTileNS
             cnt++;
           }
         }
-        ret = ret + (int)(ret * cnt);
+        ret = ret + (int)(ret * cnt * 0.5f);
       }
 
       return ret > 0 ? ret : Unit.MovementCostOnUnaccesible;

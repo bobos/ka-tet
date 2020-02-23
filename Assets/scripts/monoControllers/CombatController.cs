@@ -35,8 +35,8 @@ namespace MonoNS
   public class OperationPredict {
     public List<UnitPredict> attackers = new List<UnitPredict>();
     public List<UnitPredict> defenders = new List<UnitPredict>();
-    public int attackerOptimPoints = 0;
-    public int defenderOptimPoints = 0;
+    public int attackerOptimPoints = 1;
+    public int defenderOptimPoints = 1;
     public OperationGeneralResult sugguestedResult;
     public CombatController.ResultType suggestedResultType;
   }
@@ -128,10 +128,14 @@ namespace MonoNS
     }
 
     OperationPredict predict;
-    public OperationPredict StartOperation(Unit attacker, Unit targetUnit) {
+    public OperationPredict StartOperation(Unit attacker, Unit targetUnit, Settlement targetSettlement) {
       if (attacker.GetStaminaLevel() == StaminaLvl.Exhausted) {
         // no enough stamina, can not start operation
         return null;
+      }
+      OperationPredict predict = new OperationPredict();
+      if (targetSettlement != null) {
+        targetUnit = this.defender = targetSettlement.garrison[0];
       }
 
       start = true;
@@ -158,14 +162,13 @@ namespace MonoNS
         }
       }
 
-      OperationPredict predict = new OperationPredict();
       UnitPredict unitPredict = new UnitPredict();
       unitPredict.unit = attacker;
       unitPredict.percentOfEffectiveForce = GetEffectiveForcePercentage(attacker, false);
       unitPredict.joinPossibility = 100;
       SetGaleVantage(attacker, defender, unitPredict);
       // TODO:tmp morale buff from commander
-      unitPredict.operationPoint = attacker.GetUnitAttackCombatPoint();
+      unitPredict.operationPoint = attacker.IsCamping() ? attacker.unitCampingAttackCombatPoint : attacker.GetUnitAttackCombatPoint();
       predict.attackers.Add(unitPredict);
       predict.attackerOptimPoints += unitPredict.operationPoint;
       hexMap.ShowAttackArrow(attacker, targetUnit, unitPredict);
@@ -187,10 +190,26 @@ namespace MonoNS
       unitPredict.unit = defender;
       unitPredict.percentOfEffectiveForce = GetEffectiveForcePercentage(defender, true);
       unitPredict.joinPossibility = 100;
-      unitPredict.operationPoint = defender.GetUnitDefendCombatPoint(true);
+      unitPredict.operationPoint = targetSettlement != null ? targetSettlement.GetDefendForce() : defender.GetUnitDefendCombatPoint(true);
       predict.defenders.Add(unitPredict);
       predict.defenderOptimPoints += unitPredict.operationPoint;
-      hexMap.ShowDefenderStat(defender, unitPredict);
+      if (targetSettlement == null) {
+        hexMap.ShowDefenderStat(defender, unitPredict);
+      }
+      if (targetSettlement != null) {
+        foreach(Unit unit in targetSettlement.garrison) {
+          if (Util.eq<Unit>(unit, defender)) {
+            continue;
+          }
+
+          unitPredict = new UnitPredict();
+          unitPredict.unit = unit;
+          unitPredict.percentOfEffectiveForce = GetEffectiveForcePercentage(unit, true);
+          unitPredict.joinPossibility = 100;
+          unitPredict.operationPoint = 0;
+          predict.defenders.Add(unitPredict);
+        }
+      }
 
       foreach(Unit unit in supportDefenders) {
         unitPredict = new UnitPredict();
@@ -213,6 +232,7 @@ namespace MonoNS
     void CalculateWinChance(OperationPredict predict) {
       int bigger = predict.attackerOptimPoints > predict.defenderOptimPoints ? predict.attackerOptimPoints : predict.defenderOptimPoints;
       int smaller = predict.attackerOptimPoints > predict.defenderOptimPoints ? predict.defenderOptimPoints : predict.attackerOptimPoints;
+      smaller = smaller < 1 ? 1 : smaller;
       float odds = bigger / smaller;
       if (odds <= 1.4f) {
         // 1 - 2x odds
@@ -234,12 +254,17 @@ namespace MonoNS
     }
 
     int GetJoinPossibility(Unit unit1, Unit unit2) {
+      Party mainParty = unit1.rf.general.party; 
+      if (Util.eq<Unit>(unit1, defender) && defender.IsCamping()) {
+        mainParty = hexMap.warProvince.ownerParty;
+      }
+
       // TODO: apply commander range and general triats to adjust possibility 
-      if (Util.eq<Party>(unit1.rf.general.party, unit2.rf.general.party)) {
+      if (Util.eq<Party>(mainParty, unit2.rf.general.party)) {
         return 100;
       }
 
-      Party.Relation relation = unit1.rf.general.party.GetRelation();
+      Party.Relation relation = mainParty.GetRelation();
       if (relation == Party.Relation.normal) {
         return 100;
       }
@@ -468,7 +493,8 @@ namespace MonoNS
           while (hexMap.popAniController.Animating) { yield return null; }
         }
         foreach(UnitPredict up in newAttackers) {
-          hexMap.popAniController.Show(hexMap.GetUnitView(up.unit), 
+          hexMap.popAniController.Show(
+            up.unit.IsCamping() ? (View)hexMap.settlementMgr.GetView(up.unit.tile.settlement) : hexMap.GetUnitView(up.unit), 
             Cons.GetTextLib().get("pop_joinOperation"),
             Color.green);
           while (hexMap.popAniController.Animating) { yield return null; }
@@ -482,18 +508,20 @@ namespace MonoNS
           while (hexMap.popAniController.Animating) { yield return null; }
         }
         foreach(UnitPredict up in newDefenders) {
-          hexMap.popAniController.Show(hexMap.GetUnitView(up.unit), 
-            Cons.GetTextLib().get("pop_joinOperation"),
-            Color.green);
-          while (hexMap.popAniController.Animating) { yield return null; }
-          if (Util.eq<Unit>(up.unit, defender)) {
-            hexMap.ShowDefenderStat(defender, up);
-          } else {
-            hexMap.ShowDefendArrow(up.unit, defender, up);
+          if (!up.unit.IsCamping()) {
+            hexMap.popAniController.Show(hexMap.GetUnitView(up.unit), 
+              Cons.GetTextLib().get("pop_joinOperation"),
+              Color.green);
+            while (hexMap.popAniController.Animating) { yield return null; }
+            if (Util.eq<Unit>(up.unit, defender)) {
+              hexMap.ShowDefenderStat(defender, up);
+            } else {
+              hexMap.ShowDefendArrow(up.unit, defender, up);
+            }
           }
         }
 
-        if (predict.defenders.Count == 1) {
+        if (!defender.IsCamping() && predict.defenders.Count == 1) {
           bool noRetreat = true;
           foreach (Tile t in defender.tile.neighbours) {
             if (t.Deployable(defender)) {
@@ -640,6 +668,9 @@ namespace MonoNS
           all.Add(up);
         }
 
+        int settlementWounded = 0;
+        int settlementDead = 0;
+        int settlementLaborDead = 0;
         foreach(UnitPredict up in all) {
           Unit unit = up.unit;
           hexMap.UpdateWound(unit, up.wounded);
@@ -649,16 +680,33 @@ namespace MonoNS
             hexMap.settlementMgr.defenderLaborDead += up.laborDead;
           }
 
-          // morale, movement, wounded, killed, laborKilled, disserter, attack, def, discontent
-          int[] stats = new int[]{0,0,up.wounded,up.dead,up.laborDead,0,0,0,0};
-          hexMap.unitAniController.ShowEffects(unit, stats);
-          while (hexMap.unitAniController.ShowAnimating) { yield return null; }
+          if (up.operationPoint == 0 ||
+            (defender.IsCamping() && Util.eq<Unit>(defender, up.unit))) {
+            settlementDead += up.dead;
+            settlementWounded += up.wounded;
+            settlementLaborDead += up.laborDead;
+          } else {
+            View view = null;
+            if (unit.IsCamping()) {
+              view = hexMap.settlementMgr.GetView(unit.tile.settlement);
+            }
+            // morale, movement, wounded, killed, laborKilled, disserter, attack, def, discontent
+            int[] stats = new int[]{0,0,up.wounded,up.dead,up.laborDead,0,0,0,0};
+            hexMap.unitAniController.ShowEffects(unit, stats, view);
+            while (hexMap.unitAniController.ShowAnimating) { yield return null; }
+          }
 
           if (unit.rf.soldiers <= Unit.DisbandUnitUnder) {
             // unit disbanded
             hexMap.unitAniController.DestroyUnit(unit, DestroyType.ByDisband);
             while (hexMap.unitAniController.DestroyAnimating) { yield return null; }
           }
+        }
+
+        if (defender.IsCamping()) {
+            int[] stats = new int[]{0,0,settlementWounded,settlementDead,settlementLaborDead,0,0,0,0};
+            hexMap.unitAniController.ShowEffects(null, stats, hexMap.settlementMgr.GetView(defender.tile.settlement));
+            while (hexMap.unitAniController.ShowAnimating) { yield return null; }
         }
 
         int capturedHorse = (int)((atkWin ? defenderCavDead : attackerCavDead) * 0.2f);
@@ -678,8 +726,9 @@ namespace MonoNS
         if (atkWin) {
           // TODO: general trait apply to stop chaos 
           defender.chaos = (
-            resultLevel == ResultType.Small && Cons.SlimChance() ||
-            resultLevel == ResultType.Great && Cons.HighlyLikely()) || resultLevel == ResultType.Crushing;
+            !defender.IsCamping() &&
+            (resultLevel == ResultType.Small && Cons.SlimChance() ||
+             resultLevel == ResultType.Great && Cons.HighlyLikely() || resultLevel == ResultType.Crushing));
           // TODO
           // 1. accumulate operation result(kill+wounded vs enemy kill+wounded) for per commander for party influence update
           // 2. body cover
@@ -703,7 +752,12 @@ namespace MonoNS
               stats[0] = morale1;
             }
 
-            hexMap.unitAniController.ShowEffects(unit, stats);
+            View view = null;
+            if (unit.IsCamping()) {
+              view = hexMap.settlementMgr.GetView(unit.tile.settlement);
+            }
+
+            hexMap.unitAniController.ShowEffects(unit, stats, view);
             while (hexMap.unitAniController.ShowAnimating) { yield return null; }
           }
 
@@ -719,14 +773,20 @@ namespace MonoNS
             if (Util.eq<Unit>(unit, defender)) {
               unit.rf.morale += morale;
               stats[0] = morale;
-              hexMap.unitAniController.Riot(unit, discontent);
-              while (hexMap.unitAniController.riotAnimating) { yield return null; }
+              if (!unit.IsCamping()) {
+                hexMap.unitAniController.Riot(unit, discontent);
+                while (hexMap.unitAniController.riotAnimating) { yield return null; }
+              }
             } else {
               unit.rf.morale += morale1;
               stats[0] = morale1;
             }
 
-            hexMap.unitAniController.ShowEffects(unit, stats);
+            View view = null;
+            if (unit.IsCamping()) {
+              view = hexMap.settlementMgr.GetView(unit.tile.settlement);
+            }
+            hexMap.unitAniController.ShowEffects(unit, stats, view);
             while (hexMap.unitAniController.ShowAnimating) { yield return null; }
           }
         } else {
@@ -750,7 +810,11 @@ namespace MonoNS
               stats[0] = morale1;
             }
 
-            hexMap.unitAniController.ShowEffects(unit, stats);
+            View view = null;
+            if (unit.IsCamping()) {
+              view = hexMap.settlementMgr.GetView(unit.tile.settlement);
+            }
+            hexMap.unitAniController.ShowEffects(unit, stats, view);
             while (hexMap.unitAniController.ShowAnimating) { yield return null; }
           }
 
@@ -766,21 +830,29 @@ namespace MonoNS
             if (Util.eq<Unit>(unit, attacker)) {
               unit.rf.morale += morale;
               stats[0] = morale;
-              hexMap.unitAniController.Riot(unit, discontent);
-              while (hexMap.unitAniController.riotAnimating) { yield return null; }
+              if (!unit.IsCamping()) {
+                hexMap.unitAniController.Riot(unit, discontent);
+                while (hexMap.unitAniController.riotAnimating) { yield return null; }
+              }
             } else {
               unit.rf.morale += morale1;
               stats[0] = morale1;
             }
 
-            hexMap.unitAniController.ShowEffects(unit, stats);
+            View view = null;
+            if (unit.IsCamping()) {
+              view = hexMap.settlementMgr.GetView(unit.tile.settlement);
+            }
+            hexMap.unitAniController.ShowEffects(unit, stats, view);
             while (hexMap.unitAniController.ShowAnimating) { yield return null; }
           }
         }
         int deadToll = attackerInfDead + attackerCavDead + attackerLaborDead
           + defenderInfDead + defenderCavDead + defenderLaborDead;
         Tile tile = atkWin ? defender.tile : attacker.tile;
-        tile.deadZone.Occur(deadToll);
+        if (tile.settlement == null) {
+          tile.deadZone.Occur(deadToll);
+        }
 
         // affected all allies
         Unit loser = atkWin ? defender : attacker;
@@ -802,13 +874,16 @@ namespace MonoNS
         }
 
         loser.movementRemaining = Unit.MovementcostOnHill * 100;
-        // TODO: apply general trait to calmdown
-        hexMap.popAniController.Show(hexMap.GetUnitView(loser), 
-         loser.chaos ? Cons.GetTextLib().get("pop_chaos") : Cons.GetTextLib().get("pop_retreat"),
-         Color.white);
-        while (hexMap.popAniController.Animating) { yield return null; }
+        int escapeDistance = 0;
+        if (!loser.IsCamping() && !loser.IsGone()) {
+          escapeDistance = 5;
+          // TODO: apply general trait to calmdown
+          hexMap.popAniController.Show(hexMap.GetUnitView(loser), 
+           loser.chaos ? Cons.GetTextLib().get("pop_chaos") : Cons.GetTextLib().get("pop_retreat"),
+           Color.white);
+          while (hexMap.popAniController.Animating) { yield return null; }
+        }
         HashSet<Tile> from = new HashSet<Tile>{loser.tile};
-        int escapeDistance = 5;
         bool moved = false;
         while (escapeDistance > 0) {
           moved = false;

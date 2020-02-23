@@ -279,9 +279,14 @@ namespace MonoNS
       num.text = unit.Name() + "[兵:" + unit.rf.soldiers + "/伤:" + unit.rf.wounded + "/亡:" + unit.kia + "/逃:" + unit.mia + "/役:" + unit.labor + "]";
       morale.text = "士气: " + unit.rf.morale;
       offense.text = "单兵战力: " + GetCombatpointRate(unit.cp);
-      defense.text = "部队战力: " + UnitInfoView.Shorten(unit.GetUnitAttackCombatPoint()) + "/" + UnitInfoView.Shorten(unit.unitPureCombatPoint)
+      if (unit.IsCamping()) {
+        defense.text = "部队战力: " + UnitInfoView.Shorten(unit.unitCampingAttackCombatPoint)
         + " ♙" + UnitInfoView.Shorten(unit.GetUnitDefendCombatPoint(true));
-      string stateStr = unit.tile.sieged ? "围城中 " : ""; 
+      } else {
+        defense.text = "部队战力: " + UnitInfoView.Shorten(unit.GetUnitAttackCombatPoint()) + "/" + UnitInfoView.Shorten(unit.unitPureCombatPoint)
+        + " ♙" + UnitInfoView.Shorten(unit.GetUnitDefendCombatPoint(true));
+      }
+      string stateStr = unit.tile.sieged ? "围城中 " : "";
       stateStr += unit.IsWarWeary() ? "士气低落 " : "";
       stateStr += unit.GetDiscontent() + " ";
       stateStr += unit.IsHungry() ? (unit.IsStarving() ? "饥饿 " : "半饥饿 ") : "";

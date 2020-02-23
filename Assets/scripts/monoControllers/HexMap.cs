@@ -232,11 +232,13 @@ namespace MonoNS
     {
       if (path.Length == 0) return;
       CreateLine(path, mat);
-      GameObject unitInfoGO = (GameObject)Instantiate(UnitInfoPrefab,
-          tile2GO[path[0]].transform.position,
-          Quaternion.identity, tile2GO[path[0]].transform);
-      unitInfoGO.GetComponent<UnitInfoView>().SetStr(label, kolor);
-      lineLabels.Add(unitInfoGO);
+      if (label != "") {
+        GameObject unitInfoGO = (GameObject)Instantiate(UnitInfoPrefab,
+            tile2GO[path[0]].transform.position,
+            Quaternion.identity, tile2GO[path[0]].transform);
+        unitInfoGO.GetComponent<UnitInfoView>().SetStr(label, kolor);
+        lineLabels.Add(unitInfoGO);
+      }
     }
 
     void CreateLine(Tile[] path, Material mat) {
@@ -399,21 +401,24 @@ namespace MonoNS
 
     List<UnitView> toggledUnitViews = new List<UnitView>();
     public void ShowAttackArrow(Unit fromUnit, Unit toUnit, UnitPredict predict) {
-      string txt = fromUnit.GeneralName() + "\n" + predict.joinPossibility + "%\n" + predict.operationPoint*0.001f
-        + "(" + predict.percentOfEffectiveForce + "%)" +
-        (predict.windAdvantage ? "↑↑↑" : (predict.windDisadvantage ? "↓↓": "")) +
-       (fromUnit.GetStaminaLevel() == StaminaLvl.Tired ? "☹"
-        : (fromUnit.GetStaminaLevel() == StaminaLvl.Exhausted ? "☹☹" : ""));
-      UnitView view = GetUnitView(fromUnit);
-      toggledUnitViews.Add(view);
-      view.ToggleText(false);
+      string txt = "";
+      if (!fromUnit.IsCamping()) {
+        txt = fromUnit.GeneralName() + "\n" + predict.joinPossibility + "%\n" + UnitInfoView.Shorten(predict.operationPoint)
+          + "(" + predict.percentOfEffectiveForce + "%)" +
+          (predict.windAdvantage ? "↑↑↑" : (predict.windDisadvantage ? "↓↓": "")) +
+         (fromUnit.GetStaminaLevel() == StaminaLvl.Tired ? "☹"
+          : (fromUnit.GetStaminaLevel() == StaminaLvl.Exhausted ? "☹☹" : ""));
+        UnitView view = GetUnitView(fromUnit);
+        toggledUnitViews.Add(view);
+        view.ToggleText(false);
+      }
       CreateArrow(new Tile[]{fromUnit.tile, toUnit.tile}, MatBurning, txt,
         predict.joinPossibility >= 70 ? Color.cyan : Color.red);
     }
 
     public void ShowDefendArrow(Unit fromUnit, Unit toUnit, UnitPredict predict) {
       string txt = fromUnit.GeneralName() + "\n" + predict.joinPossibility + "%\n"
-        + predict.operationPoint*0.001f + "(" + predict.percentOfEffectiveForce + "%)" +
+        + UnitInfoView.Shorten(predict.operationPoint) + "(" + predict.percentOfEffectiveForce + "%)" +
        (fromUnit.GetStaminaLevel() == StaminaLvl.Tired ? "☹"
         : (fromUnit.GetStaminaLevel() == StaminaLvl.Exhausted ? "☹☹" : ""));
       UnitView view = GetUnitView(fromUnit);
@@ -424,19 +429,19 @@ namespace MonoNS
     }
 
      public void ShowDefenderStat(Unit defender, UnitPredict predict) {
-      string txt = defender.GeneralName() + "\n" + predict.joinPossibility + "%\n"
-        + predict.operationPoint*0.001f + "(" + predict.percentOfEffectiveForce + "%)" +
-       (defender.GetStaminaLevel() == StaminaLvl.Tired ? "☹"
-        : (defender.GetStaminaLevel() == StaminaLvl.Exhausted ? "☹☹" : ""));
-      UnitView view = GetUnitView(defender);
-      toggledUnitViews.Add(view);
-      view.ToggleText(false);
-      GameObject tileGO = tile2GO[defender.tile];
-      GameObject unitInfoGO = (GameObject)Instantiate(UnitInfoPrefab,
-          tileGO.transform.position,
-          Quaternion.identity, tileGO.transform);
-      unitInfoGO.GetComponent<UnitInfoView>().SetStr(txt, Color.cyan);
-      lineLabels.Add(unitInfoGO);
+       string txt = defender.GeneralName() + "\n" + predict.joinPossibility + "%\n"
+         + UnitInfoView.Shorten(predict.operationPoint) + "(" + predict.percentOfEffectiveForce + "%)" +
+        (defender.GetStaminaLevel() == StaminaLvl.Tired ? "☹"
+         : (defender.GetStaminaLevel() == StaminaLvl.Exhausted ? "☹☹" : ""));
+       UnitView view = GetUnitView(defender);
+       toggledUnitViews.Add(view);
+       view.ToggleText(false);
+       GameObject tileGO = tile2GO[defender.tile];
+       GameObject unitInfoGO = (GameObject)Instantiate(UnitInfoPrefab,
+           tileGO.transform.position,
+           Quaternion.identity, tileGO.transform);
+       unitInfoGO.GetComponent<UnitInfoView>().SetStr(txt, Color.cyan);
+       lineLabels.Add(unitInfoGO);
     }
 
     void CreateTileGO(Tile tile)

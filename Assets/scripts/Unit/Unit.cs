@@ -615,6 +615,14 @@ namespace UnitNS
       }
     }
 
+    public int unitCampingAttackCombatPoint {
+      get {
+        int total = vantage.TotalPoints(cp);
+        total = (int)((total + total * GetCampingAttackBuff()) * 0.1f * (1 + GetStaminaDebuf(false)));
+        return total < 0 ? 0 : total;
+      }
+    }
+
     public int unitPureDefendCombatPoint {
       get {
         return IsCavalry() ? unitPureCombatPoint : (int)(unitPureCombatPoint * CombatController.DefendModifier);
@@ -625,9 +633,14 @@ namespace UnitNS
       return unitPoisioned.Poision();
     }
 
+    public float GetCampingAttackBuff()
+    {
+      return GetNewGeneralBuf() + GetChaosBuf() + GetWarwearyBuf() - plainSickness.debuf + rf.lvlBuf - disarmorDefDebuf;
+    }
+
     public float GetBuff()
     {
-      return GetNewGeneralBuf() + GetChaosBuf() + GetWarwearyBuf() + vantage.Buf() - plainSickness.debuf + rf.lvlBuf - disarmorDefDebuf;
+      return GetCampingAttackBuff() + vantage.Buf();
     }
 
     public float GetStaminaDebuf(bool asMainDefender) {

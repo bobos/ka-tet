@@ -74,20 +74,27 @@ namespace MonoNS
 
       if (actionName == ActionController.actionName.GARRISONCANCEL) {
         CancelGarrison();
+        return;
       }
 
       if (actionName == ActionController.actionName.GARRISON1) {
         selectedUnit = G1;
+        hexMap.mouseController.selectedUnit = selectedUnit;
+        hexMap.mouseController.PrepareUnitSelection();
         hexMap.unitSelectionPanel.OnUnitSelect(selectedUnit, true);
       }
 
       if (actionName == ActionController.actionName.GARRISON2) {
         selectedUnit = G2;
+        hexMap.mouseController.selectedUnit = selectedUnit;
+        hexMap.mouseController.PrepareUnitSelection();
         hexMap.unitSelectionPanel.OnUnitSelect(selectedUnit, true);
       }
 
       if (actionName == ActionController.actionName.GARRISON3) {
         selectedUnit = G3;
+        hexMap.mouseController.selectedUnit = selectedUnit;
+        hexMap.mouseController.PrepareUnitSelection();
         hexMap.unitSelectionPanel.OnUnitSelect(selectedUnit, true);
       }
 

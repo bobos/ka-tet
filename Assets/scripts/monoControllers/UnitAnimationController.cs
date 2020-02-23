@@ -36,10 +36,12 @@ namespace MonoNS
 
     IEnumerator CoDestroy(Unit unit, DestroyType type, int killed)
     {
-      UnitView view = hexMap.GetUnitView(unit);
-      view.DestroyAnimation(type);
-      while (view.Animating) { yield return null; }
-      hexMap.DestroyUnitView(unit);
+      if (!unit.IsCamping()) {
+        UnitView view = hexMap.GetUnitView(unit);
+        view.DestroyAnimation(type);
+        while (view.Animating) { yield return null; }
+        hexMap.DestroyUnitView(unit);
+      }
 
       if (type == DestroyType.ByBurningCamp) {
         eventDialog.Show(new MonoNS.Event(EventDialog.EventName.BurningCampDestroyUnit, unit, null, 0, 0, killed));
@@ -494,16 +496,16 @@ namespace MonoNS
     }
 
     public bool ShowAnimating = false;
-    public void ShowEffects(Unit unit, int[] effects) {
-      if (!unit.IsShowingAnimation()) { return; }
+    public void ShowEffects(Unit unit, int[] effects, View view = null) {
+      if (view == null && !unit.IsShowingAnimation()) { return; }
       ShowAnimating = true;
       hexMap.cameraKeyboardController.DisableCamera();
-      StartCoroutine(CoShowEffects(unit, effects));
+      StartCoroutine(CoShowEffects(unit, effects, view));
     }
 
-    IEnumerator CoShowEffects(Unit unit, int[] effects)
+    IEnumerator CoShowEffects(Unit unit, int[] effects, View theView = null)
     {
-      UnitView view = hexMap.GetUnitView(unit);
+      View view = theView != null ? theView : hexMap.GetUnitView(unit);
       int morale = effects[0];
       int movement = effects[1];
       int wounded = effects[2];

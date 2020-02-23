@@ -12,7 +12,7 @@
 
     public float Buf() {
       if (unit.IsCamping()) {
-        return unit.tile.settlement.wall.defensePoint * 0.01f;
+        return unit.tile.settlement.wall.defensePoint * 0.015f;
       }
 
       if (unit.tile.terrian == MapTileNS.TerrianType.Hill) {

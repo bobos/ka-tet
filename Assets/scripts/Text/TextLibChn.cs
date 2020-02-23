@@ -333,6 +333,7 @@ namespace TextNS
       {"misc_hundredThousand", "万"},
       {"misc_thousand", "千"},
       {"misc_hundred", "百"},
+      {"misc_defenceForce", @"{0}守军"},
 
       };
     }

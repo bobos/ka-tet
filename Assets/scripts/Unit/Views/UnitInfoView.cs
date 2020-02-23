@@ -59,14 +59,14 @@ namespace UnitNS
         + "[" + unit.rf.soldiers + "]\n"
         + Shorten(unit.GetUnitAttackCombatPoint()) + "/" + Shorten(unit.unitPureCombatPoint) + "\n"
         + "♟" + Shorten(totalDefendPoint) + "♙" + Shorten(unit.unitPureDefendCombatPoint);
-      textMesh.fontSize = 38;
+      textMesh.fontSize = 45;
       textMesh.color = color;
     }
 
     public void SetStr(string str, Color color) {
       TextMesh textMesh = this.transform.GetComponent<TextMesh>();
       textMesh.text = str;
-      textMesh.fontSize = 38;
+      textMesh.fontSize = 45;
       textMesh.color = color;
     }
     
