@@ -12,10 +12,7 @@
 
     public float Buf() {
       if (unit.IsCamping()) {
-        if (unit.IsCavalry()) {
-          return -0.3f;
-        }
-        return unit.tile.settlement.wall.defensePoint * 0.005f;
+        return unit.tile.settlement.wall.defensePoint * 0.01f;
       }
 
       if (unit.tile.terrian == MapTileNS.TerrianType.Hill) {

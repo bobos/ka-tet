@@ -123,7 +123,7 @@ namespace UnitNS
       currentVelocity = Vector3.zero;
     }
 
-    public void OnUnitSelect(Unit unit)
+    public void OnUnitSelect(Unit unit, bool _isGarrison=false)
     {
       if (Util.eq<Unit>(unit, this.unit))
       {

@@ -25,18 +25,12 @@ public class SettlementView : View
   }
 
   public static Vector3 NamePosition(Vector3 p) {
-    return new Vector3(p.x - 1f, p.y - 1f, p.z);
+    return new Vector3(p.x - 1f, p.y - 1f, p.z + 0.5f);
   }
 
   public void SetNameGO(GameObject nameGO) {
     this.nameGO = nameGO;
-    UpdateName();
-  }
-
-  public void UpdateName() {
-    Color color = settlement.owner.attackside ? Color.yellow : Color.white;
-    string factionName = settlement.owner.faction.Name();
-    nameGO.GetComponent<UnitNS.UnitNameView>().SetNameColor(settlement.name + "[" + factionName + "]", color, 80);
+    nameGO.GetComponent<UnitNS.UnitNameView>().settlement = settlement;
   }
 
   public void DestroyAnimation(DestroyType type)

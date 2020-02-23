@@ -17,17 +17,18 @@ public class StorageLevel {
   public int MaxStorage() {
     int turns = 6;
     if (level == 1) {
-      // support 15000*3 men for 6 turns for defenders, or 3 turns intruders
+      // support 10000*3 men for 6 turns for defenders, or 3 turns intruders
       return (int)((Infantry.MaxTroopNum * 3 * turns) / 10);
     }
     
     if (level == 2) {
-      // support 15000*6 men for 6 turns for defenders, or 3 turns intruders
+      // support 10000*6 men for 6 turns for defenders, or 3 turns intruders
       return (int)((Infantry.MaxTroopNum * 6 * turns) / 10);
     }
 
-    // support 15000*12 men for 6 turns for defenders, or 3 turns intruders
-    return (int)((Infantry.MaxTroopNum * 12 * turns) / 10);
+    // for city and strategy base
+    // 10000*3 men for 60 turns(half-year) for defenders
+    return (int)((Infantry.MaxTroopNum * 3 * turns * 10) / 10);
   }
 
   public string GetLevelTxt() {

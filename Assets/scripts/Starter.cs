@@ -179,11 +179,10 @@ public class Starter : MonoBehaviour {
     // create settlements
     const int supply = 4 * Infantry.MaxTroopNum / 10 * Infantry.BaseSlots;
     if (!settlementMgr.BuildStrategyBase(hexMap.GetTile(1,1),
-                    hexMap.GetAIParty(), supply * 5 * 5, 5000, 3)) {
+                    hexMap.GetAIParty(), supply * 5 * 5, 5000)) {
       Util.Throw("Failed to build base at 1,1");}
     if (!settlementMgr.BuildCity("河间府", hexMap.GetTile(27, 17),
                     hexMap.GetPlayerParty(),
-                    2, // storageLevel
                     2, // wallLevel
                     34000, // male
                     23889, // female

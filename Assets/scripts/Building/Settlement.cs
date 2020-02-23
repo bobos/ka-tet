@@ -192,25 +192,10 @@ public abstract class Settlement: DataModel
     return (int)(laborForce / 500);
   }
 
-  public bool Decamp(Unit unit)
+  public bool Decamp(Unit unit, Tile targetTile)
   {
     if (garrison.Contains(unit))
     {
-      Tile targetTile = null;
-      foreach (Tile tile in baseTile.neighbours)
-      {
-        if (tile.Deployable(unit))
-        {
-          targetTile = tile;
-          break;
-        } 
-      }
-
-      if (targetTile == null)
-      {
-        return false;
-      }
-
       garrison.Remove(unit);
       parkSlots++;
       unit.Decamp(targetTile);
@@ -240,6 +225,19 @@ public abstract class Settlement: DataModel
 
   public bool IsNormal() {
     return state == State.normal;
+  }
+
+  public int GetDefendForce() {
+    int force = 0;
+    if (IsEmpty()) {
+      return force;
+    }
+
+    foreach(Unit unit in garrison) {
+      force += unit.GetUnitDefendCombatPoint(true);
+    }
+
+    return force;
   }
 
   public int SupplyNeeded() {

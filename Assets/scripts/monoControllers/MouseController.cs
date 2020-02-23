@@ -439,6 +439,11 @@ namespace MonoNS
 
     public void Escape()
     {
+      if (mouseMode == mode.detect && selectedSettlement != null && hexMap.settlementViewPanel.selectedUnit != null) {
+        hexMap.settlementViewPanel.CancelGarrison();
+        return;
+      }
+
       selectedPath = null;
       if (selectedUnit != null)
       {
@@ -531,7 +536,7 @@ namespace MonoNS
       }
     }
 
-    public delegate void OnUnitSelect(Unit selectedUnit);
+    public delegate void OnUnitSelect(Unit selectedUnit, bool isGarrison);
     public event OnUnitSelect onUnitSelect;
     public event OnUnitSelect onUnitPreflight;
     public delegate void OnUnitDeselect(Unit deselectedUnit);
@@ -547,6 +552,14 @@ namespace MonoNS
     public Settlement targetSettlement;
     void ClickOnTile()
     {
+      if (hexMap.unitSelectionPanel.tileSelecting) {
+        if (hexMap.unitSelectionPanel.isSelectableTile(tileUnderMouse)) {
+          selectedSettlement.Decamp(hexMap.settlementViewPanel.selectedUnit, tileUnderMouse);
+          hexMap.settlementViewPanel.CancelGarrison();
+        }
+        return;
+      }
+
       targetUnit = null;
       targetSettlement = null;
       if (mouseMode == mode.detect) {
@@ -584,7 +597,7 @@ namespace MonoNS
         {
           selectedUnit = u;
           PrepareUnitSelection();
-          if (onUnitSelect != null) onUnitSelect(selectedUnit);
+          if (onUnitSelect != null) onUnitSelect(selectedUnit, false);
         }
         else
         {
@@ -789,7 +802,7 @@ namespace MonoNS
           selectedPath = paths[tileUnderMouse];
         }
         Unit u = selectedUnit.Preflight(tileUnderMouse, selectedPath);
-        if (onUnitPreflight != null && u != null) onUnitPreflight(u);
+        if (onUnitPreflight != null && u != null) onUnitPreflight(u, false);
         hexMap.HighlightPath(selectedPath);
       }
       else

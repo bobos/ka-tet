@@ -4,7 +4,7 @@ using FieldNS;
 public class Camp : Settlement
 {
   public Camp(string name, Tile tile, WarParty warParty, int storageLevel) :
-  base(name, tile, warParty, 0, 3,
+  base(name, tile, warParty, 0, 1,
     new StorageLevel(storageLevel > 2 ? 2 : storageLevel),
     new WallDefense(1))
   {

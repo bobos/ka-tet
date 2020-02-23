@@ -111,6 +111,10 @@ namespace MonoNS
       }
     }
 
+    public void OnDecampClick() {
+      hexMap.unitSelectionPanel.Decamp();
+    }
+
     public void OnRetreatClick()
     {
       if (onBtnClick != null)
@@ -144,7 +148,39 @@ namespace MonoNS
     {
       if (onBtnClick != null)
       {
-        onBtnClick(actionName.DECAMP);
+        onBtnClick(actionName.MGTGARRISON);
+      }
+    }
+
+    public void OnGarrisonCancelClick()
+    {
+      if (onBtnClick != null)
+      {
+        onBtnClick(actionName.GARRISONCANCEL);
+      }
+    }
+
+    public void OnGarrison1Click()
+    {
+      if (onBtnClick != null)
+      {
+        onBtnClick(actionName.GARRISON1);
+      }
+    }
+
+    public void OnGarrison2Click()
+    {
+      if (onBtnClick != null)
+      {
+        onBtnClick(actionName.GARRISON2);
+      }
+    }
+
+    public void OnGarrison3Click()
+    {
+      if (onBtnClick != null)
+      {
+        onBtnClick(actionName.GARRISON3);
       }
     }
 
@@ -231,6 +267,11 @@ namespace MonoNS
       WGCONFIRM,
       WGCANCEL,
       DECAMP,
+      MGTGARRISON,
+      GARRISONCANCEL,
+      GARRISON1,
+      GARRISON2,
+      GARRISON3,
       DISTSUPPLY,
       DISTLABOR,
       LABOR2Unit,

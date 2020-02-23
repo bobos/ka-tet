@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using UnitNS;
 using FieldNS;
 using System.Collections.Generic;
+using MapTileNS;
 
 namespace MonoNS
 {
@@ -23,6 +24,7 @@ namespace MonoNS
       GameObject[] btns = {MoveButton, AttackButton, DefendButton, CampButton,
                            SabotageButton, FireButton, AmbushButton, EncampButton,
                            RetreatButton, TransferSupplyButton, TransferLaborButton,
+                           DecampButton, SabotageSiegeButton
                            };
       buttons = btns;
       mouseController.onUnitSelect += OnUnitSelect;
@@ -51,6 +53,8 @@ namespace MonoNS
     public GameObject RetreatButton;
     public GameObject TransferSupplyButton;
     public GameObject TransferLaborButton;
+    public GameObject DecampButton;
+    public GameObject SabotageSiegeButton;
     GameObject[] buttons;
 
     public Text title;
@@ -92,24 +96,74 @@ namespace MonoNS
       if ((unit != null && !unit.IsAI() && name == ActionController.actionName.MOVE)
         || (unit != null && unit.IsAI() && name == ActionController.actionName.ATTACK))
       {
-        RefreshButtons(unit);
+        RefreshButtons(unit, false);
       }
     }
 
-    void RefreshButtons(Unit unit)
+    void RefreshButtons(Unit unit, bool isGarrison)
     {
-      ToggleButtons(!unit.TurnDone(), unit);
+      ToggleButtons(!unit.TurnDone(), unit, isGarrison);
     }
 
-    public void ToggleButtons(bool state, Unit unit)
+    public bool tileSelecting = false;
+    public void Decamp() {
+      tileSelecting = true;
+      hexMap.msgBox.Show("选择部署地点");
+      hexMap.HighlightArea(deployableTiles.ToArray(), HexMap.RangeType.camp);
+    }
+
+    public void CancelGarrison(Unit unit) {
+      hexMap.msgBox.Show("");
+      if (tileSelecting) {
+        tileSelecting = false;
+        hexMap.DehighlightArea();
+        deployableTiles = null;
+      }
+      OnUnitDeselect(unit);
+    }
+
+    public bool isSelectableTile(Tile tile) {
+      foreach(Tile t in deployableTiles) {
+        if (Util.eq<Tile>(t, tile)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    List<Tile> deployableTiles;
+    public void ToggleButtons(bool state, Unit unit, bool isGarrison = false)
     {
       foreach (GameObject button in buttons)
       {
         button.SetActive(false);
       }
+
       // TODO: uncomment
       //if (!state || hexMap.combatController.start || unit.IsAI()) return;
       if (!state || hexMap.combatController.start) return;
+
+      if (isGarrison) {
+        bool hasEnemy = false;
+        deployableTiles = new List<Tile>();
+        foreach(Tile tile in mouseController.selectedSettlement.baseTile.neighbours) {
+          Unit u = tile.GetUnit();
+          if (u != null && u.IsAI() != unit.IsAI()) {
+            hasEnemy = true;
+          }
+          if (tile.Deployable(unit)) {
+            deployableTiles.Add(tile);
+          }
+        }
+        if (hasEnemy) {
+          AttackButton.SetActive(true);
+        }
+        if (deployableTiles.Count > 0) {
+          DecampButton.SetActive(true);
+        }
+        //SabotageSiegeButton.SetActive(true);
+        return;
+      }
 
       if (hexMap.wargameController.start && hexMap.wargameController.IsWargameUnit(unit)) {
       } else {
@@ -180,7 +234,7 @@ namespace MonoNS
 
     public void OnModeQuit(Unit unit)
     {
-      RefreshButtons(unit);
+      RefreshButtons(unit, false);
     }
 
     string GetCombatpointRate(int cp) {
@@ -196,10 +250,10 @@ namespace MonoNS
       return rate;
     }
 
-    public void OnUnitSelect(Unit unit)
+    public void OnUnitSelect(Unit unit, bool isGarrison = false)
     {
       self.SetActive(true);
-      bool isPreflight = !Util.eq<Unit>(unit, mouseController.selectedUnit);
+      bool isPreflight = !isGarrison && !Util.eq<Unit>(unit, mouseController.selectedUnit);
 
       // set attack, defense details
       string details = 
@@ -224,8 +278,9 @@ namespace MonoNS
       slots.text = "粮草: " + unit.supply.supply + "石" + " 可维持" + unit.slots + "/" + unit.GetMaxSupplySlots() + "回合" + " 每回合消耗:" + unit.supply.SupplyNeededPerTurn() + "石";
       num.text = unit.Name() + "[兵:" + unit.rf.soldiers + "/伤:" + unit.rf.wounded + "/亡:" + unit.kia + "/逃:" + unit.mia + "/役:" + unit.labor + "]";
       morale.text = "士气: " + unit.rf.morale;
-      offense.text = "单兵战斗力: " + GetCombatpointRate(unit.cp);
-      defense.text = "部队战斗力: " + unit.unitCombatPoint;
+      offense.text = "单兵战力: " + GetCombatpointRate(unit.cp);
+      defense.text = "部队战力: " + UnitInfoView.Shorten(unit.GetUnitAttackCombatPoint()) + "/" + UnitInfoView.Shorten(unit.unitPureCombatPoint)
+        + " ♙" + UnitInfoView.Shorten(unit.GetUnitDefendCombatPoint(true));
       string stateStr = unit.tile.sieged ? "围城中 " : ""; 
       stateStr += unit.IsWarWeary() ? "士气低落 " : "";
       stateStr += unit.GetDiscontent() + " ";
@@ -247,10 +302,10 @@ namespace MonoNS
         return;
       }
 
-      ToggleButtons(false, unit);
+      ToggleButtons(false, unit, isGarrison);
       // TODO: AI test
       if (unit.IsAI() == !turnController.player) {
-        RefreshButtons(unit);
+        RefreshButtons(unit, isGarrison);
       }
     }
 

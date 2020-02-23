@@ -32,7 +32,6 @@ namespace MonoNS
       mouseController = hexMap.mouseController;
       popAniController = hexMap.popAniController;
       actionController = hexMap.actionController;
-      actionController.onBtnClick += OnBtnClick;
       cc = hexMap.cameraKeyboardController;
       ghostUnit = GhostUnit.createGhostUnit();
     }
@@ -191,18 +190,6 @@ namespace MonoNS
       return null;
     }
 
-    public void OnBtnClick(ActionController.actionName name)
-    {
-      if (name == ActionController.actionName.DECAMP)
-      {
-        Settlement settlement = mouseController.selectedSettlement;
-        if (settlement == null || settlement.garrison.ToArray().Length == 0) return;
-        settlement.Decamp(settlement.garrison[0]);
-        hexMap.settlementViewPanel.OnSettlementDeselect(settlement);
-        GetView(settlement).OnSettlementDeselect(settlement);
-      }
-    }
-
     ActionController actionController;
     MouseController mouseController;
     GhostUnit ghostUnit;
@@ -216,26 +203,25 @@ namespace MonoNS
         location.storageLevel, 1, unit);
     }
 
-    public bool BuildStrategyBase(Tile location, WarParty warParty, int supply, int labor,
-      int storageLevel) {
+    public bool BuildStrategyBase(Tile location, WarParty warParty, int supply, int labor) {
       return BuildSettlement(
         System.String.Format(
           textLib.get("settlement_strategyBase"),
           warParty.faction.Name()
         ),
-        location, Settlement.Type.strategyBase, warParty, supply, 0, 0, 0, labor, storageLevel, 1, null);
+        location, Settlement.Type.strategyBase, warParty, supply, 0, 0, 0, labor, 3, 1, null);
     }
 
     public bool BuildCity(string name, Tile location,
       WarParty warParty,
-      int storageLevel, int wallLevel,
+      int wallLevel,
       int male, int female, int child, int labor, int supply) {
       return BuildSettlement(
         name,
         location,
         Settlement.Type.city,
         warParty,
-        supply, male, female, child, labor, storageLevel, wallLevel, null);
+        supply, male, female, child, labor, 3, wallLevel, null);
     }
 
     private bool BuildSettlement(
@@ -257,11 +243,11 @@ namespace MonoNS
         if (type == Settlement.Type.city)
         {
           settlement = new City(name, location, warParty, supply, male, female,
-            child, labor, storageLevel, wallLevel);
+            child, labor, wallLevel);
         }
         if (type == Settlement.Type.strategyBase)
         {
-          settlement = new StrategyBase(name, location, warParty, supply, labor, storageLevel);
+          settlement = new StrategyBase(name, location, warParty, supply, labor);
         }
       }
 
@@ -305,7 +291,6 @@ namespace MonoNS
     public int[] OccupySettlement(Unit unit, Settlement settlement) {
       int[] deathNum = new int[3]{0,0,0};
       settlement.owner = unit.IsAI() ? hexMap.GetAIParty() : hexMap.GetPlayerParty();
-      GetView(settlement).UpdateName();
       settlement.Encamp(unit);
       if (settlement.owner.attackside) {
         attackerRoots.Add(settlement);

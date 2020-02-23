@@ -5,10 +5,9 @@ public class City : Settlement
 {
   public City(string name, Tile tile, WarParty warParty,
     int supply, int male, int female, int child, int labor,
-    int storageLevel,
     int wallLevel) :
-    base(name, tile, warParty, supply, 8,
-    new StorageLevel(storageLevel < 2 ? 2 : storageLevel),
+    base(name, tile, warParty, supply, 3,
+    new StorageLevel(3),
     new WallDefense(wallLevel < 2 ? 2 : wallLevel)
     )
   {
