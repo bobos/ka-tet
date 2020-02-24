@@ -5207,6 +5207,8 @@ MonoBehaviour:
     type: 3}
   PopTextPrefab: {fileID: 1494587712262224, guid: 5c837f8051153411188e4957638b549a,
     type: 3}
+  SiegeWallPrefab: {fileID: 4476222928804734191, guid: d9a912d06428d3c4d962def28f4eb4d0,
+    type: 3}
   lineCache: []
   lineLabels: []
 --- !u!1 &925431661

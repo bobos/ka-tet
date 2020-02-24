@@ -37,6 +37,7 @@ Game Tips:
 28. 战斗爆发地，战斗结束如果死亡人数超过500，该地块标记为尸体区，进入尸体区，部队50%几率染上疾病，可以排出有民夫部队（民夫最少200人）前去掩埋尸体，掩埋部队一定几率引发不满，如果超过3回合不掩埋，尸体消失，计入战场瘟疫爆发点数
 29. 为三缺一，否则战力凡凡
 
+siegewal destroyed by force, fire, flood
 部队交换位置
 cover body 50 action points, +2 discontent
 grey unit when no movementpoint
@@ -125,3 +126,10 @@ all event not showing for AI
 先登(+攻城buf) [累计攻城主攻数5次]
 行军大师 [部队行军精疲力竭30次]
 战争创伤 [惨败小几率获得]
+
+
+in Attached script to direct access gameobject:
+ public void Destroy()
+  {
+    GameObject.Destroy(gameObject);
+  }

@@ -5,17 +5,14 @@ using MapTileNS;
 using MonoNS;
 using FieldNS;
 
-public abstract class Settlement: DataModel
+public abstract class Settlement: Building
 {
   public const int Visibility = 3;
-
   public int supplyDeposit = 0;
   public WallDefense wall;
   public StorageLevel storageLvl;
   public int parkSlots { get; private set; }
   public List<Unit> garrison = new List<Unit>();
-  public Tile baseTile;
-  public WarParty owner;
   private int _civillian_male;
   private int _civillian_female;
   private int _civillian_child;
@@ -58,29 +55,9 @@ public abstract class Settlement: DataModel
   }
   public int availableLabor;
 
-  public delegate void OnSettlementReady(Settlement settlement);
-  public event OnSettlementReady onSettlementReady;
-
-  public State state;
   public Type type;
   public string name = "default";
-
-  protected int buildWork = 0;
-  protected HexMap hexMap;
-  SettlementMgr settlementMgr;
   BuildingNS.Supply supply;
-
-  public int buildTurns {
-    get {
-      if (buildWork <= 0) return 0;
-      int canBeDone = HowMuchBuildWorkToFinish();
-      if (canBeDone == 0) return -1;
-      if (canBeDone >= buildWork) return 1;
-      int remaining  = buildWork % HowMuchBuildWorkToFinish();
-      int turns  = (buildWork - remaining) / canBeDone;
-      return turns + (remaining > 0 ? 1 : 0);
-    }
-  }
 
   public Tile[] GetVisibleArea() {
     return baseTile.GetNeighboursWithinRange<Tile>(Visibility, (Tile _tile) => true);
@@ -95,12 +72,6 @@ public abstract class Settlement: DataModel
       this.laborNeeded = laborNeeded;
       this.supplyNeeded = supplyNeeded;
     }
-  }
-
-  public enum State
-  {
-    constructing,
-    normal
   }
 
   public enum Type
@@ -159,7 +130,7 @@ public abstract class Settlement: DataModel
         continue;
       }
 
-      if (!tile.sieged) {
+      if (tile.siegeWall == null || !tile.siegeWall.IsFunctional()) {
         underSiege = false;
         break;
       }
@@ -184,7 +155,7 @@ public abstract class Settlement: DataModel
     return false;
   }
   
-  private int HowMuchBuildWorkToFinish() {
+  protected override int HowMuchBuildWorkToFinish() {
     int laborForce = labor;
     foreach(Unit unit in garrison) {
       laborForce += unit.labor;
@@ -205,22 +176,6 @@ public abstract class Settlement: DataModel
     {
       return false;
     }
-  }
-
-  public bool TurnEnd()
-  {
-    if (state == State.constructing) {
-      buildWork -= HowMuchBuildWorkToFinish();
-    }
-
-    if (buildWork < 1)
-    {
-      buildWork = 0;
-      state = State.normal;
-      onSettlementReady(this);
-      return true;
-    }
-    return false;
   }
 
   public bool IsNormal() {

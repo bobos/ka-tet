@@ -98,6 +98,7 @@ namespace MonoNS
     public GameObject NameTextPrefab;
     public GameObject UnitInfoPrefab;
     public GameObject PopTextPrefab;
+    public GameObject SiegeWallPrefab;
     public WarParty[] warParties = new WarParty[2];
     public List<GameObject> lineCache = new List<GameObject>();
     public List<GameObject> lineLabels = new List<GameObject>();

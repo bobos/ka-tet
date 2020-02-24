@@ -30,7 +30,7 @@ namespace MonoNS
 
     IEnumerator CoDestroy(Settlement settlement, BuildingNS.DestroyType type)
     {
-      SettlementView view = settlementMgr.GetView(settlement);
+      SettlementView view = (SettlementView)settlementMgr.GetView(settlement);
       view.DestroyAnimation(type);
       while (view.Animating) { yield return null; }
       view.Destroy();
@@ -39,6 +39,24 @@ namespace MonoNS
           EventDialog.EventName.FloodDestroyCamp :
           EventDialog.EventName.WildFireDestroyCamp, null, settlement));
       while (eventDialog.Animating) { yield return null; }
+      hexMap.cameraKeyboardController.EnableCamera();
+      Animating = false;
+    }
+
+    public void DestroySiegeWall(SiegeWall siegeWall, BuildingNS.DestroyType type)
+    {
+      Animating = true;
+      siegeWall.Destroy();
+      hexMap.cameraKeyboardController.DisableCamera();
+      StartCoroutine(CoDestroySiegeWall(siegeWall, type));
+    }
+
+    IEnumerator CoDestroySiegeWall(SiegeWall siegeWall, BuildingNS.DestroyType type)
+    {
+      SiegeWallView view = (SiegeWallView)settlementMgr.GetView(siegeWall);
+      view.DestroyAnimation(type);
+      while (view.Animating) { yield return null; }
+      view.Destroy();
       hexMap.cameraKeyboardController.EnableCamera();
       Animating = false;
     }

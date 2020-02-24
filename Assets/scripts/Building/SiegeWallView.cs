@@ -1,0 +1,33 @@
+﻿using System.Collections.Generic;
+using MapTileNS;
+using UnityEngine;
+using MonoNS;
+using System.Collections;
+using BuildingNS;
+
+public class SiegeWallView : View
+{
+
+  // Use this for initialization
+  public SiegeWall siegeWall = null;
+  public override void OnCreate(DataModel siegeWall)
+  {
+    this.siegeWall = (SiegeWall)siegeWall;
+  }
+
+  public void DestroyAnimation(DestroyType type)
+  {
+    Animating = true;
+    StartCoroutine(CoDestroyAnimation(type));
+  }
+
+  IEnumerator CoDestroyAnimation(DestroyType type) {
+    yield return new WaitForSeconds(1);
+    Animating = false;
+  }
+
+  public void Destroy()
+  {
+    GameObject.Destroy(gameObject);
+  }
+}

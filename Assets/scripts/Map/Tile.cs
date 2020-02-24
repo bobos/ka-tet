@@ -27,7 +27,7 @@ namespace MapTileNS
     public bool burnable = false;
     public bool road = false;
     public bool vantagePoint = false;
-    public bool sieged = false;
+    public SiegeWall siegeWall = null;
 
     public Dictionary<Tile, Tile[]> roads = new Dictionary<Tile, Tile[]>();
     public Tile(int q, int r, HexMap hexMap) : base(q, r, hexMap) { }
@@ -394,7 +394,7 @@ namespace MapTileNS
     {
       if ((!vantagePoint) && (terrian == TerrianType.Plain || terrian == TerrianType.Hill) &&
         (field == FieldType.Wild || field == FieldType.Village || field == FieldType.Flooded
-         || field == FieldType.Schorched))
+         || field == FieldType.Schorched) && siegeWall == null)
       {
         return Work2BuildCamp;
       }

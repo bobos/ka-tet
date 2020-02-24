@@ -28,7 +28,7 @@ namespace MonoNS
       base.PreGameInit(hexMap, me);
       attackerRoots = new List<Settlement>();
       defenderRoots = new List<Settlement>();
-      buildingQueue = new List<Settlement>();
+      buildingQueue = new List<Building>();
       mouseController = hexMap.mouseController;
       popAniController = hexMap.popAniController;
       actionController = hexMap.actionController;
@@ -89,9 +89,9 @@ namespace MonoNS
       StartCoroutine(PerformTurnEnd(warParty));
     }
 
-    public SettlementView GetView(Settlement settlement) {
+    public View GetView(Building settlement) {
       if (!settlement2GO.ContainsKey(settlement)) return null;
-      return settlement2GO[settlement].GetComponent<SettlementView>();
+      return settlement2GO[settlement].GetComponent<View>();
     }
 
     TextLib textLib = Cons.GetTextLib();
@@ -99,7 +99,7 @@ namespace MonoNS
     PopTextAnimationController popAniController;
     IEnumerator PerformTurnEnd(WarParty warParty)
     {
-      foreach (Settlement settlement in buildingQueue.ToArray())
+      foreach (Building settlement in buildingQueue.ToArray())
       {
         if (Util.eq<WarParty>(warParty, settlement.owner))
         {
@@ -159,7 +159,7 @@ namespace MonoNS
       foreach (Settlement root in roots)
       {
         if (root.state != Settlement.State.constructing) {
-          SettlementView view = GetView(root);
+          View view = GetView(root);
           List<List<Unit>> failedUnits = root.ReduceSupply();
           foreach(Unit u in failedUnits[0]) {
             popAniController.Show(view, 
@@ -195,7 +195,7 @@ namespace MonoNS
     GhostUnit ghostUnit;
     public List<Settlement> attackerRoots;
     public List<Settlement> defenderRoots;
-    List<Settlement> buildingQueue;
+    List<Building> buildingQueue;
 
     public bool BuildCamp(Tile location, WarParty warParty, Unit unit) {
       return BuildSettlement(location.name, location, Settlement.Type.camp, warParty,
@@ -224,6 +224,16 @@ namespace MonoNS
         supply, male, female, child, labor, 3, wallLevel, null);
     }
 
+    public bool BuildSiegeWall(Tile location, WarParty warParty) {
+      if(location.Work2BuildSettlement() == -1) return false; // unbuildable tile
+      SiegeWall siegeWall = new SiegeWall(location, warParty);
+      siegeWall.onBuildingReady += this.SettlementReady;
+      buildingQueue.Add(siegeWall);
+      CreateSiegeWall(siegeWall);
+      location.siegeWall = siegeWall;
+      return true;
+    }
+
     private bool BuildSettlement(
       string name, Tile location, Settlement.Type type, WarParty warParty,
       int supply, int male, int female, int child, int labor,
@@ -235,7 +245,7 @@ namespace MonoNS
       if (type == Settlement.Type.camp)
       {
         settlement = new Camp(name, location, warParty, storageLevel);
-        settlement.onSettlementReady += this.SettlementReady;
+        settlement.onBuildingReady += this.SettlementReady;
         buildingQueue.Add(settlement);
       }
       else
@@ -267,8 +277,8 @@ namespace MonoNS
       return true;
     }
 
-    Dictionary<Settlement, GameObject> settlement2GO = new Dictionary<Settlement, GameObject>();
-    public void CreateSettlement(Settlement settlement)
+    Dictionary<Building, GameObject> settlement2GO = new Dictionary<Building, GameObject>();
+    void CreateSettlement(Settlement settlement)
     {
       Vector3 position = settlement.baseTile.GetSurfacePosition();
       GameObject GO = (GameObject)Instantiate(settlement.type == Settlement.Type.camp ? hexMap.CampPrefab : hexMap.TentPrefab,
@@ -283,9 +293,30 @@ namespace MonoNS
       settlement2GO[settlement] = GO;
     }
 
-    public void SettlementReady(Settlement settlement)
+    void CreateSiegeWall(SiegeWall siegeWall)
+    {
+      Tile tile = siegeWall.baseTile;
+      Vector3 position = tile.GetSurfacePosition();
+      GameObject GO = (GameObject)Instantiate(hexMap.SiegeWallPrefab,
+        position,
+        Quaternion.identity,
+        hexMap.GetTileView(tile).transform);
+      SiegeWallView view = GO.GetComponent<SiegeWallView>();
+      view.OnCreate(siegeWall);
+      settlement2GO[siegeWall] = GO;
+    }
+
+    public void SettlementReady(Building settlement)
     {
       buildingQueue.Remove(settlement);
+      SetBuildingSkinReady(GetView(settlement).gameObject);
+    }
+
+    void SetBuildingSkinReady(GameObject view) {
+      MeshRenderer[] mrs = view.GetComponentsInChildren<MeshRenderer>();
+      foreach (MeshRenderer mr in mrs) {
+        mr.material = hexMap.MatSchorched;
+      }
     }
 
     public int[] OccupySettlement(Unit unit, Settlement settlement) {
@@ -381,6 +412,11 @@ namespace MonoNS
       } else {
         defenderLaborDead += camp.labor;
       }
+    }
+
+    public void DestroySiegeWall(SiegeWall sw)
+    {
+      buildingQueue.Remove(sw);
     }
 
     public void GetVisibleArea(bool attackSide, HashSet<Tile> tiles) {

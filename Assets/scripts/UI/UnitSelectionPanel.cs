@@ -286,7 +286,8 @@ namespace MonoNS
         defense.text = "部队战力: " + UnitInfoView.Shorten(unit.GetUnitAttackCombatPoint()) + "/" + UnitInfoView.Shorten(unit.unitPureCombatPoint)
         + " ♙" + UnitInfoView.Shorten(unit.GetUnitDefendCombatPoint(true));
       }
-      string stateStr = unit.tile.sieged ? "围城中 " : "";
+      string stateStr = unit.tile.siegeWall != null && unit.tile.siegeWall.IsFunctional() ? "围城中 " :
+        (unit.tile.siegeWall != null && unit.tile.siegeWall.owner.isAI == unit.IsAI() ? "修建长围中" : "");
       stateStr += unit.IsWarWeary() ? "士气低落 " : "";
       stateStr += unit.GetDiscontent() + " ";
       stateStr += unit.IsHungry() ? (unit.IsStarving() ? "饥饿 " : "半饥饿 ") : "";

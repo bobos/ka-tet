@@ -828,8 +828,6 @@ namespace UnitNS
       int takenMovement = CostToEnterTile(next, PathFind.Mode.Normal);
       List<Unit> knownUnits = hexMap.combatController.GetKnownEnemies();
       movementRemaining -= takenMovement;
-      // remove the sieging of the previous tile
-      tile.sieged = false;
       bool allyOnTile = next.GetUnit() != null;
       SetTile(next);
       return AfterMoveUpdate(knownUnits, allyOnTile);
