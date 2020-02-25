@@ -13,6 +13,7 @@ public class SiegeWall: Building
   // Use this for initialization
   public SiegeWall(Tile tile, WarParty warParty)
   {
+    isSiegeWall = true;
     this.baseTile = tile;
     this.owner = warParty;
     hexMap = GameObject.FindObjectOfType<HexMap>();

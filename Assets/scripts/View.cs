@@ -10,6 +10,7 @@ public abstract class View: MonoBehaviour {
 }
 
 public abstract class Building: DataModel {
+  public bool isSiegeWall = false;
   public delegate void OnBuildingReady(Building building);
   public event OnBuildingReady onBuildingReady;
   public State state = State.constructing;

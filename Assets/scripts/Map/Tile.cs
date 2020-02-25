@@ -392,8 +392,9 @@ namespace MapTileNS
     SettlementAnimationController settlementAniController;
     public int Work2BuildSettlement()
     {
-      if ((!vantagePoint) && (terrian == TerrianType.Plain || terrian == TerrianType.Hill) &&
+      if ((terrian == TerrianType.Plain || terrian == TerrianType.Hill) &&
         (field == FieldType.Wild || field == FieldType.Village || field == FieldType.Flooded
+         || field == FieldType.Road
          || field == FieldType.Schorched) && siegeWall == null)
       {
         return Work2BuildCamp;

@@ -310,7 +310,20 @@ namespace MonoNS
     {
       buildingQueue.Remove(settlement);
       SetBuildingSkinReady(GetView(settlement).gameObject);
+      if (settlement.isSiegeWall) {
+        Settlement s = null;
+        foreach(Tile tile in settlement.baseTile.neighbours) {
+          if (tile.settlement != null) {
+            s = tile.settlement;
+            break;
+          }
+        }
+        if (s.IsUnderSiege()) {
+          hexMap.eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.UnderSiege, null, s));
+        }
+      }
     }
+
 
     void SetBuildingSkinReady(GameObject view) {
       MeshRenderer[] mrs = view.GetComponentsInChildren<MeshRenderer>();

@@ -411,88 +411,71 @@ namespace MonoNS
 
     public bool SiegeAnimating = false;
     public void Siege(Unit unit) {
+      Settlement target = GetSettlement(unit);
+      if (target == null || target.IsUnderSiege() && unit.tile.siegeWall != null) {
+        return;
+      }
       SiegeAnimating = true;
       hexMap.cameraKeyboardController.DisableCamera();
       StartCoroutine(CoSiege(unit));
     }
 
-    public enum SiegeResult {
-      NoCity,
-      Ready,
-      NoLabor,
-      NoPoint
-    }
-
-    public class SiegePredict {
-      public SiegeResult result = SiegeResult.NoCity;
-      public Settlement target;
-      public const int MinLabor = 800;
-      public const int MinPoint = Unit.ActionCost;
-    }
-
-    public SiegePredict Ready4Siege(Unit unit) {
-      SiegePredict predict = new SiegePredict();
-
+    Settlement GetSettlement(Unit unit) {
+      Settlement settlement = null;
       foreach (Tile tile in unit.tile.neighbours) {
         if (tile.settlement != null && tile.settlement.owner.isAI != unit.IsAI()) {
-          predict.target = tile.settlement;
-          predict.result = SiegeResult.Ready;
+          settlement = tile.settlement;
           break;
         }
       }
 
-      if (predict.result == SiegeResult.NoCity) {
-        return predict;
-      }
-
-      if (unit.labor < SiegePredict.MinLabor) {
-        predict.result = SiegeResult.NoLabor;
-      }
-
-      if (unit.GetStaminaLevel() == StaminaLvl.Tired || unit.GetStaminaLevel() == StaminaLvl.Exhausted) {
-        predict.result = SiegeResult.NoPoint;
-      }
-
-      return predict;
+      return settlement;
     }
 
     IEnumerator CoSiege(Unit unit) {
-      SiegePredict predict = Ready4Siege(unit); 
-
-      if (predict.result == SiegeResult.Ready) {
-        // siege ready
-        unit.tile.sieged = true;
-        unit.movementRemaining -= SiegePredict.MinPoint;
+      if(!hexMap.settlementMgr.BuildSiegeWall(unit.tile, hexMap.GetWarParty(unit))) {
         if (unit.IsShowingAnimation()) {
           popAniController.Show(hexMap.GetUnitView(unit),
-          textLib.get("pop_sieged"), Color.green);
+          textLib.get("pop_buildFail"), Color.yellow);
           while (popAniController.Animating) { yield return null; }
         }
-
-        if (predict.target.IsUnderSiege()) {
-          eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.UnderSiege, unit, predict.target));
-          while (eventDialog.Animating) { yield return null; }
-        }
-      }
-
-      if (predict.result == SiegeResult.NoLabor) {
+      } else {
         if (unit.IsShowingAnimation()) {
           popAniController.Show(hexMap.GetUnitView(unit),
-          System.String.Format(textLib.get("pop_insufficientLabor"), SiegePredict.MinLabor), Color.yellow);
+          textLib.get("pop_sieging"), Color.green);
           while (popAniController.Animating) { yield return null; }
         }
       }
-
-      if (predict.result == SiegeResult.NoPoint) {
-        if (unit.IsShowingAnimation()) {
-          popAniController.Show(hexMap.GetUnitView(unit),
-          System.String.Format(textLib.get("pop_insufficientPoint"), SiegePredict.MinPoint), Color.yellow);
-          while (popAniController.Animating) { yield return null; }
-        }
-      }
-
       hexMap.cameraKeyboardController.EnableCamera();
       SiegeAnimating = false;
+
+      ///if (predict.result == SiegeResult.Ready) {
+      ///  // siege ready
+      ///  //unit.tile.sieged = true;
+      ///  unit.movementRemaining -= SiegePredict.MinPoint;
+
+      ///  if (predict.target.IsUnderSiege()) {
+      ///    eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.UnderSiege, unit, predict.target));
+      ///    while (eventDialog.Animating) { yield return null; }
+      ///  }
+      ///}
+
+      ///if (predict.result == SiegeResult.NoLabor) {
+      ///  if (unit.IsShowingAnimation()) {
+      ///    popAniController.Show(hexMap.GetUnitView(unit),
+      ///    System.String.Format(textLib.get("pop_insufficientLabor"), SiegePredict.MinLabor), Color.yellow);
+      ///    while (popAniController.Animating) { yield return null; }
+      ///  }
+      ///}
+
+      ///if (predict.result == SiegeResult.NoPoint) {
+      ///  if (unit.IsShowingAnimation()) {
+      ///    popAniController.Show(hexMap.GetUnitView(unit),
+      ///    System.String.Format(textLib.get("pop_insufficientPoint"), SiegePredict.MinPoint), Color.yellow);
+      ///    while (popAniController.Animating) { yield return null; }
+      ///  }
+      ///}
+
     }
 
     public bool ShowAnimating = false;
