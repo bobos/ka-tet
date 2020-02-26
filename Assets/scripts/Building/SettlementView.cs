@@ -59,7 +59,7 @@ public class SettlementView : View
       && Util.eq<Settlement>(settlement, this.settlement)
       && !settlement.IsUnderSiege())
     {
-      HashSet<Tile> tiles = settlementMgr.GetSupplyRangeTiles(settlement);
+      HashSet<Tile> tiles = settlementMgr.GetFullSupplyRangeTiles(settlement);
       Tile[] tileArray = new Tile[tiles.Count];
       tiles.CopyTo(tileArray);
       hexMap.HighlightArea(tileArray, HexMap.RangeType.supplyRange);

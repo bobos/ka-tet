@@ -131,7 +131,7 @@ namespace TextNS
         // use default txt lib
         if (!defaultTxtDict.TryGetValue(key, out ret))
         {
-          return "notFound";
+          return "NF";
         }
       }
       return ret;

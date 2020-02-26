@@ -385,7 +385,7 @@ namespace MonoNS
       return deathNum;
     }
 
-    public HashSet<Tile> GetSupplyRangeTiles(Settlement settlement) {
+    HashSet<Tile> GetSupplyRangeTiles(Settlement settlement) {
       SetGhostOwner(settlement);
       HashSet<Tile> ret = new HashSet<Tile>();
       if (!settlement.IsNormal()) {
@@ -394,6 +394,25 @@ namespace MonoNS
       }
       foreach(Tile tile in ghostUnit.GetAccessibleTilesForSupply(settlement.baseTile,
                             GetGhostUnitRangeForSettlementSupply())) {
+        ret.Add(tile);
+      }
+      return ret;
+    }
+
+    public HashSet<Tile> GetFullSupplyRangeTiles(Settlement settlement) {
+      HashSet<Tile> tiles = GetSupplyRangeTiles(settlement);
+      foreach(Tile tile in settlement.GetExtraSupplyRange()) {
+        tiles.Add(tile);
+      }
+      return tiles;
+    }
+
+    public HashSet<Tile> GetSupplyRangeTiles4SiegeWall(Building siegeWall) {
+      SetGhostOwner(siegeWall);
+      HashSet<Tile> ret = new HashSet<Tile>();
+      ret.Add(siegeWall.baseTile);
+      foreach(Tile tile in ghostUnit.GetAccessibleTilesForSupply(siegeWall.baseTile,
+                            (int)(GetGhostUnitRangeForSettlementSupply() * 0.35))) {
         ret.Add(tile);
       }
       return ret;
@@ -445,7 +464,7 @@ namespace MonoNS
       return (int)(ghostUnit.GetFullMovement() * 1.3f);
     }
 
-    void SetGhostOwner(Settlement settlement) {
+    void SetGhostOwner(Building settlement) {
       ghostUnit.SetPlayer(!settlement.owner.isAI);
     }
 

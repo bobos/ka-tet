@@ -181,8 +181,7 @@ public class Starter : MonoBehaviour {
     if (!settlementMgr.BuildStrategyBase(hexMap.GetTile(1,1),
                     hexMap.GetAIParty(), supply * 5 * 5, 5000)) {
       Util.Throw("Failed to build base at 1,1");}
-    if (!settlementMgr.BuildCity("河间府", hexMap.GetTile(26, 18),
-    //if (!settlementMgr.BuildCity("河间府", hexMap.GetTile(27, 17),
+    if (!settlementMgr.BuildCity("河间府", hexMap.GetTile(27, 17),
                     hexMap.GetPlayerParty(),
                     2, // wallLevel
                     34000, // male
@@ -204,8 +203,8 @@ public class Starter : MonoBehaviour {
 
     // * AI *
     //caocao.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(1, 1), 0, 6000);
-    caocao.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(26, 15), 70000, 5000);
-    abc.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(25, 16), 6000, 4000);
+    caocao.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(19, 2), 70000, 5000);
+    abc.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(10, 17), 6000, 4000);
     xuchu.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(27, 15), 3000);
     x1.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(24, 15), 3000);
     x2.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(24, 17), 10000, 1000);

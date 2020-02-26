@@ -130,7 +130,7 @@ public abstract class Settlement: Building
         continue;
       }
 
-      if (tile.siegeWall == null || !tile.siegeWall.IsFunctional()) {
+      if (tile.siegeWall == null || !tile.siegeWall.IsFunctional() || tile.siegeWall.owner.isAI == owner.isAI) {
         underSiege = false;
         break;
       }
@@ -431,22 +431,27 @@ public abstract class Settlement: Building
     return suggestion.ToArray();
   } 
 
+  bool IsRoadBlocked(Tile[] path) {
+    bool blocked = false;
+    foreach(Tile t in path) {
+      if (!t.Passable(owner.isAI)) {
+        blocked = true;
+        break;
+      }
+    }
+    return blocked;
+  }
+
   public Settlement[] GetReachableSettlements()
   {
     if (!IsFunctional()) return new Settlement[0];
     HashSet<Settlement> settlements = new HashSet<Settlement>();
     bool isAI = owner.isAI;
     foreach(Tile tile in baseTile.linkedTilesForCamp) {
-      if (tile.settlement != null && tile.settlement.owner.isAI == owner.isAI
+      if (tile.settlement != null && tile.settlement.owner.isAI == isAI
         && tile.settlement.IsFunctional() && baseTile.roads.ContainsKey(tile)) {
         Tile[] path = baseTile.roads[tile];
-        bool blocked = false;
-        foreach(Tile t in path) {
-          if (!t.Passable(isAI)) {
-            blocked = true;
-            break;
-           }
-        }
+        bool blocked = IsRoadBlocked(baseTile.roads[tile]);
         if (!blocked) {
           settlements.Add(tile.settlement);
         }
@@ -457,14 +462,39 @@ public abstract class Settlement: Building
     return ret;
   }
 
+  public HashSet<Tile> GetExtraSupplyRange() {
+    HashSet<Tile> tiles = new HashSet<Tile>();
+    // siege units
+    foreach(Tile tile in baseTile.linkedTilesForCamp) {
+      if (tile.settlement == null || tile.settlement.owner.isAI == owner.isAI || tile.settlement.type != Type.city) {
+        continue;
+      }
+      Tile[] path = baseTile.roads[tile];
+      if (IsRoadBlocked(path)) {
+        continue;
+      }
+
+      // there is linked enemy settlement, check if there is siege wall built on the road besides enemy city
+      HashSet<Tile> road = new HashSet<Tile>(path);
+      foreach(Tile t in tile.neighbours) {
+        if (t.field == FieldType.Road && road.Contains(t) && t.siegeWall != null && t.siegeWall.IsFunctional()) {
+          foreach(Tile tt in settlementMgr.GetSupplyRangeTiles4SiegeWall(t.siegeWall)) {
+            tiles.Add(tt);
+          }
+          break;
+        }
+      }
+    }
+
+    return tiles;
+  }
+
   public Unit[] GetReachableUnits() {
     if (!IsFunctional()) return new Unit[0];
-    HashSet<Unit> all = owner.GetUnits();
     List<Unit> units = new List<Unit>();
-    HashSet<Tile> tiles = settlementMgr.GetSupplyRangeTiles(this);
-    foreach(Unit unit in all) {
-      if (unit.IsCamping()) continue;
-      if (tiles.Contains(unit.tile)) {
+    foreach(Tile tile in settlementMgr.GetFullSupplyRangeTiles(this)) {
+      Unit unit = tile.GetUnit();
+      if (unit != null && unit.IsAI() == owner.isAI && !unit.IsCamping()) {
         units.Add(unit);
       }
     }

@@ -22,7 +22,7 @@ namespace MonoNS
       turnController.onEndTurnClicked += OnEndTurnClicked;
       turnController.onNewTurn += OnNewTurn;
       GameObject[] btns = {MoveButton, AttackButton, DefendButton, CampButton,
-                           SabotageButton, FireButton, AmbushButton, EncampButton,
+                           SabotageButton, FireButton, SiegeButton, EncampButton,
                            RetreatButton, TransferSupplyButton, TransferLaborButton,
                            DecampButton, SabotageSiegeButton
                            };
@@ -48,7 +48,7 @@ namespace MonoNS
     public GameObject SabotageButton;
     public GameObject NextTurnButton;
     public GameObject FireButton;
-    public GameObject AmbushButton; // Siege
+    public GameObject SiegeButton; // Siege
     public GameObject EncampButton;
     public GameObject RetreatButton;
     public GameObject TransferSupplyButton;
@@ -207,8 +207,8 @@ namespace MonoNS
         }
 
         if (mouseController.nearEnemySettlement != null && !mouseController.nearEnemySettlement.IsEmpty()
-          && !hexMap.wargameController.start) {
-          AmbushButton.SetActive(true);
+          && !hexMap.wargameController.start && mouseController.nearEnemySettlement.type == Settlement.Type.city) {
+          SiegeButton.SetActive(true);
         }
 
         if ((mouseController.nearAlly || mouseController.nearMySettlement != null) && 
