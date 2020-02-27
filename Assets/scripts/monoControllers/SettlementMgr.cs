@@ -47,7 +47,7 @@ namespace MonoNS
     // TODO: just for tmp test
     public void BuildRoad(Tile from, Tile to) {
       List<Tile> path = new List<Tile>(); 
-      foreach(Tile tile in ghostUnit.FindPath(from, to, true)) {
+      foreach(Tile tile in ghostUnit.FindPath(from, to)) {
         if (!Util.eq<Tile>(tile, from) && !Util.eq<Tile>(tile, to)) {
           tile.BuildRoad();
           path.Add(tile);
@@ -122,23 +122,23 @@ namespace MonoNS
           continue;
         }
         // ambush supply caravans
-        if(!job.from.GetReachableSettlements().Contains(job.to)) {
+        if(!job.from.IsSettlementLinked(job.to)) {
           hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.SupplyRouteBlocked, null, job.from, 0, 0, 0, 0, 0, job.to));
           while (hexMap.eventDialog.Animating) { yield return null; }
           continue;
         }
-        Tile[] route = job.from.baseTile.roads[job.to.baseTile];
-        Unit ambusher = IsSupplyRouteAmbushed(route, warParty.isAI);
-        if (ambusher != null) {
-          // There is enemy unit ambushed on the supply route
-          if (job.type == QueueJobType.DistSupply) {
-            job.from.SupplyIntercepted(ambusher, job.to, job.amount);
-          } else {
-            job.from.LaborIntercepted(ambusher, job.to, job.amount);
-          }
-          while (hexMap.eventDialog.Animating) { yield return null; }
-          continue;
-        }
+        //Tile[] route = job.from.baseTile.roads[job.to.baseTile];
+        //Unit ambusher = IsSupplyRouteAmbushed(route, warParty.isAI);
+        //if (ambusher != null) {
+        //  // There is enemy unit ambushed on the supply route
+        //  if (job.type == QueueJobType.DistSupply) {
+        //    job.from.SupplyIntercepted(ambusher, job.to, job.amount);
+        //  } else {
+        //    job.from.LaborIntercepted(ambusher, job.to, job.amount);
+        //  }
+        //  while (hexMap.eventDialog.Animating) { yield return null; }
+        //  continue;
+        //}
 
         if (job.type == QueueJobType.DistSupply) {
           job.from.DistSupply(job.amount, job.to);
@@ -179,6 +179,16 @@ namespace MonoNS
       }
 
       turnEndOngoing = false;
+    }
+
+    public HashSet<Tile> GetControlledTiles(bool isAI) {
+      HashSet<Tile> tiles = new HashSet<Tile>();
+      foreach(Settlement settlement in hexMap.IsAttackSide(isAI) ? attackerRoots : defenderRoots) {
+        foreach(Tile tile in GetFullSupplyRangeTiles(settlement)) {
+          tiles.Add(tile);
+        }
+      }
+      return tiles;
     }
 
     public Unit IsSupplyRouteAmbushed(Tile[] route, bool isAI) {
@@ -323,7 +333,6 @@ namespace MonoNS
         }
       }
     }
-
 
     void SetBuildingSkinReady(GameObject view) {
       MeshRenderer[] mrs = view.GetComponentsInChildren<MeshRenderer>();

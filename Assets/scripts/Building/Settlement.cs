@@ -442,6 +442,35 @@ public abstract class Settlement: Building
     return blocked;
   }
 
+  public bool IsSettlementLinked(Settlement target) {
+    if (Util.eq<Settlement>(this, target)) {
+      return false;
+    }
+
+    return IsLinked(new HashSet<Settlement>(), target);
+  }
+  
+  public bool IsLinked(HashSet<Settlement> visited, Settlement target) {
+    bool linked = false;
+    visited.Add(this);
+
+    if (Util.eq<Settlement>(this, target)) {
+      return true;
+    }
+
+    foreach(Settlement s in GetReachableSettlements()) {
+      if (visited.Contains(s)) {
+        continue;
+      }
+
+      if (s.IsLinked(visited, target)) {
+        linked = true;
+        break;
+      }
+    }
+    return linked;
+  }
+
   public Settlement[] GetReachableSettlements()
   {
     if (!IsFunctional()) return new Settlement[0];

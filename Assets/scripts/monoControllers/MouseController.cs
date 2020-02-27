@@ -629,8 +629,7 @@ namespace MonoNS
 
       if (mouseMode == mode.dist || mouseMode == mode.distLabor)
       {
-        Settlement[] settlements = selectedSettlement.GetReachableSettlements();
-        if (settlements.Contains(s)) {
+        if(selectedSettlement.IsSettlementLinked(s)) {
           transferedSettlement = s;
         } else {
           return;

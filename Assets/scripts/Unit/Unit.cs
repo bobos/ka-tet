@@ -865,8 +865,9 @@ namespace UnitNS
     // ==============================================================
     // ================= path finding ===============================
     // ==============================================================
-
+    public HashSet<Tile> enemyControlledTiles;
     public Tile[] GetPureAccessibleTiles() {
+      enemyControlledTiles = hexMap.settlementMgr.GetControlledTiles(!IsAI());
       return PFTile2Tile(PathFinder.FindAccessibleTiles(tile, this, movementRemaining));
     }
 
@@ -888,6 +889,7 @@ namespace UnitNS
 
     public Tile[] GetAccessibleTilesForSupply(Tile start, int remaining)
     {
+      enemyControlledTiles = null;
       return PFTile2Tile(PathFinder.FindAccessibleTiles(start, this, remaining, PathFind.Mode.Supply));
       /*
       HashSet<Tile> tiles = new HashSet<Tile>();
@@ -907,8 +909,9 @@ namespace UnitNS
     }
 
     // only for Ghost unit to pathfind settlement path
-    public Tile[] FindPath(Tile source, Tile target, bool targetAlwaysReachable)
+    public Tile[] FindPath(Tile source, Tile target)
     {
+      enemyControlledTiles = null;
       return PFTile2Tile(PathFinder.FindPath(source, target, this, PathFind.Mode.Supply));
     }
 
@@ -918,7 +921,7 @@ namespace UnitNS
       if (target.GetUnit() != null) {
         return new Tile[]{};
       }
-
+      enemyControlledTiles = hexMap.settlementMgr.GetControlledTiles(!IsAI());
       return PFTile2Tile(PathFinder.FindPath(tile, target, this));
     }
 

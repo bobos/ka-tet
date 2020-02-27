@@ -15,7 +15,7 @@ namespace MapTileNS
     public const float HillHeightStart = 0.5f;
     public const float HillHeightEnd = 1.0f;
     public const float HighgroundWatermark = 0.65f;
-    public const int Work2BuildCamp = 1;//34;
+    public const int Work2BuildCamp = 34;
     public const float HighGround = 0.312f;
     public const float VantageGround = 0.8f;
     public Flood flood = null;
@@ -343,6 +343,10 @@ namespace MapTileNS
           }
         }
         ret = ret + (int)(ret * cnt * 0.5f);
+        if (unit.enemyControlledTiles != null && unit.enemyControlledTiles.Contains(this)) {
+          // this tile is controlled by enemy, extra cost is needed
+          ret = (int)(ret * 1.2f);
+        }
       }
 
       return ret > 0 ? ret : Unit.MovementCostOnUnaccesible;
