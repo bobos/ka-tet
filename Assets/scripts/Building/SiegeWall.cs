@@ -18,6 +18,7 @@ public class SiegeWall: Building
     this.owner = warParty;
     hexMap = GameObject.FindObjectOfType<HexMap>();
     buildWork = tile.Work2BuildSettlement();
+    settlementMgr = hexMap.settlementMgr;
   }
 
   protected override int HowMuchBuildWorkToFinish() {

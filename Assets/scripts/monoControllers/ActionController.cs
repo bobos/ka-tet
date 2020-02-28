@@ -331,7 +331,11 @@ namespace MonoNS
       }
       if (name == actionName.SABOTAGE)
       {
-        StartCoroutine(Flood(unit, tile));
+        if (tile == null) {
+          StartCoroutine(DestroySiegeWall(unit));
+        } else {
+          StartCoroutine(Flood(unit, tile));
+        }
       }
       if (name == actionName.FIRE)
       {
@@ -383,8 +387,18 @@ namespace MonoNS
 
     IEnumerator Flood(Unit unit, Tile tile)
     {
-      tileAniController.Flood(tile);
+      tileAniController.Flood(unit, tile);
       while (tileAniController.FloodAnimating)
+      {
+        yield return null;
+      }
+      ActionOngoing = false;
+    }
+
+    IEnumerator DestroySiegeWall(Unit unit)
+    {
+      tileAniController.DestroySiegeWall(unit);
+      while (tileAniController.DestroySiegeAnimating)
       {
         yield return null;
       }

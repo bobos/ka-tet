@@ -216,7 +216,7 @@ public class Starter : MonoBehaviour {
     zhangfei.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(28, 17), 0);
 
     // * AI *
-    caocao.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(1, 1), 70000, 5000);
+    caocao.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(27, 16), 70000, 5000);
     abc.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(2, 2), 6000, 4000);
     xuchu.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(2, 1), 3000);
     x1.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(2, 3), 3000);

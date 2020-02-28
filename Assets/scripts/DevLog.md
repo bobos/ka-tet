@@ -40,7 +40,6 @@ Game Tips:
 31. 敌方控制范围移动需要额外2/10移动力
 32. 筑城最少需要500民夫
 
-in city labor exchange
 siegewal destroyed by force, fire, flood
 部队交换位置
 cover body 50 action points, +2 discontent

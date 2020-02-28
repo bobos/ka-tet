@@ -25,52 +25,92 @@ namespace MonoNS
     PopTextAnimationController popAniController;
     EventDialog eventDialog;
     TextLib textLib = Cons.GetTextLib();
+    public const int MinLaborForBreakDam = 500;
+    public const int MinLaborForBreakSiege = 200;
 
     public override void UpdateChild() {}
 
+    public bool DestroySiegeAnimating = false;
+    public bool DestroySiegeWall(Unit unit)
+    {
+      DestroySiegeAnimating = true;
+      hexMap.cameraKeyboardController.DisableCamera();
+      StartCoroutine(CoDestroySiegeWall(unit));
+      if (unit != null && unit.labor < MinLaborForBreakSiege) {
+        return false; 
+      }
+      return true;
+    }
+
+    IEnumerator CoDestroySiegeWall(Unit u)
+    {
+      if (u.labor < MinLaborForBreakSiege && u.IsShowingAnimation()) {
+        popAniController.Show(hexMap.GetUnitView(u), 
+          System.String.Format(textLib.get("pop_insufficientLabor"), MinLaborForBreakSiege), Color.yellow);
+        while (popAniController.Animating) { yield return null; }
+      } else {
+        settlementAniController.DestroySiegeWall(u.tile.siegeWall, BuildingNS.DestroyType.ByForce);
+        while (settlementAniController.Animating) { yield return null; }
+        popAniController.Show(hexMap.GetUnitView(u), textLib.get("pop_siegeBreak"), Color.green);
+        while (popAniController.Animating) { yield return null; }
+      }
+      hexMap.cameraKeyboardController.EnableCamera();
+      DestroySiegeAnimating = false;
+    }
+
     public bool FloodAnimating = false;
-    public void Flood(Tile tile, HashSet<Tile> tiles = null)
+    public bool Flood(Unit unit, Tile tile, HashSet<Tile> tiles = null)
     {
       FloodAnimating = true;
       hexMap.cameraKeyboardController.DisableCamera();
-      StartCoroutine(CoFlood(tile, tiles == null ? tile.CreateFlood() : tiles));
+      StartCoroutine(CoFlood(unit, tile, tiles == null ? tile.CreateFlood() : tiles));
+      if (unit != null && unit.labor < MinLaborForBreakDam) {
+        return false; 
+      }
+      return true;
     }
 
-    IEnumerator CoFlood(Tile t, HashSet<Tile> tiles)
+    IEnumerator CoFlood(Unit u, Tile t, HashSet<Tile> tiles)
     {
-      popAniController.Show(hexMap.GetTileView(t), textLib.get("pop_damBroken"), Color.white);
-      while (popAniController.Animating) { yield return null; }
-      foreach(Tile tile in tiles) {
-        hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(tile).transform.position);
-        Settlement settlement = tile.settlement;
-        Unit unit = tile.GetUnit();
-        tile.Flood();
-        TileView view = hexMap.GetTileView(tile);
-        view.FloodAnimation();
-        while (view.Animating) { yield return null; }
-        if (settlement != null) {
-          List<Unit> garrison = settlementAniController.DestroySettlement(settlement, BuildingNS.DestroyType.ByFlood);
-          while (settlementAniController.Animating) { yield return null; }
-          foreach(Unit u in garrison) {
-            unitAniController.DestroyUnit(u, DestroyType.ByFlood);
-            while (unitAniController.DestroyAnimating) { yield return null; }
+      if (u != null && u.labor < MinLaborForBreakDam && u.IsShowingAnimation()) {
+        popAniController.Show(hexMap.GetUnitView(u), 
+          System.String.Format(textLib.get("pop_insufficientLabor"), MinLaborForBreakDam), Color.yellow);
+        while (popAniController.Animating) { yield return null; }
+      } else {
+        popAniController.Show(hexMap.GetTileView(t), textLib.get("pop_damBroken"), Color.white);
+        while (popAniController.Animating) { yield return null; }
+        foreach(Tile tile in tiles) {
+          hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(tile).transform.position);
+          Settlement settlement = tile.settlement;
+          Unit unit = tile.GetUnit();
+          tile.Flood();
+          TileView view = hexMap.GetTileView(tile);
+          view.FloodAnimation();
+          while (view.Animating) { yield return null; }
+          if (settlement != null) {
+            List<Unit> garrison = settlementAniController.DestroySettlement(settlement, BuildingNS.DestroyType.ByFlood);
+            while (settlementAniController.Animating) { yield return null; }
+            foreach(Unit u1 in garrison) {
+              unitAniController.DestroyUnit(u1, DestroyType.ByFlood);
+              while (unitAniController.DestroyAnimating) { yield return null; }
+            }
           }
-        }
 
-        if (unit != null) {
-          Tile newTile = tile.Escape();
-          if (newTile == null) {
-            unitAniController.DestroyUnit(unit, DestroyType.ByFlood);
-            while (unitAniController.DestroyAnimating) { yield return null; }
-          } else {
-            unitAniController.ShowEffects(unit, DisasterEffect.Apply(DisasterType.Flood, unit));
-            while(unitAniController.ShowAnimating) { yield return null; }
-            unitAniController.MoveUnit(unit, newTile);
-            while (unitAniController.MoveAnimating) { yield return null; }
-            if (!Util.eq<Tile>(newTile, unit.tile)) {
-              // Failed to move, destroy unit
+          if (unit != null) {
+            Tile newTile = tile.Escape();
+            if (newTile == null) {
               unitAniController.DestroyUnit(unit, DestroyType.ByFlood);
               while (unitAniController.DestroyAnimating) { yield return null; }
+            } else {
+              unitAniController.ShowEffects(unit, DisasterEffect.Apply(DisasterType.Flood, unit));
+              while(unitAniController.ShowAnimating) { yield return null; }
+              unitAniController.MoveUnit(unit, newTile);
+              while (unitAniController.MoveAnimating) { yield return null; }
+              if (!Util.eq<Tile>(newTile, unit.tile)) {
+                // Failed to move, destroy unit
+                unitAniController.DestroyUnit(unit, DestroyType.ByFlood);
+                while (unitAniController.DestroyAnimating) { yield return null; }
+              }
             }
           }
         }
@@ -153,7 +193,7 @@ namespace MonoNS
       if (tile.flood != null) {
         HashSet<Tile> tiles = tile.flood.OnWeatherChange(weather);
         if (tiles.Count > 0) {
-          Flood(tile, tiles);
+          Flood(null, tile, tiles);
           while (FloodAnimating) { yield return null; }
         }
       }

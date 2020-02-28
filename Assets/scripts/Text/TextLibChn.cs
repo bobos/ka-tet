@@ -305,6 +305,7 @@ namespace TextNS
       {"pop_insufficientPoint", @"需要{0}体力"},
       {"pop_sieged", "围困工事已修筑"},
       {"pop_sieging", "修建长围"},
+      {"pop_siegeBreak", "拆毁长围"},
       {"pop_buildFail", "无法建造"},
       {"pop_farmDestroyed", "农田被毁"},
       {"pop_altitudeSickness", "高原反应"},

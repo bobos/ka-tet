@@ -24,7 +24,7 @@ namespace MonoNS
       GameObject[] btns = {MoveButton, AttackButton, DefendButton, CampButton,
                            SabotageButton, FireButton, SiegeButton, EncampButton,
                            RetreatButton, TransferSupplyButton, TransferLaborButton,
-                           DecampButton, SabotageSiegeButton
+                           DecampButton
                            };
       buttons = btns;
       mouseController.onUnitSelect += OnUnitSelect;
@@ -54,7 +54,6 @@ namespace MonoNS
     public GameObject TransferSupplyButton;
     public GameObject TransferLaborButton;
     public GameObject DecampButton;
-    public GameObject SabotageSiegeButton;
     GameObject[] buttons;
 
     public Text title;
@@ -161,6 +160,9 @@ namespace MonoNS
         if (deployableTiles.Count > 0) {
           DecampButton.SetActive(true);
         }
+        if (unit.labor > 0) {
+          TransferLaborButton.SetActive(true);
+        }
         //SabotageSiegeButton.SetActive(true);
         return;
       }
@@ -188,7 +190,7 @@ namespace MonoNS
       }
 
       if (unit.type == Type.Infantry) {
-        if (mouseController.nearDam != null) {
+        if (mouseController.nearDam != null || (unit.tile.siegeWall != null && unit.tile.siegeWall.owner.isAI != unit.IsAI())) {
           SabotageButton.SetActive(true);
         }
       }

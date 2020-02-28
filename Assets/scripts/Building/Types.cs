@@ -6,7 +6,8 @@ namespace BuildingNS
   public enum DestroyType
   {
     ByFire,
-    ByFlood
+    ByFlood,
+    ByForce
   }
 
 }

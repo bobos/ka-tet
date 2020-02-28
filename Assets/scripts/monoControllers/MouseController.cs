@@ -213,7 +213,11 @@ namespace MonoNS
 
       if (action == ActionController.actionName.SABOTAGE)
       {
-        if(!actionController.sabotage(selectedUnit, nearDam)){
+        Tile tile = nearDam;
+        if (selectedUnit.tile.siegeWall != null && selectedUnit.tile.siegeWall.owner.isAI != selectedUnit.IsAI()) {
+          tile = null;
+        }
+        if(!actionController.sabotage(selectedUnit, tile)){
           // TODO
           Debug.LogError("Failed to sabotage, try again!");
         }
@@ -316,12 +320,13 @@ namespace MonoNS
         if (mouseMode == mode.transferLabor) {
           try {
             int labor = hexMap.inputField.GetInput();
-            if (labor == 0 || labor > selectedUnit.labor ||
+            Unit unit = selectedUnit != null ? selectedUnit : hexMap.settlementViewPanel.selectedUnit;
+            if (labor == 0 || labor > unit.labor ||
                 (transferedUnit != null && labor > transferedUnit.LaborCanTakeIn())) {
               msgBox.Show("invalid input");
               return;
             }
-            selectedUnit.labor -= labor;
+            unit.labor -= labor;
             if (transferedUnit != null) {
               int remain = transferedUnit.TakeInLabor(labor);
               selectedUnit.labor += remain;
@@ -736,9 +741,13 @@ namespace MonoNS
 
     void UpdateUnitTransferLabor()
     {
-      if (Input.GetMouseButtonUp(0) && tileUnderMouse != null)
+      if (Input.GetMouseButtonUp(0) && tileUnderMouse != null || hexMap.settlementViewPanel.selectedUnit != null)
       {
-        ClickOnTile();
+        if (hexMap.settlementViewPanel.selectedUnit != null) {
+          transferedSettlement = selectedSettlement;
+        } else {
+          ClickOnTile();
+        }
         if (transferedUnit == null && transferedSettlement == null) {
           return;
         }

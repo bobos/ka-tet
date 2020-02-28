@@ -287,7 +287,7 @@ namespace MonoNS
       return true;
     }
 
-    Dictionary<Building, GameObject> settlement2GO = new Dictionary<Building, GameObject>();
+    public Dictionary<Building, GameObject> settlement2GO = new Dictionary<Building, GameObject>();
     void CreateSettlement(Settlement settlement)
     {
       Vector3 position = settlement.baseTile.GetSurfacePosition();

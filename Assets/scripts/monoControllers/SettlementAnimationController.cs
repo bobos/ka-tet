@@ -34,6 +34,7 @@ namespace MonoNS
       view.DestroyAnimation(type);
       while (view.Animating) { yield return null; }
       view.Destroy();
+      settlementMgr.settlement2GO.Remove(settlement);
       eventDialog.Show(new Event(
           type == BuildingNS.DestroyType.ByFlood ?
           EventDialog.EventName.FloodDestroyCamp :
@@ -57,6 +58,7 @@ namespace MonoNS
       view.DestroyAnimation(type);
       while (view.Animating) { yield return null; }
       view.Destroy();
+      settlementMgr.settlement2GO.Remove(siegeWall);
       hexMap.cameraKeyboardController.EnableCamera();
       Animating = false;
     }
