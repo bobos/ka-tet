@@ -34,6 +34,7 @@ namespace FieldNS
     public int infantryWounded;
     public int cavalryWounded;
     public Faction faction;
+    public General commanderGeneral;
 
     public bool isAI { get; private set; }
     public bool attackside { get; private set; }

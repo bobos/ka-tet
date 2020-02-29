@@ -31,27 +31,28 @@ namespace MonoNS
     public override void UpdateChild() {}
 
     public bool DestroySiegeAnimating = false;
-    public bool DestroySiegeWall(Unit unit)
+    public bool DestroySiegeWall(Unit unit, Tile tile = null)
     {
       DestroySiegeAnimating = true;
       hexMap.cameraKeyboardController.DisableCamera();
-      StartCoroutine(CoDestroySiegeWall(unit));
+      StartCoroutine(CoDestroySiegeWall(unit, tile));
       if (unit != null && unit.labor < MinLaborForBreakSiege) {
         return false; 
       }
       return true;
     }
 
-    IEnumerator CoDestroySiegeWall(Unit u)
+    IEnumerator CoDestroySiegeWall(Unit u, Tile tile)
     {
-      if (u.labor < MinLaborForBreakSiege && u.IsShowingAnimation()) {
+      if (u != null && u.labor < MinLaborForBreakSiege && u.IsShowingAnimation()) {
         popAniController.Show(hexMap.GetUnitView(u), 
           System.String.Format(textLib.get("pop_insufficientLabor"), MinLaborForBreakSiege), Color.yellow);
         while (popAniController.Animating) { yield return null; }
       } else {
-        settlementAniController.DestroySiegeWall(u.tile.siegeWall, BuildingNS.DestroyType.ByForce);
+        tile = tile == null ? u.tile : tile;
+        settlementAniController.DestroySiegeWall(tile.siegeWall, BuildingNS.DestroyType.ByForce);
         while (settlementAniController.Animating) { yield return null; }
-        popAniController.Show(hexMap.GetUnitView(u), textLib.get("pop_siegeBreak"), Color.green);
+        popAniController.Show(hexMap.GetTileView(tile), textLib.get("pop_siegeBreak"), Color.green);
         while (popAniController.Animating) { yield return null; }
       }
       hexMap.cameraKeyboardController.EnableCamera();
@@ -87,6 +88,11 @@ namespace MonoNS
           TileView view = hexMap.GetTileView(tile);
           view.FloodAnimation();
           while (view.Animating) { yield return null; }
+          if (tile.siegeWall != null) {
+            DestroySiegeWall(null, tile);
+            while (DestroySiegeAnimating) { yield return null; }
+          }
+
           if (settlement != null) {
             List<Unit> garrison = settlementAniController.DestroySettlement(settlement, BuildingNS.DestroyType.ByFlood);
             while (settlementAniController.Animating) { yield return null; }
@@ -139,6 +145,11 @@ namespace MonoNS
         TileView view = hexMap.GetTileView(tile);
         view.BurnAnimation();
         while (view.Animating) { yield return null; }
+        if (tile.siegeWall != null) {
+          DestroySiegeWall(null, tile);
+          while (DestroySiegeAnimating) { yield return null; }
+        }
+
         if (settlement != null) {
           List<Unit> garrison = settlementAniController.DestroySettlement(settlement, BuildingNS.DestroyType.ByFire);
           while (settlementAniController.Animating) { yield return null; }

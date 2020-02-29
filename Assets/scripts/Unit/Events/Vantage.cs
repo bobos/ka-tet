@@ -10,13 +10,17 @@
       this.unit = unit;
     }
 
+    public bool IsAtVantagePoint() {
+      return unit.tile.vantagePoint;
+    }
+
     public float Buf() {
       if (unit.IsCamping()) {
         return unit.tile.settlement.wall.defensePoint * 0.015f;
       }
 
       if (unit.tile.terrian == MapTileNS.TerrianType.Hill) {
-        if (unit.tile.vantagePoint) {
+        if (IsAtVantagePoint()) {
           return 0.2f;
         }
 

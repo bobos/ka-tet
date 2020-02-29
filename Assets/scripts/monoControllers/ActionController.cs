@@ -66,6 +66,13 @@ namespace MonoNS
       }
     }
 
+    public void OnReposition() {
+      if (onBtnClick != null)
+      {
+        onBtnClick(actionName.REPOS);
+      }
+    }
+
     public void OnPoisionClick()
     {
       if (onBtnClick != null)
@@ -253,6 +260,7 @@ namespace MonoNS
       MOVE,
       STAND,
       ATTACK,
+      REPOS,
       POISION,
       SABOTAGE,
       ATTACKEmpty,

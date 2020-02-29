@@ -24,7 +24,7 @@ namespace MonoNS
       GameObject[] btns = {MoveButton, AttackButton, DefendButton, CampButton,
                            SabotageButton, FireButton, SiegeButton, EncampButton,
                            RetreatButton, TransferSupplyButton, TransferLaborButton,
-                           DecampButton
+                           DecampButton, ReposButton
                            };
       buttons = btns;
       mouseController.onUnitSelect += OnUnitSelect;
@@ -54,6 +54,7 @@ namespace MonoNS
     public GameObject TransferSupplyButton;
     public GameObject TransferLaborButton;
     public GameObject DecampButton;
+    public GameObject ReposButton;
     GameObject[] buttons;
 
     public Text title;
@@ -180,6 +181,10 @@ namespace MonoNS
         if (!hexMap.combatController.start && unit.GetStaminaLevel() != StaminaLvl.Exhausted) {
           AttackButton.SetActive(true);
         }
+      }
+
+      if (!hexMap.wargameController.start && mouseController.nearAlly) {
+        ReposButton.SetActive(true);
       }
 
       if (mouseController.nearMySettlement != null && mouseController.nearMySettlement.HasRoom()

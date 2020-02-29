@@ -122,8 +122,8 @@ namespace MonoNS
         {
           if (!unit.IsCamping()) {
             cc.FixCameraAt(hexMap.GetUnitView(unit).transform.position);
+            while (cc.fixingCamera) { yield return null; }
           }
-          while (cc.fixingCamera) { yield return null; }
           while (!actionController.move(unit))
           {
             yield return null;

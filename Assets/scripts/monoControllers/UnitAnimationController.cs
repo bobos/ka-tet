@@ -5,6 +5,7 @@ using TextNS;
 using UnityEngine;
 using MapTileNS;
 using FieldNS;
+using System.Collections.Generic;
 
 namespace MonoNS
 {
@@ -82,7 +83,6 @@ namespace MonoNS
         discontent = unit.marchOnHeat.Occur();
         discontent += unit.marchOnExhaustion.Occur();
       }
-
       if (unit.IsShowingAnimation()) {
         hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(unit.tile).transform.position);
       }
@@ -273,12 +273,13 @@ namespace MonoNS
     public bool AttackEmptyAnimating = false;
     public void AttackEmpty(Unit unit, Settlement settlement, bool occupy = true) {
       AttackEmptyAnimating = true;
-      hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(settlement.baseTile).transform.position);
-      hexMap.cameraKeyboardController.DisableCamera();
       StartCoroutine(CoAttackEmpty(unit, settlement, occupy));
     }
 
     IEnumerator CoAttackEmpty(Unit unit, Settlement settlement, bool occupy) {
+      hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(settlement.baseTile).transform.position);
+      while (hexMap.cameraKeyboardController.fixingCamera) { yield return null; }
+      hexMap.cameraKeyboardController.DisableCamera();
       if (settlement.type != Settlement.Type.camp) {
         occupy = true;
       } else if (!unit.IsAI()) {
@@ -448,34 +449,6 @@ namespace MonoNS
       }
       hexMap.cameraKeyboardController.EnableCamera();
       SiegeAnimating = false;
-
-      ///if (predict.result == SiegeResult.Ready) {
-      ///  // siege ready
-      ///  //unit.tile.sieged = true;
-      ///  unit.movementRemaining -= SiegePredict.MinPoint;
-
-      ///  if (predict.target.IsUnderSiege()) {
-      ///    eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.UnderSiege, unit, predict.target));
-      ///    while (eventDialog.Animating) { yield return null; }
-      ///  }
-      ///}
-
-      ///if (predict.result == SiegeResult.NoLabor) {
-      ///  if (unit.IsShowingAnimation()) {
-      ///    popAniController.Show(hexMap.GetUnitView(unit),
-      ///    System.String.Format(textLib.get("pop_insufficientLabor"), SiegePredict.MinLabor), Color.yellow);
-      ///    while (popAniController.Animating) { yield return null; }
-      ///  }
-      ///}
-
-      ///if (predict.result == SiegeResult.NoPoint) {
-      ///  if (unit.IsShowingAnimation()) {
-      ///    popAniController.Show(hexMap.GetUnitView(unit),
-      ///    System.String.Format(textLib.get("pop_insufficientPoint"), SiegePredict.MinPoint), Color.yellow);
-      ///    while (popAniController.Animating) { yield return null; }
-      ///  }
-      ///}
-
     }
 
     public bool ShowAnimating = false;

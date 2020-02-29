@@ -23,8 +23,9 @@ namespace UnitNS
     public const int MovementCostOnUnaccesible = -1;
     public const int DisbandUnitUnder = 50;
 
-    public const int L1Visibility = 4;
-    public const int L2Visibility = 5;
+    public const int L1Visibility = 2;
+    public const int L2Visibility = 4;
+    public const int VantageVisibility = 8;
     public const int L1DiscoverRange = 1; // under 2000
     public const int L2DiscoverRange = 2; // > 4000
     public const int ConcealCoolDownIn = 3;
@@ -205,6 +206,10 @@ namespace UnitNS
       return rf.general != null ? rf.general.Name() : " ";
     }
 
+    public bool IsCommander() {
+      return Util.eq<General>(hexMap.GetWarParty(this).commanderGeneral, rf.general);
+    }
+
     public string GetStateName()
     {
       if (state == State.Conceal)
@@ -369,9 +374,10 @@ namespace UnitNS
     }
 
     public Tile[] GetVisibleArea() {
+      // TODO: apply commander lvl and vantage point
       int v = L1Visibility;
-      if (IsCavalry()) {
-        v = L2Visibility;
+      if (IsCommander()) {
+        v = vantage.IsAtVantagePoint() ? VantageVisibility : L2Visibility;
       }
       return tile.GetNeighboursWithinRange<Tile>(v, (Tile _tile) => true);
     }

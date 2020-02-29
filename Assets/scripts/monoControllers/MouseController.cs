@@ -107,6 +107,7 @@ namespace MonoNS
     public bool nearEnemy = false;
     public bool nearWater = false;
     public List<Unit> nearbyEnemey = null;
+    public HashSet<Unit> nearbyAlly = null;
 
     void ResetUnitSelection() {
       nearEnemySettlement = null;
@@ -118,6 +119,7 @@ namespace MonoNS
       nearWater = false;
       inCampField = null;
       nearbyEnemey = new List<Unit>();
+      nearbyAlly = new HashSet<Unit>();
     }
 
     public void PrepareUnitSelection() {
@@ -148,15 +150,13 @@ namespace MonoNS
         Unit u = tile.GetUnit();
         if (u != null && u.IsAI() == selectedUnit.IsAI()) {
           nearAlly = true;
+          nearbyAlly.Add(u);
         }
 
         if (u != null && u.IsAI() != selectedUnit.IsAI() && !u.IsConcealed()) {
           nearEnemy = true;
           nearbyEnemey.Add(u);
         }
-
-        //TODO: check assault for Scout with enemy in 2 rings and self is hidden
-
       }
 
       if (s != null && selectedUnit.IsAI() == s.owner.isAI) {
@@ -247,6 +247,16 @@ namespace MonoNS
         Update_CurrentFunc = UpdateUnitAttack;
         msgBox.Show("选择进攻目标!");
         foreach(Unit u in nearbyEnemey) {
+          hexMap.TargetUnit(u);
+        }
+      }
+
+      if (action == ActionController.actionName.REPOS)
+      {
+        mouseMode = mode.repos;
+        Update_CurrentFunc = UpdateUnitRepos;
+        msgBox.Show("选择目标!");
+        foreach(Unit u in nearbyAlly) {
           hexMap.TargetUnit(u);
         }
       }
@@ -413,6 +423,7 @@ namespace MonoNS
       camera,
       move,
       attack,
+      repos,
       sabotage,
       transfer,
       transferLabor,
@@ -447,6 +458,13 @@ namespace MonoNS
       if (mouseMode == mode.detect && selectedSettlement != null && hexMap.settlementViewPanel.selectedUnit != null) {
         hexMap.settlementViewPanel.CancelGarrison();
         return;
+      }
+
+      if (mouseMode == mode.repos) {
+        foreach(Unit u in nearbyAlly) {
+          hexMap.SetUnitSkin(u);
+          targetUnit = null;
+        }
       }
 
       selectedPath = null;
@@ -589,6 +607,11 @@ namespace MonoNS
         }
       }
 
+      if (mouseMode == mode.repos && nearbyAlly.Contains(u)) {
+        targetUnit = u;
+        return;
+      }
+
       if (mouseMode == mode.detect)
       {
         if (selectedUnit != null && onUnitDeselect != null) onUnitDeselect(selectedUnit);
@@ -674,6 +697,24 @@ namespace MonoNS
         if (u != null)
         {
           hover.Show(u.Name());
+        }
+      }
+    }
+
+    void UpdateUnitRepos()
+    {
+      if (tileUnderMouse == null) {
+        return;
+      }
+      if (Input.GetMouseButtonUp(0))
+      {
+        ClickOnTile();
+        if (targetUnit != null) {
+          msgBox.Show("");
+          Tile tile1 = selectedUnit.tile;
+          hexMap.unitAniController.MoveUnit(selectedUnit, targetUnit.tile);
+          hexMap.unitAniController.MoveUnit(targetUnit, tile1);
+          Escape();
         }
       }
     }

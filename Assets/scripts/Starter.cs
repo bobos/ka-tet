@@ -214,15 +214,17 @@ public class Starter : MonoBehaviour {
     guanyu.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(27, 17), 0, 200);
     machao.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(27, 17), 0, 200);
     zhangfei.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(28, 17), 0);
+    hexMap.GetPlayerParty().commanderGeneral = liubei;
 
     // * AI *
-    caocao.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(27, 16), 70000, 5000);
+    caocao.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(1, 1), 70000, 5000);
     abc.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(2, 2), 6000, 4000);
     xuchu.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(2, 1), 3000);
     x1.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(2, 3), 3000);
     x2.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(2, 4), 10000, 1000);
     x3.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(1, 1), 10000, 300);
     x4.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(1, 1), 10000, 400);
+    hexMap.GetAIParty().commanderGeneral = caocao;
     SettlementMgr.Ready4Refresh = true;
     FoW.Init(hexMap);
     cameraKeyboardController.FixCameraAt(hexMap.GetUnitView(liubei.commandUnit.onFieldUnit).transform.position);

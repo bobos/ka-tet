@@ -173,13 +173,19 @@ namespace CourtNS {
     }
 
     void Die() {
+      // TODO: assign new commanderGeneral in warparty
       LeaveFaction();
       stat = GeneralStat.Dead;
     }
 
     void LeaveCampaign() {
+      // TODO: assign new commanderGeneral in warparty
       if (onGeneralLeaveCampaign != null) onGeneralLeaveCampaign(this);
       stat = GeneralStat.Rest;
+    }
+
+    void Treason() {
+      // TODO: assign new commanderGeneral in warparty
     }
 
     bool AssignOnField(Troop troop) {

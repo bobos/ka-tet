@@ -53,6 +53,7 @@ namespace UnitNS
         + (unit.IsCavalry() ? "♞" : "♜")
         + (unit.hexMap.wargameController.start ? "[推演]\n" : "")
         + unit.GeneralName()
+        + (unit.IsAI() ? "" : (unit.IsCommander() ? "♛" : ""))
         + "[" + unit.rf.general.party.Name() + "]"
         + "\n";
       textMesh.text = title + unit.rf.province.Name() + "-" + unit.rf.rank.Name()

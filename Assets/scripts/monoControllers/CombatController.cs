@@ -860,23 +860,49 @@ namespace MonoNS
         foreach(UnitPredict up in atkWin ? predict.defenders : predict.attackers) {
           supporters.Add(up.unit);
         }
-        foreach(Tile t in loser.tile.GetNeighboursWithinRange<Tile>(4, (Tile tt) => true)) {
-          Unit unit = t.GetUnit();
-          if (unit != null && unit.IsAI() == loser.IsAI() && !supporters.Contains(unit)) {
-            int drop = -3;
+        if (loser.IsCommander()) {
+          // TODO: event, when result > Small 投矛解甲
+          int drop = -8;
+          if (resultLevel == ResultType.Small) {
+            drop = -12;
+          }
+          if (resultLevel == ResultType.Great) {
+            drop = -20;
+          }
+          if (resultLevel == ResultType.Crushing) {
+            drop = -30;
+          }
+          // TODO: apply general trait to stop dropping for -20 and above
+          foreach(Unit u in hexMap.GetWarParty(loser).GetUnits()) {
+            if (u.IsCommander()) {
+              continue;
+            }
             int[] stats = new int[]{drop,0,0,0,0,0,0,0,0};
-            unit.rf.morale += drop;
-            if (unit.IsShowingAnimation()) {
-              hexMap.unitAniController.ShowEffects(unit, stats);
+            u.rf.morale += drop;
+            if (u.IsShowingAnimation()) {
+              hexMap.unitAniController.ShowEffects(u, stats);
               while (hexMap.unitAniController.ShowAnimating) { yield return null; }
+            }
+          }
+        } else {
+          foreach(Tile t in loser.tile.GetNeighboursWithinRange<Tile>(4, (Tile tt) => true)) {
+            Unit unit = t.GetUnit();
+            if (unit != null && unit.IsAI() == loser.IsAI() && !supporters.Contains(unit)) {
+              int drop = -3;
+              int[] stats = new int[]{drop,0,0,0,0,0,0,0,0};
+              unit.rf.morale += drop;
+              if (unit.IsShowingAnimation()) {
+                hexMap.unitAniController.ShowEffects(unit, stats);
+                while (hexMap.unitAniController.ShowAnimating) { yield return null; }
+              }
             }
           }
         }
 
         loser.movementRemaining = Unit.MovementcostOnHill * 100;
         int escapeDistance = 0;
-        if (!loser.IsCamping() && !loser.IsGone()) {
-          escapeDistance = 5;
+        if (!loser.IsCamping() && !loser.IsGone() && resultLevel != ResultType.Close) {
+          escapeDistance = loser.chaos ? 5 : 3;
           // TODO: apply general trait to calmdown
           hexMap.popAniController.Show(hexMap.GetUnitView(loser), 
            loser.chaos ? Cons.GetTextLib().get("pop_chaos") : Cons.GetTextLib().get("pop_retreat"),
@@ -904,7 +930,8 @@ namespace MonoNS
 
           if (!moved) {
             // Failed to find escape tile
-            if (loser.chaos) {
+            // TODO: apply general trait to avoid retreating unit backfire
+            if (true) {
               List<Unit> ally = new List<Unit>();
               foreach(Tile t in loser.tile.neighbours) {
                 Unit u = t.GetUnit();
@@ -950,7 +977,7 @@ namespace MonoNS
             break;
           }
         }
-        loser.movementRemaining = 0;
+        loser.movementRemaining = loser.chaos ? 0 : loser.movementRemaining;
       } else {
       // TODO: uncomment
       //if (!attacker.IsAI()) {
