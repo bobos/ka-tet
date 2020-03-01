@@ -731,7 +731,6 @@ namespace MonoNS
              resultLevel == ResultType.Great && Cons.HighlyLikely() || resultLevel == ResultType.Crushing));
           // TODO
           // 1. accumulate operation result(kill+wounded vs enemy kill+wounded) for per commander for party influence update
-          // 2. body cover
           // 6. kill general
           int morale = vicBuf[0];
           int morale1 = vicBuf[1];

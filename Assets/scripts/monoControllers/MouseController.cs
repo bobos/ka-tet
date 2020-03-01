@@ -245,9 +245,21 @@ namespace MonoNS
       {
         mouseMode = mode.attack;
         Update_CurrentFunc = UpdateUnitAttack;
-        msgBox.Show("选择进攻目标!");
+        msgBox.Show("选择目标!");
         foreach(Unit u in nearbyEnemey) {
           hexMap.TargetUnit(u);
+        }
+      }
+
+      if (action == ActionController.actionName.CHARGE)
+      {
+        mouseMode = mode.attack;
+        Update_CurrentFunc = UpdateUnitCharge;
+        msgBox.Show("选择目标!");
+        foreach(Unit u in nearbyEnemey) {
+          if (u.CanBeShaked(selectedUnit) > 0) {
+            hexMap.TargetUnit(u);
+          }
         }
       }
 
@@ -467,6 +479,12 @@ namespace MonoNS
         }
       }
 
+      if (mouseMode == mode.attack) {
+        foreach(Unit u in nearbyEnemey) {
+          hexMap.SetUnitSkin(u);
+        }
+      }
+
       selectedPath = null;
       if (selectedUnit != null)
       {
@@ -596,12 +614,13 @@ namespace MonoNS
       }
 
       if (mouseMode == mode.attack) {
-        if(u != null && u.IsAI() != selectedUnit.IsAI()) {
+        if(u != null && u.IsAI() != selectedUnit.IsAI() && nearbyEnemey.Contains(u)) {
           targetUnit = u;
           return;
         }
 
-        if (hexMap.settlementViewPanel.selectedUnit == null && s != null && s.owner.isAI != selectedUnit.IsAI()) {
+        if (hexMap.settlementViewPanel.selectedUnit == null && s != null && s.owner.isAI != selectedUnit.IsAI()
+          && Util.eq<Settlement>(nearEnemySettlement, s)) {
           targetSettlement = s;
           return;
         }
@@ -714,6 +733,23 @@ namespace MonoNS
           Tile tile1 = selectedUnit.tile;
           hexMap.unitAniController.MoveUnit(selectedUnit, targetUnit.tile);
           hexMap.unitAniController.MoveUnit(targetUnit, tile1);
+          Escape();
+        }
+      }
+    }
+
+    void UpdateUnitCharge()
+    {
+      if (tileUnderMouse == null) {
+        return;
+      }
+      if (Input.GetMouseButtonUp(0))
+      {
+        ClickOnTile();
+        if (targetUnit != null && targetUnit.CanBeShaked(selectedUnit) > 0) {
+          msgBox.Show("");
+          Tile tile1 = selectedUnit.tile;
+          actionController.charge(selectedUnit, targetUnit);
           Escape();
         }
       }

@@ -14,7 +14,7 @@ namespace UnitNS
     protected abstract int GetBaseSupplySlots();
     protected abstract Unit Clone();
 
-    public const int ActionCost = 40; // For actions like: attack
+    public const int ActionCost = 40; // For actions like: attack, bury
     public const int DefenceCost = 15;
     public const int MovementcostOnHill = 25;
     public const int MovementcostOnHillRoad = 20;
@@ -98,9 +98,8 @@ namespace UnitNS
       farmDestroy = new FarmDestroy(this);
     }
 
-    public void CloneInit(float disarmorDefDebuf, float newGeneralDebuf, Supply supply, PlainSickness plainSickness, WarWeary warWeary) {
+    public void CloneInit(float disarmorDefDebuf, Supply supply, PlainSickness plainSickness, WarWeary warWeary) {
       this.disarmorDefDebuf = disarmorDefDebuf;
-      this.newGeneralDebuf = newGeneralDebuf;
       this.supply = supply;
       this.plainSickness = plainSickness;
       this.warWeary = warWeary;
@@ -208,6 +207,19 @@ namespace UnitNS
 
     public bool IsCommander() {
       return Util.eq<General>(hexMap.GetWarParty(this).commanderGeneral, rf.general);
+    }
+
+    public int CanBeShaked(Unit charger) {
+      // TODO: apply general trait
+      if(!IsCavalry() && !Util.eq<Rank>(rf.rank, Cons.elite)) {
+        if (Util.eq<Rank>(rf.rank, Cons.rookie)) {
+          return 100;
+        } else {
+          return 50;
+        }
+      } else {
+        return 0;
+      }
     }
 
     public string GetStateName()
@@ -641,7 +653,7 @@ namespace UnitNS
 
     public float GetCampingAttackBuff()
     {
-      return GetNewGeneralBuf() + GetChaosBuf() + GetWarwearyBuf() - plainSickness.debuf + rf.lvlBuf - disarmorDefDebuf;
+      return GetChaosBuf() + GetWarwearyBuf() - plainSickness.debuf + rf.lvlBuf - disarmorDefDebuf;
     }
 
     public float GetBuff()
@@ -657,16 +669,6 @@ namespace UnitNS
       } else {
          return 0f;
       }
-    }
-
-    float newGeneralDebuf = 0f;
-    public void SetNewGeneralBuf() {
-      newGeneralDebuf = -0.3f;
-      rf.morale -= 5;
-    }
-
-    public float GetNewGeneralBuf() {
-      return newGeneralDebuf;
     }
 
     public float GetWarwearyBuf()

@@ -165,13 +165,14 @@ public class Starter : MonoBehaviour {
       new Troop(10000, Cons.Liang, Cons.riverSouth, Type.Infantry, Cons.elite)
     );
     xuchu.Assign(hexMap,
-      new Troop(2000, Cons.Liang, Cons.middleEarth, Type.Cavalry, Cons.elite)
+      new Troop(2500, Cons.Liang, Cons.middleEarth, Type.Cavalry, Cons.elite)
     );
+    Cons.Liang.SetRoyalGuard(xuchu);
     abc.Assign(hexMap,
       new Troop(8000, Cons.Liang, Cons.riverSouth, Type.Infantry, Cons.veteran)
     );
     x1.Assign(hexMap,
-      new Troop(1500, Cons.Liang, Cons.middleEarth, Type.Cavalry, Cons.rookie)
+      new Troop(1000, Cons.Liang, Cons.middleEarth, Type.Cavalry, Cons.rookie)
     );
     x2.Assign(hexMap,
       new Troop(10000, Cons.Liang, Cons.riverSouth, Type.Infantry, Cons.rookie)
@@ -209,8 +210,9 @@ public class Starter : MonoBehaviour {
     settlementMgr.BuildRoad(camp2, city);
 
     // after settlement created, general enters campaign
-    liubei.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(27, 18), 0, 4000);
-    zhaoyun.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(28, 18), 30000, 2000);
+    liubei.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(27, 18), 100000, 4000);
+    //zhaoyun.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(28, 18), 30000, 2000);
+    zhaoyun.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(2, 5), 30000, 2000);
     guanyu.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(27, 17), 0, 200);
     machao.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(27, 17), 0, 200);
     zhangfei.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(28, 17), 0);

@@ -23,6 +23,7 @@ namespace MonoNS
     EventDialog eventDialog;
     PopTextAnimationController popAniController;
     TextLib textLib = Cons.GetTextLib();
+    public const int MinLaborBuryBody = 800;
 
     public override void UpdateChild() {}
 
@@ -163,35 +164,7 @@ namespace MonoNS
         // Riot
         eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.Riot, unit, null, moraleReduce));
         while (eventDialog.Animating) { yield return null; }
-
-        General oldGeneral = unit.rf.general;
         unit.rf.general.UnitRiot();
-        General newGeneral = unit.rf.general;
-
-        if (oldGeneral.IsDead()) {
-          eventDialog.Show(new MonoNS.Event(EventDialog.EventName.GeneralExecuted, null, null, 0, 0, 0, 0, 0, null, oldGeneral));
-          while (eventDialog.Animating) { yield return null; }
-        }
-
-        if (oldGeneral.IsRest()) {
-          eventDialog.Show(new MonoNS.Event(EventDialog.EventName.GeneralReturned, null, null, 0, 0, 0, 0, 0, null, oldGeneral));
-          while (eventDialog.Animating) { yield return null; }
-        }
-
-        if (oldGeneral.IsIdle()) {
-          eventDialog.Show(new MonoNS.Event(EventDialog.EventName.GeneralResigned, null, null, 0, 0, 0, 0, 0, null, oldGeneral));
-          while (eventDialog.Animating) { yield return null; }
-        }
-
-        if (unit.rf.IsRest()) {
-          eventDialog.Show(new MonoNS.Event(EventDialog.EventName.Retreat, unit, null));
-          while (eventDialog.Animating) { yield return null; }
-        }
-
-        if (newGeneral != null) {
-          eventDialog.Show(new MonoNS.Event(EventDialog.EventName.NewGeneral, unit, null));
-          while (eventDialog.Animating) { yield return null; }
-        }
       }
       hexMap.cameraKeyboardController.EnableCamera();
       riotAnimating = false;
@@ -408,6 +381,91 @@ namespace MonoNS
 
       hexMap.cameraKeyboardController.EnableCamera();
       PoisionAnimating = false;
+    }
+
+    public bool BuryAnimating = false;
+    public void Bury(Unit unit) {
+      BuryAnimating = true;
+      hexMap.cameraKeyboardController.DisableCamera();
+      StartCoroutine(CoBury(unit));
+    }
+
+    IEnumerator CoBury(Unit unit) {
+      if (unit.labor < MinLaborBuryBody) {
+        if (unit.IsShowingAnimation()) {
+          popAniController.Show(hexMap.GetUnitView(unit),
+          System.String.Format(
+            textLib.get("pop_insufficient"),
+            MinLaborBuryBody
+          ),
+          Color.yellow);
+          while (popAniController.Animating) { yield return null; }
+        }
+      } else {
+        unit.movementRemaining -= Unit.ActionCost;
+        // TODO: apply trait
+        int discontent = 2;
+        Riot(unit, discontent);
+        while (riotAnimating) { yield return null; }
+        unit.tile.deadZone.Clean();
+      }
+
+      hexMap.cameraKeyboardController.EnableCamera();
+      BuryAnimating = false;
+    }
+
+    public bool ChargeAnimating = false;
+    public const int chargePoint = Unit.ActionCost;
+    public void Charge(Unit from, Unit to) {
+      ChargeAnimating = true;
+      hexMap.cameraKeyboardController.DisableCamera();
+      StartCoroutine(CoCharge(from, to));
+    }
+
+    IEnumerator CoCharge(Unit from, Unit to) {
+      if (from.movementRemaining < chargePoint) {
+        popAniController.Show(hexMap.GetUnitView(from),
+          System.String.Format(textLib.get("pop_insufficientPoint"), chargePoint), Color.yellow);
+        while (popAniController.Animating) { yield return null; }
+      } else {
+        from.movementRemaining -= chargePoint;
+        popAniController.Show(hexMap.GetUnitView(from), textLib.get("pop_charging"), Color.green);
+        while (popAniController.Animating) { yield return null; }
+        bool scared = to.CanBeShaked(from) >= Util.Rand(1, 100);
+        int killed = Util.Rand(0, 7);
+        int wounded = Util.Rand(3, 10);
+        // morale, movement, wounded, killed, laborKilled, disserter, attack, def, discontent
+        ShowEffects(from, new int[]{0,0,wounded,killed,0,0,0,0,0});
+        while (ShowAnimating) { yield return null; }
+        if (scared) {
+          Tile tile = null;
+          foreach(Tile t in to.tile.neighbours) {
+            if (t.Deployable(to)) {
+              tile = t;
+              break;
+            }
+          }
+
+          if (tile == null) {
+            scared = false;
+          } else {
+            popAniController.Show(hexMap.GetUnitView(to), textLib.get("pop_shaked"), Color.white);
+            while (popAniController.Animating) { yield return null; }
+            Tile toTile = to.tile;
+            MoveUnit(to, tile);
+            while (MoveAnimating) { yield return null; }
+            MoveUnit(from, toTile);
+            while (MoveAnimating) { yield return null; }
+          }
+        }
+
+        if (!scared) {
+          popAniController.Show(hexMap.GetUnitView(to), textLib.get("pop_holding"), Color.green);
+          while (popAniController.Animating) { yield return null; }
+        }
+      }
+      hexMap.cameraKeyboardController.EnableCamera();
+      ChargeAnimating = false;
     }
 
     public bool SiegeAnimating = false;

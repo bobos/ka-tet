@@ -30,7 +30,7 @@ namespace UnitNS
               (relation == CourtNS.Party.Relation.tense && Cons.FiftyFifty()) ||
               relation == CourtNS.Party.Relation.xTense && Cons.HighlyLikely()) {
               result.discontent = Util.Rand(2,4);
-              result.influence = 50;
+              result.influence = 100;
             }
           }
         }

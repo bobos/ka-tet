@@ -66,6 +66,14 @@ namespace MonoNS
       }
     }
 
+    public void OnChargeClick()
+    {
+      if (onBtnClick != null)
+      {
+        onBtnClick(actionName.CHARGE);
+      }
+    }
+
     public void OnReposition() {
       if (onBtnClick != null)
       {
@@ -108,6 +116,10 @@ namespace MonoNS
     public void OnSiegeClick()
     {
       siege(hexMap.mouseController.selectedUnit);
+    }
+
+    public void OnBuryClick() {
+      buryBody(hexMap.mouseController.selectedUnit);
     }
 
     public void OnEncampClick()
@@ -266,6 +278,8 @@ namespace MonoNS
       ATTACKEmpty,
       FIRE,
       SIEGE,
+      BURY,
+      CHARGE,
       ENCAMP,
       RETREAT,
       CAMP,
@@ -321,21 +335,25 @@ namespace MonoNS
       return DoAction(unit, null, null, actionName.SIEGE);
     }
 
+    public bool buryBody(Unit unit) {
+      return DoAction(unit, null, null, actionName.BURY);
+    }
+
     public bool commenceOperation() {
       return DoAction(null, null, null, actionName.COMMENCEOP);
     }
 
-    public bool DoAction(Unit unit, Unit[] units, Tile tile, actionName name)
+    public bool charge(Unit from, Unit to) {
+      return DoAction(from, to, null, actionName.CHARGE);
+    }
+
+    public bool DoAction(Unit unit, Unit unit1, Tile tile, actionName name)
     {
       if (ActionOngoing) return false;
       ActionOngoing = true;
       if (name == actionName.MOVE)
       {
         StartCoroutine(DoMove(unit));
-      }
-      if (name == actionName.ATTACK)
-      {
-        StartCoroutine(DoAttack(unit, units));
       }
       if (name == actionName.SABOTAGE)
       {
@@ -364,6 +382,14 @@ namespace MonoNS
       if (name == actionName.COMMENCEOP) 
       {
         StartCoroutine(DoCommenceOp());
+      }
+      if (name == actionName.BURY) 
+      {
+        StartCoroutine(DoBuryBody(unit));
+      }
+      if (name == actionName.CHARGE) 
+      {
+        StartCoroutine(DoCharge(unit, unit1));
       }
       return true;
     }
@@ -423,13 +449,6 @@ namespace MonoNS
       ActionOngoing = false;
     }
 
-    IEnumerator DoAttack(Unit receiver, Unit[] punchers)
-    {
-      yield return new WaitForSeconds(3);
-      ActionOngoing = false;
-      if (actionDone != null) actionDone(receiver, punchers, actionName.ATTACK);
-    }
-
     IEnumerator DoAttackEmptySettlement(Unit unit, Settlement settlement, bool occupy = true)
     {
       unitAniController.AttackEmpty(unit, settlement, occupy);
@@ -459,6 +478,26 @@ namespace MonoNS
       }
       ActionOngoing = false;
     }
+
+    IEnumerator DoBuryBody(Unit unit)
+    {
+      unitAniController.Bury(unit);
+      while (unitAniController.BuryAnimating)
+      {
+        yield return null;
+      }
+      ActionOngoing = false;
+    }
+
+    IEnumerator DoCharge(Unit from, Unit to) {
+      unitAniController.Charge(from, to);
+      while (unitAniController.ChargeAnimating)
+      {
+        yield return null;
+      }
+      ActionOngoing = false;
+    }
+
   }
 
 }

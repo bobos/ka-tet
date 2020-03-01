@@ -24,7 +24,7 @@ namespace MonoNS
       GameObject[] btns = {MoveButton, AttackButton, DefendButton, CampButton,
                            SabotageButton, FireButton, SiegeButton, EncampButton,
                            RetreatButton, TransferSupplyButton, TransferLaborButton,
-                           DecampButton, ReposButton
+                           DecampButton, ReposButton, BuryButton, ChargeButton
                            };
       buttons = btns;
       mouseController.onUnitSelect += OnUnitSelect;
@@ -55,6 +55,8 @@ namespace MonoNS
     public GameObject TransferLaborButton;
     public GameObject DecampButton;
     public GameObject ReposButton;
+    public GameObject BuryButton;
+    public GameObject ChargeButton;
     GameObject[] buttons;
 
     public Text title;
@@ -187,6 +189,19 @@ namespace MonoNS
         ReposButton.SetActive(true);
       }
 
+      if (!hexMap.wargameController.start && !unit.IsCavalry() && unit.tile.deadZone.DecompositionCntDown > 0) {
+        BuryButton.SetActive(true);
+      }
+
+      if (!hexMap.wargameController.start && unit.rf.royalGuard) {
+        foreach(Unit enemy in mouseController.nearbyEnemey) {
+          if (enemy.CanBeShaked(unit) > 0) {
+            ChargeButton.SetActive(true);
+            break;
+          }
+        }
+      }
+
       if (mouseController.nearMySettlement != null && mouseController.nearMySettlement.HasRoom()
         && !mouseController.nearMySettlement.IsUnderSiege()) {
         if (!hexMap.wargameController.start) {
@@ -265,8 +280,7 @@ namespace MonoNS
       // set attack, defense details
       string details = 
       "惩罚:\n"
-      + "整合度惩罚:" + unit.GetNewGeneralBuf() * 100
-      + "%\n混乱惩罚:" + unit.GetChaosBuf() * 100
+      + "混乱惩罚:" + unit.GetChaosBuf() * 100
       + "%\n厌战惩罚:" + unit.GetWarwearyBuf() * 100
       + "%\n无胄惩罚:" + unit.disarmorDefDebuf * 100
       + "%\n平原反应:" + unit.plainSickness.debuf * 100

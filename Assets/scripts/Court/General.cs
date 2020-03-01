@@ -136,44 +136,21 @@ namespace CourtNS {
       ReportFieldEvent(FieldEvent.Destroyed);
       HandOutTroop().Destroy();
       LeaveCampaign();
+      // TODO: apply traits
       if (Cons.FairChance()) {
         // Killed in battle
         Die();
       }
     }
 
-    public void GeneralKilledOnField() {
-      hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.GeneralKilledInBattle, null, null, 0, 0, 0, 0, 0, null, this));
-      Troop troop = HandOutTroop();
-      LeaveCampaign();
-      Die();
-      AssignOnField(troop);
-    }
-
-    public bool GeneralReplacedOnField() {
-      Troop troop = HandOutTroop();
-      LeaveCampaign();
-      return AssignOnField(troop);
-    }
-
     public void UnitRiot() {
       int rand = Util.Rand(1, 10);
-      party.influence -= 100;
-      AssignOnField(HandOutTroop());
-      if (rand < 6) {
-        // Returned
-        LeaveCampaign();
-      } else if (rand < 9) {
-        // Resigned
-        LeaveFaction();
-      } else {
-        // Executed
-        Die();
-      }
+      party.influence -= 400;
     }
 
     void Die() {
       // TODO: assign new commanderGeneral in warparty
+      hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.GeneralKilledInBattle, null, null, 0, 0, 0, 0, 0, null, this));
       LeaveFaction();
       stat = GeneralStat.Dead;
     }
@@ -186,19 +163,6 @@ namespace CourtNS {
 
     void Treason() {
       // TODO: assign new commanderGeneral in warparty
-    }
-
-    bool AssignOnField(Troop troop) {
-      General newGen = faction.GetAvailableGeneral();
-      if (newGen == null) {
-        troop.onFieldUnit.Retreat();
-        return false;
-      }
-      newGen.Assign(hexMap, troop);
-      newGen.stat = GeneralStat.OnField;
-      warParty.Join(newGen);
-      troop.onFieldUnit.SetNewGeneralBuf();
-      return true;
     }
 
     Troop HandOutTroop() {

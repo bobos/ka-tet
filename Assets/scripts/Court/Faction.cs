@@ -12,7 +12,8 @@ namespace CourtNS {
 	  void AddGeneral(General general);
 	  void RemoveGeneral(General general);
     General GetAvailableGeneral();
-
+    bool SetRoyalGuard(General general);
+    General GetRoyalGuard();
 		Faction OverLord();
 		HashSet<Faction> SubLords();
 		void AddSubLord(Faction faction);
@@ -26,16 +27,49 @@ namespace CourtNS {
     public const float MaxInfanUnitSizeRatio = 0.011f; // 100 civillians: 1 soldier
     public const float MaxCavUnitSizeRatio = 0.0067f; // 150 civillians: 1 soldier
     public int population = 0;
+    General royalGuard = null;
 	  protected bool isAI;
 		HashSet<Faction> subLords = new HashSet<Faction>();  
 		Faction overLord = null;
 	  HashSet<General> generals = new HashSet<General>();
     protected TextLib txtLib = Cons.GetTextLib();
+    public const int rgInfluence = 200;
 
 	  public _Faction(bool isAI, int population) {
 	  	this.isAI = isAI;
       this.population = population;
 	  }
+
+    public bool SetRoyalGuard(General general) {
+      Troop troop = general.commandUnit;
+      if (troop == null) {
+        return false;
+      }
+      bool ret = troop.SetAsRoyalGuard();
+      if (ret) {
+        RemoveRoyalGuard();
+        general.party.influence += rgInfluence;
+        royalGuard = general;
+      }
+      return ret;
+    }
+
+    public void RemoveRoyalGuard() {
+      General general = GetRoyalGuard();
+      if (general == null) {
+        return;
+      }
+      general.party.influence -= rgInfluence;
+      Troop troop = general.commandUnit;
+      if (troop != null) {
+        troop.RemoveAsRoyalGuard();
+      }
+      royalGuard = null;
+    }
+
+    public General GetRoyalGuard() {
+      return royalGuard;
+    }
 
     public abstract string Name();
     public abstract string Description();

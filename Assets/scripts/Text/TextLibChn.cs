@@ -83,6 +83,7 @@ namespace TextNS
       {"rank_veteran", "牙兵"},
       {"rank_elite", "禁军"},
       {"rank_scout", "斥候"},
+      {"rank_royalGuard", "甲骑俱装"},
 
       // region
       {"r_riverRun", "河间"},
@@ -296,6 +297,9 @@ namespace TextNS
       {"pop_crashedByAlly", "受溃兵冲击"},
       {"pop_noRetreatBuf", "战力翻番！"},
       {"pop_retreat", "撤退!"},
+      {"pop_charging", "冲阵!"},
+      {"pop_shaked", "阵脚松动!"},
+      {"pop_holding", "稳住阵脚"},
 
       // settlement
       {"settlement_storageLvl1", "初级粮仓"},

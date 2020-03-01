@@ -15,7 +15,7 @@ namespace UnitNS
       discontent += point;
       if (discontent >= Max) {
         discontent = 0;
-        int moraleReduce = -30;
+        int moraleReduce = -50;
         unit.rf.morale += moraleReduce;
         return moraleReduce;
       }
