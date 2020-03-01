@@ -77,6 +77,8 @@ namespace TextNS
       {"u_satisfied", @"士卒不满度: {0}/10"},
       {"u_unsatisfied", @"士卒不满度: {0}/10"},
       {"u_riot", @"不满度: {0}/10"},
+      {"u_infantryName", @"{0}步兵"},
+      {"u_cavalryName", @"{0}骑兵"},
       {"rank_rookie", "厢兵"},
       {"rank_veteran", "牙兵"},
       {"rank_elite", "禁军"},
@@ -94,29 +96,6 @@ namespace TextNS
       {"r_middleEarth", "关中"},
       {"r_farWest", "关外"},
       {"r_farNorth", "漠北"},
-
-		//   legion names
-      {"l_1", "第一"},
-      {"l_2", "第二"},
-      {"l_3", "第三"},
-      {"l_4", "第四"},
-
-		  {"l_legion", "军"},
-
-		  {"l_longwei", "龙威"},
-      {"l_longshen", "龙武"},
-		  {"l_longwei1", "神武"},
-      {"l_longshen1", "殿前"},
-      {"l_huben", "虎贲"},
-      {"l_qingshen", "擒生"},
-      {"l_huben1", "铁林"},
-      {"l_qingshen1", "浮屠"},
-		  {"l_longwei5", "神龙"},
-      {"l_longshen5", "龙神"},
-		  {"l_longwei6", "虎威"},
-      {"l_longshen6", "虎武"},
-      {"l_huben6", "期门"},
-      {"l_qingshen6", "捉生"},
 
       // faction
       {"f_liang", "梁"},
