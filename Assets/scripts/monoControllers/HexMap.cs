@@ -574,7 +574,11 @@ namespace MonoNS
       return false;
     }
 
-    public void OverlayDisable(Tile tile) {
+    public void OverlayDisable(Tile tile, HashSet<Tile> enemyZone = null) {
+      HashSet<Tile> zone = enemyZone;
+      if (zone == null) {
+        zone = FoW.Get().GetVisibleArea(true);
+      }
       Unit unit = tile.GetUnit();
       if (unit != null && !unit.IsConcealed()) {
         ActivateUnitView(unit);
@@ -582,6 +586,11 @@ namespace MonoNS
       if (FoW.Get() == null ||
         FoW.Get().GetVisibleArea().Contains(tile)) {
         Overlay(tile, TransMat);
+        TileView view = GetTileView(tile);
+        view.RefreshVisual();
+        if (zone.Contains(tile)) {
+          view.RefreshVisual(true);
+        }
       } else {
         OverlayFoW(tile);
       }

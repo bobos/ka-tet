@@ -22,11 +22,14 @@ public class TileView : View
     this.tile = (Tile)tile;
   }
 
-  public void RefreshVisual() {
+  public void RefreshVisual(bool enemyZone = false) {
     GameObject tileGO = gameObject;
     string txt = "";
+    if (enemyZone) {
+      txt += "☒\n";
+    }
     if (tile.deadZone != null && tile.deadZone.DecompositionCntDown > 0) {
-      txt = "☠☠☠☠\n";
+      txt += "☠☠☠☠\n";
     }
     if (tile.vantagePoint) {
       txt += "Vat\n";

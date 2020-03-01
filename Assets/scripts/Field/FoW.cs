@@ -14,10 +14,15 @@ namespace FieldNS
       Fog();
     }
 
-    public HashSet<Tile> GetVisibleArea() {
+    public HashSet<Tile> GetVisibleArea(bool enemy = false) {
       HashSet<Tile> tiles = new HashSet<Tile>();
       // TODO: AI test
-      WarParty party = hexMap.turnController.playerTurn ? hexMap.GetPlayerParty() : hexMap.GetAIParty();
+      WarParty party;
+      if (enemy) {
+        party = hexMap.turnController.playerTurn ? hexMap.GetAIParty() : hexMap.GetPlayerParty();
+      } else {
+        party = hexMap.turnController.playerTurn ? hexMap.GetPlayerParty() : hexMap.GetAIParty();
+      }
       party.GetVisibleArea(tiles);
       hexMap.settlementMgr.GetVisibleArea(party.attackside, tiles);
       return tiles;
@@ -25,10 +30,11 @@ namespace FieldNS
 
     public void Fog() {
       HashSet<Tile> tiles = GetVisibleArea();
+      WarParty wp = !hexMap.turnController.playerTurn ? hexMap.GetPlayerParty() : hexMap.GetAIParty();
       foreach (Tile tile in hexMap.tiles)
       {
         if (tiles.Contains(tile)) {
-          hexMap.OverlayDisable(tile);
+          hexMap.OverlayDisable(tile, GetVisibleArea(true));
         } else {
           hexMap.OverlayFoW(tile);
         }
