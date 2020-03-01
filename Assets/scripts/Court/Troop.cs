@@ -48,7 +48,6 @@ namespace CourtNS
       state = TroopState.Idle;
     }
 
-    int rgInfluence = 200;
     public bool SetAsRoyalGuard() {
       if (type != Type.Cavalry || !Util.eq<Rank>(Cons.veteran, rank)) {
         return false;
@@ -105,7 +104,7 @@ namespace CourtNS
       }
       set {
         _rank = value;
-        if (type == Type.Cavalry && Util.eq<Rank>(_rank, Cons.elite)) {
+        if (Util.eq<Rank>(_rank, Cons.elite)) {
           this._rank = Cons.veteran;
         }
       }

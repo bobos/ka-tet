@@ -417,40 +417,74 @@ namespace MonoNS
     public bool ChargeAnimating = false;
     public const int chargePoint = Unit.ActionCost;
     public void Charge(Unit from, Unit to) {
+      if (!from.CanCharge()) {
+        return;
+      }
       ChargeAnimating = true;
       hexMap.cameraKeyboardController.DisableCamera();
       StartCoroutine(CoCharge(from, to));
     }
 
     IEnumerator CoCharge(Unit from, Unit to) {
-      if (from.movementRemaining < chargePoint) {
-        popAniController.Show(hexMap.GetUnitView(from),
-          System.String.Format(textLib.get("pop_insufficientPoint"), chargePoint), Color.yellow);
-        while (popAniController.Animating) { yield return null; }
-      } else {
-        from.movementRemaining -= chargePoint;
-        popAniController.Show(hexMap.GetUnitView(from), textLib.get("pop_charging"), Color.green);
-        while (popAniController.Animating) { yield return null; }
-        bool scared = to.CanBeShaked(from) >= Util.Rand(1, 100);
-        int killed = Util.Rand(0, 7);
-        int wounded = Util.Rand(3, 10);
-        // morale, movement, wounded, killed, laborKilled, disserter, attack, def, discontent
-        ShowEffects(from, new int[]{0,0,wounded,killed,0,0,0,0,0});
-        while (ShowAnimating) { yield return null; }
-        if (scared) {
-          Tile tile = null;
-          foreach(Tile t in to.tile.neighbours) {
-            if (t.Deployable(to)) {
-              tile = t;
-              break;
-            }
+      from.movementRemaining -= chargePoint;
+      popAniController.Show(hexMap.GetUnitView(from), textLib.get("pop_charging"), Color.green);
+      while (popAniController.Animating) { yield return null; }
+      bool scared = to.CanBeShaked(from) >= Util.Rand(1, 100);
+      int killed = Util.Rand(0, 7);
+      int wounded = Util.Rand(3, 10);
+      from.rf.soldiers -= (killed + wounded);
+      from.rf.wounded += wounded;
+      from.kia += killed;
+      hexMap.UpdateWound(from, wounded);
+      // morale, movement, wounded, killed, laborKilled, disserter, attack, def, discontent
+      ShowEffects(from, new int[]{0,0,wounded,killed,0,0,0,0,0});
+      while (ShowAnimating) { yield return null; }
+      if (scared) {
+        Tile tile = null;
+        List<Unit> ally = new List<Unit>();
+        foreach(Tile t in to.tile.neighbours) {
+          if (t.Deployable(to)) {
+            tile = t;
+            break;
           }
+          Unit u = t.GetUnit();
+          if (u != null && u.IsAI() == to.IsAI()) {
+            ally.Add(u);
+          }
+        }
 
+        if (tile == null && ally.Count == 0) {
+          scared = false;
+        } else {
+          popAniController.Show(hexMap.GetUnitView(to), textLib.get("pop_shaked"), Color.white);
+          while (popAniController.Animating) { yield return null; }
           if (tile == null) {
-            scared = false;
-          } else {
-            popAniController.Show(hexMap.GetUnitView(to), textLib.get("pop_shaked"), Color.white);
+            Unit conflicted = ally[Util.Rand(0, ally.Count - 1)];
+            popAniController.Show(hexMap.GetUnitView(conflicted), textLib.get("pop_crashedByAlly"), Color.white);
             while (popAniController.Animating) { yield return null; }
+            wounded = Util.Rand(20, 50);
+            killed = Util.Rand(10, 20);
+            int morale = -3;
+            // morale, movement, wounded, killed, laborKilled, disserter, attack, def, discontent
+            ShowEffects(to, new int[]{morale,0,wounded,killed,0,0,0,0,0});
+            while (ShowAnimating) { yield return null; }
+            to.rf.soldiers -= (wounded + killed);
+            to.rf.wounded += wounded;
+            to.kia += killed;
+            to.rf.morale += morale;
+            hexMap.UpdateWound(to, wounded);
+
+            wounded = Util.Rand(20, 50);
+            killed = Util.Rand(10, 20);
+            // morale, movement, wounded, killed, laborKilled, disserter, attack, def, discontent
+            ShowEffects(conflicted, new int[]{morale,0,wounded,killed,0,0,0,0,0});
+            while (ShowAnimating) { yield return null; }
+            conflicted.rf.soldiers -= (wounded + killed);
+            conflicted.rf.wounded += wounded;
+            conflicted.kia += killed;
+            conflicted.rf.morale += morale;
+            hexMap.UpdateWound(conflicted, wounded);
+          } else {
             Tile toTile = to.tile;
             MoveUnit(to, tile);
             while (MoveAnimating) { yield return null; }
@@ -458,11 +492,11 @@ namespace MonoNS
             while (MoveAnimating) { yield return null; }
           }
         }
+      }
 
-        if (!scared) {
-          popAniController.Show(hexMap.GetUnitView(to), textLib.get("pop_holding"), Color.green);
-          while (popAniController.Animating) { yield return null; }
-        }
+      if (!scared) {
+        popAniController.Show(hexMap.GetUnitView(to), textLib.get("pop_holding"), Color.green);
+        while (popAniController.Animating) { yield return null; }
       }
       hexMap.cameraKeyboardController.EnableCamera();
       ChargeAnimating = false;

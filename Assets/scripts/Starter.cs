@@ -211,8 +211,7 @@ public class Starter : MonoBehaviour {
 
     // after settlement created, general enters campaign
     liubei.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(27, 18), 100000, 4000);
-    //zhaoyun.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(28, 18), 30000, 2000);
-    zhaoyun.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(2, 5), 30000, 2000);
+    zhaoyun.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(28, 18), 30000, 2000);
     guanyu.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(27, 17), 0, 200);
     machao.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(27, 17), 0, 200);
     zhangfei.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(28, 17), 0);
@@ -221,7 +220,7 @@ public class Starter : MonoBehaviour {
     // * AI *
     caocao.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(1, 1), 70000, 5000);
     abc.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(2, 2), 6000, 4000);
-    xuchu.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(2, 1), 3000);
+    xuchu.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(28, 19), 3000);
     x1.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(2, 3), 3000);
     x2.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(2, 4), 10000, 1000);
     x3.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(1, 1), 10000, 300);

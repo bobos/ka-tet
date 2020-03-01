@@ -193,7 +193,7 @@ namespace MonoNS
         BuryButton.SetActive(true);
       }
 
-      if (!hexMap.wargameController.start && unit.rf.royalGuard) {
+      if (!hexMap.wargameController.start && unit.CanCharge()) {
         foreach(Unit enemy in mouseController.nearbyEnemey) {
           if (enemy.CanBeShaked(unit) > 0) {
             ChargeButton.SetActive(true);

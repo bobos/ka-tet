@@ -80,10 +80,8 @@ namespace TextNS
       {"u_infantryName", @"{0}步兵"},
       {"u_cavalryName", @"{0}骑兵"},
       {"rank_rookie", "厢兵"},
-      {"rank_veteran", "牙兵"},
-      {"rank_elite", "禁军"},
-      {"rank_scout", "斥候"},
-      {"rank_royalGuard", "甲骑俱装"},
+      {"rank_veteran", "禁军"},
+      {"rank_royalGuard", "大全装"},
 
       // region
       {"r_riverRun", "河间"},
@@ -103,9 +101,9 @@ namespace TextNS
       {"f_hejian", "河间"},
 
       // party
-      {"p_eagleParty", "东林党"},
-      {"p_pigeonParty", "内戚党"},
-      {"p_yanParty", "阉党"},
+      {"p_eagleParty", "新党"},
+      {"p_pigeonParty", "旧党"},
+      {"p_yanParty", "北院"},
       {"party_relationNormal", "缓和"},
       {"party_relationTense", "紧张"},
       {"party_relationXtense", "一触即发"},
@@ -283,6 +281,7 @@ namespace TextNS
       {"pop_poisionDone", "投毒成功!"},
       {"pop_insufficientLabor", @"需要{0}民夫"},
       {"pop_insufficientPoint", @"需要{0}体力"},
+      {"pop_insufficientForce", @"需要{0}兵力"},
       {"pop_sieged", "围困工事已修筑"},
       {"pop_sieging", "修建长围"},
       {"pop_siegeBreak", "拆毁长围"},
@@ -294,7 +293,7 @@ namespace TextNS
       {"pop_joinOperation", "投入战斗"},
       {"pop_chaos", "一溃千里"},
       {"pop_escapeNoRout", "无路可退"},
-      {"pop_crashedByAlly", "受溃兵冲击"},
+      {"pop_crashedByAlly", "受友军冲击"},
       {"pop_noRetreatBuf", "战力翻番！"},
       {"pop_retreat", "撤退!"},
       {"pop_charging", "冲阵!"},

@@ -211,7 +211,7 @@ namespace UnitNS
 
     public int CanBeShaked(Unit charger) {
       // TODO: apply general trait
-      if(!IsCavalry() && !Util.eq<Rank>(rf.rank, Cons.elite)) {
+      if(!IsCavalry()) {
         if (Util.eq<Rank>(rf.rank, Cons.rookie)) {
           return 100;
         } else {
@@ -220,6 +220,10 @@ namespace UnitNS
       } else {
         return 0;
       }
+    }
+
+    public bool CanCharge() {
+      return rf.royalGuard && rf.soldiers >= 800 && movementRemaining >= ActionCost; 
     }
 
     public string GetStateName()

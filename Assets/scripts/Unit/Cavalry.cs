@@ -9,7 +9,7 @@ namespace  UnitNS
     public const float MovementCostModifierOnHill = 1.5f;
     public const float MovementCostModifierOnPlainOrRoad = 0.7f;
     public const int MinTroopNum = 300;
-    public const int MaxTroopNum = 2500;
+    public const int MaxTroopNum = 2000;
 
     public static Unit Create(bool clone, Troop troop, Tile tile, int supply, State state = State.Stand, 
                     int kia = 0, int mia = 0, int movement = -1, float disarmorDefDebuf = 0f,

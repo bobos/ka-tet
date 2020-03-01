@@ -582,8 +582,6 @@ namespace MonoNS
     public event OnUnitSelect onUnitPreflight;
     public delegate void OnUnitDeselect(Unit deselectedUnit);
     public event OnUnitDeselect onUnitDeselect;
-    public delegate void OnUnitAttack(Unit[] punchers, Unit receiver);
-    public event OnUnitAttack onUnitAttack;
     public delegate void OnSettlementSelect(Settlement selectedSettlement);
     public event OnSettlementSelect onSettlementSelect;
     public delegate void OnSettlementDeselect(Settlement deselectedSettlement);
