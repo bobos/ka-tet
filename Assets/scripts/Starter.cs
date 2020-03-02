@@ -218,12 +218,19 @@ public class Starter : MonoBehaviour {
     hexMap.GetPlayerParty().commanderGeneral = liubei;
 
     // * AI *
-    caocao.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(1, 1), 70000, 5000);
-    abc.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(2, 2), 6000, 4000);
-    xuchu.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(28, 19), 3000);
-    x1.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(2, 3), 3000);
-    x2.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(2, 4), 10000, 1000);
-    x3.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(1, 1), 10000, 300);
+    //caocao.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(1, 1), 70000, 5000);
+    //abc.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(2, 2), 6000, 4000);
+    //xuchu.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(2, 5), 3000);
+    //x1.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(2, 3), 3000);
+    //x2.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(2, 4), 10000, 1000);
+    //x3.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(1, 1), 10000, 300);
+    //x4.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(1, 1), 10000, 400);
+    caocao.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(23, 16), 70000, 5000);
+    abc.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(22, 16), 6000, 4000);
+    xuchu.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(23, 17), 3000);
+    x1.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(22, 17), 3000);
+    x2.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(22, 15), 10000, 1000);
+    x3.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(21, 17), 10000, 300);
     x4.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(1, 1), 10000, 400);
     hexMap.GetAIParty().commanderGeneral = caocao;
     SettlementMgr.Ready4Refresh = true;

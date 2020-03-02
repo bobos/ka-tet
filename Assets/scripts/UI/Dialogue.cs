@@ -109,6 +109,17 @@ namespace MonoNS
       rightText.text = System.String.Format(textLib.get("event_RemoveHelmetSoldierDialog"), unit.Name());
     }
 
+    public void ShowFormationBreaking(Unit unit) {
+      phase = 2;
+      Animating = true;
+      self.SetActive(true);
+      right.SetActive(false);
+      left.SetActive(true);
+
+      leftImg.sprite = unit.IsAI() ? AttackGeneral : DefenderGeneral;
+      leftText.text = System.String.Format(textLib.get("event_FormationBreaking"), unit.GeneralName());
+    }
+
   }
 
 

@@ -68,7 +68,7 @@ namespace MonoNS
     }
 
     public bool MoveAnimating = false;
-    public bool MoveUnit(Unit unit, Tile tile = null) {
+    public bool MoveUnit(Unit unit, Tile tile = null, bool dontFixCamera = false) {
       MoveAnimating = true;
       Tile old = unit.tile;
       bool hiddenB4 = unit.IsConcealed();
@@ -84,7 +84,7 @@ namespace MonoNS
         discontent = unit.marchOnHeat.Occur();
         discontent += unit.marchOnExhaustion.Occur();
       }
-      if (unit.IsShowingAnimation()) {
+      if (unit.IsShowingAnimation() && !dontFixCamera) {
         hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(unit.tile).transform.position);
       }
       hexMap.cameraKeyboardController.DisableCamera();
@@ -460,8 +460,6 @@ namespace MonoNS
           while (popAniController.Animating) { yield return null; }
           if (tile == null) {
             Unit conflicted = ally[Util.Rand(0, ally.Count - 1)];
-            popAniController.Show(hexMap.GetUnitView(conflicted), textLib.get("pop_crashedByAlly"), Color.white);
-            while (popAniController.Animating) { yield return null; }
             wounded = Util.Rand(20, 50);
             killed = Util.Rand(10, 20);
             int morale = -3;
@@ -474,16 +472,8 @@ namespace MonoNS
             to.rf.morale += morale;
             hexMap.UpdateWound(to, wounded);
 
-            wounded = Util.Rand(20, 50);
-            killed = Util.Rand(10, 20);
-            // morale, movement, wounded, killed, laborKilled, disserter, attack, def, discontent
-            ShowEffects(conflicted, new int[]{morale,0,wounded,killed,0,0,0,0,0});
-            while (ShowAnimating) { yield return null; }
-            conflicted.rf.soldiers -= (wounded + killed);
-            conflicted.rf.wounded += wounded;
-            conflicted.kia += killed;
-            conflicted.rf.morale += morale;
-            hexMap.UpdateWound(conflicted, wounded);
+            CrashByAlly(conflicted, morale);
+            while (CrashAnimating) { yield return null; }
           } else {
             Tile toTile = to.tile;
             MoveUnit(to, tile);
@@ -500,6 +490,30 @@ namespace MonoNS
       }
       hexMap.cameraKeyboardController.EnableCamera();
       ChargeAnimating = false;
+    }
+
+    public bool CrashAnimating = false;
+    public void CrashByAlly(Unit unit, int morale) {
+      CrashAnimating = true;
+      hexMap.cameraKeyboardController.DisableCamera();
+      StartCoroutine(CoCrashByAlly(unit, morale));
+    }
+
+    IEnumerator CoCrashByAlly(Unit unit, int morale) {
+      popAniController.Show(hexMap.GetUnitView(unit), textLib.get("pop_crashedByAlly"), Color.white);
+      while (popAniController.Animating) { yield return null; }
+      int wounded = Util.Rand(20, 50);
+      int killed = Util.Rand(10, 20);
+      // morale, movement, wounded, killed, laborKilled, disserter, attack, def, discontent
+      ShowEffects(unit, new int[]{morale,0,wounded,killed,0,0,0,0,0});
+      while (ShowAnimating) { yield return null; }
+      unit.rf.soldiers -= (wounded + killed);
+      unit.rf.wounded += wounded;
+      unit.kia += killed;
+      unit.rf.morale += morale;
+      hexMap.UpdateWound(unit, wounded);
+      hexMap.cameraKeyboardController.EnableCamera();
+      CrashAnimating = false;
     }
 
     public bool SiegeAnimating = false;

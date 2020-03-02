@@ -57,6 +57,17 @@ namespace MonoNS
       title.Clear();
     }
 
+    public bool sleeping = false;
+    public void Sleep(int sec) {
+      sleeping = true;
+      StartCoroutine(CoSleep(sec));
+    }
+
+    IEnumerator CoSleep(int sec) {
+      yield return new WaitForSeconds(sec);
+      sleeping = false;
+    }
+
     //bool updateReady = false;
     public bool showingTitle { get; private set; }
     TurnPhaseTitle title;

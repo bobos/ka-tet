@@ -334,7 +334,7 @@ namespace MapTileNS
         foreach (Tile t in neighbours) {
           Unit u1 = t.GetUnit();
           Settlement s = t.settlement;
-          if (u1 != null && u1.IsAI() != unit.IsAI()) {
+          if (u1 != null && u1.IsAI() != unit.IsAI() && !u1.chaos && !u1.defeating) {
             cnt++;
           }
 
@@ -345,7 +345,7 @@ namespace MapTileNS
         ret = ret + (int)(ret * cnt * 0.5f);
         if (unit.enemyControlledTiles != null && unit.enemyControlledTiles.Contains(this)) {
           // this tile is controlled by enemy, extra cost is needed
-          ret = (int)(ret * 1.2f);
+          ret = (int)(ret * 1.1f);
         }
       }
 

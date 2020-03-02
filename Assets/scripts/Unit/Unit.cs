@@ -188,6 +188,7 @@ namespace UnitNS
     }
     public Troop rf;
     public State state = State.Stand;
+    public bool defeating = false;
 
     int __labor = 0;
     int __movementRemaining;
@@ -422,6 +423,10 @@ namespace UnitNS
       if (chaos) {
         chaos = false;
         //hexMap.GetUnitView(this).UpdateUnitInfo();
+      }
+
+      if (defeating) {
+        defeating = false;
       }
 
       if (concealCoolDownTurn > 0) {

@@ -237,11 +237,11 @@ namespace MonoNS
       if (odds <= 1.4f) {
         // 1 - 2x odds
         predict.suggestedResultType = ResultType.Close;
-      } else if (odds <= 2.4f) {
-        // 2x - 3.5x
+      } else if (odds <= 1.6f) {
+        // 2x - 2.4x
         predict.suggestedResultType = ResultType.Small;
-      } else if (odds <= 4) {
-        // 3.5x - 6x
+      } else if (odds <= 2.6f) {
+        // 2.4x - 3.9xx
         predict.suggestedResultType = ResultType.Great;
       } else {
         predict.suggestedResultType = ResultType.Crushing;
@@ -406,15 +406,15 @@ namespace MonoNS
     // initiatorMorale, supporterMorale, initiatorDiscontent
     int[] GetDftBuf(ResultType type) {
       if (type == ResultType.Close) {
-        return new int[]{-5, -3, 1};
+        return new int[]{-5, -3, 0};
       }
       if (type == ResultType.Small) {
-        return new int[]{-20, -15, 2};
+        return new int[]{-10, -5, 1};
       }
       if (type == ResultType.Great) {
-        return new int[]{-30, -25, 4};
+        return new int[]{-20, -20, 4};
       }
-      return new int[]{-40, -30, 8};
+      return new int[]{-40, -40, 8};
     }
 
     public bool commenceOpAnimating = false;
@@ -577,13 +577,13 @@ namespace MonoNS
           attackerCasualty = (int)(attackerTotal * (attackerBigger ? m1 : m));
         } else {
           if (attackerBigger) {
-            defenderCasualty = (int)(defenderTotal * factor * 0.025f);
+            defenderCasualty = (int)(defenderTotal * factor * 0.018f);
           } else {
-            attackerCasualty = (int)(attackerTotal * factor * 0.025f);
+            attackerCasualty = (int)(attackerTotal * factor * 0.018f);
           }
 
           if (resultLevel == ResultType.Small) {
-            // 2x - 3.5x
+            // 2x - 2.4x
             int modifier = Util.Rand(5, 6);
             if (attackerBigger) {
               attackerCasualty = (int)(defenderCasualty * modifier * 0.1f);
@@ -593,7 +593,7 @@ namespace MonoNS
           }
 
           if (resultLevel == ResultType.Great) {
-            // 3.5x - 6x
+            // 2.4x - 3.9x
             int modifier = Util.Rand(3, 4);
             if (attackerBigger) {
               attackerCasualty = (int)(defenderCasualty * modifier* 0.1f);
@@ -603,8 +603,8 @@ namespace MonoNS
           }
 
           if (resultLevel == ResultType.Crushing) {
-            if (factor < 44) {
-              // 6x - 8x odds
+            if (factor < 30) {
+              // 3.9x - 6x odds
               int modifier = Util.Rand(1, 2);
               if (attackerBigger) {
                 attackerCasualty = (int)(defenderCasualty * modifier * 0.1f);
@@ -612,7 +612,7 @@ namespace MonoNS
                 defenderCasualty = (int)(attackerCasualty * modifier * 0.1f);
               }
             } else {
-              // 8x larger
+              // 6x larger
               float modifier = 0.05f;
               if (attackerBigger) {
                 attackerCasualty = (int)(defenderCasualty * modifier);
@@ -719,6 +719,113 @@ namespace MonoNS
           capturedHorse);
         while(hexMap.eventDialogAlt.Animating) { yield return null; }
         CancelOperation();
+
+        Unit loser = atkWin ? defender : attacker;
+        // TODO: when defender is in city, capture the city on victory
+        if (true) {
+        //if (resultLevel == ResultType.Great || resultLevel == ResultType.Crushing) {
+          Dictionary<Tile, bool> tiles = new Dictionary<Tile, bool>();
+          Dictionary<Unit, List<Tile>> plan = new Dictionary<Unit, List<Tile>>();
+          List<UnitPredict> troops = atkWin ? predict.defenders : predict.attackers;
+          Tile baseTile = loser.tile;
+          foreach(Tile t in baseTile.GetNeighboursWithinRange(10, (Tile _tile) => true)) {
+            tiles[t] = !t.Deployable(loser);
+          }
+
+          // sort units from far to near
+          troops.Sort(delegate (UnitPredict a, UnitPredict b)
+          {
+            return (int)(Tile.Distance(baseTile, b.unit.tile) - Tile.Distance(baseTile, a.unit.tile));
+          });
+
+          List<Unit> involves = new List<Unit>();
+          foreach(UnitPredict up in troops) {
+            involves.Add(up.unit);
+            if (up.unit.IsCamping()) { 
+              plan[up.unit] = null;
+              continue;
+            }
+            // first step
+            Tile step1 = null;
+            foreach (Tile t in up.unit.tile.neighbours) {
+              // already taken
+              if (tiles[t]) { continue; }
+              step1 = t;
+              break;
+            }
+
+            if (step1 == null) {
+              plan[up.unit] = null;
+              continue;
+            }
+
+            List<Tile> path = new List<Tile>();
+            path.Add(step1);
+            // second step
+            Tile step2 = null;
+            foreach (Tile t in step1.neighbours) {
+              // already taken
+              if (tiles[t]) { continue; }
+              step2 = t;
+              break;
+            }
+
+            if (step2 == null) {
+              tiles[step1] = true;
+            } else {
+              path.Add(step2);
+              tiles[step2] = true;
+            }
+            tiles[up.unit.tile] = false;
+
+            plan[up.unit] = path;
+          }
+
+          foreach (Unit unit in involves) {
+            if (resultLevel == ResultType.Crushing) {
+              unit.chaos = true;
+            } else {
+              unit.defeating = true;
+            }
+          }
+
+          hexMap.turnController.ShowTitle(Cons.GetTextLib().get("title_formationBreaking"), Color.black);
+          while(hexMap.turnController.showingTitle) { yield return null; }
+          hexMap.dialogue.ShowFormationBreaking(atkWin ? attacker : defender);
+          while(hexMap.dialogue.Animating) { yield return null; }
+          hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetUnitView(loser).transform.position);
+          while(hexMap.cameraKeyboardController.fixingCamera) { yield return null; }
+
+          // move all unit at once
+          List<Unit> failedToMove = new List<Unit>();
+          foreach(UnitPredict up in troops) {
+            Unit unit = up.unit;
+            List<Tile> path = plan[unit];
+            if (path == null) {
+              if (!unit.IsCamping()) {
+                failedToMove.Add(unit);
+              }
+              continue;
+            }
+            foreach(Tile t in path) {
+              hexMap.unitAniController.MoveUnit(unit, t, true);
+            }
+          }
+          hexMap.turnController.Sleep(1);
+          while(hexMap.turnController.sleeping) { yield return null; }
+
+          // TODO: 力挽狂澜
+          foreach(Unit unit in failedToMove) {
+            foreach(Tile t in unit.tile.neighbours) {
+              Unit u = t.GetUnit();
+              if (u != null && u.IsAI() == unit.IsAI() && !involves.Contains(u)) {
+                hexMap.unitAniController.CrashByAlly(u, -20);
+                while (hexMap.unitAniController.CrashAnimating) { yield return null; }
+                continue;
+              }
+            }
+          }
+        }
 
         // Aftermath
         int[] vicBuf = GetVicBuf(resultLevel);
@@ -854,7 +961,6 @@ namespace MonoNS
         }
 
         // affected all allies
-        Unit loser = atkWin ? defender : attacker;
         HashSet<Unit> supporters = new HashSet<Unit>();
         foreach(UnitPredict up in atkWin ? predict.defenders : predict.attackers) {
           supporters.Add(up.unit);

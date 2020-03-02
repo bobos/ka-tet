@@ -43,7 +43,17 @@ Game Tips:
 34. 主帅战败，所有部队士气大降
 35. 800甲骑俱装对步兵可使用冲阵，消耗40点体力，对rookie 100%成功，对老兵50%成功，对精锐无效
 
+close: both stand
+small: one fallback
+great: break formation(all one step, starts from outside unit), reserved cavalry addon attack
+crushing: break formation(all 3 steps), all chaos
+
+all retreat unit get tmp defeatDebuf(weaker chaos)
+retreat unit has no movement affect on nearby tiles
 casualty error
+capture city on victory
+
+ai主帅等级决定ai战斗等级
 
 战场瘟疫爆发时，每只部队随机确定时候染病，染病几率由低到高在到低变化
 如果主帅部队大败，所有部队士气额外下降10-20, 小败各部士气下降2-5
