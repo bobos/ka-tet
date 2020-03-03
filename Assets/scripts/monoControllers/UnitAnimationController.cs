@@ -512,6 +512,11 @@ namespace MonoNS
       unit.kia += killed;
       unit.rf.morale += morale;
       hexMap.UpdateWound(unit, wounded);
+      if (unit.rf.soldiers <= Unit.DisbandUnitUnder) {
+        // unit disbanded
+        hexMap.unitAniController.DestroyUnit(unit, DestroyType.ByDisband);
+        while (hexMap.unitAniController.DestroyAnimating) { yield return null; }
+      }
       hexMap.cameraKeyboardController.EnableCamera();
       CrashAnimating = false;
     }
@@ -558,14 +563,14 @@ namespace MonoNS
     }
 
     public bool ShowAnimating = false;
-    public void ShowEffects(Unit unit, int[] effects, View view = null) {
+    public void ShowEffects(Unit unit, int[] effects, View view = null, bool noFix = false) {
       if (view == null && !unit.IsShowingAnimation()) { return; }
       ShowAnimating = true;
       hexMap.cameraKeyboardController.DisableCamera();
-      StartCoroutine(CoShowEffects(unit, effects, view));
+      StartCoroutine(CoShowEffects(unit, effects, view, noFix));
     }
 
-    IEnumerator CoShowEffects(Unit unit, int[] effects, View theView = null)
+    IEnumerator CoShowEffects(Unit unit, int[] effects, View theView, bool noFix)
     {
       View view = theView != null ? theView : hexMap.GetUnitView(unit);
       int morale = effects[0];
@@ -580,28 +585,28 @@ namespace MonoNS
       if (morale != 0) {
         popAniController.Show(view,
           textLib.get("pop_morale") + (morale > 0 ? ("+" + morale) : ("" + morale)),
-          morale > 0 ? Color.green : Color.white);
+          morale > 0 ? Color.green : Color.white, noFix);
         while (popAniController.Animating) { yield return null; }
       }
 
       if (movement != 0) {
         popAniController.Show(view,
           textLib.get("pop_movement") + (movement > 0 ? ("+" + movement) : ("" + movement)),
-          movement > 0 ? Color.green : Color.white);
+          movement > 0 ? Color.green : Color.white, noFix);
         while (popAniController.Animating) { yield return null; }
       }
 
       if (killed != 0) {
         popAniController.Show(view,
           textLib.get("pop_killed") + killed,
-          Color.white);
+          Color.white, noFix);
         while (popAniController.Animating) { yield return null; }
       }
 
       if (wounded != 0) {
         popAniController.Show(view,
           textLib.get("pop_wounded") + wounded,
-          Color.white);
+          Color.white, noFix);
         while (popAniController.Animating) { yield return null; }
       }
 
@@ -615,21 +620,21 @@ namespace MonoNS
       if (desserter != 0) {
         popAniController.Show(view,
           textLib.get("pop_desserter") + desserter,
-          Color.white);
+          Color.white, noFix);
         while (popAniController.Animating) { yield return null; }
       }
 
       if (atk != 0) {
         popAniController.Show(view,
           textLib.get("pop_atk") + (atk > 0 ? ("+" + atk) : ("" + atk)),
-          atk > 0 ? Color.green : Color.white);
+          atk > 0 ? Color.green : Color.white, noFix);
         while (popAniController.Animating) { yield return null; }
       }
 
       if (def != 0) {
         popAniController.Show(view,
           textLib.get("pop_def") + (def > 0 ? ("+" + def) : ("" + def)),
-          def > 0 ? Color.green : Color.white);
+          def > 0 ? Color.green : Color.white, noFix);
         while (popAniController.Animating) { yield return null; }
       }
 
@@ -637,11 +642,11 @@ namespace MonoNS
         if (discontent < 0) {
           popAniController.Show(view, 
             System.String.Format(textLib.get("pop_content"), -discontent),
-            Color.green);
+            Color.green, noFix);
         } else {
           popAniController.Show(view, 
             System.String.Format(textLib.get("pop_discontent"), discontent),
-            Color.yellow);
+            Color.yellow, noFix);
         }
         while (popAniController.Animating) { yield return null; }
       }

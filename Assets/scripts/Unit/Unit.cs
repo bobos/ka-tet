@@ -686,7 +686,7 @@ namespace UnitNS
     }
 
     public float GetChaosBuf() {
-      return chaos ? -0.99f : 0f;
+      return chaos ? -0.99f : (defeating ? -0.3f : 0f);
     }
 
     // ==============================================================

@@ -17,17 +17,19 @@ namespace MonoNS
 
     public override void UpdateChild() {}
 
-    public void Show(View view, string msg, Color color)
+    public void Show(View view, string msg, Color color, bool noFix = false)
     {
       if (view == null || !view.viewActivated) { return; }
       Animating = true;
       hexMap.cameraKeyboardController.DisableCamera();
-      StartCoroutine(CoShow(view, msg, color));
+      StartCoroutine(CoShow(view, msg, color, noFix));
     }
 
-    IEnumerator CoShow(View view, string msg, Color color)
+    IEnumerator CoShow(View view, string msg, Color color, bool noFix)
     {
-      cc.FixCameraAt(view.transform.position);
+      if (!noFix) {
+        cc.FixCameraAt(view.transform.position);
+      }
       while (cc.fixingCamera) { yield return null; }
       PopTextView textView = hexMap.ShowPopText(view, msg, color);
       while (textView.Animating) { yield return null; }

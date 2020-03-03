@@ -313,6 +313,7 @@ namespace TextNS
       {"title_wargame_commiting", "执行作战计划"},
       {"title_wargame_committed", "执行完毕"},
       {"title_formationBreaking", "破阵!"},
+      {"title_formationCrushing", "一溃千里"},
 
       {"operation_success_chance", @"胜算{0}成"},
       {"misc_windAdvantage", "背风面"},

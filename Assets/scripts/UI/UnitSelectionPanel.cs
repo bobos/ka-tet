@@ -280,7 +280,7 @@ namespace MonoNS
       // set attack, defense details
       string details = 
       "惩罚:\n"
-      + "混乱惩罚:" + unit.GetChaosBuf() * 100
+      + "战败惩罚:" + unit.GetChaosBuf() * 100
       + "%\n厌战惩罚:" + unit.GetWarwearyBuf() * 100
       + "%\n无胄惩罚:" + unit.disarmorDefDebuf * 100
       + "%\n平原反应:" + unit.plainSickness.debuf * 100
