@@ -25,8 +25,11 @@ public class TileView : View
   public void RefreshVisual(bool enemyZone = false) {
     GameObject tileGO = gameObject;
     string txt = "";
-    if (enemyZone) {
+    if (hexMap.AttackerZone.Contains(tile) || hexMap.DefenderZone.Contains(tile)) {
       txt += "☒\n";
+    }
+    if (enemyZone) {
+      txt += "⊘\n";
     }
     if (tile.deadZone != null && tile.deadZone.DecompositionCntDown > 0) {
       txt += "☠☠☠☠\n";

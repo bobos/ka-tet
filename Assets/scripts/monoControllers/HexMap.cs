@@ -116,6 +116,30 @@ namespace MonoNS
       return (Tile)GetHex(x, y);
     }
 
+    List<Tile> _DefenderZone;
+    List<Tile> _AttackerZone;
+    public List<Tile> DefenderZone {
+      get {
+        _DefenderZone = new List<Tile>();
+        foreach(Tile tile in
+          GetHex(numCols - 1, numRows - 1).GetNeighboursWithinRange(2, (Tile _tile) => true)) {
+          if (tile.Accessible()) { _DefenderZone.Add(tile); }
+        }
+        return _DefenderZone;
+      }
+    }
+
+    public List<Tile> AttackerZone {
+      get {
+        _AttackerZone = new List<Tile>();
+        foreach(Tile tile in
+          GetHex(1, 1).GetNeighboursWithinRange(2, (Tile _tile) => true)) {
+          if (tile.Accessible()) { _AttackerZone.Add(tile); }
+        }
+        return _AttackerZone;
+      }
+    }
+
     // Use this for initialization
     public void PreGameInit()
     {
