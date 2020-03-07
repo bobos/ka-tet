@@ -103,10 +103,26 @@ namespace MonoNS
       left.SetActive(true);
 
       leftImg.sprite = unit.IsAI() ? AttackGeneral : DefenderGeneral;
+      leftCacheDialog = System.String.Format(textLib.get(allowed ? "event_RemoveAllowedGeneralDialog": "event_RemoveDisallowedGeneralDialog"),
+        unit.GeneralName());
+      leftText.text = "";
+      rightImg.sprite = normalSoldier;
+      rightText.text = System.String.Format(textLib.get("event_RemoveHelmetSoldierDialog"), unit.GeneralName());
+    }
+
+    public void ShowRemoveHelmetFollow(Unit unit, bool allowed) {
+      phase = 1;
+      Animating = true;
+      self.SetActive(true);
+      right.SetActive(true);
+      left.SetActive(true);
+
+      leftImg.sprite = unit.IsAI() ? AttackGeneral : DefenderGeneral;
       leftCacheDialog = System.String.Format(textLib.get(allowed ? "event_RemoveAllowedGeneralDialog": "event_RemoveDisallowedGeneralDialog"), unit.GeneralName());
       leftText.text = "";
       rightImg.sprite = normalSoldier;
-      rightText.text = System.String.Format(textLib.get("event_RemoveHelmetSoldierDialog"), unit.Name());
+      rightText.text = System.String.Format(textLib.get("event_RemoveHelmetSoldierDialogFollow"),
+        unit.GeneralName(), hexMap.GetWarParty(unit).firstRemoveArmor.GeneralName());
     }
 
     public void ShowFormationBreaking(Unit unit) {

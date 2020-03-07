@@ -463,6 +463,7 @@ namespace UnitNS
     }
 
     public void Retreat() {
+      // TODO: move the queuing unit in
       if (labor > 0) {
         foreach (Settlement cityOrBase in
           hexMap.IsAttackSide(IsAI()) ? hexMap.settlementMgr.attackerRoots
@@ -483,6 +484,7 @@ namespace UnitNS
 
     public int Destroy()
     {
+      // TODO: move the queuing unit in
       int killed = rf.soldiers + rf.wounded;
       hexMap.UpdateWound(this, -rf.wounded);
       kia += killed;

@@ -308,18 +308,28 @@ namespace MonoNS
       while (ShowAnimating) { yield return null; }
       if (Cons.IsHeat(hexMap.weatherGenerator.currentWeather)) {
         int ret = unit.armorRemEvent.Occur();
+        WarParty wp = hexMap.GetWarParty(unit);
         if(ret != 0) {
           if (ret < 0) {
             // disarmor not allowed
             int discontent = -ret;
-            hexMap.dialogue.ShowRemoveHelmet(unit, false);
+            if (wp.firstRemoveArmor == null) {
+              hexMap.dialogue.ShowRemoveHelmet(unit, false);
+            } else {
+              hexMap.dialogue.ShowRemoveHelmetFollow(unit, false);
+            }
             while (hexMap.dialogue.Animating) { yield return null; }
             Riot(unit, discontent);
             while (riotAnimating) { yield return null; }
           } else {
             // disarmor allowed
             int defReduce = ret;
-            hexMap.dialogue.ShowRemoveHelmet(unit, true);
+            if (wp.firstRemoveArmor == null) {
+              wp.firstRemoveArmor = unit;
+              hexMap.dialogue.ShowRemoveHelmet(unit, true);
+            } else {
+              hexMap.dialogue.ShowRemoveHelmetFollow(unit, true);
+            }
             while (hexMap.dialogue.Animating) { yield return null; }
             unit.disarmorDefDebuf = defReduce * 0.01f; 
           }

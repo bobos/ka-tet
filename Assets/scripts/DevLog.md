@@ -44,8 +44,6 @@ Game Tips:
 35. 800甲骑俱装对步兵可使用冲阵，消耗40点体力，对rookie 100%成功，对老兵50%成功，对精锐无效
 36. 如果主帅部队战败，所有部队士气下降8 - 30
 
-unit can not move to enemy's retreat zone[move range check]
-retreat support
 casualty error
 capture city on victory
 

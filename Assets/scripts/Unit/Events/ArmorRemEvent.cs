@@ -9,9 +9,16 @@
     }
 
     public int Occur() {
-      if (unit.rf.rank == Cons.rookie && !unit.IsAI() && !unit.IsHillLander() && !fired && unit.IsOnField() && Cons.FiftyFifty()) {
-        // TODO apply general trait
+      Unit first = unit.hexMap.GetWarParty(unit).firstRemoveArmor;
+      if (first != null && first.IsGone()) {
+        return 0;
+      }
+
+      // TODO: displined general, this never happens
+      if ((unit.rf.rank == Cons.rookie || first != null)
+          && !unit.IsAI() && !unit.IsHillLander() && !fired && unit.IsOnField() && Cons.HighlyLikely()) {
         fired = true;
+        // TODO totally depends on general trait, normally, allowed
         return Cons.FiftyFifty() ? Discontent() : DefReduce();
       }
       return 0;
