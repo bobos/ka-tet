@@ -40,6 +40,7 @@ namespace MonoNS {
       WargameBtn.SetActive(false);
       CommitBtn.SetActive(true);
       CancelBtn.SetActive(true);
+      hexMap.unitSelectionPanel.NextTurnButton.SetActive(false);
       unitList = new List<WargameUnit>();
       visibleArea = FieldNS.FoW.Get().GetVisibleArea();
     }
@@ -47,6 +48,7 @@ namespace MonoNS {
     void Quit() {
       start = false;
       WargameBtn.SetActive(true);
+      hexMap.unitSelectionPanel.NextTurnButton.SetActive(true);
       CommitBtn.SetActive(false);
       CancelBtn.SetActive(false);
       hexMap.CleanLines();

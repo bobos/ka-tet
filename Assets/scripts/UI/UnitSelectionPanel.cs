@@ -174,10 +174,12 @@ namespace MonoNS
         return;
       }
 
-      if (hexMap.wargameController.start && hexMap.wargameController.IsWargameUnit(unit) || !hexMap.deployDone) {
+      if (hexMap.wargameController.start && hexMap.wargameController.IsWargameUnit(unit)
+        || !hexMap.deployDone) {
       } else {
         MoveButton.SetActive(true);
       }
+
       if (!hexMap.wargameController.start && hexMap.deployDone) {
         NextTurnButton.SetActive(true);
         RetreatButton.SetActive(true);
@@ -339,11 +341,7 @@ namespace MonoNS
         return;
       }
 
-      ToggleButtons(false, unit, isGarrison);
-      // TODO: AI test
-      if (unit.IsAI() == !turnController.player) {
-        RefreshButtons(unit, isGarrison);
-      }
+      ToggleButtons(unit.IsAI() == !turnController.player, unit, isGarrison);
     }
 
     public void OnUnitDeselect(Unit unit)
@@ -421,23 +419,9 @@ namespace MonoNS
 
       // disable other buttons than move
       ToggleButtons(false, mouseController.selectedUnit);
-      if (action == ActionController.actionName.MOVE)
-      {
-        MoveButton.SetActive(true);
-      }
-      if (action == ActionController.actionName.ATTACK)
-      {
-        AttackButton.SetActive(true);
-      }
     }
 
-    public override void UpdateChild()
-    {
-      if (!turnController.endingTurn && !turnController.showingTitle)
-      {
-        NextTurnButton.SetActive(true);
-      }
-    }
+    public override void UpdateChild() { }
   }
 
 }
