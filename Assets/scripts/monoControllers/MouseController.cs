@@ -211,6 +211,13 @@ namespace MonoNS
         return;
       }
 
+      if (action == ActionController.actionName.RETREAT)
+      {
+        hexMap.actionController.retreat(selectedUnit);
+        Escape();
+        return;
+      }
+
       if (action == ActionController.actionName.SABOTAGE)
       {
         Tile tile = nearDam;

@@ -113,11 +113,37 @@ namespace MonoNS
       phase = 2;
       Animating = true;
       self.SetActive(true);
-      right.SetActive(false);
-      left.SetActive(true);
+      string text = System.String.Format(textLib.get("event_FormationBreaking"), unit.GeneralName());
+      if (hexMap.IsAttackSide(unit.IsAI())) {
+        right.SetActive(false);
+        left.SetActive(true);
+        leftImg.sprite = AttackGeneral;
+        leftText.text = text;
+      } else {
+        left.SetActive(false);
+        right.SetActive(true);
+        rightImg.sprite = AttackGeneral;
+        rightText.text = text;
+      }
+    }
 
-      leftImg.sprite = unit.IsAI() ? AttackGeneral : DefenderGeneral;
-      leftText.text = System.String.Format(textLib.get("event_FormationBreaking"), unit.GeneralName());
+    public void ShowRetreat(Unit unit) {
+      phase = 2;
+      Animating = true;
+      self.SetActive(true);
+      string text = System.String.Format(textLib.get("event_Retreat"), unit.GeneralName());
+      if (hexMap.IsAttackSide(unit.IsAI())) {
+        right.SetActive(false);
+        left.SetActive(true);
+        leftImg.sprite = AttackGeneral;
+        leftText.text = text;
+      } else {
+        left.SetActive(false);
+        right.SetActive(true);
+        rightImg.sprite = DefenderGeneral;
+        rightText.text = text;
+      }
+
     }
 
   }

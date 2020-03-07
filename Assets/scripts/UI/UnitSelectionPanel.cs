@@ -182,7 +182,7 @@ namespace MonoNS
 
       if (!hexMap.wargameController.start && hexMap.deployDone) {
         NextTurnButton.SetActive(true);
-        RetreatButton.SetActive(true);
+        RetreatButton.SetActive(unit.CanRetreat());
       }
       
       if (mouseController.nearEnemy || mouseController.nearEnemySettlement != null) {

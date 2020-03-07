@@ -127,13 +127,15 @@ namespace CourtNS {
 
     public void TroopRetreat() {
       ReportFieldEvent(FieldEvent.Retreated);
-      HandOutTroop().LeaveCampaign();
+      commandUnit.LeaveCampaign();
       LeaveCampaign();
     }
 
     public void TroopDestroyed() {
       ReportFieldEvent(FieldEvent.Destroyed);
-      HandOutTroop().Destroy();
+      commandUnit.Destroy();
+      commandUnit.general = null;
+      commandUnit = null;
       LeaveCampaign();
       // TODO: apply traits
       if (Cons.FairChance()) {
@@ -162,15 +164,6 @@ namespace CourtNS {
 
     void Treason() {
       // TODO: assign new commanderGeneral in warparty
-    }
-
-    Troop HandOutTroop() {
-      Troop troop = commandUnit;
-      if (troop != null) {
-        troop.general = null;
-      }
-      commandUnit = null;
-      return troop;
     }
 
     public List<FieldEvent> GetFieldRecords() {

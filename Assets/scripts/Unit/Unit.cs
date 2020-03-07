@@ -214,9 +214,9 @@ namespace UnitNS
       // TODO: apply general trait
       if(!IsCavalry()) {
         if (Util.eq<Rank>(rf.rank, Cons.rookie)) {
-          return 100;
+          return 60;
         } else {
-          return 50;
+          return 30;
         }
       } else {
         return 0;
@@ -458,18 +458,27 @@ namespace UnitNS
       turnDone = true;
     }
 
+    public bool CanRetreat() {
+      return (hexMap.IsAttackSide(IsAI()) ? hexMap.AttackerZone : hexMap.DefenderZone).Contains(tile);
+    }
+
     public void Retreat() {
-      // TODO: return labor
-      labor = 0;
+      if (labor > 0) {
+        foreach (Settlement cityOrBase in
+          hexMap.IsAttackSide(IsAI()) ? hexMap.settlementMgr.attackerRoots
+          : hexMap.settlementMgr.defenderRoots) {
+          if (cityOrBase.type != Settlement.Type.camp) {
+            cityOrBase.labor += labor;
+            labor = 0;
+            break;
+          }
+        }
+      }
       if (rf.general != null) {
         rf.general.TroopRetreat();
       }
       SetState(State.Retreated);
       tile.RemoveUnit(this);
-      if (tile.settlement != null && tile.settlement.owner.isAI == this.IsAI()) {
-        tile.settlement.RemoveUnit(this);
-      }
-      hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.Retreat, this, null));
     }
 
     public int Destroy()
@@ -898,8 +907,9 @@ namespace UnitNS
         visible = hexMap.wargameController.visibleArea;
       }
 
+      List<Tile> zone = hexMap.IsAttackSide(this.IsAI()) ? hexMap.DefenderZone : hexMap.AttackerZone;
       foreach (Tile tile in GetPureAccessibleTiles()) {
-        if (visible.Contains(tile) && tile.GetUnit() == null) {
+        if (visible.Contains(tile) && tile.GetUnit() == null && !zone.Contains(tile)) {
           area.Add(tile);
         }
       }
@@ -910,21 +920,6 @@ namespace UnitNS
     {
       enemyControlledTiles = null;
       return PFTile2Tile(PathFinder.FindAccessibleTiles(start, this, remaining, PathFind.Mode.Supply));
-      /*
-      HashSet<Tile> tiles = new HashSet<Tile>();
-      foreach (Tile tile in PFTile2Tile(PathFinder.FindAccessibleTiles(start, this, remaining, true)))
-      {
-        foreach (Tile h in tile.neighbours)
-        {
-          if (h.terrian == TerrianType.Hill && tile.settlement == null)
-          {
-            tiles.Add(h);
-          }
-        }
-        tiles.Add(tile);
-      }
-      return tiles.ToArray();
-      */
     }
 
     // only for Ghost unit to pathfind settlement path

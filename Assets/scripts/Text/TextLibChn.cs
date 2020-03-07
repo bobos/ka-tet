@@ -244,6 +244,7 @@ namespace TextNS
       {"event_RemoveAllowedGeneralDialog", @"{0}: 此事关军心，告诸将士，我许卿等以便宜行事!"},
       {"event_RemoveDisallowedGeneralDialog", @"{0}: 盔者乃防具之首, 岂可轻易取走耶? 有再提此事者，我必斫掉其狗头使其再无顶盔之苦恼!!"},
       {"event_FormationBreaking", @"{0}: 尔等大势已去，何不速速来降! 投矛解甲者不杀!"},
+      {"event_Retreat", @"{0}: 胜败乃兵家常事，他日再战!"},
 
       // pop out msg
       {"pop_discontent", @"不满+{0}"},

@@ -363,6 +363,10 @@ namespace MonoNS
       return DoAction(from, to, null, actionName.CHARGE);
     }
 
+    public bool retreat(Unit unit) {
+      return DoAction(unit, null, null, actionName.RETREAT);
+    }
+
     public bool DoAction(Unit unit, Unit unit1, Tile tile, actionName name)
     {
       if (ActionOngoing) return false;
@@ -406,6 +410,10 @@ namespace MonoNS
       if (name == actionName.CHARGE) 
       {
         StartCoroutine(DoCharge(unit, unit1));
+      }
+      if (name == actionName.RETREAT) 
+      {
+        StartCoroutine(DoRetreat(unit));
       }
       return true;
     }
@@ -508,6 +516,15 @@ namespace MonoNS
     IEnumerator DoCharge(Unit from, Unit to) {
       unitAniController.Charge(from, to);
       while (unitAniController.ChargeAnimating)
+      {
+        yield return null;
+      }
+      ActionOngoing = false;
+    }
+
+    IEnumerator DoRetreat(Unit unit) {
+      unitAniController.Retreat(unit);
+      while (unitAniController.RetreatAnimating)
       {
         yield return null;
       }

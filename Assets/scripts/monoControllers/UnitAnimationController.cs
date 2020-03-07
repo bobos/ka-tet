@@ -462,7 +462,7 @@ namespace MonoNS
             Unit conflicted = ally[Util.Rand(0, ally.Count - 1)];
             wounded = Util.Rand(20, 50);
             killed = Util.Rand(10, 20);
-            int morale = -3;
+            int morale = -2;
             // morale, movement, wounded, killed, laborKilled, disserter, attack, def, discontent
             ShowEffects(to, new int[]{morale,0,wounded,killed,0,0,0,0,0});
             while (ShowAnimating) { yield return null; }
@@ -487,6 +487,11 @@ namespace MonoNS
       if (!scared) {
         popAniController.Show(hexMap.GetUnitView(to), textLib.get("pop_holding"), Color.green);
         while (popAniController.Animating) { yield return null; }
+        int morale = 5;
+        to.rf.morale += morale;
+        // morale, movement, wounded, killed, laborKilled, disserter, attack, def, discontent
+        ShowEffects(to, new int[]{morale,0,0,0,0,0,0,0,0});
+        while (ShowAnimating) { yield return null; }
       }
       hexMap.cameraKeyboardController.EnableCamera();
       ChargeAnimating = false;
@@ -560,6 +565,23 @@ namespace MonoNS
       }
       hexMap.cameraKeyboardController.EnableCamera();
       SiegeAnimating = false;
+    }
+
+    public bool RetreatAnimating = false;
+    public void Retreat(Unit unit) {
+      RetreatAnimating = true;
+      hexMap.cameraKeyboardController.DisableCamera();
+      StartCoroutine(CoRetreat(unit));
+    }
+
+    IEnumerator CoRetreat(Unit unit) {
+      hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(unit.tile).transform.position);
+      while(hexMap.cameraKeyboardController.fixingCamera) { yield return null; }
+      hexMap.dialogue.ShowRetreat(unit);
+      while(hexMap.dialogue.Animating) { yield return null; }
+      unit.Retreat();
+      hexMap.cameraKeyboardController.EnableCamera();
+      RetreatAnimating = false;
     }
 
     public bool ShowAnimating = false;
