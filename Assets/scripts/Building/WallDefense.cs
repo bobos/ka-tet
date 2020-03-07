@@ -13,14 +13,14 @@ public class WallDefense {
 
   public int MaxDefensePoint() {
     if (level == 1) {
-      return 20;
+      return 30;
     }
     
     if (level == 2) {
-      return 150;
+      return 100;
     }
 
-    return 200;
+    return 150;
   }
 
   public void DepleteDefense() {

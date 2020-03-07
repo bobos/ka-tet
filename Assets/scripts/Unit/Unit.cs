@@ -14,7 +14,7 @@ namespace UnitNS
     protected abstract int GetBaseSupplySlots();
     protected abstract Unit Clone();
 
-    public const int ActionCost = 40; // For actions like: attack, bury
+    public const int ActionCost = 30; // For actions like: attack, bury
     public const int DefenceCost = 15;
     public const int MovementcostOnHill = 25;
     public const int MovementcostOnHillRoad = 20;
@@ -554,7 +554,7 @@ namespace UnitNS
       {
         return StaminaLvl.Fresh;
       }
-      if (movementRemaining > 20)
+      if (movementRemaining >= 30)
       {
         return StaminaLvl.Tired;
       }
@@ -871,10 +871,8 @@ namespace UnitNS
       }
       if (!dontAddToNewTile && h != null)
       {
-        // not encamp, do move
+        // not encamp
         h.AddUnit(this);
-        UnitActionBroker broker = UnitActionBroker.GetBroker();
-        broker.BrokeChange(this, ActionType.UnitMove, tile);
       }
       tile = h;
     }
@@ -890,6 +888,10 @@ namespace UnitNS
 
     public Tile[] GetAccessibleTiles()
     {
+      if (!hexMap.deployDone) {
+        return hexMap.InitPlayerDeploymentZone();
+      }
+
       List<Tile> area = new List<Tile>();
       HashSet<Tile> visible = FieldNS.FoW.Get().GetVisibleArea();
       if (hexMap.wargameController.start) {

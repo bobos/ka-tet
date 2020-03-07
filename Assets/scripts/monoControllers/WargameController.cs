@@ -30,7 +30,7 @@ namespace MonoNS {
     public override void PreGameInit(HexMap hexMap, BaseController me)
     {
       base.PreGameInit(hexMap, me);
-      WargameBtn.SetActive(true);
+      WargameBtn.SetActive(hexMap.deployDone);
       CommitBtn.SetActive(false);
       CancelBtn.SetActive(false);
     }

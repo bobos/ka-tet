@@ -35,6 +35,7 @@ namespace MonoNS
       hexMap.eventDialog.eventDialogOff += EventDialogOff;
       self = this.transform.gameObject;
       self.SetActive(false);
+      DeploymentDoneButton.SetActive(!hexMap.deployDone);
     }
 
     MouseController mouseController;
@@ -47,6 +48,7 @@ namespace MonoNS
     public GameObject CampButton;
     public GameObject SabotageButton;
     public GameObject NextTurnButton;
+    public GameObject DeploymentDoneButton;
     public GameObject FireButton;
     public GameObject SiegeButton; // Siege
     public GameObject EncampButton;
@@ -78,7 +80,9 @@ namespace MonoNS
 
     public void OnNewTurn()
     {
-      NextTurnButton.SetActive(true);
+      if (hexMap.deployDone) {
+        NextTurnButton.SetActive(true);
+      }
     }
 
     public void EventDialogOn() {
@@ -157,7 +161,7 @@ namespace MonoNS
             deployableTiles.Add(tile);
           }
         }
-        if (hasEnemy) {
+        if (hasEnemy && hexMap.deployDone) {
           AttackButton.SetActive(true);
         }
         if (deployableTiles.Count > 0) {
@@ -170,22 +174,23 @@ namespace MonoNS
         return;
       }
 
-      if (hexMap.wargameController.start && hexMap.wargameController.IsWargameUnit(unit)) {
+      if (hexMap.wargameController.start && hexMap.wargameController.IsWargameUnit(unit) || !hexMap.deployDone) {
       } else {
         MoveButton.SetActive(true);
       }
-      if (!hexMap.wargameController.start) {
+      if (!hexMap.wargameController.start && hexMap.deployDone) {
         NextTurnButton.SetActive(true);
         RetreatButton.SetActive(true);
       }
       
       if (mouseController.nearEnemy || mouseController.nearEnemySettlement != null) {
-        if (!hexMap.combatController.start && unit.GetStaminaLevel() != StaminaLvl.Exhausted) {
+        if (!hexMap.combatController.start && unit.GetStaminaLevel() != StaminaLvl.Exhausted
+         && hexMap.deployDone) {
           AttackButton.SetActive(true);
         }
       }
 
-      if (!hexMap.wargameController.start && mouseController.nearAlly) {
+      if (!hexMap.wargameController.start && mouseController.nearAlly && hexMap.deployDone) {
         ReposButton.SetActive(true);
       }
 
@@ -193,7 +198,7 @@ namespace MonoNS
         BuryButton.SetActive(true);
       }
 
-      if (!hexMap.wargameController.start && unit.CanCharge()) {
+      if (!hexMap.wargameController.start && unit.CanCharge() && hexMap.deployDone) {
         foreach(Unit enemy in mouseController.nearbyEnemey) {
           if (enemy.CanBeShaked(unit) > 0) {
             ChargeButton.SetActive(true);
@@ -209,18 +214,22 @@ namespace MonoNS
         }
       }
 
-      if (unit.type == Type.Infantry) {
+      if (unit.type == Type.Infantry && hexMap.deployDone) {
         if (mouseController.nearDam != null || (unit.tile.siegeWall != null && unit.tile.siegeWall.owner.isAI != unit.IsAI())) {
           SabotageButton.SetActive(true);
         }
       }
 
-      if (mouseController.nearFire != null) {
+      if (mouseController.nearFire != null && hexMap.deployDone) {
         FireButton.SetActive(true);
       }
 
-      if (mouseController.nearWater) {
+      if (mouseController.nearWater && hexMap.deployDone) {
         DefendButton.SetActive(true);
+      }
+
+      if (!hexMap.deployDone && mouseController.inCampField != null) {
+        CampButton.SetActive(true);
       }
 
       if (unit.type == Type.Infantry) {
@@ -228,7 +237,8 @@ namespace MonoNS
           CampButton.SetActive(true);
         }
 
-        if (mouseController.nearEnemySettlement != null && !mouseController.nearEnemySettlement.IsEmpty()
+        if (hexMap.deployDone &&
+          mouseController.nearEnemySettlement != null && !mouseController.nearEnemySettlement.IsEmpty()
           && !hexMap.wargameController.start && mouseController.nearEnemySettlement.type == Settlement.Type.city) {
           SiegeButton.SetActive(true);
         }
@@ -340,10 +350,20 @@ namespace MonoNS
     {
       ToggleButtons(false, unit);
       self.SetActive(false);
+      FoW.Init(hexMap);
     }
 
     public void OnBtnClick(ActionController.actionName action)
     {
+      if (action == ActionController.actionName.DEPLOYMENTDONE) {
+        hexMap.turnController.DeploymentDone();
+        hexMap.deployDone = true;
+        DeploymentDoneButton.SetActive(false);
+        hexMap.wargameController.WargameBtn.SetActive(true);
+        NextTurnButton.SetActive(true);
+        FoW.Get().Fog();
+      }
+
       if (action == ActionController.actionName.SHOWMINE || action == ActionController.actionName.SHOWENEMY) {
         WarParty wp = action == ActionController.actionName.SHOWENEMY ? hexMap.GetAIParty() : hexMap.GetPlayerParty();
         WarPartyStat stat = wp.GetStat();

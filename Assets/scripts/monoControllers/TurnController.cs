@@ -19,8 +19,16 @@ namespace MonoNS
       settlementMgr = hexMap.settlementMgr;
       cc = hexMap.cameraKeyboardController;
       endingTurn = false;
-      TurnChange();
+      if (hexMap.deployDone) {
+        TurnChange();
+      } else {
+        DeploymentPhase();
+      }
       if (onNewTurn != null) { onNewTurn(); }
+    }
+
+    public void DeploymentDone() {
+      TurnChange();
     }
 
     public override void UpdateChild() {}
@@ -41,6 +49,12 @@ namespace MonoNS
     void WarWeary() {
       showingTitle = true;
       title.Set(textLib.get("other_warWeary"), Color.red);
+      StartCoroutine(KeepShowingTitle());
+    }
+
+    void DeploymentPhase() {
+      showingTitle = true;
+      title.Set(textLib.get("title_deployment"), Color.yellow);
       StartCoroutine(KeepShowingTitle());
     }
 

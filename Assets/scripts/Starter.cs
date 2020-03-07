@@ -76,6 +76,10 @@ public class Starter : MonoBehaviour {
 
     //initialization all controllers
     hexMap.PreGameInit();
+    hexMap.SetWarParties(
+      new WarParty(false, Cons.HeJian),
+      new WarParty(true, Cons.Liang)
+    );
     foreach(BaseController controller in controllers) {
       controller.PreGameInit(hexMap, controller);
     }
@@ -184,19 +188,13 @@ public class Starter : MonoBehaviour {
       new Troop(4000, Cons.Liang, Cons.riverSouth, Type.Infantry, Cons.rookie)
     );
 
-    // step 4, on field assignment
-    hexMap.SetWarParties(
-      new WarParty(false, false, Cons.HeJian),
-      new WarParty(true, true, Cons.Liang)
-    );
-
     // create settlements
     const int supply = 4 * Infantry.MaxTroopNum / 10 * Infantry.BaseSlots;
     if (!settlementMgr.BuildStrategyBase(hexMap.GetTile(1,1),
-                    hexMap.GetAIParty(), supply * 5 * 10, 5000)) {
+                    hexMap.GetWarParty(Cons.Liang), supply * 5 * 10, 5000)) {
       Util.Throw("Failed to build base at 1,1");}
     if (!settlementMgr.BuildCity("河间府", hexMap.GetTile(27, 17),
-                    hexMap.GetPlayerParty(),
+                    hexMap.GetWarParty(Cons.HeJian),
                     2, // wallLevel
                     34000, // male
                     23889, // female
@@ -210,31 +208,31 @@ public class Starter : MonoBehaviour {
     settlementMgr.BuildRoad(camp2, city);
 
     // after settlement created, general enters campaign
-    liubei.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(27, 18), 100000, 4000);
-    zhaoyun.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(28, 18), 30000, 2000);
-    guanyu.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(27, 17), 0, 200);
-    machao.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(27, 17), 0, 200);
-    zhangfei.EnterCampaign(hexMap, hexMap.GetPlayerParty(), hexMap.GetTile(28, 17), 0);
-    hexMap.GetPlayerParty().commanderGeneral = liubei;
+    liubei.EnterCampaign(hexMap, hexMap.GetTile(27, 18), 100000, 4000);
+    zhaoyun.EnterCampaign(hexMap, hexMap.GetTile(28, 18), 30000, 2000);
+    guanyu.EnterCampaign(hexMap, hexMap.GetTile(27, 17), 0, 200);
+    machao.EnterCampaign(hexMap, hexMap.GetTile(27, 17), 0, 200);
+    zhangfei.EnterCampaign(hexMap, hexMap.GetTile(28, 17), 0);
+    hexMap.GetWarParty(liubei.faction).commanderGeneral = liubei;
 
     // * AI *
-    //caocao.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(1, 1), 70000, 5000);
-    //abc.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(2, 2), 6000, 4000);
-    //xuchu.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(2, 5), 3000);
-    //x1.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(2, 3), 3000);
-    //x2.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(2, 4), 10000, 1000);
-    //x3.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(1, 1), 10000, 300);
-    //x4.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(1, 1), 10000, 400);
-    caocao.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(23, 16), 70000, 5000);
-    abc.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(22, 16), 6000, 4000);
-    xuchu.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(23, 17), 3000);
-    x1.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(22, 17), 3000);
-    x2.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(22, 15), 10000, 1000);
-    x3.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(21, 17), 10000, 300);
-    x4.EnterCampaign(hexMap, hexMap.GetAIParty(), hexMap.GetTile(1, 1), 10000, 400);
-    hexMap.GetAIParty().commanderGeneral = caocao;
+    caocao.EnterCampaign(hexMap, hexMap.GetTile(1, 1), 70000, 5000);
+    abc.EnterCampaign(hexMap, hexMap.GetTile(2, 2), 6000, 4000);
+    xuchu.EnterCampaign(hexMap, hexMap.GetTile(2, 5), 3000);
+    x1.EnterCampaign(hexMap, hexMap.GetTile(2, 3), 3000);
+    x2.EnterCampaign(hexMap, hexMap.GetTile(2, 4), 10000, 1000);
+    x3.EnterCampaign(hexMap, hexMap.GetTile(1, 1), 10000, 300);
+    x4.EnterCampaign(hexMap, hexMap.GetTile(1, 1), 10000, 400);
+    hexMap.GetWarParty(caocao.faction).commanderGeneral = caocao;
     SettlementMgr.Ready4Refresh = true;
     FoW.Init(hexMap);
-    cameraKeyboardController.FixCameraAt(hexMap.GetUnitView(liubei.commandUnit.onFieldUnit).transform.position);
+    Unit commander = hexMap.GetPlayerParty().commanderGeneral.commandUnit.onFieldUnit;
+    View view;
+    if (commander.IsCamping()) {
+      view = hexMap.GetTileView(commander.tile);
+    } else {
+      view = hexMap.GetUnitView(commander);
+    }
+    cameraKeyboardController.FixCameraAt(view.transform.position);
   }
 }

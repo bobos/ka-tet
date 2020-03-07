@@ -31,15 +31,20 @@ namespace MonoNS
     IEnumerator CoDestroy(Settlement settlement, BuildingNS.DestroyType type)
     {
       SettlementView view = (SettlementView)settlementMgr.GetView(settlement);
-      view.DestroyAnimation(type);
-      while (view.Animating) { yield return null; }
+      if (type != BuildingNS.DestroyType.BySelf) {
+        view.DestroyAnimation(type);
+        while (view.Animating) { yield return null; }
+      }
+
       view.Destroy();
       settlementMgr.settlement2GO.Remove(settlement);
-      eventDialog.Show(new Event(
-          type == BuildingNS.DestroyType.ByFlood ?
-          EventDialog.EventName.FloodDestroyCamp :
-          EventDialog.EventName.WildFireDestroyCamp, null, settlement));
-      while (eventDialog.Animating) { yield return null; }
+      if (type != BuildingNS.DestroyType.BySelf) {
+        eventDialog.Show(new Event(
+            type == BuildingNS.DestroyType.ByFlood ?
+            EventDialog.EventName.FloodDestroyCamp :
+            EventDialog.EventName.WildFireDestroyCamp, null, settlement));
+        while (eventDialog.Animating) { yield return null; }
+      }
       hexMap.cameraKeyboardController.EnableCamera();
       Animating = false;
     }

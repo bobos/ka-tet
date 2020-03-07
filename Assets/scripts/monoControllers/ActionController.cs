@@ -42,6 +42,20 @@ namespace MonoNS
       }
     }
 
+    public void OnDeploymentDoneClick() {
+      if (onBtnClick != null)
+      {
+        onBtnClick(actionName.DEPLOYMENTDONE);
+      }
+    }
+
+    public void OnDestroyClick() {
+      if (onBtnClick != null)
+      {
+        onBtnClick(actionName.DESTROY);
+      }
+    }
+
     public void OnShowMyNetwork()
     {
       if (onBtnClick != null)
@@ -270,6 +284,8 @@ namespace MonoNS
     public enum actionName
     {
       MOVE,
+      DEPLOYMENTDONE,
+      DESTROY,
       STAND,
       ATTACK,
       REPOS,

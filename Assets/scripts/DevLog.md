@@ -42,11 +42,10 @@ Game Tips:
 33. 主帅到高山上 视野8
 34. 主帅战败，所有部队士气大降
 35. 800甲骑俱装对步兵可使用冲阵，消耗40点体力，对rookie 100%成功，对老兵50%成功，对精锐无效
-36. 如果主帅部队大败，所有部队士气下降8 - 30
+36. 如果主帅部队战败，所有部队士气下降8 - 30
 
 unit can not move to enemy's retreat zone[move range check]
 retreat support
-predeployment
 casualty error
 capture city on victory
 

@@ -100,6 +100,10 @@ public abstract class Settlement: Building
     this.supply = new BuildingNS.Supply(hexMap);
   }
 
+  public virtual bool CanBeAbandoned() {
+    return false;
+  }
+
   public List<Unit> Destroy()
   {
     settlementMgr.DestroySettlement(this);

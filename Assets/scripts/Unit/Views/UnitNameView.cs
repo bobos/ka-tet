@@ -1,4 +1,5 @@
 ﻿using CourtNS;
+using FieldNS;
 using MapTileNS;
 using UnityEngine;
 
@@ -28,7 +29,7 @@ namespace UnitNS
         }
       }
 
-      name += "\n♟" + UnitInfoView.Shorten(defendForce); 
+      name += FoW.Get().IsFogged(settlement.baseTile) ? "??" : "\n♟" + UnitInfoView.Shorten(defendForce); 
       TextMesh textMesh = this.transform.GetComponent<TextMesh>();
       textMesh.text = name;
       textMesh.color = color;

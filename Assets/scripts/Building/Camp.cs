@@ -12,6 +12,14 @@ public class Camp : Settlement
     this.labor = 0;
     type = Settlement.Type.camp;
     state = State.constructing;
+    if (!hexMap.deployDone) {
+      state = State.normal;
+      buildWork = 0;
+    }
+  }
+
+  public override bool CanBeAbandoned() {
+    return IsEmpty() && labor == 0;
   }
 }
 

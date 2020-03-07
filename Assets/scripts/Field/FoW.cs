@@ -19,8 +19,14 @@ namespace FieldNS
       // TODO: AI test
       WarParty party;
       if (enemy) {
+        if (!hexMap.deployDone) {
+          return tiles;
+        }
         party = hexMap.turnController.playerTurn ? hexMap.GetAIParty() : hexMap.GetPlayerParty();
       } else {
+        if (!hexMap.deployDone) {
+          return new HashSet<Tile>(hexMap.InitPlayerDeploymentZone());
+        }
         party = hexMap.turnController.playerTurn ? hexMap.GetPlayerParty() : hexMap.GetAIParty();
       }
       party.GetVisibleArea(tiles);
@@ -30,7 +36,6 @@ namespace FieldNS
 
     public void Fog() {
       HashSet<Tile> tiles = GetVisibleArea();
-      WarParty wp = !hexMap.turnController.playerTurn ? hexMap.GetPlayerParty() : hexMap.GetAIParty();
       foreach (Tile tile in hexMap.tiles)
       {
         if (tiles.Contains(tile)) {

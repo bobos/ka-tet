@@ -36,8 +36,7 @@
     UnitVisible,
     UnitLeft,
     UnitHidden,
-    UnitDestroyed,
-    UnitMove
+    UnitDestroyed
   }
 
   public enum LvlFire

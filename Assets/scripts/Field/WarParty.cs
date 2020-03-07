@@ -20,9 +20,9 @@ namespace FieldNS
 
   public class WarParty
   {
-    public WarParty(bool isAI, bool attackside, Faction faction)
+    public WarParty(bool attackside, Faction faction)
     {
-      this.isAI = isAI;
+      this.isAI = faction.IsAI();
       this.attackside = attackside;
       this.faction = faction;
       foreach (Party party in faction.GetParties())

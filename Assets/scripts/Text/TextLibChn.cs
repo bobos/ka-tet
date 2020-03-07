@@ -314,6 +314,7 @@ namespace TextNS
       {"title_wargame_committed", "执行完毕"},
       {"title_formationBreaking", "破阵!"},
       {"title_formationCrushing", "一溃千里"},
+      {"title_deployment", "战前部署"},
 
       {"operation_success_chance", @"胜算{0}成"},
       {"misc_windAdvantage", "背风面"},

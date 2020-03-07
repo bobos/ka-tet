@@ -241,6 +241,12 @@ namespace MonoNS
         Escape();
       }
 
+      if (action == ActionController.actionName.DESTROY)
+      {
+        hexMap.settlementAniController.DestroySettlement(selectedSettlement, BuildingNS.DestroyType.BySelf);
+        Escape();
+      }
+
       if (action == ActionController.actionName.ATTACK)
       {
         mouseMode = mode.attack;
@@ -373,8 +379,13 @@ namespace MonoNS
                           " can take in " + transferedSettlement.SupplyCanTakeIn());
               return;
             }
-            settlementMgr.AddDistJob(selectedSettlement, transferedSettlement, supply, SettlementMgr.QueueJobType.DistSupply);
-            popAniController.Show(settlementMgr.GetView(selectedSettlement), textLib.get("pop_transferIssued"), Color.green);
+            if (!hexMap.deployDone) {
+              selectedSettlement.supplyDeposit -= supply;
+              transferedSettlement.supplyDeposit += supply;
+            } else {
+              settlementMgr.AddDistJob(selectedSettlement, transferedSettlement, supply, SettlementMgr.QueueJobType.DistSupply);
+              popAniController.Show(settlementMgr.GetView(selectedSettlement), textLib.get("pop_transferIssued"), Color.green);
+            }
             Escape();
           } catch (System.Exception exception) {
             msgBox.Show(exception.Message);
@@ -390,8 +401,13 @@ namespace MonoNS
               msgBox.Show("invalid input, max labor can distribute " + canDist);
               return;
             }
-            settlementMgr.AddDistJob(selectedSettlement, transferedSettlement, supply, SettlementMgr.QueueJobType.DistLabor);
-            popAniController.Show(settlementMgr.GetView(selectedSettlement), textLib.get("pop_transferIssued"), Color.green);
+            if (!hexMap.deployDone) {
+              selectedSettlement.labor -= supply;
+              transferedSettlement.labor += supply;
+            } else {
+              settlementMgr.AddDistJob(selectedSettlement, transferedSettlement, supply, SettlementMgr.QueueJobType.DistLabor);
+              popAniController.Show(settlementMgr.GetView(selectedSettlement), textLib.get("pop_transferIssued"), Color.green);
+            }
             Escape();
           } catch (System.Exception exception) {
             msgBox.Show(exception.Message);
@@ -606,9 +622,13 @@ namespace MonoNS
       }
       Unit u = tileUnderMouse.GetUnit();
       Settlement s = tileUnderMouse.settlement;
-      // TODO: search playerTurn when disable AI turn debug
-      if (tileUnderMouse.IsThereConcealedEnemy(!hexMap.turnController.playerTurn)) {
-        u = null;
+
+      if (!hexMap.deployDone && s == null && u == null
+        && hexMap.InitPlayerDeploymentZone().Contains(tileUnderMouse)) {
+        if (selectedUnit != null && s == null) {
+          selectedUnit.SetWargameTile(tileUnderMouse);
+          Escape();
+        }
       }
 
       if (mouseMode == mode.attack) {

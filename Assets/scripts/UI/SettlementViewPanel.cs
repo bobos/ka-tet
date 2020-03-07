@@ -13,7 +13,7 @@ namespace MonoNS
       base.PreGameInit(hexMap, me);
       mouseController = hexMap.mouseController;
       GameObject[] btns = {GarrisonButton, SupplyButton, AbandonButton, GarrisonCancel,
-        Garrison1Button, Garrison2Button, Garrison3Button, Labor2UnitButton};
+        Garrison1Button, Garrison2Button, Garrison3Button, Labor2UnitButton, DestroyButton};
       buttons = btns;
       mouseController.onSettlementSelect += OnSettlementSelect;
       mouseController.onSettlementDeselect += OnSettlementDeselect;
@@ -34,6 +34,7 @@ namespace MonoNS
     public GameObject Garrison3Button;
     public GameObject GarrisonCancel;
     public GameObject Labor2UnitButton;
+    public GameObject DestroyButton;
     GameObject[] buttons;
 
     public Text title;
@@ -138,6 +139,11 @@ namespace MonoNS
       } else {
         GarrisonButton.SetActive(true);
       }
+      EnableDestroy();
+    }
+
+    void EnableDestroy() {
+      DestroyButton.SetActive(hexMap.mouseController.selectedSettlement.CanBeAbandoned());
     }
 
     void ToggleGarrison(bool onOff) { 
@@ -152,10 +158,19 @@ namespace MonoNS
       SupplyButton.SetActive(onOff);
       AbandonButton.SetActive(onOff);
       Labor2UnitButton.SetActive(onOff);
+      if (!onOff) {
+        DestroyButton.SetActive(onOff);
+      } else {
+        EnableDestroy();
+      }
     }
 
     public void OnSettlementSelect(Settlement s)
     {
+      if (!hexMap.deployDone && s.owner.isAI) {
+        return;
+      }
+
       self.SetActive(true);
       Unit[] garrison = s.garrison.ToArray();
       title.text = s.name + "[驻扎部队: " + garrison.Length + "/" + s.room + "]";

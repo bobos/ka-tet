@@ -7,7 +7,8 @@ namespace BuildingNS
   {
     ByFire,
     ByFlood,
-    ByForce
+    ByForce,
+    BySelf
   }
 
 }

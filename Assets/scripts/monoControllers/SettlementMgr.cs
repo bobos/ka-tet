@@ -283,7 +283,7 @@ namespace MonoNS
       CreateSettlement(settlement);
       settlement.Encamp(unit);
 
-      if (type != Settlement.Type.camp) SettlementReady(settlement);
+      if (type != Settlement.Type.camp || !hexMap.deployDone) SettlementReady(settlement);
       return true;
     }
 

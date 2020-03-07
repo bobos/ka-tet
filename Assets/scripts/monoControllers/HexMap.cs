@@ -120,10 +120,12 @@ namespace MonoNS
     List<Tile> _AttackerZone;
     public List<Tile> DefenderZone {
       get {
-        _DefenderZone = new List<Tile>();
-        foreach(Tile tile in
-          GetHex(numCols - 1, numRows - 1).GetNeighboursWithinRange(2, (Tile _tile) => true)) {
-          if (tile.Accessible()) { _DefenderZone.Add(tile); }
+        if (_DefenderZone == null) {
+          _DefenderZone = new List<Tile>();
+          foreach(Tile tile in
+            GetHex(numCols - 1, numRows - 1).GetNeighboursWithinRange(2, (Tile _tile) => true)) {
+            if (tile.Accessible()) { _DefenderZone.Add(tile); }
+          }
         }
         return _DefenderZone;
       }
@@ -131,17 +133,54 @@ namespace MonoNS
 
     public List<Tile> AttackerZone {
       get {
-        _AttackerZone = new List<Tile>();
-        foreach(Tile tile in
-          GetHex(1, 1).GetNeighboursWithinRange(2, (Tile _tile) => true)) {
-          if (tile.Accessible()) { _AttackerZone.Add(tile); }
+        if (_AttackerZone == null) {
+          _AttackerZone = new List<Tile>();
+          foreach(Tile tile in
+            GetHex(1, 1).GetNeighboursWithinRange(2, (Tile _tile) => true)) {
+            if (tile.Accessible()) { _AttackerZone.Add(tile); }
+          }
         }
         return _AttackerZone;
       }
     }
 
+    List<Tile> _zone;
+    public List<Tile> UndeploymentZone {
+      get {
+        if (_zone == null) {
+          _zone = new List<Tile>();
+          foreach(Tile tile in
+            GetHex(1, 1).GetNeighboursWithinRange(11, (Tile _tile) => true)) {
+              _zone.Add(tile);
+          }
+        }
+        return _zone;
+      }
+    }
+
+    Tile[] _initZone;
+    public Tile[] InitPlayerDeploymentZone() {
+      if (_initZone == null) {
+        List<Tile> ts = new List<Tile>();
+        for (int x = 0; x < numCols; x++)
+        {
+          for (int y = 0; y < numRows; y++)
+          {
+            Tile tile = tiles[x, y];
+            if ((tile.Accessible() || tile.settlement != null) && !UndeploymentZone.Contains(tile)) {
+              ts.Add(tile);
+            }
+          }
+        }
+        _initZone = ts.ToArray();
+      }
+      return _initZone;
+    }
+
     // Use this for initialization
-    public void PreGameInit()
+    public bool deployDone;
+    public int turnNum;
+    public void PreGameInit(int turnNum = 1)
     {
       turnController = GameObject.FindObjectOfType<TurnController>();
       weatherGenerator = GameObject.FindObjectOfType<WeatherGenerator>();
@@ -176,6 +215,7 @@ namespace MonoNS
       lineRenderer = transform.GetComponentInChildren<LineRenderer>();
       lineRenderer.startWidth = 0.1f;
       lineRenderer.endWidth = 0.1f;
+      this.turnNum = turnNum;
       //updateReady = true;
     }
 
@@ -190,6 +230,7 @@ namespace MonoNS
     public void SetWarParties(WarParty defender, WarParty invader) {
       warParties[0] = invader.isAI ? defender : invader;
       warParties[1] = invader.isAI ? invader : defender;
+      deployDone = !invader.isAI || turnNum != 1;
     }
 
     public WarParty GetPlayerParty() {
@@ -211,6 +252,10 @@ namespace MonoNS
 
     public WarParty GetWarParty(Unit unit) {
       return unit.IsAI() ? GetAIParty() : GetPlayerParty();
+    }
+
+    public WarParty GetWarParty(Faction faction) {
+      return faction.IsAI() ? GetAIParty() : GetPlayerParty();
     }
 
     public WarParty GetWarParty() {
