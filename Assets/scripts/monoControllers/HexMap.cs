@@ -227,10 +227,10 @@ namespace MonoNS
       }
     }
 
-    public void SetWarParties(WarParty defender, WarParty invader) {
-      warParties[0] = invader.isAI ? defender : invader;
-      warParties[1] = invader.isAI ? invader : defender;
-      deployDone = !invader.isAI || turnNum != 1;
+    public void SetWarParties(WarParty p1, WarParty p2) {
+      warParties[0] = p1.isAI ? p2 : p1;
+      warParties[1] = p1.isAI ? p1 : p2;
+      deployDone = GetPlayerParty().attackside || turnNum != 1;
     }
 
     public WarParty GetPlayerParty() {

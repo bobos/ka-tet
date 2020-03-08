@@ -129,7 +129,7 @@ namespace MonoNS
       phase = 2;
       Animating = true;
       self.SetActive(true);
-      string text = System.String.Format(textLib.get("event_FormationBreaking"), unit.GeneralName());
+      string text = System.String.Format(textLib.get("event_FormationBreaking_song2"), unit.GeneralName());
       if (hexMap.IsAttackSide(unit.IsAI())) {
         right.SetActive(false);
         left.SetActive(true);

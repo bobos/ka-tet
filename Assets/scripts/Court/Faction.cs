@@ -137,17 +137,17 @@ namespace CourtNS {
 
 	}
 
-  public class Liang: _Faction {
-    Party[] parties = new Party[]{Cons.Tiger};
-		public Liang(bool isAI, int population):base (isAI, population) {
+  public class Liao: _Faction {
+    Party[] parties = new Party[]{Cons.NorthCourt, Cons.SouthCourt};
+		public Liao(bool isAI, int population):base (isAI, population) {
 
     }
     public override string Name() {
-      return txtLib.get("f_liang");
+      return txtLib.get("f_liao");
     }
 
     public override string Description() {
-      return txtLib.get("f_liang_d");
+      return txtLib.get("f_liao_d");
     }
 
     public override Party[] GetParties() {
@@ -175,21 +175,39 @@ namespace CourtNS {
     }
   }
 
-	public class HeJian: _Faction {
-    Party[] parties = new Party[]{Cons.Pigeon, Cons.Eagle};
-		public HeJian(bool isAI, int population):base (isAI, population) {}
+	public class Song: _Faction {
+    Party[] parties = new Party[]{Cons.NewParty, Cons.OldParty};
+		public Song(bool isAI, int population):base (isAI, population) {}
 
     public override string Name() {
-      return txtLib.get("f_hejian");
+      return txtLib.get("f_song");
     }
 
     public override string Description() {
-      return txtLib.get("f_hejian_d");
+      return txtLib.get("f_song_d");
     }
 
     public override Party[] GetParties() {
       return parties;
     }
   }
+
+  public class Xia: _Faction {
+    Party[] parties = new Party[]{Cons.NoParty};
+		public Xia(bool isAI, int population):base (isAI, population) {}
+
+    public override string Name() {
+      return txtLib.get("f_xia");
+    }
+
+    public override string Description() {
+      return txtLib.get("f_xia_d");
+    }
+
+    public override Party[] GetParties() {
+      return parties;
+    }
+  }
+
 
 }

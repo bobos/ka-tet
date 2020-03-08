@@ -147,7 +147,12 @@ public class Cons {
   public static Province huaiNorth = new HuaiNorth(lowLand);
   public static Province huaiSouth = new HuaiSouth(lowLand);
 
-  public static void InitRegion() {
+  public static void Init() {
+    NewParty.counterParty = OldParty;
+    OldParty.counterParty = NewParty;
+    NorthCourt.counterParty = SouthCourt;
+    SouthCourt.counterParty = NorthCourt;
+
     Cons.upLand.UncomfortableRegions.Add(plain);
     Cons.upLand.UncomfortableRegions.Add(lowLand);
 
@@ -161,16 +166,16 @@ public class Cons {
   }
 
   //* parties */
-  //* HeJian */
-  public static Party Pigeon = new Party("p_pigeonParty", "p_pigeonParty_d");
-  public static Party Eagle = new Party("p_eagleParty", "p_eagleParty_d");
-
-  //* Liang */
-  public static Party Tiger = new Party("p_yanParty", "p_yanParty_d");
+  public static Party NewParty = new Party("p_newParty", "p_newParty_d");
+  public static Party OldParty = new Party("p_oldParty", "p_oldParty_d");
+  public static Party NorthCourt = new Party("p_northCourt", "p_northCourt_d");
+  public static Party SouthCourt = new Party("p_southCourt", "p_southCourt_d");
+  public static Party NoParty = new Party("p_noParty", "p_noParty_d");
 
   //* factions */
-  public static Faction Liang = new Liang(true, 5000000);
-  public static Faction HeJian = new HeJian(false, 100000);
+  public static Faction Liao = new Liao(true, 5000000);
+  public static Faction Song = new Song(false, 8000000);
+  public static Faction Xia = new Xia(true, 2000000);
   public static Faction GF = new Ghost();
 
 }

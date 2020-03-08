@@ -11,8 +11,10 @@ namespace UnitNS
     }
 
     public static GhostUnit createGhostUnit() {
-      Troop troop = new Troop(3800, Cons.GF, Cons.middleEarth, Type.Infantry, Cons.elite);
-      return new GhostUnit(troop);
+      General gen = new General("x", "x", Cons.riverSouth, new Traits[]{});
+      gen.JoinFaction(Cons.GF, Cons.NoParty);
+
+      return new GhostUnit(new Troop(3800, Cons.middleEarth, Type.Infantry, Cons.elite, gen));
     }
   }
 }

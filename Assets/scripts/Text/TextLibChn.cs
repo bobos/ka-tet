@@ -97,13 +97,16 @@ namespace TextNS
       {"r_farNorth", "漠北"},
 
       // faction
-      {"f_liang", "梁"},
-      {"f_hejian", "河间"},
+      {"f_liao", "辽"},
+      {"f_song", "宋"},
+      {"f_xia", "夏"},
 
       // party
-      {"p_eagleParty", "新党"},
-      {"p_pigeonParty", "旧党"},
-      {"p_yanParty", "北院"},
+      {"p_newParty", "新党"},
+      {"p_oldParty", "旧党"},
+      {"p_northCourt", "北院"},
+      {"p_southCourt", "南院"},
+      {"p_noParty", ""},
       {"party_relationNormal", "缓和"},
       {"party_relationTense", "紧张"},
       {"party_relationXtense", "一触即发"},
@@ -244,7 +247,10 @@ namespace TextNS
       {"event_RemoveHelmetSoldierDialogFollow", @"{0}所部兵士: 酷热难耐，军中兵士恳请将军效法{1}将军，准许军中将士只着毡帽免戴铁胄以解暑热!"},
       {"event_RemoveAllowedGeneralDialog", @"{0}: 此事关军心，告诸将士，我许卿等以便宜行事!"},
       {"event_RemoveDisallowedGeneralDialog", @"{0}: 盔者乃防具之首, 岂可轻易取走耶? 有再提此事者，我必斫掉其狗头使其再无顶盔之苦恼!!"},
-      {"event_FormationBreaking", @"{0}: 尔等大势已去，何不速速来降! 投矛解甲者不杀!"},
+      {"event_FormationBreaking", @"{0}: 尔等大势已去，何不速速来降! 解甲投矛者不杀!"},
+      {"event_FormationBreaking_songVliao1", @"{0}: 先取幽云十六州，再分子将打衙头!"},
+      {"event_FormationBreaking_song1", @"{0}: 天威卷地过黄河，万里胡人尽汉歌!"},
+      {"event_FormationBreaking_song2", @"{0}: 旗队浑如锦绣堆，银装背嵬打回回!"},
       {"event_Retreat", @"{0}: 胜败乃兵家常事，他日再战!"},
 
       // pop out msg

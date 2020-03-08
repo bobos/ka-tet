@@ -975,16 +975,18 @@ namespace MonoNS
             }
           }
 
-          if (resultLevel == ResultType.Great) {
-            hexMap.turnController.ShowTitle(Cons.GetTextLib().get("title_formationBreaking"), Color.black);
-          } else {
-            hexMap.turnController.ShowTitle(Cons.GetTextLib().get("title_formationCrushing"), Color.black);
+          if (supporters.Count > 2) {
+            if (resultLevel == ResultType.Great) {
+              hexMap.turnController.ShowTitle(Cons.GetTextLib().get("title_formationBreaking"), Color.black);
+            } else {
+              hexMap.turnController.ShowTitle(Cons.GetTextLib().get("title_formationCrushing"), Color.black);
+            }
+            while(hexMap.turnController.showingTitle) { yield return null; }
+            hexMap.dialogue.ShowFormationBreaking(atkWin ? attacker : defender);
+            while(hexMap.dialogue.Animating) { yield return null; }
+            hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetUnitView(loser).transform.position);
+            while(hexMap.cameraKeyboardController.fixingCamera) { yield return null; }
           }
-          while(hexMap.turnController.showingTitle) { yield return null; }
-          hexMap.dialogue.ShowFormationBreaking(atkWin ? attacker : defender);
-          while(hexMap.dialogue.Animating) { yield return null; }
-          hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetUnitView(loser).transform.position);
-          while(hexMap.cameraKeyboardController.fixingCamera) { yield return null; }
 
           // move all unit at once
           List<Unit> failedToMove = new List<Unit>();

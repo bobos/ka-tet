@@ -84,11 +84,10 @@ namespace CourtNS {
     }
 
     // At Court Actions
-    public void Assign(HexMap hexMap, Troop troop) {
+    public void CreateTroop(HexMap hexMap, int num, Province province, UnitNS.Type type, UnitNS.Rank rank) {
       ResetFieldRecords();
       this.hexMap = hexMap;
-      commandUnit = troop;
-      troop.AssignGeneral(this);
+      commandUnit = new Troop(num, province, type, rank, this);
     }
 
     public void JoinParty(Party party) {

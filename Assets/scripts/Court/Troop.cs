@@ -35,11 +35,12 @@ namespace CourtNS
       return type == Type.Cavalry ? Cavalry.MaxTroopNum : Infantry.MaxTroopNum;
     }
 
-    public Troop(int soldiers, Faction faction, Province province, Type type, Rank rank) {
+    public Troop(int soldiers, Province province, Type type, Rank rank, General general) {
       this.rank = rank;
       this.type = type;
       this.soldiers = soldiers;
-      this.faction = faction;
+      this.general = general;
+      faction = general.faction;
       name = province.AssignLegionName(type);
       combatPoint = province.region.CombatPoint(type);
       movementPoint = province.region.Mov(type);
@@ -141,13 +142,5 @@ namespace CourtNS
       state = TroopState.Disbanded;
       onFieldUnit = null;
     }
-
-    public void AssignGeneral(General general) {
-      this.general = general;
-      //if (onFieldUnit != null) {
-      //  onFieldUnit.UpdateGeneralName();
-      //}
-    }
-
   }
 }
