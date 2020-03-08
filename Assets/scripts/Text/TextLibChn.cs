@@ -250,10 +250,18 @@ namespace TextNS
       {"event_RemoveHelmetSoldierDialogFollow", @"{0}所部兵士: 酷热难耐，军中兵士恳请将军效法{1}将军，准许军中将士只着毡帽免戴铁胄以解暑热!"},
       {"event_RemoveAllowedGeneralDialog", @"{0}: 此事关军心，告诸将士，我许卿等以便宜行事!"},
       {"event_RemoveDisallowedGeneralDialog", @"{0}: 盔者乃防具之首, 岂可轻易取走耶? 有再提此事者，我必斫掉其狗头使其再无顶盔之苦恼!!"},
+
+
+
       {"event_FormationBreaking", @"{0}: 尔等大势已去，何不速速来降! 解甲投矛者不杀!"},
+      {"event_FormationBreaking1", @"{0}: 什么土鸡瓦狗，不过尔尔!"},
       {"event_FormationBreaking_songVliao1", @"{0}: 先取幽云十六州，再分子将打衙头!"},
       {"event_FormationBreaking_song1", @"{0}: 天威卷地过黄河，万里胡人尽汉歌!"},
       {"event_FormationBreaking_song2", @"{0}: 旗队浑如锦绣堆，银装背嵬打回回!"},
+      {"event_FormationBreaking_song3", @"{0}: 看我金戈铁马，气吞万里如虎!"},
+      {"event_FormationBreaking_songVxia", @"{0}: 汉家儿郎十万强，打下银州坐五凉!"},
+      {"event_FormationBreaking_liaoVxia", @"{0}: 番汉精锐十万强，打下银州坐五凉!"},
+      {"event_FormationBreaking_xia", @"{0}: 大宋何曾耸，大辽亦无奇。 满川龙虎辈，犹自说兵机!"},
       {"event_Retreat", @"{0}: 胜败乃兵家常事，他日再战!"},
 
       // pop out msg
@@ -341,6 +349,7 @@ namespace TextNS
       {"weather_blizardReminder", "铁衣冷难着"},
       {"weather_heavyRainReminder", "电尾烧黑云"},
       {"weather_mistReminder", "厚雾结长空"},
+      {"weather_citySieged", "黑云压城城欲摧"},
 
       };
     }

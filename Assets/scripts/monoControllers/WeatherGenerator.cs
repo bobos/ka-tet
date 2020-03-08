@@ -72,6 +72,10 @@ namespace MonoNS
     }
 
     public string GetWeatherExtraInfo() {
+      if (hexMap.settlementMgr.IsThereSiegedCity()) {
+        return Cons.GetTextLib().get("weather_citySieged");
+      }
+
       if (Cons.IsGale(hexMap.windGenerator.current)) {
         return Cons.GetTextLib().get("weather_galeReminder");
       }

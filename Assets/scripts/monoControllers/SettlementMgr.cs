@@ -468,6 +468,17 @@ namespace MonoNS
       }
     }
 
+    public bool IsThereSiegedCity() {
+      bool yes = false;
+      foreach(Settlement s in defenderRoots) {
+        if (s.type == Settlement.Type.city && s.IsUnderSiege()) {
+          yes = true;
+          break;
+        }
+      }
+      return yes;
+    }
+
     int GetGhostUnitRangeForSettlementSupply()
     {
       return (int)(ghostUnit.GetFullMovement() * 1.3f);
