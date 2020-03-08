@@ -64,6 +64,33 @@ namespace MonoNS
       return tomorrowWeather;
     }
 
+    public string GetWeatherName() {
+      if (Cons.IsGale(hexMap.windGenerator.current)) {
+        return hexMap.windGenerator.current.Name();
+      }
+      return currentWeather.Name();
+    }
+
+    public string GetWeatherExtraInfo() {
+      if (Cons.IsGale(hexMap.windGenerator.current)) {
+        return Cons.GetTextLib().get("weather_galeReminder");
+      }
+
+      if (Cons.IsHeat(currentWeather)) {
+        return Cons.GetTextLib().get("weather_heatReminder");
+      }
+
+      if (Cons.IsHeavyRain(currentWeather)) {
+        return Cons.GetTextLib().get("weather_heavyRainReminder");
+      }
+
+      if (Cons.IsBlizard(currentWeather)) {
+        return Cons.GetTextLib().get("weather_blizardReminder");
+      }
+
+      return "";
+    }
+
     Weather GenerateWeather()
     {
       int luckNum = Util.Rand(1, 10);

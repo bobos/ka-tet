@@ -10,22 +10,25 @@ namespace MonoNS
     public override void PreGameInit(HexMap hexMap, BaseController me)
     {
       base.PreGameInit(hexMap, me);
-      title = this.GetComponent<Text>();
     }
 
-    Text title;
-    public void Set(string faction, Color color)
+    public Text title;
+    public Text subTitle;
+    public void Set(string title, Color color, string subTitle, Color color1)
     {
       if (this != null && this.title != null)
       {
-        this.title.text = faction;
+        this.title.text = title;
         this.title.color = color;
+        this.subTitle.text = subTitle;
+        this.subTitle.color = color1;
       }
     }
 
     public void Clear()
     {
       this.title.text = "";
+      this.subTitle.text = "";
     }
 
     public override void UpdateChild() {}

@@ -21,6 +21,9 @@ namespace CourtNS {
 		void SetOverLord(Faction faction);
     int MaxUnitSize(Type unitType);
     Party[] GetParties();
+    HashSet<Province> GetProvinces();
+    void AddProvince(Province province);
+    void RemoveProvince(Province province);
   }
 
 	public abstract class _Faction: Faction {
@@ -34,6 +37,7 @@ namespace CourtNS {
 	  HashSet<General> generals = new HashSet<General>();
     protected TextLib txtLib = Cons.GetTextLib();
     public const int rgInfluence = 200;
+    HashSet<Province> provinces = new HashSet<Province>();
 
 	  public _Faction(bool isAI, int population) {
 	  	this.isAI = isAI;
@@ -134,6 +138,18 @@ namespace CourtNS {
 		public void SetOverLord(Faction faction) {
 			overLord = faction;
 		}
+
+    public HashSet<Province> GetProvinces() {
+      return provinces;
+    }
+
+    public void AddProvince(Province province) {
+      provinces.Add(province);
+    }
+
+    public void RemoveProvince(Province province) {
+      provinces.Remove(province);
+    }
 
 	}
 

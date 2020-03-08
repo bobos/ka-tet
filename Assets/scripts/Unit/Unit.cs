@@ -356,10 +356,6 @@ namespace UnitNS
       return _IsVisible(this.state);
     }
 
-    public bool IsHillLander() {
-      return Util.eq<Region>(rf.province.region, Cons.hillLand);
-    }
-
     bool _IsVisible(State state) {
       foreach (State s in visibleStates)
       {

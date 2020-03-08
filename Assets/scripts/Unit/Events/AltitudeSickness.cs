@@ -12,9 +12,9 @@ namespace UnitNS
     }
 
     public int Occur() {
-      if (!Util.eq<Region>(unit.hexMap.warProvince.region, Cons.upLand) ||
-       Util.eq<Region>(unit.rf.province.region, Cons.upLand) ||
-       triggered ||
+      // TODO: for DLC
+      return 0;
+      if (!Util.eq<Province>(unit.hexMap.warProvince, Cons.heHuang) || triggered ||
        (unit.GetStaminaLevel() != StaminaLvl.Exhausted &&
         unit.GetStaminaLevel() != StaminaLvl.Tired)) {
         return 0;

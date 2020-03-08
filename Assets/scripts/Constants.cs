@@ -129,40 +129,45 @@ public class Cons {
   public static UnitNS.Rank veteran = new UnitNS.Veteran();
   public static UnitNS.Rank elite = new UnitNS.Elite();
 
-  public static Region upLand = new Upland();
-  public static Region lowLand = new Lowland();
-  public static Region plain = new Plain();
-  public static Region hillLand = new Hillland();
-  public static Region grassLand = new Grassland();
+  public static Region han = new HanRegion();
+  public static Region qidan = new QidanRegion();
+  public static Region dangxiang = new DangxiangRegion();
+  public static Region tubo = new TuboRegion();
 
-  public static Province riverRun = new RiverRun(hillLand);
-  public static Province riverSouth = new RiverSouth(plain);
-  public static Province riverNorth = new RiverNorth(plain);
-  public static Province riverWest = new RiverWest(upLand);
-  public static Province riverEast = new RiverEast(plain);
-  public static Province middleEarth = new MiddleEarth(plain);
-  public static Province farWest = new FarWest(upLand);
-  public static Province farNorth = new FarNorth(grassLand);
-  public static Province huaiWest = new HuaiWest(lowLand);
-  public static Province huaiNorth = new HuaiNorth(lowLand);
-  public static Province huaiSouth = new HuaiSouth(lowLand);
+  public static Province heHuang = new HeHuang();
+  public static Province heXi = new HeXi();
+  public static Province heDong = new HeDong();
+  public static Province heBei = new HeBei();
+  public static Province heNan = new HeNan();
+  public static Province shanXi = new ShanXi();
+  public static Province xiJing = new XiJing();
+  public static Province zhongJing = new ZhongJing();
+  public static Province shangJing = new ShangJing();
 
   public static void Init() {
     NewParty.counterParty = OldParty;
     OldParty.counterParty = NewParty;
     NorthCourt.counterParty = SouthCourt;
     SouthCourt.counterParty = NorthCourt;
+    Liao.AddProvince(shangJing);
+    Liao.AddProvince(zhongJing);
+    Liao.AddProvince(xiJing);
 
-    Cons.upLand.UncomfortableRegions.Add(plain);
-    Cons.upLand.UncomfortableRegions.Add(lowLand);
-
-    Cons.plain.UncomfortableRegions.Add(upLand);
-    Cons.plain.UncomfortableRegions.Add(lowLand);
-
-    Cons.grassLand.UncomfortableRegions.Add(lowLand);
-    Cons.grassLand.UncomfortableRegions.Add(upLand);
-
-    Cons.lowLand.UncomfortableRegions.Add(upLand);
+    shangJing.ownerFaction = zhongJing.ownerFaction = xiJing.ownerFaction = Liao;
+    shangJing.ownerParty = zhongJing.ownerParty = NorthCourt;
+    xiJing.ownerParty = SouthCourt;
+    
+    Song.AddProvince(heBei);
+    Song.AddProvince(heDong);
+    Song.AddProvince(heNan);
+    Song.AddProvince(shanXi);
+    heBei.ownerFaction = heDong.ownerFaction = heNan.ownerFaction = shanXi.ownerFaction = Song;
+    heBei.ownerParty = heDong.ownerParty = OldParty;
+    shanXi.ownerParty = heNan.ownerParty = NewParty;
+    
+    Xia.AddProvince(heXi);
+    heXi.ownerFaction = Xia;
+    heXi.ownerParty = NoParty;
   }
 
   //* parties */

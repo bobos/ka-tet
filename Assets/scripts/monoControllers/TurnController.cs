@@ -38,29 +38,26 @@ namespace MonoNS
 
     void TurnChange()
     {
-      playerTurn = !playerTurn;
-      string faction = textLib.get(playerTurn ? "f_player": "f_AI");
-      turnIndicator.Set(turnNum, faction);
       showingTitle = true;
-      title.Set(textLib.get(playerTurn ? "other_playerTurn" : "other_AITurn"), Color.white);
-      StartCoroutine(KeepShowingTitle());
+      playerTurn = !playerTurn;
+      StartCoroutine(CoShowTurnTile());
     }
 
     void WarWeary() {
       showingTitle = true;
-      title.Set(textLib.get("other_warWeary"), Color.red);
+      title.Set(textLib.get("other_warWeary"), Color.red, "", Color.white);
       StartCoroutine(KeepShowingTitle());
     }
 
     void DeploymentPhase() {
       showingTitle = true;
-      title.Set(textLib.get("title_deployment"), Color.yellow);
+      title.Set(textLib.get("title_deployment"), Color.yellow, "", Color.white);
       StartCoroutine(KeepShowingTitle());
     }
 
     public void ShowTitle(string txt, Color color) {
       showingTitle = true;
-      title.Set(txt, color);
+      title.Set(txt, color, "", Color.white);
       StartCoroutine(KeepShowingTitle());
     }
 
@@ -69,6 +66,26 @@ namespace MonoNS
       yield return new WaitForSeconds(1);
       showingTitle = false;
       title.Clear();
+    }
+
+    IEnumerator CoShowTurnTile() {
+      if (playerTurn) {
+        yield return new WaitForSeconds(1);
+        title.Set(
+          System.String.Format(textLib.get("title_days"), turnNum, weatherGenerator.GetWeatherName()),
+          Color.white,
+          weatherGenerator.GetWeatherExtraInfo(),
+          Color.red
+          );
+        yield return new WaitForSeconds(2);
+        title.Clear();
+      }
+      string faction = textLib.get(playerTurn ? "f_player": "f_AI");
+      turnIndicator.Set(turnNum, faction);
+      title.Set(textLib.get(playerTurn ? "other_playerTurn" : "other_AITurn"), Color.white, "", Color.white);
+      yield return new WaitForSeconds(1);
+      title.Clear();
+      showingTitle = false;
     }
 
     public bool sleeping = false;
@@ -163,9 +180,6 @@ namespace MonoNS
           while (unitAniController.DestroyAnimating) { yield return null; };
         }
       }
-
-      //TODO
-      yield return new WaitForSeconds(1);
 
       // AI turn
       TurnChange();

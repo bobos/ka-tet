@@ -20,29 +20,101 @@ namespace CourtNS
     public abstract int ExtraSupplySlot();
   }
 
-  public class Upland : Region
+  public class QidanRegion : Region
   {
 
     public override string Name()
     {
-      return textLib.get("region_upland");
+      return textLib.get("region_qidanRegion");
     }
 
     public override string Description()
     {
-      return textLib.get("region_upland_description");
+      return textLib.get("region_qidanRegion_description");
     }
 
     public override int CombatPoint(Type unitType)
     {
       if (unitType == Type.Infantry)
         return 10;
-      return 40;
+      return 50;
     }
 
     public override int Will()
     {
-      return 85;
+      return 80;
+    }
+
+    public override int RetreatThreshold()
+    {
+      return 35;
+    }
+
+    public override int ExtraSupplySlot()
+    {
+      return 0;
+    }
+  }
+
+  public class HanRegion : Region
+  {
+
+    public override string Name()
+    {
+      return textLib.get("region_hanRegion");
+    }
+
+    public override string Description()
+    {
+      return textLib.get("region_hanRegion_description");
+    }
+
+    public override int CombatPoint(Type unitType)
+    {
+      if (unitType == Type.Infantry)
+        return 10;
+      return 45;
+    }
+
+    public override int Will()
+    {
+      return 80;
+    }
+
+    public override int RetreatThreshold()
+    {
+      return 35;
+    }
+
+    public override int ExtraSupplySlot()
+    {
+      return 0;
+    }
+  }
+
+  public class DangxiangRegion : Region
+  {
+
+    public override string Name()
+    {
+      return textLib.get("region_dangxiangRegion");
+    }
+
+    public override string Description()
+    {
+      return textLib.get("region_dangxiangRegion_description");
+    }
+
+    public override int CombatPoint(Type unitType)
+    {
+      if (unitType == Type.Infantry)
+        return 10;
+      return 45;
+    }
+
+    public override int Will()
+    {
+      return 80;
     }
 
     public override int RetreatThreshold()
@@ -56,125 +128,17 @@ namespace CourtNS
     }
   }
 
-  public class Plain : Region
+  public class TuboRegion : Region
   {
 
     public override string Name()
     {
-      return textLib.get("region_plain");
+      return textLib.get("region_tuboRegion");
     }
 
     public override string Description()
     {
-      return textLib.get("region_plain_description");
-    }
-
-    public override int CombatPoint(Type unitType)
-    {
-      if (unitType == Type.Infantry)
-        return 15;
-      return 35;
-    }
-
-    public override int Will()
-    {
-      return 80;
-    }
-
-    public override int RetreatThreshold()
-    {
-      return 40;
-    }
-
-    public override int ExtraSupplySlot()
-    {
-      return 0;
-    }
-  }
-
-  public class Lowland : Region
-  {
-
-    public override string Name()
-    {
-      return textLib.get("region_lowland");
-    }
-
-    public override string Description()
-    {
-      return textLib.get("region_lowland_description");
-    }
-
-    public override int CombatPoint(Type unitType)
-    {
-      if (unitType == Type.Infantry)
-        return 10;
-      return 35;
-    }
-
-    public override int Will()
-    {
-      return 80;
-    }
-
-    public override int RetreatThreshold()
-    {
-      return 40;
-    }
-
-    public override int ExtraSupplySlot()
-    {
-      return 0;
-    }
-  }
-
-  public class Hillland : Region
-  {
-
-    public override string Name()
-    {
-      return textLib.get("region_hillland");
-    }
-
-    public override string Description()
-    {
-      return textLib.get("region_hillland_description");
-    }
-
-    public override int CombatPoint(Type unitType)
-    {
-      if (unitType == Type.Infantry)
-        return 15;
-      return 35;
-    }
-
-    public override int Will()
-    {
-      return 90;
-    }
-
-    public override int RetreatThreshold()
-    {
-      return 35;
-    }
-
-    public override int ExtraSupplySlot()
-    {
-      return 0;
-    }
-  }
-
-  public class Grassland : Region
-  {
-
-    public override string Name()
-    {
-      return textLib.get("region_grassland");
-    }
-
-    public override string Description()
-    {
-      return textLib.get("region_grassland_description");
+      return textLib.get("region_tuboRegion_description");
     }
 
     public override int CombatPoint(Type unitType)
@@ -186,17 +150,17 @@ namespace CourtNS
 
     public override int Will()
     {
-      return 85;
+      return 80;
     }
 
     public override int RetreatThreshold()
     {
-      return 40;
+      return 45;
     }
 
     public override int ExtraSupplySlot()
     {
-      return 1;
+      return 0;
     }
   }
 

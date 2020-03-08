@@ -14,11 +14,14 @@ namespace UnitNS
     }
 
     public int Occur() {
+      // TODO: for DLC
+      return 0;
       if (happened || 
-      (!Util.eq<Region>(unit.hexMap.warProvince.region, Cons.plain) &&
-       !Util.eq<Region>(unit.hexMap.warProvince.region, Cons.lowLand)) ||
-       unit.type != Type.Cavalry ||
-       !Util.eq<Region>(unit.rf.province.region, Cons.upLand)) {
+      (!Util.eq<Province>(unit.hexMap.warProvince, Cons.heBei) &&
+       !Util.eq<Province>(unit.hexMap.warProvince, Cons.heDong) &&
+       !Util.eq<Province>(unit.hexMap.warProvince, Cons.heNan)
+       ) ||
+       unit.type != Type.Cavalry) {
         return 0;
       }
 

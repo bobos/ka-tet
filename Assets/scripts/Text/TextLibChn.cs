@@ -84,17 +84,20 @@ namespace TextNS
       {"rank_royalGuard", "大全装"},
 
       // region
-      {"r_riverRun", "河间"},
-      {"r_riverSouth", "河南"},
-      {"r_riverNorth", "河北"},
-      {"r_riverEast", "河东"},
-      {"r_riverWest", "河西"},
-      {"r_huaiWest", "淮西"},
-      {"r_huaiNorth", "淮北"},
-      {"r_huaiSouth", "淮南"},
-      {"r_middleEarth", "关中"},
-      {"r_farWest", "关外"},
-      {"r_farNorth", "漠北"},
+      {"r_heHuang", "河湟"},
+      {"r_heXi", "河西"},
+      {"r_heDong", "河东"},
+      {"r_heBei", "河北"},
+      {"r_heNan", "河南"},
+      {"r_shanXi", "陕西"},
+      {"r_xiJing", "西京"},
+      {"r_zhongJing", "中京"},
+      {"r_shangJing", "上京"},
+
+      {"region_qidanRegion", "契丹人"},
+      {"region_hanRegion", "汉人"},
+      {"region_dangxiangRegion", "党项人"},
+      {"region_tuboRegion", "吐蕃人"},
 
       // faction
       {"f_liao", "辽"},
@@ -323,6 +326,7 @@ namespace TextNS
       {"title_formationBreaking", "破阵!"},
       {"title_formationCrushing", "一溃千里"},
       {"title_deployment", "战前部署"},
+      {"title_days", @"第{0}日 · {1}"},
 
       {"operation_success_chance", @"胜算{0}成"},
       {"misc_windAdvantage", "背风面"},
@@ -331,6 +335,12 @@ namespace TextNS
       {"misc_thousand", "千"},
       {"misc_hundred", "百"},
       {"misc_defenceForce", @"{0}守军"},
+
+      {"weather_galeReminder", "风劲角弓鸣"},
+      {"weather_heatReminder", "禾木半枯焦"},
+      {"weather_blizardReminder", "铁衣冷难着"},
+      {"weather_heavyRainReminder", "电尾烧黑云"},
+      {"weather_mistReminder", "厚雾结长空"},
 
       };
     }

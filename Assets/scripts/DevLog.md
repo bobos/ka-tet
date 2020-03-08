@@ -8,7 +8,7 @@ Game Tips:
 7. 暴雨，大雪，小雪，移动力至少降低50%
 21. [河间外]部队移动到精疲力竭一定几率引发不满+1
 9. 春夏秋季，守方田野行军一定几率触发毁坏稻田事件, 如行省所属党派和毁坏稻田党派关系紧张，触发参本事件
-10.夏季，下雨天于两淮河东河南密林中，部队一定几率染上痢疾
+10.夏季，下雨天于河东河北密林中，部队一定几率染上痢疾
 
 士气：
 19. 饥饿状态：士气下降部队减员, 一定几率不满+2
@@ -44,9 +44,8 @@ Game Tips:
 35. 800甲骑俱装对步兵可使用冲阵，消耗40点体力，对rookie 100%成功，对老兵50%成功，对精锐无效
 36. 如果主帅部队战败，所有部队士气下降8 - 30
 
-至少3只部队接阵才算破阵
 每半月一回合，15个战斗回合
-
+河北 接大阵 大兵团 平原战  河西 堡垒群 山地 小兵团 
 casualty error
 capture city on victory
 青塘吐蕃 高原 西夏山地
@@ -159,3 +158,6 @@ in Attached script to direct access gameobject:
 
 convert Array to Hashset:
 HashSet<Tile> road = new HashSet<Tile>(baseTile.roads[tile]);
+
+Find gameobject by name:
+ GameObject.Find("LeftPart").gameObject;

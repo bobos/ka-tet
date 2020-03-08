@@ -50,9 +50,8 @@ namespace MapTileNS
         poision = new Poision(this);
       }
       if (field == FieldType.Wild) {
-        if (Util.eq<Region>(hexMap.warProvince.region, Cons.plain) && Cons.FiftyFifty()) {
-          epidemic = new Epidemic(this);
-        } else if (Util.eq<Region>(hexMap.warProvince.region, Cons.lowLand)) {
+        if ((Util.eq<Province>(hexMap.warProvince, Cons.heBei)
+             || Util.eq<Province>(hexMap.warProvince, Cons.heDong)) && Cons.FiftyFifty()) {
           epidemic = new Epidemic(this);
         }
         //TODO poison horse

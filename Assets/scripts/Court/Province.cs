@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UnitNS;
+﻿using UnitNS;
 using TextNS;
 
 namespace CourtNS
@@ -31,16 +30,16 @@ namespace CourtNS
 
   }
 
-  // HeZhong
-  public class RiverRun : Province
+  // 河湟 吐蕃
+  public class HeHuang : Province
   {
     private string name;
     private string description;
 
-    public RiverRun(Region region): base(region)
+    public HeHuang(): base(new TuboRegion())
     {
-      name = textLib.get("r_riverRun");
-      description = textLib.get("r_riverRun_d");
+      name = textLib.get("r_heHuang");
+      description = textLib.get("r_heHuang_d");
     }
     
     public override string Name()
@@ -54,18 +53,18 @@ namespace CourtNS
     }
   }
 
-  // He Xi
-  public class RiverWest : Province
+  // 河西 西夏
+  public class HeXi : Province
   {
     private string name;
     private string description;
 
-    public RiverWest(Region region): base(region)
+    public HeXi(): base(new DangxiangRegion())
     {
-      name = textLib.get("r_riverWest");
-      description = textLib.get("r_riverWest_d");
+      name = textLib.get("r_heXi");
+      description = textLib.get("r_heXi_d");
     }
-
+    
     public override string Name()
     {
       return name;
@@ -77,90 +76,18 @@ namespace CourtNS
     }
   }
 
-  // He Dong
-  public class RiverEast : Province
+  // 河东
+  public class HeDong : Province
   {
     private string name;
     private string description;
 
-    public RiverEast(Region region): base(region)
+    public HeDong(): base(new HanRegion())
     {
-      name = textLib.get("r_riverEast");
-      description = textLib.get("r_riverEast_d");
+      name = textLib.get("r_heDong");
+      description = textLib.get("r_heDong_d");
     }
-
-    public override string Name()
-    {
-      return name;
-    }
-
-    public override string Description()
-    {
-      return description;
-    }
-
-  }
-
-  // He Nan
-  public class RiverSouth : Province
-  {
-    private string name;
-    private string description;
-
-    public RiverSouth(Region region): base(region)
-    {
-      name = textLib.get("r_riverSouth");
-      description = textLib.get("r_riverSouth_d");
-    }
-
-    public override string Name()
-    {
-      return name;
-    }
-
-    public override string Description()
-    {
-      return description;
-    }
-
-  }
-
-  // He Bei
-  public class RiverNorth : Province
-  {
-    private string name;
-    private string description;
-
-    public RiverNorth(Region region): base(region)
-    {
-      name = textLib.get("r_riverNorth");
-      description = textLib.get("r_riverNorth_d");
-    }
-
-    public override string Name()
-    {
-      return name;
-    }
-
-    public override string Description()
-    {
-      return description;
-    }
-
-  }
-
-  // Mo Bei
-  public class FarNorth : Province
-  {
-    private string name;
-    private string description;
-
-    public FarNorth(Region region): base(region)
-    {
-      name = textLib.get("r_farNorth");
-      description = textLib.get("r_farNorth_d");
-    }
-
+    
     public override string Name()
     {
       return name;
@@ -172,66 +99,18 @@ namespace CourtNS
     }
   }
 
-  // Guan Wai
-  public class FarWest : Province
+  // 河北
+  public class HeBei : Province
   {
     private string name;
     private string description;
 
-    public FarWest(Region region): base(region)
+    public HeBei(): base(new HanRegion())
     {
-      name = textLib.get("r_farWest");
-      description = textLib.get("r_farWest_d");
+      name = textLib.get("r_heBei");
+      description = textLib.get("r_heBei_d");
     }
-
-    public override string Name()
-    {
-      return name;
-    }
-
-    public override string Description()
-    {
-      return description;
-    }
-
-  }
-
-  // Guan Zhong
-  public class MiddleEarth : Province
-  {
-    private string name;
-    private string description;
-
-    public MiddleEarth(Region region): base(region)
-    {
-      name = textLib.get("r_middleEarth");
-      description = textLib.get("r_middleEarth_d");
-    }
-
-    public override string Name()
-    {
-      return name;
-    }
-
-    public override string Description()
-    {
-      return description;
-    }
-
-  }
-
-  // Huai Xi 
-  public class HuaiWest : Province
-  {
-    private string name;
-    private string description;
-
-    public HuaiWest(Region region): base(region)
-    {
-      name = textLib.get("r_huaiWest");
-      description = textLib.get("r_huaiWest_d");
-    }
-
+    
     public override string Name()
     {
       return name;
@@ -243,42 +122,18 @@ namespace CourtNS
     }
   }
 
-  // Huai Bei 
-  public class HuaiNorth : Province
+  // 河南
+  public class HeNan : Province
   {
     private string name;
     private string description;
 
-    public HuaiNorth(Region region): base(region)
+    public HeNan(): base(new HanRegion())
     {
-      name = textLib.get("r_huaiNorth");
-      description = textLib.get("r_huaiNorth_d");
+      name = textLib.get("r_heNan");
+      description = textLib.get("r_heNan_d");
     }
-
-    public override string Name()
-    {
-      return name;
-    }
-
-    public override string Description()
-    {
-      return description;
-    }
-
-  }
-
-  // Huai Nan
-  public class HuaiSouth : Province
-  {
-    private string name;
-    private string description;
-
-    public HuaiSouth(Region region): base(region)
-    {
-      name = textLib.get("r_huaiSouth");
-      description = textLib.get("r_huaiSouth_d");
-    }
-
+    
     public override string Name()
     {
       return name;
@@ -289,4 +144,97 @@ namespace CourtNS
       return description;
     }
   }
+
+  // 陕西
+  public class ShanXi : Province
+  {
+    private string name;
+    private string description;
+
+    public ShanXi(): base(new HanRegion())
+    {
+      name = textLib.get("r_shanXi");
+      description = textLib.get("r_shanXi_d");
+    }
+    
+    public override string Name()
+    {
+      return name;
+    }
+
+    public override string Description()
+    {
+      return description;
+    }
+  }
+
+  // 西京
+  public class XiJing : Province
+  {
+    private string name;
+    private string description;
+
+    public XiJing(): base(new QidanRegion())
+    {
+      name = textLib.get("r_xiJing");
+      description = textLib.get("r_xiJing_d");
+    }
+    
+    public override string Name()
+    {
+      return name;
+    }
+
+    public override string Description()
+    {
+      return description;
+    }
+  }
+
+  // 中京
+  public class ZhongJing : Province
+  {
+    private string name;
+    private string description;
+
+    public ZhongJing(): base(new HanRegion())
+    {
+      name = textLib.get("r_zhongJing");
+      description = textLib.get("r_zhongJing_d");
+    }
+    
+    public override string Name()
+    {
+      return name;
+    }
+
+    public override string Description()
+    {
+      return description;
+    }
+  }
+
+  // 上京
+  public class ShangJing : Province
+  {
+    private string name;
+    private string description;
+
+    public ShangJing(): base(new QidanRegion())
+    {
+      name = textLib.get("r_shangJing");
+      description = textLib.get("r_shangJing_d");
+    }
+    
+    public override string Name()
+    {
+      return name;
+    }
+
+    public override string Description()
+    {
+      return description;
+    }
+  }
+  
 }

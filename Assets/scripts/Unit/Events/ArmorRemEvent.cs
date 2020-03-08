@@ -16,7 +16,7 @@
 
       // TODO: displined general, this never happens
       if ((unit.rf.rank == Cons.rookie || first != null)
-          && !unit.IsAI() && !unit.IsHillLander() && !fired && unit.IsOnField() && Cons.HighlyLikely()) {
+          && !unit.IsAI() && !fired && unit.IsOnField() && Cons.HighlyLikely()) {
         fired = true;
         // TODO totally depends on general trait, normally, allowed
         return Cons.FiftyFifty() ? Discontent() : DefReduce();
