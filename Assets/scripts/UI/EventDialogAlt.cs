@@ -153,17 +153,14 @@ namespace MonoNS
       int defInf = 0;
       int defCav = 0;
       string atkGenerals = "";
-      string atkSerial = "";
       string defGenerals = "";
-      string defSerial = "";
 
       foreach (UnitPredict u in predict.attackers) {
-        atkGenerals += u.unit.GeneralName() + "\n";
-        string unitInfo = u.unit.Name();
-        unitInfo += u.unit.GetStaminaLevel() != StaminaLvl.Fresh ? ("[" + u.unit.GetStaminaLvlName() + "]") : "";
-        unitInfo += u.windAdvantage ? ("[" + textLib.get("misc_windAdvantage") + "]") : "";
-        unitInfo += u.windDisadvantage ? ("[" + textLib.get("misc_windDisadvantage") + "]") : "";
-        atkSerial += unitInfo + "\n";
+        atkGenerals += u.unit.GeneralName()
+        + (u.unit.GetStaminaLevel() != StaminaLvl.Fresh ? ("[" + u.unit.GetStaminaLvlName() + "]") : "")
+        + (u.windAdvantage ? ("[" + textLib.get("misc_windAdvantage") + "]") : "")
+        + (u.windDisadvantage ? ("[" + textLib.get("misc_windDisadvantage") + "]") : "")
+        + "\n";
 
         if (u.unit.IsCavalry()) {
           atkCav += u.unit.rf.soldiers;
@@ -173,9 +170,10 @@ namespace MonoNS
       }
 
       foreach (UnitPredict u in predict.defenders) {
-        defGenerals += u.unit.GeneralName() + "\n";
-        defSerial += u.unit.Name() +
-          (u.unit.GetStaminaLevel() != StaminaLvl.Fresh ? ("(" + u.unit.GetStaminaLvlName() + ") ") : "") + "\n";
+        defGenerals += u.unit.GeneralName()
+        + (u.unit.GetStaminaLevel() != StaminaLvl.Fresh ? ("(" + u.unit.GetStaminaLvlName() + ") ") : "")
+        + "\n";
+
         if (u.unit.IsCavalry()) {
           defCav += u.unit.rf.soldiers;
         } else {
@@ -193,13 +191,11 @@ namespace MonoNS
       rightImg.sprite = defenderSide;
 
       leftDescription.text = textLib.get("event_operationDetail_gen") + ":\n" + atkGenerals + "\n" +
-        textLib.get("event_operationDetail_unit") + ":\n" + atkSerial + "\n" +
         textLib.get("event_operationDetail_inf") + ": " + atkInf + "\n" +
         textLib.get("event_operationDetail_cav") + ": " + atkCav + "\n" +
         textLib.get("event_operationDetail_total") + ": " + UnitInfoView.Shorten(predict.attackerOptimPoints);
 
       rightDescription.text = textLib.get("event_operationDetail_gen") + ":\n" + defGenerals + "\n" +
-        textLib.get("event_operationDetail_unit") + ":\n" + defSerial + "\n" +
         textLib.get("event_operationDetail_inf") + ": " + defInf + "\n" +
         textLib.get("event_operationDetail_cav") + ": " + defCav + "\n" +
         textLib.get("event_operationDetail_total") + ": " + UnitInfoView.Shorten(predict.defenderOptimPoints);

@@ -77,7 +77,7 @@ namespace MonoNS
           weatherGenerator.GetWeatherExtraInfo(),
           Color.red
           );
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(1);
         title.Clear();
       }
       string faction = textLib.get(playerTurn ? "f_player": "f_AI");

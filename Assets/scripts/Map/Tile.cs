@@ -341,7 +341,7 @@ namespace MapTileNS
             cnt++;
           }
         }
-        ret = ret + (int)(ret * cnt * 0.5f);
+        ret = ret + (int)(ret * cnt * 0.25f);
         if (unit.enemyControlledTiles != null && unit.enemyControlledTiles.Contains(this)) {
           // this tile is controlled by enemy, extra cost is needed
           ret = (int)(ret * 1.1f);

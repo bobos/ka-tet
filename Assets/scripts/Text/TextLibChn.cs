@@ -209,7 +209,6 @@ namespace TextNS
       {"event_ourSide_title", "我方"},
       {"event_aiSide_title", "敌方"},
       {"event_operationDetail_gen", "参战将领"},
-      {"event_operationDetail_unit", "作战序列"},
       {"event_operationDetail_inf", "步兵数量"},
       {"event_operationDetail_cav", "骑兵数量"},
       {"event_operationDetail_total", "总战力"},

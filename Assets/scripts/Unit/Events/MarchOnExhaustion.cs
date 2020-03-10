@@ -9,7 +9,7 @@
 
     public int Occur() {
       if (unit.GetStaminaLevel() == StaminaLvl.Exhausted && Cons.SlimChance()) {
-        return 3;
+        return 1;
       }
       return 0;
     }

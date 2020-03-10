@@ -214,9 +214,9 @@ namespace UnitNS
       // TODO: apply general trait
       if(!IsCavalry()) {
         if (Util.eq<Rank>(rf.rank, Cons.rookie)) {
-          return 60;
+          return 70;
         } else {
-          return 30;
+          return 40;
         }
       } else {
         return 0;
