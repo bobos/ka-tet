@@ -127,10 +127,10 @@ namespace UnitNS
     {
       if (Util.eq<Unit>(unit, this.unit))
       {
-        if (!unit.IsAI() && !unit.TurnDone()) hexMap.HighlightUnit(unit);
+        //if (!unit.IsAI() && !unit.TurnDone()) hexMap.HighlightUnit(unit);
         if (hexMap.wargameController.start && hexMap.wargameController.IsWargameUnit(unit)) {
         } else {
-          Tile[] range = unit.GetAccessibleTiles();
+          Tile[] range = unit.GetAccessibleTiles(unit.IsAI() == hexMap.turnController.playerTurn);
           hexMap.HighlightArea(range, HexMap.RangeType.movement, this.unit);
           hexMap.HighlightPath(unit.GetPath());
         }

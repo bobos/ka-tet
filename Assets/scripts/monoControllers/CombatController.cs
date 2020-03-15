@@ -129,7 +129,7 @@ namespace MonoNS
 
     OperationPredict predict;
     public OperationPredict StartOperation(Unit attacker, Unit targetUnit, Settlement targetSettlement) {
-      if (attacker.GetStaminaLevel() == StaminaLvl.Exhausted) {
+      if (!attacker.CanAttack()) {
         // no enough stamina, can not start operation
         return null;
       }
@@ -392,7 +392,7 @@ namespace MonoNS
 
     int[] GetVicBuf(ResultType type) {
       if (type == ResultType.Close) {
-        return new int[]{-2, -1, 0};
+        return new int[]{-1, -1, 0};
       }
       if (type == ResultType.Small) {
         return new int[]{0, 0, 0};
@@ -406,13 +406,13 @@ namespace MonoNS
     // initiatorMorale, supporterMorale, initiatorDiscontent
     int[] GetDftBuf(ResultType type) {
       if (type == ResultType.Close) {
-        return new int[]{-5, -3, 0};
+        return new int[]{-2, -2, 0};
       }
       if (type == ResultType.Small) {
-        return new int[]{-10, -5, 1};
+        return new int[]{-7, -4, 1};
       }
       if (type == ResultType.Great) {
-        return new int[]{-15, -15, 4};
+        return new int[]{-10, -6, 4};
       }
       return new int[]{-30, -30, 8};
     }
@@ -577,9 +577,9 @@ namespace MonoNS
           attackerCasualty = (int)(attackerTotal * (attackerBigger ? m1 : m));
         } else {
           if (attackerBigger) {
-            defenderCasualty = (int)(defenderTotal * factor * 0.018f);
+            defenderCasualty = (int)(defenderTotal * factor * 0.015f);
           } else {
-            attackerCasualty = (int)(attackerTotal * factor * 0.018f);
+            attackerCasualty = (int)(attackerTotal * factor * 0.015f);
           }
 
           if (resultLevel == ResultType.Small) {
@@ -788,7 +788,7 @@ namespace MonoNS
           }
           hexMap.turnController.Sleep(1);
           while(hexMap.turnController.sleeping) { yield return null; }
-          if (!defender.IsCamping()) {
+          if (!defender.IsCamping() && !defender.IsGone()) {
             hexMap.unitAniController.Riot(defender, discontent);
             while (hexMap.unitAniController.riotAnimating) { yield return null; }
           }
@@ -853,7 +853,7 @@ namespace MonoNS
           }
           hexMap.turnController.Sleep(1);
           while(hexMap.turnController.sleeping) { yield return null; }
-          if (!attacker.IsCamping()) {
+          if (!attacker.IsCamping() && !attacker.IsGone()) {
             hexMap.unitAniController.Riot(attacker, discontent);
             while (hexMap.unitAniController.riotAnimating) { yield return null; }
           }

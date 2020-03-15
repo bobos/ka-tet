@@ -14,8 +14,8 @@ namespace UnitNS
     protected abstract int GetBaseSupplySlots();
     protected abstract Unit Clone();
 
-    public const int ActionCost = 30; // For actions like: attack, bury
-    public const int DefenceCost = 15;
+    public const int ActionCost = 15; // For actions like: attack, bury
+    public const int DefenceCost = 10;
     public const int MovementcostOnHill = 25;
     public const int MovementcostOnHillRoad = 20;
     public const int MovementcostOnPlain = 20;
@@ -223,8 +223,14 @@ namespace UnitNS
       }
     }
 
+    public bool charged = false;
     public bool CanCharge() {
-      return rf.royalGuard && rf.soldiers >= 800 && movementRemaining >= ActionCost; 
+      return !charged && rf.royalGuard && rf.soldiers >= 800 && movementRemaining >= ActionCost; 
+    }
+
+    public bool attacked = false;
+    public bool CanAttack() {
+      return !attacked && GetStaminaLevel() != StaminaLvl.Exhausted;
     }
 
     public string GetStateName()
@@ -420,6 +426,9 @@ namespace UnitNS
         chaos = false;
         //hexMap.GetUnitView(this).UpdateUnitInfo();
       }
+
+      charged = false;
+      attacked = false;
 
       if (defeating) {
         defeating = false;
@@ -792,7 +801,9 @@ namespace UnitNS
 
       if (stopAtNextMove) {
         stopAtNextMove = false;
-        return false;
+        if (!allyOnTile) {
+          return false;
+        }
       }
 
       // Unit should stop once spots new enemy
@@ -888,12 +899,13 @@ namespace UnitNS
     // ================= path finding ===============================
     // ==============================================================
     public HashSet<Tile> enemyControlledTiles;
-    public Tile[] GetPureAccessibleTiles() {
+    public Tile[] GetPureAccessibleTiles(bool fullMovement = false) {
       enemyControlledTiles = hexMap.settlementMgr.GetControlledTiles(!IsAI());
-      return PFTile2Tile(PathFinder.FindAccessibleTiles(tile, this, movementRemaining));
+      return PFTile2Tile(PathFinder.FindAccessibleTiles(tile, this,
+        fullMovement ? GetFullMovement() : movementRemaining));
     }
 
-    public Tile[] GetAccessibleTiles()
+    public Tile[] GetAccessibleTiles(bool fullMovement = false)
     {
       if (!hexMap.deployDone) {
         return hexMap.InitPlayerDeploymentZone();
@@ -906,7 +918,7 @@ namespace UnitNS
       }
 
       List<Tile> zone = hexMap.IsAttackSide(this.IsAI()) ? hexMap.DefenderZone : hexMap.AttackerZone;
-      foreach (Tile tile in GetPureAccessibleTiles()) {
+      foreach (Tile tile in GetPureAccessibleTiles(fullMovement)) {
         if (visible.Contains(tile) && tile.GetUnit() == null && !zone.Contains(tile)) {
           area.Add(tile);
         }

@@ -15,7 +15,7 @@
     }
 
     public float Buf() {
-      if (unit.IsCamping()) {
+      if (unit.IsCamping() && unit.tile.settlement != null) {
         return unit.tile.settlement.wall.defensePoint * 0.04f;
       }
 

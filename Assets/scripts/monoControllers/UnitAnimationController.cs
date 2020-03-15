@@ -437,6 +437,7 @@ namespace MonoNS
 
     IEnumerator CoCharge(Unit from, Unit to) {
       from.movementRemaining -= chargePoint;
+      from.charged = true;
       popAniController.Show(hexMap.GetUnitView(from), textLib.get("pop_charging"), Color.green);
       while (popAniController.Animating) { yield return null; }
       bool scared = to.CanBeShaked(from) >= Util.Rand(1, 100);

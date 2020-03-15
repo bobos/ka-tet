@@ -187,7 +187,7 @@ namespace MonoNS
       
       if (mouseController.nearEnemy || mouseController.nearEnemySettlement != null) {
         if (!hexMap.combatController.start && unit.GetStaminaLevel() != StaminaLvl.Exhausted
-         && hexMap.deployDone) {
+         && hexMap.deployDone && unit.CanAttack()) {
           AttackButton.SetActive(true);
         }
       }
@@ -216,25 +216,25 @@ namespace MonoNS
         }
       }
 
-      if (unit.type == Type.Infantry && hexMap.deployDone) {
+      if (unit.type == Type.Infantry && hexMap.deployDone && !hexMap.wargameController.start) {
         if (mouseController.nearDam != null || (unit.tile.siegeWall != null && unit.tile.siegeWall.owner.isAI != unit.IsAI())) {
           SabotageButton.SetActive(true);
         }
       }
 
-      if (mouseController.nearFire != null && hexMap.deployDone) {
+      if (mouseController.nearFire != null && hexMap.deployDone && !hexMap.wargameController.start) {
         FireButton.SetActive(true);
       }
 
-      if (mouseController.nearWater && hexMap.deployDone) {
+      if (mouseController.nearWater && hexMap.deployDone && !hexMap.wargameController.start) {
         DefendButton.SetActive(true);
       }
 
-      if (!hexMap.deployDone && mouseController.inCampField != null) {
+      if (!hexMap.deployDone && mouseController.inCampField != null && !hexMap.wargameController.start) {
         CampButton.SetActive(true);
       }
 
-      if (unit.type == Type.Infantry) {
+      if (unit.type == Type.Infantry && !hexMap.wargameController.start) {
         if (mouseController.inCampField != null && !hexMap.wargameController.start) {
           CampButton.SetActive(true);
         }
@@ -256,7 +256,7 @@ namespace MonoNS
         }
       }
 
-      if (unit.type == Type.Cavalry) {
+      if (unit.type == Type.Cavalry && !hexMap.wargameController.start) {
         if ((mouseController.nearAlly || mouseController.nearMySettlement != null) ||
          !hexMap.wargameController.start) {
           if (unit.supply.supply > 0) {
