@@ -10,11 +10,10 @@ namespace MonoNS
     {
       base.PreGameInit(hexMap, me);
       turnController = hexMap.turnController;
-      turnController.onNewTurn += OnTurnEnd;
       current = GenerateWind();
       direction = DecideDirection();
       // initialize the wind
-      OnTurnEnd();
+      NextDay();
     }
 
     public override void UpdateChild() {}
@@ -25,7 +24,7 @@ namespace MonoNS
     Current nextCurrent = null;
     Cons.Direction nextDirection;
 
-    public void OnTurnEnd()
+    public void NextDay()
     {
       if (nextCurrent == null)
       {

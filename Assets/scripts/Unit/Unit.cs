@@ -16,10 +16,10 @@ namespace UnitNS
 
     public const int ActionCost = 15; // For actions like: attack, bury
     public const int DefenceCost = 10;
-    public const int MovementcostOnHill = 25;
-    public const int MovementcostOnHillRoad = 20;
-    public const int MovementcostOnPlain = 20;
-    public const int MovementcostOnPlainRoad = 15;
+    public const int MovementcostOnHill = 20;
+    public const int MovementcostOnHillRoad = 15;
+    public const int MovementcostOnPlain = 15;
+    public const int MovementcostOnPlainRoad = 12;
     public const int MovementCostOnUnaccesible = -1;
     public const int DisbandUnitUnder = 50;
 
@@ -566,11 +566,11 @@ namespace UnitNS
 
     public StaminaLvl GetStaminaLevel()
     {
-      if (movementRemaining >= 50)
+      if (movementRemaining >= 30)
       {
         return StaminaLvl.Fresh;
       }
-      if (movementRemaining >= 30)
+      if (movementRemaining >= ActionCost)
       {
         return StaminaLvl.Tired;
       }

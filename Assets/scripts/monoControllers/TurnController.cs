@@ -151,12 +151,6 @@ namespace MonoNS
       WarParty aiParty = hexMap.GetAIParty();
       WarParty p = player ? playerParty : aiParty;
       WarParty otherP = !player ? playerParty : aiParty;
-      player = !player;
-      cnt++;
-      if (cnt == 2) {
-        cnt = 0;
-        turnNum++;
-      }
 
       foreach (Unit unit in p.GetUnits())
       {
@@ -181,8 +175,44 @@ namespace MonoNS
         }
       }
 
-      // AI turn
+      player = !player;
+      cnt++;
+      if (cnt == 2) {
+        cnt = 0;
+        turnNum++;
+        weatherGenerator.NextDay();
+        hexMap.windGenerator.NextDay();
+        if (onNewTurn != null) { 
+          onNewTurn();
+        }
+      }
       TurnChange();
+      if (cnt == 0) {
+        if (turnNum > 20) {
+          // starts to drop morale
+          if (turnNum == 21) {
+            WarWeary();
+          }
+
+          WarParty atkParty = playerParty.attackside ? playerParty : aiParty;
+          WarParty defParty = playerParty.attackside ? aiParty : playerParty;
+          foreach (Unit unit in atkParty.GetUnits()) {
+            // drop 5 morale point for attack units per turn
+            if (unit.rf.morale >= Rank.MoralePunishLine) {
+              unit.rf.morale -= 4;
+            }
+          }
+
+          if ((turnNum % 2) != 0) {
+            foreach(Unit unit in defParty.GetUnits()) {
+              // drop 5 morale point for defense side on odd turn
+              if (unit.rf.morale >= Rank.MoralePunishLine) {
+                unit.rf.morale -= 4;
+              }
+            }
+          }
+        }
+      }
 
       // TODO
       FoW.Get().Fog();
@@ -286,40 +316,8 @@ namespace MonoNS
       */
       endingTurn = false;
       if (cnt == 0) {
-        if (turnNum > 20) {
-          // starts to drop morale
-          if (turnNum == 21) {
-            WarWeary();
-          }
-
-          WarParty atkParty = playerParty.attackside ? playerParty : aiParty;
-          WarParty defParty = playerParty.attackside ? aiParty : playerParty;
-          foreach (Unit unit in atkParty.GetUnits()) {
-            // drop 5 morale point for attack units per turn
-            if (unit.rf.morale >= Rank.MoralePunishLine) {
-              unit.rf.morale -= 4;
-            }
-          }
-
-          if ((turnNum % 2) != 0) {
-            foreach(Unit unit in defParty.GetUnits()) {
-              // drop 5 morale point for defense side on odd turn
-              if (unit.rf.morale >= Rank.MoralePunishLine) {
-                unit.rf.morale -= 4;
-              }
-            }
-          }
-        }
-
-        Weather weather = weatherGenerator.NextDay();
-        if (onNewTurn != null) { 
-          onNewTurn();
-          eventStasher.Step();
-          while (eventStasher.stepAnimating) { yield return null; }
-        }
-
         foreach(Tile tile in weatherGenerator.tileCB) {
-          tileAniController.WeatherChange(tile, weather);
+          tileAniController.WeatherChange(tile, weatherGenerator.currentWeather);
           while (tileAniController.WeatherAnimating) { yield return null; }
         }
       }
