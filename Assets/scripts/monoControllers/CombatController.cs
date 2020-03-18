@@ -152,7 +152,7 @@ namespace MonoNS
         }
 
         if (u.IsAI() == attacker.IsAI() && u.GetStaminaLevel() != StaminaLvl.Exhausted
-          && !Util.eq<Unit>(u, attacker)) {
+          && !Util.eq<Unit>(u, attacker) && u.CanAttack()) {
           supportAttackers.Add(u);
         }
 
@@ -320,11 +320,13 @@ namespace MonoNS
             if (unit.rf.soldiers < total) {
               total -= unit.rf.soldiers;
               up.dead += unit.rf.soldiers;
+              unit.kia += unit.rf.soldiers;
               up.laborDead += unit.labor;
               unit.rf.soldiers = 0;
               unit.labor = 0;
             } else {
               up.dead += total;
+              unit.kia += total;
               unit.rf.soldiers -= total;
               total = 0;
               break;
@@ -336,6 +338,7 @@ namespace MonoNS
           if (unit.rf.soldiers < 20) {
             total -= unit.rf.soldiers;
             up.dead += unit.rf.soldiers;
+            unit.kia += unit.rf.soldiers;
             up.laborDead += unit.labor;
             unit.rf.soldiers = 0;
             unit.labor = 0;
@@ -409,7 +412,7 @@ namespace MonoNS
         return new int[]{-2, -2, 0};
       }
       if (type == ResultType.Small) {
-        return new int[]{-7, -4, 1};
+        return new int[]{-5, -4, 1};
       }
       if (type == ResultType.Great) {
         return new int[]{-10, -6, 4};
@@ -451,6 +454,7 @@ namespace MonoNS
         foreach (UnitPredict u in predict.attackers) {
           if (u.joinPossibility >= Util.Rand(0, 100)) {
             newAttackers.Add(u);
+            u.unit.attacked = true; 
           } else {
             giveupAttackers.Add(u.unit);
           }

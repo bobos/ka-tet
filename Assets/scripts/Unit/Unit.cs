@@ -16,7 +16,7 @@ namespace UnitNS
 
     public const int ActionCost = 15; // For actions like: attack, bury
     public const int DefenceCost = 10;
-    public const int MovementcostOnHill = 20;
+    public const int MovementcostOnHill = 25;
     public const int MovementcostOnHillRoad = 15;
     public const int MovementcostOnPlain = 15;
     public const int MovementcostOnPlainRoad = 12;

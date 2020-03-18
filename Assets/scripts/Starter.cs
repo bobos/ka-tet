@@ -179,8 +179,8 @@ public class Starter : MonoBehaviour {
     // after settlement created, general enters campaign
     liubei.EnterCampaign(hexMap, hexMap.GetTile(27, 18), 100000, 4000);
     zhaoyun.EnterCampaign(hexMap, hexMap.GetTile(28, 18), 30000, 2000);
-    guanyu.EnterCampaign(hexMap, hexMap.GetTile(27, 17), 0, 200);
-    machao.EnterCampaign(hexMap, hexMap.GetTile(27, 17), 0, 200);
+    guanyu.EnterCampaign(hexMap, hexMap.GetTile(27, 17), 0, 1000);
+    machao.EnterCampaign(hexMap, hexMap.GetTile(27, 17), 0, 1000);
     zhangfei.EnterCampaign(hexMap, hexMap.GetTile(28, 17), 0);
     hexMap.GetWarParty(liubei.faction).commanderGeneral = liubei;
 
@@ -190,8 +190,8 @@ public class Starter : MonoBehaviour {
     xuchu.EnterCampaign(hexMap, hexMap.GetTile(2, 5), 3000);
     x1.EnterCampaign(hexMap, hexMap.GetTile(2, 3), 3000);
     x2.EnterCampaign(hexMap, hexMap.GetTile(2, 4), 10000, 1000);
-    x3.EnterCampaign(hexMap, hexMap.GetTile(1, 1), 10000, 300);
-    x4.EnterCampaign(hexMap, hexMap.GetTile(1, 1), 10000, 400);
+    x3.EnterCampaign(hexMap, hexMap.GetTile(1, 1), 10000, 1000);
+    x4.EnterCampaign(hexMap, hexMap.GetTile(1, 1), 10000, 1000);
     hexMap.GetWarParty(caocao.faction).commanderGeneral = caocao;
     SettlementMgr.Ready4Refresh = true;
     FoW.Init(hexMap);

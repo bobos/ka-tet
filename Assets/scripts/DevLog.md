@@ -47,7 +47,7 @@ Game Tips:
 放火选地点
 每半月一回合，15个战斗回合
 河北 接大阵 大兵团 平原战  河西/陕西 堡垒群 山地 小兵团 
-casualty error
+wargame: switch
 capture city on victory
 
 ai主帅等级决定ai战斗等级

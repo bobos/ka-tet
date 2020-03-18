@@ -405,7 +405,7 @@ namespace MonoNS
         if (unit.IsShowingAnimation()) {
           popAniController.Show(hexMap.GetUnitView(unit),
           System.String.Format(
-            textLib.get("pop_insufficient"),
+            textLib.get("pop_insufficientLabor"),
             MinLaborBuryBody
           ),
           Color.yellow);
