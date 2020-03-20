@@ -49,6 +49,7 @@ Game Tips:
 河北 接大阵 大兵团 平原战  河西/陕西 堡垒群 山地 小兵团 
 wargame: switch
 capture city on victory
+defender boring??
 
 ai主帅等级决定ai战斗等级
 

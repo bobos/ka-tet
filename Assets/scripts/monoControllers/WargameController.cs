@@ -22,6 +22,7 @@ namespace MonoNS {
 
   public class WargameController : BaseController {
     List<WargameUnit> unitList;
+    List<WargameUnit> unitRepoList;
     public bool start = false;
     public GameObject WargameBtn;
     public GameObject CommitBtn;
@@ -42,6 +43,7 @@ namespace MonoNS {
       CancelBtn.SetActive(true);
       hexMap.unitSelectionPanel.NextTurnButton.SetActive(false);
       unitList = new List<WargameUnit>();
+      unitRepoList = new List<WargameUnit>();
       visibleArea = FieldNS.FoW.Get().GetVisibleArea();
     }
 
@@ -72,6 +74,9 @@ namespace MonoNS {
         hexMap.actionController.move(u.unit);
         while (hexMap.actionController.ActionOngoing) { yield  return null; }
       }
+      foreach(WargameUnit u in unitRepoList) {
+        hexMap.unitAniController.MoveUnit(u.unit, u.path[0]);
+      }
       if (hexMap.turnController.playerTurn) {
         hexMap.turnController.ShowTitle(Cons.GetTextLib().get("title_wargame_committed"), Color.white);
         while (hexMap.turnController.showingTitle) { yield  return null; }
@@ -84,6 +89,10 @@ namespace MonoNS {
       // Cancel all unit in reverse order
       unitList.Reverse();
       foreach(WargameUnit u in unitList) {
+        u.unit.movementRemaining = u.remainingMovement;
+        u.unit.SetWargameTile(u.originTile);
+      }
+      foreach(WargameUnit u in unitRepoList) {
         u.unit.movementRemaining = u.remainingMovement;
         u.unit.SetWargameTile(u.originTile);
       }
@@ -101,6 +110,14 @@ namespace MonoNS {
           break;
         }
       }
+      if (!found) {
+        foreach(WargameUnit u in unitRepoList) {
+          if (Util.eq<Unit>(u.unit, unit)) {
+            found = true;
+            break;
+          }
+        }
+      }
 
       return found;
     }
@@ -115,6 +132,15 @@ namespace MonoNS {
       unit.movementRemaining -= unit.GetPathCost(path);
       unit.SetWargameTile(tile);
       unitList.Add(new WargameUnit(tile, unit, path, originTile, originMovement));
+    }
+
+    public void AddRepo(Tile tile, Unit unit, Tile[] path) {
+      Tile originTile = unit.tile;
+      int originMovement = unit.movementRemaining;
+      // always assume the target tile is within range
+      unit.movementRemaining -= unit.GetPathCost(path);
+      unit.SetWargameTile(tile);
+      unitRepoList.Add(new WargameUnit(tile, unit, path, originTile, originMovement));
     }
 
   }

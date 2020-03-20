@@ -192,7 +192,7 @@ namespace MonoNS
         }
       }
 
-      if (!hexMap.wargameController.start && mouseController.nearAlly && hexMap.deployDone) {
+      if (mouseController.nearAlly && hexMap.deployDone && !hexMap.wargameController.IsWargameUnit(unit)) {
         ReposButton.SetActive(true);
       }
 

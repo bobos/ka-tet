@@ -453,10 +453,20 @@ namespace MonoNS
       if (scared) {
         Tile tile = null;
         List<Unit> ally = new List<Unit>();
+        int allyNum = 0;
         foreach(Tile t in to.tile.neighbours) {
           if (t.Deployable(to)) {
-            tile = t;
-            break;
+            int count = 0;
+            foreach(Tile t1 in t.neighbours) {
+              Unit uu = t1.GetUnit();
+              if (!Util.eq<Tile>(t1, to.tile) && uu != null && uu.IsAI() == to.IsAI()) {
+                count++;
+              }
+            }
+            if (count >= allyNum) {
+              allyNum = count;
+              tile = t;
+            }
           }
           Unit u = t.GetUnit();
           if (u != null && u.IsAI() == to.IsAI()) {

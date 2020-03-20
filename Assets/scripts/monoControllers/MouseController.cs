@@ -756,8 +756,13 @@ namespace MonoNS
         if (targetUnit != null) {
           msgBox.Show("");
           Tile tile1 = selectedUnit.tile;
-          hexMap.unitAniController.MoveUnit(selectedUnit, targetUnit.tile);
-          hexMap.unitAniController.MoveUnit(targetUnit, tile1);
+          if (hexMap.wargameController.start) {
+            hexMap.wargameController.AddRepo(targetUnit.tile, selectedUnit, new Tile[]{targetUnit.tile});
+            hexMap.wargameController.AddRepo(tile1, targetUnit, new Tile[]{tile1});
+          } else {
+            hexMap.unitAniController.MoveUnit(selectedUnit, targetUnit.tile);
+            hexMap.unitAniController.MoveUnit(targetUnit, tile1);
+          }
           Escape();
         }
       }
