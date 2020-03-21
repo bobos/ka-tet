@@ -225,9 +225,10 @@ namespace UnitNS
 
     public bool charged = false;
     public bool CanCharge() {
-      return !charged && rf.royalGuard && rf.soldiers >= 800 && movementRemaining >= ActionCost; 
+      return CanAttack() && !charged && rf.royalGuard && rf.soldiers >= 800 && movementRemaining >= ActionCost; 
     }
 
+    public bool retreated = false;
     public bool attacked = false;
     public bool CanAttack() {
       return !attacked && GetStaminaLevel() != StaminaLvl.Exhausted;
@@ -429,6 +430,7 @@ namespace UnitNS
 
       charged = false;
       attacked = false;
+      retreated = false;
 
       if (defeating) {
         defeating = false;
@@ -464,7 +466,24 @@ namespace UnitNS
     }
 
     public bool CanRetreat() {
-      return (hexMap.IsAttackSide(IsAI()) ? hexMap.AttackerZone : hexMap.DefenderZone).Contains(tile);
+      return !retreated && (hexMap.IsAttackSide(IsAI()) ? hexMap.AttackerZone : hexMap.DefenderZone).Contains(tile);
+    }
+
+    public bool SetRetreatPath() {
+      Tile[] path = new Tile[0];
+      foreach (Tile t in hexMap.IsAttackSide(IsAI()) ? hexMap.AttackerZone : hexMap.DefenderZone) {
+        if (t.Deployable(this)) {
+          path = FindPath(this.tile, t);
+          if (path.Length > 0) {
+            break;
+          }
+        }
+      }
+      if (path.Length == 0) {
+        return false;
+      }
+      SetPath(path);
+      return true;
     }
 
     public void Retreat() {
@@ -566,7 +585,7 @@ namespace UnitNS
 
     public StaminaLvl GetStaminaLevel()
     {
-      if (movementRemaining >= 30)
+      if (movementRemaining >= 40)
       {
         return StaminaLvl.Fresh;
       }

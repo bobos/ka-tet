@@ -17,6 +17,7 @@ namespace UnitNS
 
     public FarmDestryResult Occur() {
       FarmDestryResult result = new FarmDestryResult();
+      return result;
       if (unit.tile.field == FieldType.Village
         && !Cons.IsWinter(unit.hexMap.weatherGenerator.season)) {
         if (unit.hexMap.IsAttackSide(unit.IsAI())) {

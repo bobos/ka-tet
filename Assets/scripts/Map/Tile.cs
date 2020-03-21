@@ -15,7 +15,7 @@ namespace MapTileNS
     public const float HillHeightStart = 0.5f;
     public const float HillHeightEnd = 1.0f;
     public const float HighgroundWatermark = 0.65f;
-    public const int Work2BuildCamp = 1; //34;
+    public const int Work2BuildCamp = 34;
     public const float HighGround = 0.312f;
     public const float VantageGround = 0.8f;
     public Flood flood = null;

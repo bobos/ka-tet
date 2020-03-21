@@ -44,10 +44,19 @@ Game Tips:
 35. 800甲骑俱装对步兵可使用冲阵，消耗40点体力，对rookie 100%成功，对老兵50%成功，对精锐无效
 36. 如果主帅部队战败，所有部队士气下降8 - 30
 
+偃月阵
+retreat overlap unit
+build watch tower
+fire escape through
+speedup
+defeated no escape route, destroyed
+close push one away
+lower breaking formation bar[small]
+charge too powerful
+enemy nearby supply bug
 放火选地点
-每半月一回合，15个战斗回合
+每月一回合，10个战斗回合
 河北 接大阵 大兵团 平原战  河西/陕西 堡垒群 山地 小兵团 
-wargame: switch
 capture city on victory
 defender boring??
 

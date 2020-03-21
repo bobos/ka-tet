@@ -213,7 +213,11 @@ namespace MonoNS
 
       if (action == ActionController.actionName.RETREAT)
       {
-        hexMap.actionController.retreat(selectedUnit);
+        if (selectedUnit.CanRetreat()) {
+          hexMap.actionController.retreat(selectedUnit);
+        } else if (selectedUnit.SetRetreatPath()) {
+          hexMap.actionController.ForceRetreat(selectedUnit);
+        }
         Escape();
         return;
       }

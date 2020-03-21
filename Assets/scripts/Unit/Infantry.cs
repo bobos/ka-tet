@@ -6,7 +6,7 @@ namespace  UnitNS
 {
   public class Infantry : Unit
   {
-    public const int BaseSlots = 5;
+    public const int BaseSlots = 6;
     public const int MaxTroopNum = 10000;
     public const int MinTroopNum = 1000;
     public const float MinLabor = 0.1f;

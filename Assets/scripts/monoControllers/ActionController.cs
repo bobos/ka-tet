@@ -298,6 +298,7 @@ namespace MonoNS
       CHARGE,
       ENCAMP,
       RETREAT,
+      ForceRetreat,
       CAMP,
       SHOWMINE,
       SHOWENEMY,
@@ -367,6 +368,10 @@ namespace MonoNS
       return DoAction(unit, null, null, actionName.RETREAT);
     }
 
+    public bool ForceRetreat(Unit unit) {
+      return DoAction(unit, null, null, actionName.ForceRetreat);
+    }
+
     public bool DoAction(Unit unit, Unit unit1, Tile tile, actionName name)
     {
       if (ActionOngoing) return false;
@@ -414,6 +419,10 @@ namespace MonoNS
       if (name == actionName.RETREAT) 
       {
         StartCoroutine(DoRetreat(unit));
+      }
+      if (name == actionName.ForceRetreat) 
+      {
+        StartCoroutine(DoForceRetreat(unit));
       }
       return true;
     }
@@ -524,6 +533,15 @@ namespace MonoNS
 
     IEnumerator DoRetreat(Unit unit) {
       unitAniController.Retreat(unit);
+      while (unitAniController.RetreatAnimating)
+      {
+        yield return null;
+      }
+      ActionOngoing = false;
+    }
+
+    IEnumerator DoForceRetreat(Unit unit) {
+      unitAniController.ForceRetreat(unit);
       while (unitAniController.RetreatAnimating)
       {
         yield return null;

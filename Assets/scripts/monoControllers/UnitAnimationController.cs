@@ -425,7 +425,7 @@ namespace MonoNS
     }
 
     public bool ChargeAnimating = false;
-    public const int chargePoint = Unit.ActionCost;
+    public const int chargePoint = Unit.ActionCost * 2;
     public void Charge(Unit from, Unit to) {
       if (!from.CanCharge()) {
         return;
@@ -603,6 +603,33 @@ namespace MonoNS
       unit.Retreat();
       hexMap.cameraKeyboardController.EnableCamera();
       RetreatAnimating = false;
+    }
+
+    public bool ForceRetreatAnimating = false;
+    public void ForceRetreat(Unit unit) {
+      ForceRetreatAnimating = true;
+      unit.retreated = true;
+      hexMap.cameraKeyboardController.DisableCamera();
+      StartCoroutine(CoForceRetreat(unit));
+    }
+
+    IEnumerator CoForceRetreat(Unit unit) {
+      hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(unit.tile).transform.position);
+      while(hexMap.cameraKeyboardController.fixingCamera) { yield return null; }
+      hexMap.dialogue.ShowRetreat(unit);
+      while(hexMap.dialogue.Animating) { yield return null; }
+      unit.movementRemaining = (int)(unit.GetFullMovement() * 1.5);
+      while (unit.movementRemaining > 0 && unit.GetPath().Length > 0) {
+        MoveUnit(unit);
+        while(MoveAnimating) { yield return null; }
+      }
+      while(MoveAnimating) { yield return null; }
+      unit.movementRemaining = 0;
+      Riot(unit, 2);
+      while(riotAnimating) { yield return null; }
+      unit.SetPath(new Tile[]{unit.tile});
+      hexMap.cameraKeyboardController.EnableCamera();
+      ForceRetreatAnimating = false;
     }
 
     public bool ShowAnimating = false;

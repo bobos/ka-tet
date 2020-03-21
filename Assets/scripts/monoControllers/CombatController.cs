@@ -178,11 +178,10 @@ namespace MonoNS
         unitPredict.unit = unit;
         unitPredict.percentOfEffectiveForce = GetEffectiveForcePercentage(unit, false);
         SetGaleVantage(unit, defender, unitPredict);
-        unitPredict.joinPossibility = GetJoinPossibility(unit, attacker);
+        unitPredict.joinPossibility = 100;
         unitPredict.operationPoint = unit.GetUnitAttackCombatPoint();
         predict.attackers.Add(unitPredict);
         predict.attackerOptimPoints += unitPredict.operationPoint;
-        hexMap.ShowAttackArrow(unit, targetUnit, unitPredict);
       }
 
       // defenders
@@ -215,16 +214,34 @@ namespace MonoNS
         unitPredict = new UnitPredict();
         unitPredict.unit = unit;
         unitPredict.percentOfEffectiveForce = GetEffectiveForcePercentage(unit, false);
-        unitPredict.joinPossibility = GetJoinPossibility(unit, targetUnit);
+        unitPredict.joinPossibility = 100;
         unitPredict.operationPoint = unit.GetUnitDefendCombatPoint(false);
         predict.defenders.Add(unitPredict);
         predict.defenderOptimPoints += unitPredict.operationPoint;
-        if (!Util.eq<Unit>(unit, targetUnit)) {
-          hexMap.ShowDefendArrow(unit, targetUnit, unitPredict);
-        }
       }
 
       CalculateWinChance(predict);
+      bool atkWin = predict.sugguestedResult.chance == 10;
+      Unit initiator = atkWin ? defender : attacker; 
+      List<UnitPredict> ups = atkWin ? predict.defenders : predict.attackers;
+      foreach (UnitPredict up in ups) {
+        up.joinPossibility = GetJoinPossibility(initiator, up.unit, predict.suggestedResultType);
+      }
+
+      foreach(UnitPredict up in predict.attackers) {
+        if (Util.eq<Unit>(up.unit, attacker)) {
+          continue;
+        }
+        hexMap.ShowAttackArrow(up.unit, targetUnit, up);
+      }
+
+      foreach(UnitPredict up in predict.defenders) {
+        if (Util.eq<Unit>(up.unit, defender)) {
+          continue;
+        }
+        hexMap.ShowDefendArrow(up.unit, targetUnit, unitPredict);
+      }
+
       this.predict = predict;
       return predict;
     }
@@ -253,7 +270,7 @@ namespace MonoNS
       }
     }
 
-    int GetJoinPossibility(Unit unit1, Unit unit2) {
+    int GetJoinPossibility(Unit unit1, Unit unit2, ResultType result) {
       Party mainParty = unit1.rf.general.party; 
       if (Util.eq<Unit>(unit1, defender) && defender.IsCamping()) {
         mainParty = hexMap.warProvince.ownerParty;
@@ -264,16 +281,20 @@ namespace MonoNS
         return 100;
       }
 
-      Party.Relation relation = mainParty.GetRelation();
-      if (relation == Party.Relation.normal) {
+      //Party.Relation relation = mainParty.GetRelation();
+      if (result == ResultType.Close) {
         return 100;
       }
 
-      if (relation == Party.Relation.tense) {
-        return 70;
+      if (result == ResultType.Small) {
+        return 80;
       }
 
-      return 50;
+      if (result == ResultType.Great) {
+        return 50;
+      }
+
+      return 20;
     }
 
     public void CancelOperation() {
@@ -412,12 +433,12 @@ namespace MonoNS
         return new int[]{-2, -2, 0};
       }
       if (type == ResultType.Small) {
-        return new int[]{-5, -4, 1};
+        return new int[]{-4, -4, 1};
       }
       if (type == ResultType.Great) {
-        return new int[]{-10, -6, 4};
+        return new int[]{-6, -5, 3};
       }
-      return new int[]{-30, -30, 8};
+      return new int[]{-20, -20, 6};
     }
 
     public bool commenceOpAnimating = false;
@@ -564,8 +585,7 @@ namespace MonoNS
         }
         factor = factor > 95 ? 95 : factor;
 
-        int dice = Util.Rand(1, 10);
-        bool atkWin = dice <= predict.sugguestedResult.chance;
+        bool atkWin = predict.sugguestedResult.chance == 10;
 // 1.0 to 1.3 - 0.01(both)
 // 1.4 to 1.8 - def: x - 1.2, atk: (x -1) * (0.5 - 0.6)   
 // 1.9 to 2.2 - atk: (x - 1.2) * (0.25 - 0.4)
@@ -581,14 +601,14 @@ namespace MonoNS
           attackerCasualty = (int)(attackerTotal * (attackerBigger ? m1 : m));
         } else {
           if (attackerBigger) {
-            defenderCasualty = (int)(defenderTotal * factor * 0.015f);
+            defenderCasualty = (int)(defenderTotal * factor * 0.012f);
           } else {
-            attackerCasualty = (int)(attackerTotal * factor * 0.015f);
+            attackerCasualty = (int)(attackerTotal * factor * 0.012f);
           }
 
           if (resultLevel == ResultType.Small) {
             // 2x - 2.4x
-            int modifier = Util.Rand(5, 6);
+            int modifier = Util.Rand(7, 8);
             if (attackerBigger) {
               attackerCasualty = (int)(defenderCasualty * modifier * 0.1f);
             } else {
@@ -598,7 +618,7 @@ namespace MonoNS
 
           if (resultLevel == ResultType.Great) {
             // 2.4x - 3.9x
-            int modifier = Util.Rand(3, 4);
+            int modifier = Util.Rand(5, 6);
             if (attackerBigger) {
               attackerCasualty = (int)(defenderCasualty * modifier* 0.1f);
             } else {
@@ -609,7 +629,7 @@ namespace MonoNS
           if (resultLevel == ResultType.Crushing) {
             if (factor < 30) {
               // 3.9x - 6x odds
-              int modifier = Util.Rand(1, 2);
+              int modifier = Util.Rand(1, 3);
               if (attackerBigger) {
                 attackerCasualty = (int)(defenderCasualty * modifier * 0.1f);
               } else {
@@ -873,20 +893,22 @@ namespace MonoNS
         Unit loser = atkWin ? defender : attacker;
         List<Unit> supporters = new List<Unit>();
         foreach(UnitPredict up in atkWin ? predict.defenders : predict.attackers) {
-          supporters.Add(up.unit);
+          if (!up.unit.IsGone()) {
+            supporters.Add(up.unit);
+          }
         }
 
         // affected all allies
         if (loser.IsCommander()) {
-          int drop = -8;
+          int drop = -2;
           if (resultLevel == ResultType.Small) {
-            drop = -12;
+            drop = -4;
           }
           if (resultLevel == ResultType.Great) {
-            drop = -20;
+            drop = -8;
           }
           if (resultLevel == ResultType.Crushing) {
-            drop = -30;
+            drop = -20;
           }
           // TODO: apply general trait to stop dropping for -20 and above
           foreach(Unit u in hexMap.GetWarParty(loser).GetUnits()) {
@@ -903,7 +925,7 @@ namespace MonoNS
           foreach(Tile t in loser.tile.GetNeighboursWithinRange<Tile>(4, (Tile tt) => true)) {
             Unit unit = t.GetUnit();
             if (unit != null && unit.IsAI() == loser.IsAI() && !supporters.Contains(unit)) {
-              int drop = -2;
+              int drop = -1;
               int[] stats = new int[]{drop,0,0,0,0,0,0,0,0};
               unit.rf.morale += drop;
               if (unit.IsShowingAnimation()) {
