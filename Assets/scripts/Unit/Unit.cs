@@ -212,11 +212,11 @@ namespace UnitNS
 
     public int CanBeShaked(Unit charger) {
       // TODO: apply general trait
-      if(!IsCavalry()) {
+      if(!IsCavalry() && !tile.vantagePoint) {
         if (Util.eq<Rank>(rf.rank, Cons.rookie)) {
           return 70;
         } else {
-          return 40;
+          return 30;
         }
       } else {
         return 0;

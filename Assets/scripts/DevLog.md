@@ -45,14 +45,14 @@ Game Tips:
 36. 如果主帅部队战败，所有部队士气下降8 - 30
 
 偃月阵
+retreat go-through ally with crash
 retreat overlap unit
 build watch tower
 fire escape through
 speedup
-defeated no escape route, destroyed
+defeated and larger than large no escape route, destroyed
 close push one away
 lower breaking formation bar[small]
-charge too powerful
 enemy nearby supply bug
 放火选地点
 每月一回合，10个战斗回合

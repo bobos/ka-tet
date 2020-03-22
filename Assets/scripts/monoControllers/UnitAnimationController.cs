@@ -425,7 +425,7 @@ namespace MonoNS
     }
 
     public bool ChargeAnimating = false;
-    public const int chargePoint = Unit.ActionCost * 2;
+    public const int chargePoint = Unit.ActionCost;
     public void Charge(Unit from, Unit to) {
       if (!from.CanCharge()) {
         return;
@@ -528,8 +528,8 @@ namespace MonoNS
     IEnumerator CoCrashByAlly(Unit unit, int morale) {
       popAniController.Show(hexMap.GetUnitView(unit), textLib.get("pop_crashedByAlly"), Color.white);
       while (popAniController.Animating) { yield return null; }
-      int wounded = Util.Rand(20, 50);
-      int killed = Util.Rand(10, 20);
+      int wounded = 0;
+      int killed = Util.Rand(40, 100);
       // morale, movement, wounded, killed, laborKilled, disserter, attack, def, discontent
       ShowEffects(unit, new int[]{morale,0,wounded,killed,0,0,0,0,0});
       while (ShowAnimating) { yield return null; }

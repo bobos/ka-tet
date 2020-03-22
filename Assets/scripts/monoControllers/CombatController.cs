@@ -371,10 +371,10 @@ namespace MonoNS
           if (unit.rf.rank.Level() == 1) {
             if (!unit.IsCavalry()) {
               total -= 20;
-              Helper(up, 20, 2);
+              Helper(up, 20, 0);
             } else {
               total -= 8;
-              Helper(up, 8, 2);
+              Helper(up, 8, 0);
             }
           }
 
@@ -382,10 +382,10 @@ namespace MonoNS
           if (unit.rf.rank.Level() == 2) {
             if (!unit.IsCavalry()) {
               total -= 10;
-              Helper(up, 10, 2);
+              Helper(up, 10, 0);
             } else {
               total -= 5;
-              Helper(up, 5, 2);
+              Helper(up, 5, 0);
             }
           }
 
@@ -393,10 +393,10 @@ namespace MonoNS
           if (unit.rf.rank.Level() == 3) {
             if (!unit.IsCavalry()) {
               total -= 5;
-              Helper(up, 5, 2);
+              Helper(up, 5, 0);
             } else {
               total -= 3;
-              Helper(up, 3, 2);
+              Helper(up, 3, 0);
             }
           }
         }
@@ -557,7 +557,7 @@ namespace MonoNS
 
           // TODO: apply general trait to increase the chance
           if (noRetreat && (predict.attackerOptimPoints > (int)(predict.defenderOptimPoints * 1.5f)) && Cons.FiftyFifty()) {
-            predict.defenderOptimPoints = predict.defenderOptimPoints * 2;
+            predict.defenderOptimPoints = predict.defenderOptimPoints * 3;
             hexMap.dialogue.ShowNoRetreatEvent(defender);
             while (hexMap.dialogue.Animating) { yield return null; }
             hexMap.popAniController.Show(hexMap.GetUnitView(defender), 
@@ -900,15 +900,15 @@ namespace MonoNS
 
         // affected all allies
         if (loser.IsCommander()) {
-          int drop = -2;
+          int drop = -5;
           if (resultLevel == ResultType.Small) {
-            drop = -4;
+            drop = -10;
           }
           if (resultLevel == ResultType.Great) {
-            drop = -8;
+            drop = -20;
           }
           if (resultLevel == ResultType.Crushing) {
-            drop = -20;
+            drop = -30;
           }
           // TODO: apply general trait to stop dropping for -20 and above
           foreach(Unit u in hexMap.GetWarParty(loser).GetUnits()) {
@@ -938,7 +938,7 @@ namespace MonoNS
         while(hexMap.turnController.sleeping) { yield return null; }
 
         // TODO: when defender is in city, capture the city on victory
-        if (resultLevel == ResultType.Great || resultLevel == ResultType.Crushing) {
+        if (resultLevel != ResultType.Close) {
           Dictionary<Tile, bool> tiles = new Dictionary<Tile, bool>();
           Dictionary<Unit, List<Tile>> plan = new Dictionary<Unit, List<Tile>>();
           Tile baseTile = loser.tile;
@@ -996,16 +996,20 @@ namespace MonoNS
           foreach (Unit unit in supporters) {
             if (resultLevel == ResultType.Crushing) {
               unit.chaos = true;
-            } else {
+            } else if (resultLevel == ResultType.Great) {
               unit.defeating = true;
             }
           }
 
+          if (resultLevel == ResultType.Small) {
+            loser.defeating = true;
+          }
+
           if (supporters.Count > 2) {
-            if (resultLevel == ResultType.Great) {
-              hexMap.turnController.ShowTitle(Cons.GetTextLib().get("title_formationBreaking"), Color.black);
-            } else {
+            if (resultLevel == ResultType.Crushing) {
               hexMap.turnController.ShowTitle(Cons.GetTextLib().get("title_formationCrushing"), Color.black);
+            } else {
+              hexMap.turnController.ShowTitle(Cons.GetTextLib().get("title_formationBreaking"), Color.black);
             }
             while(hexMap.turnController.showingTitle) { yield return null; }
             hexMap.dialogue.ShowFormationBreaking(atkWin ? attacker : defender);
@@ -1036,24 +1040,21 @@ namespace MonoNS
             foreach(Tile t in unit.tile.neighbours) {
               Unit u = t.GetUnit();
               if (u != null && u.IsAI() == unit.IsAI() && !supporters.Contains(u)) {
-                hexMap.unitAniController.CrashByAlly(u, -20);
+                hexMap.unitAniController.CrashByAlly(u, -10);
                 while (hexMap.unitAniController.CrashAnimating) { yield return null; }
                 continue;
               }
             }
           }
-        } else if (resultLevel == ResultType.Small) {
-          if (Cons.HighlyLikely()) {
+        } else {
+          if (Cons.FiftyFifty()) {
             // TODO: general trait apply to stop defeating 
             loser.defeating = true;
-          } else {
-            // TODO: general trait apply to stop chaos 
-            loser.chaos = true;
           }
           if (!loser.IsCamping()) {
-            int escapeDistance = loser.chaos ? 4 : 2;
+            int escapeDistance =  2;
             hexMap.popAniController.Show(hexMap.GetUnitView(loser), 
-             loser.chaos ? Cons.GetTextLib().get("pop_chaos") : Cons.GetTextLib().get("pop_retreat"),
+             Cons.GetTextLib().get("pop_retreat"),
              Color.white);
             while (hexMap.popAniController.Animating) { yield return null; }
             HashSet<Tile> from = new HashSet<Tile>{loser.tile};
@@ -1083,7 +1084,7 @@ namespace MonoNS
                 }
 
                 if (ally.Count > 0) {
-                  hexMap.unitAniController.CrashByAlly(ally[Util.Rand(0, ally.Count-1)], loser.chaos ? -20 : -10);
+                  hexMap.unitAniController.CrashByAlly(ally[Util.Rand(0, ally.Count-1)], -10);
                   while (hexMap.unitAniController.CrashAnimating) { yield return null; }
                 }
                 break;
