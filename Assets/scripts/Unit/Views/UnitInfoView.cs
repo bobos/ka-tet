@@ -48,7 +48,7 @@ namespace UnitNS
 
       TextMesh textMesh = this.transform.GetComponent<TextMesh>();
       Color color = unit.hexMap.GetWarParty(unit).attackside ? Color.yellow : Color.white;
-      string title = (unit.chaos ? "☠" : "")
+      string title = (unit.defeating ? "☠" : (unit.chaos ? "☠☠": ""))
         + "\n"
         + (unit.IsCavalry() ? "♞" : "♜")
         + (unit.hexMap.wargameController.start ? "[推演]\n" : "")

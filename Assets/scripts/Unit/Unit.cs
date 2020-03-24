@@ -211,8 +211,11 @@ namespace UnitNS
     }
 
     public int CanBeShaked(Unit charger) {
+      if (defeating || chaos) {
+        return 100;
+      }
       // TODO: apply general trait
-      if(!IsCavalry() && !tile.vantagePoint) {
+      if(charger.rf.royalGuard && !rf.royalGuard && !IsCommander() && IsOnField() && !tile.vantagePoint) {
         if (Util.eq<Rank>(rf.rank, Cons.rookie)) {
           return 70;
         } else {
@@ -225,7 +228,7 @@ namespace UnitNS
 
     public bool charged = false;
     public bool CanCharge() {
-      return CanAttack() && !charged && rf.royalGuard && rf.soldiers >= 800 && movementRemaining >= ActionCost; 
+      return CanAttack() && !charged && rf.soldiers >= 800 && movementRemaining >= ActionCost; 
     }
 
     public bool retreated = false;

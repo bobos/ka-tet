@@ -322,6 +322,10 @@ namespace MapTileNS
         ret = (int)(mov * (
           (terrian == TerrianType.Plain || field == FieldType.Road) ?
           Cavalry.MovementCostModifierOnPlainOrRoad : Cavalry.MovementCostModifierOnHill));
+        if (unit.rf.royalGuard) {
+          // movement punishment on elite cavalry
+          ret = (int)(ret * 1.3f);
+        }
       }
 
       if (vantagePoint) {

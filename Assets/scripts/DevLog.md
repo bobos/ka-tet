@@ -43,17 +43,20 @@ Game Tips:
 34. 主帅战败，所有部队士气大降
 35. 800甲骑俱装对步兵可使用冲阵，消耗40点体力，对rookie 100%成功，对老兵50%成功，对精锐无效
 36. 如果主帅部队战败，所有部队士气下降8 - 30
+37. 部队在山地上被冲阵几率低
+38. 主帅和重骑兵无法被冲阵
 
 偃月阵
-retreat go-through ally with crash
 retreat overlap unit
+retreat go-through ally with crash for single retreat
+
+general trait for extra supply slots
+map skeleton for AI(supply route, point, value tiles, dam, supply range etc.)
+cavalry surround camp
 build watch tower
 fire escape through
 speedup
 defeated and larger than large no escape route, destroyed
-close push one away
-lower breaking formation bar[small]
-enemy nearby supply bug
 放火选地点
 每月一回合，10个战斗回合
 河北 接大阵 大兵团 平原战  河西/陕西 堡垒群 山地 小兵团 
