@@ -448,6 +448,10 @@ namespace MapTileNS
       return units.Last();
     }
 
+    public int UnitCount() {
+      return units == null ? 0 : units.Count;
+    }
+
     public Tile Escape() {
       Unit unit = GetUnit();
       List<Tile> tiles = new List<Tile>();
@@ -473,6 +477,17 @@ namespace MapTileNS
     public int AggregateCostToEnter(int costSoFar, PFTile sourceTile, PFUnit unit, Mode mode)
     {
       return ((Unit)unit).AggregateCostToEnterTile(this, costSoFar, mode);
+    }
+
+    public Tile FindDeployableTile(Unit unit, int cnt = 5) {
+      Tile t = null;
+      foreach(Tile tile in neighbours) {
+        if (tile.Deployable(unit)) {
+          t = tile;
+          break;
+        }
+      }
+      return t != null || cnt == 0 ? t : neighbours[0].FindDeployableTile(unit, cnt--); 
     }
   }
 

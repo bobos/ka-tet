@@ -47,16 +47,13 @@ Game Tips:
 38. 主帅和重骑兵无法被冲阵
 
 偃月阵
-retreat overlap unit
-retreat go-through ally with crash for single retreat
 
-general trait for extra supply slots
+on enemy territory, unit -5 morale per turn
 map skeleton for AI(supply route, point, value tiles, dam, supply range etc.)
 cavalry surround camp
 build watch tower
 fire escape through
 speedup
-defeated and larger than large no escape route, destroyed
 放火选地点
 每月一回合，10个战斗回合
 河北 接大阵 大兵团 平原战  河西/陕西 堡垒群 山地 小兵团 

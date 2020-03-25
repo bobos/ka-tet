@@ -556,7 +556,9 @@ namespace MonoNS
           }
 
           // TODO: apply general trait to increase the chance
-          if (noRetreat && (predict.attackerOptimPoints > (int)(predict.defenderOptimPoints * 1.5f)) && Cons.FiftyFifty()) {
+          if (noRetreat && !defender.defeating && !defender.chaos
+            && !defender.IsWarWeary()
+            && (predict.attackerOptimPoints > (int)(predict.defenderOptimPoints * 1.5f)) && Cons.FiftyFifty()) {
             predict.defenderOptimPoints = predict.defenderOptimPoints * 3;
             hexMap.dialogue.ShowNoRetreatEvent(defender);
             while (hexMap.dialogue.Animating) { yield return null; }
@@ -1084,8 +1086,26 @@ namespace MonoNS
                 }
 
                 if (ally.Count > 0) {
-                  hexMap.unitAniController.CrashByAlly(ally[Util.Rand(0, ally.Count-1)], -10);
-                  while (hexMap.unitAniController.CrashAnimating) { yield return null; }
+                  Tile escapeTile = null;
+                  foreach (Unit u in ally) {
+                    foreach(Tile t1 in u.tile.neighbours) {
+                      if (t1.Deployable(loser) && !from.Contains(t1)) {
+                        escapeTile = t1;
+                        break;
+                      }
+                      if (escapeTile != null) {
+                        break;
+                      }
+                    }
+                  }
+
+                  if (escapeTile == null) {
+                    hexMap.unitAniController.CrashByAlly(ally[Util.Rand(0, ally.Count-1)], -10);
+                    while (hexMap.unitAniController.CrashAnimating) { yield return null; }
+                  } else {
+                    hexMap.unitAniController.MoveUnit(loser, escapeTile);
+                    while (hexMap.unitAniController.MoveAnimating) { yield return null; }
+                  }
                 }
                 break;
               }

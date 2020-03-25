@@ -24,8 +24,8 @@ namespace UnitNS
     public const int DisbandUnitUnder = 50;
 
     public const int L1Visibility = 2;
-    public const int L2Visibility = 4;
-    public const int VantageVisibility = 8;
+    public const int L2Visibility = 3;
+    public const int VantageVisibility = 5;
     public const int L1DiscoverRange = 1; // under 2000
     public const int L2DiscoverRange = 2; // > 4000
     public const int ConcealCoolDownIn = 3;

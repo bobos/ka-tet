@@ -645,6 +645,7 @@ namespace MonoNS
     }
 
     IEnumerator CoForceRetreat(Unit unit) {
+      Tile lastTile = unit.GetPath()[unit.GetPath().Length - 1];
       hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(unit.tile).transform.position);
       while(hexMap.cameraKeyboardController.fixingCamera) { yield return null; }
       hexMap.dialogue.ShowRetreat(unit);
@@ -655,6 +656,14 @@ namespace MonoNS
         while(MoveAnimating) { yield return null; }
       }
       while(MoveAnimating) { yield return null; }
+      if (unit.tile.UnitCount() > 1) {
+        Tile tile = unit.tile.FindDeployableTile(unit);
+        if (tile == null) {
+          tile = lastTile;
+        }
+        MoveUnit(unit, tile);
+        while(MoveAnimating) { yield return null; }
+      }
       unit.movementRemaining = 0;
       Riot(unit, 2);
       while(riotAnimating) { yield return null; }
