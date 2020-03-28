@@ -11,7 +11,6 @@
     Stand,
     Conceal,
     Camping,
-    Routing,
     Disbanded,
     Retreated
   }
@@ -23,15 +22,6 @@
     Exhausted
   }
 
-  public enum Reaction
-  {
-    Disband,
-    Stepback,
-    Retreat,
-    Rout,
-    Stand
-  }
-
   public enum ActionType {
     UnitVisible,
     UnitLeft,
@@ -39,27 +29,8 @@
     UnitDestroyed
   }
 
-  public enum LvlFire
-  {
-    Locked,
-    Lvl1,
-    Lvl2,
-    Lvl3,
-    TopLvl
-  }
-
-  public enum LvlForest
-  {
-    Locked,
-    Lvl1,
-    Lvl2,
-    Lvl3,
-    TopLvl
-  }
-
   public enum DestroyType {
     ByWildFire,
-    ByBurningCamp,
     ByFlood,
     ByDisband
   }

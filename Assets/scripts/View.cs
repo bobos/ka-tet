@@ -1,6 +1,5 @@
 using FieldNS;
 using MapTileNS;
-using UnitNS;
 using UnityEngine;
 
 public abstract class View: MonoBehaviour {
@@ -23,6 +22,7 @@ public abstract class Building: DataModel {
   protected int buildWork = 0;
   protected MonoNS.HexMap hexMap;
   protected MonoNS.SettlementMgr settlementMgr;
+  protected virtual void TurnEndCB() {}
   public WarParty owner;
 
   public int buildTurns {
@@ -40,6 +40,7 @@ public abstract class Building: DataModel {
   protected abstract int HowMuchBuildWorkToFinish();
   public bool TurnEnd()
   {
+    bool ret = false;;
     if (state == State.constructing) {
       buildWork -= HowMuchBuildWorkToFinish();
     }
@@ -49,9 +50,10 @@ public abstract class Building: DataModel {
       buildWork = 0;
       state = State.normal;
       onBuildingReady(this);
-      return true;
+      ret = true;
     }
-    return false;
+    TurnEndCB();
+    return ret;
   }
 }
 

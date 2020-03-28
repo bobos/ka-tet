@@ -84,9 +84,7 @@ namespace MonoNS
 
     public void ShowOperationResult(CombatController.ResultType result, bool attackerWin, bool playerAttack,
       int atkInfTotal, int atkCavTotal, int defInfTotal, int defCavTotal,
-      int atkInfDead, int atkInfWnd, int atkLaborDead, int atkCavDead, int atkCavWnd,
-      int defInfDead, int defInfWnd, int defLaborDead, int defCavDead, int defCavWnd,
-      int capturedHorse) {
+      int atkInfDead, int atkCavDead, int defInfDead, int defCavDead, int capturedHorse) {
       btn1Clicked = btn2Clicked = false;
       Animating = true;
       btn1.SetActive(true);
@@ -104,21 +102,15 @@ namespace MonoNS
 
       leftDescription.text = textLib.get("event_operationResult_infTotal") + ": " + atkInfTotal + "\n" +
         textLib.get("event_operationResult_infDead") + ": " + atkInfDead + "\n" +
-        textLib.get("event_operationResult_infWnd") + ": " + atkInfWnd + "\n\n" +
         textLib.get("event_operationResult_cavTotal") + ": " + atkCavTotal + "\n" +
         textLib.get("event_operationResult_cavDead") + ": " + atkCavDead + "\n" +
-        textLib.get("event_operationResult_cavWnd") + ": " + atkCavWnd + "\n\n" +
-        textLib.get("event_operationResult_total") + ": " + (atkInfDead + atkCavDead) + "\n\n" +
-        textLib.get("event_operationResult_laborDead") + ": " + atkLaborDead + "\n";
+        textLib.get("event_operationResult_total") + ": " + (atkInfDead + atkCavDead) + "\n";
 
       rightDescription.text = textLib.get("event_operationResult_infTotal") + ": " + defInfTotal + "\n" +
         textLib.get("event_operationResult_infDead") + ": " + defInfDead + "\n" +
-        textLib.get("event_operationResult_infWnd") + ": " + defInfWnd + "\n\n" +
         textLib.get("event_operationResult_cavTotal") + ": " + defCavTotal + "\n" +
         textLib.get("event_operationResult_cavDead") + ": " + defCavDead + "\n" +
-        textLib.get("event_operationResult_cavWnd") + ": " + defCavWnd + "\n\n" +
-        textLib.get("event_operationResult_total") + ": " + (defInfDead + defCavDead) + "\n\n" +
-        textLib.get("event_operationResult_laborDead") + ": " + defLaborDead + "\n";
+        textLib.get("event_operationResult_total") + ": " + (defInfDead + defCavDead) + "\n";
 
       string horseCapture = textLib.get("event_operationResult_horse") + ": " + capturedHorse + "\n";
       if (attackerWin) {

@@ -15,13 +15,13 @@ public class SiegeWallView : View
     this.siegeWall = (SiegeWall)siegeWall;
   }
 
-  public void DestroyAnimation(DestroyType type)
+  public void DestroyAnimation()
   {
     Animating = true;
-    StartCoroutine(CoDestroyAnimation(type));
+    StartCoroutine(CoDestroyAnimation());
   }
 
-  IEnumerator CoDestroyAnimation(DestroyType type) {
+  IEnumerator CoDestroyAnimation() {
     yield return new WaitForSeconds(1);
     Animating = false;
   }

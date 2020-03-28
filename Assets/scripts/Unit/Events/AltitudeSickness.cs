@@ -36,11 +36,10 @@ namespace UnitNS
         return 0;
       }
       lastTurns--;
-      int wound = (int)(unit.rf.soldiers * Util.Rand(1, 5) * 0.001f);
-      unit.rf.soldiers -= wound;
-      unit.rf.wounded += wound;
-      unit.hexMap.UpdateWound(unit, wound);
-      return wound;
+      int killed = Util.Rand(1, 3);
+      unit.kia += killed;
+      unit.rf.soldiers -= killed;
+      return killed;
     }
 
   }

@@ -5,6 +5,7 @@ using FieldNS;
 using TextNS;
 using NatureNS;
 using MapTileNS;
+using System.Collections.Generic;
 
 namespace MonoNS
 {
@@ -244,13 +245,24 @@ namespace MonoNS
       // refresh AI
       settlementMgr.TurnEnd(otherP);
       while (settlementMgr.turnEndOngoing) { yield return null; }
-      foreach (Unit unit in otherP.GetUnits())
+      List<Tile> controlledTiles = settlementMgr.GetControlledTiles(otherP.isAI);
+      List<Unit> units = new List<Unit>(); 
+      Tile tile = settlementMgr.GetRoot(otherP.isAI).baseTile;
+      foreach (Unit u in otherP.GetUnits()) {
+        units.Add(u);
+      }
+      // order unit from near to far
+      units.Sort(delegate (Unit a, Unit b)
       {
+        return (int)(Tile.Distance(tile, a.tile) - Tile.Distance(tile, b.tile));
+      });
+
+      foreach (Unit unit in units)
+      {
+        // consume supply
         int[] effects = new int[9]{0,0,0,0,0,0,0,0,0};
+        unit.supply.Consume(effects, controlledTiles);
         if (!unit.supply.consumed) {
-          effects = unit.supply.Consume();
-        }
-        if (!unit.supply.consumed || unit.supply.halfFeed) {
           View view;
           if (unit.IsCamping()) {
             view = settlementMgr.GetView(unit.tile.settlement);
@@ -258,7 +270,7 @@ namespace MonoNS
             view = hexMap.GetUnitView(unit);
           }
           hexMap.popAniController.Show(view,
-            textLib.get(unit.supply.halfFeed ? "pop_halfStarving" : "pop_starving"),
+            textLib.get("pop_starving"),
             Color.white);
           while (hexMap.popAniController.Animating)
           {
@@ -316,8 +328,8 @@ namespace MonoNS
       */
       endingTurn = false;
       if (cnt == 0) {
-        foreach(Tile tile in weatherGenerator.tileCB) {
-          tileAniController.WeatherChange(tile, weatherGenerator.currentWeather);
+        foreach(Tile t in weatherGenerator.tileCB) {
+          tileAniController.WeatherChange(t, weatherGenerator.currentWeather);
           while (tileAniController.WeatherAnimating) { yield return null; }
         }
       }

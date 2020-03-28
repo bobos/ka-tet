@@ -48,12 +48,14 @@ Game Tips:
 
 偃月阵
 
-on enemy territory, unit -5 morale per turn
+cavalry: charge&attack remain just one
+map bigbigbig, unit manymanymany
+mist: 骑兵夜袭, visibility--
+on enemy territory, unit -4 morale per turn, half-starving state
 map skeleton for AI(supply route, point, value tiles, dam, supply range etc.)
 cavalry surround camp
 build watch tower
 fire escape through
-speedup
 放火选地点
 每月一回合，10个战斗回合
 河北 接大阵 大兵团 平原战  河西/陕西 堡垒群 山地 小兵团 
@@ -161,3 +163,5 @@ HashSet<Tile> road = new HashSet<Tile>(baseTile.roads[tile]);
 
 Find gameobject by name:
  GameObject.Find("LeftPart").gameObject;
+
+delete meta and .DS_Store file to avoid project syntax error in IDE

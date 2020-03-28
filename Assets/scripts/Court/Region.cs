@@ -17,7 +17,6 @@ namespace CourtNS
     }
     public abstract int Will();
     public abstract int RetreatThreshold();
-    public abstract int ExtraSupplySlot();
   }
 
   public class QidanRegion : Region
@@ -50,10 +49,6 @@ namespace CourtNS
       return 35;
     }
 
-    public override int ExtraSupplySlot()
-    {
-      return 0;
-    }
   }
 
   public class HanRegion : Region
@@ -86,10 +81,6 @@ namespace CourtNS
       return 35;
     }
 
-    public override int ExtraSupplySlot()
-    {
-      return 0;
-    }
   }
 
   public class DangxiangRegion : Region
@@ -122,10 +113,6 @@ namespace CourtNS
       return 45;
     }
 
-    public override int ExtraSupplySlot()
-    {
-      return 0;
-    }
   }
 
   public class TuboRegion : Region
@@ -158,10 +145,6 @@ namespace CourtNS
       return 45;
     }
 
-    public override int ExtraSupplySlot()
-    {
-      return 0;
-    }
   }
 
 }

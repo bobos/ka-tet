@@ -5,7 +5,7 @@
     Unit unit;
     const int MaxEffectiveNum = 10000;
     const int LeastEffectiveNum = 2000;
-    const int MaxEffectiveNum4Move = 12000;
+    const int MaxEffectiveNum4Move = 8000;
     public Vantage(Unit unit) {
       this.unit = unit;
     }
@@ -40,30 +40,10 @@
       } else {
         return unit.rf.soldiers * pointPerSoldier;
       }
-      //int exceeded = unit.rf.soldiers - effective;
-      //if (exceeded <= 0) {
-      //  return unit.rf.soldiers * pointPerSoldier; 
-      //}
-      //int point = effective * pointPerSoldier;
-      //int step = 100;
-      //while(step > 0) {
-      //  step -= 2;
-      //  int remaining = exceeded - 100;
-      //  if (remaining > 0) {
-      //    int addedPoint = (int)(100 * step * pointPerSoldier * 0.01f);
-      //    point += addedPoint < 0 ? 0 : addedPoint;
-      //    exceeded = remaining;
-      //  } else {
-      //    int addedPoint = (int)(exceeded * step * pointPerSoldier * 0.01f);
-      //    point += addedPoint < 0 ? 0 : addedPoint;
-      //    break;
-      //  }
-      //}
-      //return point;
     }
 
     public int MovementPoint(int point) {
-      return unit.GetTotalNum() > MaxEffectiveNum4Move ? (int)(point * 0.8f) : point;
+      return unit.rf.soldiers > MaxEffectiveNum4Move ? (int)(point * 0.8f) : point;
     }
 
     int GetEffectiveNum() {

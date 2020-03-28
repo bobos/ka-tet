@@ -62,40 +62,20 @@ namespace MonoNS
     public event DialogEvent eventDialogOn;
     public event DialogEvent eventDialogOff;
     public enum EventName {
-      FloodDestroyCamp,
       FloodDestroyUnit,
       WildFireDestroyUnit,
-      WildFireDestroyCamp,
-      BurningCampDestroyUnit,
       EnemyCaptureCamp,
       EnemyCaptureCity,
       WeCaptureCamp,
       WeCaptureCity,
-      EnemyBurnCamp,
-      WeBurnCamp,
       Poision,
       Epidemic,
       Disbanded,
-      SupplyReached,
-      SupplyRouteBlocked,
-      LaborReached,
-      SupplyIntercepted,
-      LaborIntercepted,
-      InterceptFailed,
-      InsufficientSupply,
-      InsufficientLabor,
-      InsufficientSupplyLabor,
       UnitConflict,
       AltitudeSickness,
       PlainSickness,
-      EmptySettlement,
       Riot,
       GeneralKilledInBattle,
-      GeneralReturned,
-      GeneralResigned,
-      NewGeneral,
-      GeneralExecuted,
-      Retreat,
       FarmDestroyed,
       FarmDestroyedReported,
       UnderSiege,
@@ -119,8 +99,7 @@ namespace MonoNS
       Continue();
     }
 
-    public delegate void OnDecisionMade(bool accept, Unit unit);
-    public event OnDecisionMade onDisarmorDecisionClick;
+    //public delegate void OnDecisionMade(bool accept, Unit unit);
 
     public void OnBtnClick(ActionController.actionName actionName) {
       if (actionName == ActionController.actionName.EVENTDIALOGCONFIRM) {
@@ -160,30 +139,17 @@ namespace MonoNS
       // TODO: AI Test
       if (eventDialogOn != null) eventDialogOn();
       self.SetActive(true);
-      if (name == EventName.WildFireDestroyCamp) {
-        title.text = textLib.get("event_fireDestroyCamp_title");
-        description.text = System.String.Format(textLib.get("event_fireDestroyCamp"), settlement.name,
-          settlement.labor, settlement.supplyDeposit);
-        image.sprite = CampDestoyedByFire;
-      }
-
-      if (name == EventName.BurningCampDestroyUnit) {
-        title.text = textLib.get("event_burningCampDestroyUnit_title");
-        description.text = System.String.Format(textLib.get("event_burningCampDestroyUnit"), unit.GeneralName(),
-          unit.Name(), argu3);
-        image.sprite = wildfire;
-      }
-
-      if (name == EventName.FloodDestroyCamp) {
-        title.text = textLib.get("event_floodDestroyCamp_title");
-        description.text = System.String.Format(textLib.get("event_floodDestroyCamp"), settlement.name,
-          settlement.labor, settlement.supplyDeposit);
-        image.sprite = flood;
-      }
 
       if (name == EventName.FloodDestroyUnit) {
         title.text = textLib.get("event_floodDestroyUnit_title");
         description.text = System.String.Format(textLib.get("event_floodDestroyUnit"), unit.GeneralName(),
+          unit.Name(), argu3);
+        image.sprite = flood;
+      }
+
+      if (name == EventName.WildFireDestroyUnit) {
+        title.text = textLib.get("event_wildfireDestroyUnit_title");
+        description.text = System.String.Format(textLib.get("event_wildfireDestroyUnit"), unit.GeneralName(),
           unit.Name(), argu3);
         image.sprite = flood;
       }
@@ -197,7 +163,7 @@ namespace MonoNS
 
       if (name == EventName.EnemyCaptureCamp) {
         title.text = textLib.get("event_enemyCaptureCamp_title");
-        description.text = System.String.Format(textLib.get("event_enemyCaptureCamp"), settlement.name, argu1);
+        description.text = System.String.Format(textLib.get("event_enemyCaptureCamp"), settlement.name);
         image.sprite = CityLost;
       }
 
@@ -209,7 +175,7 @@ namespace MonoNS
 
       if (name == EventName.WeCaptureCamp) {
         title.text = textLib.get("event_weCaptureCamp_title");
-        description.text = System.String.Format(textLib.get("event_weCaptureCamp"), settlement.name, argu1);
+        description.text = System.String.Format(textLib.get("event_weCaptureCamp"), settlement.name);
         image.sprite = CityLost;
       }
 
@@ -219,76 +185,6 @@ namespace MonoNS
         image.sprite = CityLost;
       }
 
-      if (name == EventName.WeBurnCamp) {
-        title.text = textLib.get("event_weBurnCamp_title");
-        description.text = System.String.Format(textLib.get("event_weBurnCamp"), settlement.name);
-        image.sprite = CampLost;
-      }
-
-      if (name == EventName.EnemyBurnCamp) {
-        title.text = textLib.get("event_enemyBurnCamp_title");
-        description.text = System.String.Format(textLib.get("event_enemyBurnCamp"), settlement.name);
-        image.sprite = CampLost;
-      }
-
-      if (name == EventName.InsufficientLabor) {
-        title.text = textLib.get("event_insufficientLabor_title");
-        description.text = System.String.Format(textLib.get("event_insufficientLabor"), settlement.name, argu1, argu2);
-        image.sprite = InsufficientLabor;
-      }
-
-      if (name == EventName.InsufficientSupply) {
-        title.text = textLib.get("event_insufficientSupply_title");
-        description.text = System.String.Format(textLib.get("event_insufficientSupply"), settlement.name, argu1, argu2);
-        image.sprite = InsufficientSupply;
-      }
-
-      if (name == EventName.InsufficientSupplyLabor) {
-        title.text = textLib.get("event_insufficientSupplyLabor_title");
-        description.text = System.String.Format(textLib.get("event_insufficientSupplyLabor"), argu1, argu2, settlement.name, argu3);
-        image.sprite = InsufficientLabor;
-      }
-
-      if (name == EventName.SupplyReached) {
-        title.text = textLib.get("event_supplyDone_title");
-        description.text = System.String.Format(textLib.get("event_supplyDone"), settlement.name, argu1);
-        image.sprite = SupplyReached;
-      }
-
-      if (name == EventName.LaborReached) {
-        title.text = textLib.get("event_laborDone_title");
-        description.text = System.String.Format(textLib.get("event_laborDone"), settlement.name, argu1);
-        image.sprite = SupplyReached;
-      }
-
-      if (name == EventName.SupplyIntercepted) {
-        title.text = textLib.get("event_supplyIntercepted_title");
-        description.text = System.String.Format(textLib.get("event_supplyIntercepted"),
-          settlement.name, unit.rf.general.Name(), argu1, argu2, argu3, argu4, argu5);
-        image.sprite = Ambushed;
-      }
-
-      if (name == EventName.LaborIntercepted) {
-        title.text = textLib.get("event_laborIntercepted_title");
-        description.text = System.String.Format(textLib.get("event_laborIntercepted"),
-          settlement.name, unit.rf.general.Name(), argu1, argu2, argu3, argu4);
-        image.sprite = LaborIntercepted;
-      }
-
-      if (name == EventName.InterceptFailed) {
-        title.text = textLib.get("event_interceptFailed_title");
-        description.text = System.String.Format(textLib.get("event_interceptFailed"),
-          unit.rf.general.Name(), argu1, argu2, argu3);
-        image.sprite = SupplyIntercepted;
-      }
-
-      if (name == EventName.SupplyRouteBlocked) {
-        title.text = textLib.get("event_supplyRouteBlocked_title");
-        description.text = System.String.Format(textLib.get("event_supplyRouteBlocked"),
-          settlement.name, settlement1.name);
-        image.sprite = Defeated;
-      }
-
       if (name == EventName.Riot) {
         title.text = textLib.get("event_riot_title");
         description.text = System.String.Format(textLib.get("event_riot"),
@@ -296,46 +192,11 @@ namespace MonoNS
         image.sprite = Riot;
       }
 
-      if (name == EventName.GeneralExecuted) {
-        title.text = textLib.get("event_generalExecuted_title");
-        description.text = System.String.Format(textLib.get("event_generalExecuted"),
-          general.Name());
-        image.sprite = GeneralExecuted;
-      }
-
-      if (name == EventName.NewGeneral) {
-        title.text = textLib.get("event_newGeneral_title");
-        description.text = System.String.Format(textLib.get("event_newGeneral"),
-          unit.GeneralName(), unit.Name());
-        image.sprite = GeneralSwapped;
-      }
-
-      if (name == EventName.GeneralReturned) {
-        title.text = textLib.get("event_generalReturned_title");
-        description.text = System.String.Format(textLib.get("event_generalReturned"),
-          general.Name());
-        image.sprite = GeneralSwapped;
-      }
-
-      if (name == EventName.GeneralResigned) {
-        title.text = textLib.get("event_generalResigned_title");
-        description.text = System.String.Format(textLib.get("event_generalResigned"),
-          general.Name());
-        image.sprite = Resigned;
-      }
-
       if (name == EventName.GeneralKilledInBattle) {
         title.text = textLib.get("event_generalKilled_title");
         description.text = System.String.Format(textLib.get("event_generalKilled"),
           general.Name());
         image.sprite = drown;
-      }
-
-      if (name == EventName.Retreat) {
-        title.text = textLib.get("event_unitRetreat_title");
-        description.text = System.String.Format(textLib.get("event_unitRetreat"),
-          unit.Name());
-        image.sprite = Retreat;
       }
 
       if (name == EventName.Epidemic) {
@@ -376,7 +237,7 @@ namespace MonoNS
       if (name == EventName.UnitConflict) {
         title.text = textLib.get("event_unitConflict_title");
         description.text = System.String.Format(textLib.get("event_unitConflict"),
-          unit.rf.general.Name(), unit1.rf.general.Name(), argu1, argu2, argu3, argu4, argu5);
+          unit.rf.general.Name(), unit1.rf.general.Name(), argu2 + argu3, argu1);
         image.sprite = drown;
       }
 
@@ -393,17 +254,6 @@ namespace MonoNS
           unit.rf.general.Name());
         image.sprite = Retreat;
       }
-
-      if (name == EventName.EmptySettlement) {
-        ToggleDecision();
-        title.text = textLib.get("event_emptySettlement_title");
-        description.text = System.String.Format(textLib.get("event_emptySettlement"),
-          settlement.name);
-        image.sprite = EmptySettlement;
-        approveText.text = textLib.get("event_emptySettlement_occupy_title");
-        disapproveText.text = textLib.get("event_emptySettlement_burndown_title");
-      }
-
     }
 
     void ToggleConfirm() {

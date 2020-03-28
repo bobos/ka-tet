@@ -141,21 +141,14 @@ namespace MapTileNS
 
     public bool CanCatchFire()
     {
-      if (tile.terrian == TerrianType.Hill || tile.terrian == TerrianType.Mountain)
-      {
-        return true;
-      }
-      return false;
+      return tile.field != FieldType.Settlement
+        && (tile.terrian == TerrianType.Hill || tile.terrian == TerrianType.Mountain);
     }
 
     // Can the plain tile caught fire by nearby burning tiles
     public bool CanPlainCatchFire()
     {
-      if (tile.field == FieldType.Wild && Cons.IsAutumn(tile.weatherGenerator.season))
-      {
-        return true;
-      }
-      return false;
+      return tile.field == FieldType.Wild && Cons.IsAutumn(tile.weatherGenerator.season);
     }
 
     void PickTile2Burn(HashSet<Tile> tiles, Tile tile1, Tile tile2, Tile tile3, bool chance1, bool chance2, bool chance3)

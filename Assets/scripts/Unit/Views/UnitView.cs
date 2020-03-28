@@ -25,7 +25,6 @@ namespace UnitNS
       actionController = hexMap.actionController;
       mouseController = hexMap.mouseController;
       actionController.onBtnClick += OnBtnClick;
-      actionController.actionDone += ActionDone;
       mouseController.onUnitSelect += OnUnitSelect;
       mouseController.onModeQuit += OnModeQuit;
       mouseController.onUnitDeselect += OnUnitDeselect;
@@ -71,24 +70,10 @@ namespace UnitNS
     {
       OnUnitDeselect(mouseController.selectedUnit);
       actionController.onBtnClick -= OnBtnClick;
-      actionController.actionDone -= ActionDone;
       mouseController.onUnitSelect -= OnUnitSelect;
       mouseController.onModeQuit -= OnModeQuit;
       mouseController.onUnitDeselect -= OnUnitDeselect;
       Destroy(unitInfoGO);
-    }
-
-    public void ActionDone(Unit actionUnit, Unit[] units, ActionController.actionName actionName)
-    {
-      if (actionName == ActionController.actionName.ATTACK)
-      {
-        foreach (Unit attacker in units)
-        {
-          if (Util.eq<Unit>(attacker, unit))
-          {
-          }
-        }
-      }
     }
 
     public void DestroyAnimation(DestroyType type)

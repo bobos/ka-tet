@@ -19,7 +19,7 @@ namespace MonoNS
 
     public delegate void BtnClicked(actionName btn);
     public event BtnClicked onBtnClick;
-    public delegate void ActionDone(Unit unit, Unit[] units, actionName btn);
+    public delegate void ActionDone(Unit unit, actionName btn);
     public event ActionDone actionDone;
     TileAnimationController tileAniController {
       get {
@@ -46,13 +46,6 @@ namespace MonoNS
       if (onBtnClick != null)
       {
         onBtnClick(actionName.DEPLOYMENTDONE);
-      }
-    }
-
-    public void OnDestroyClick() {
-      if (onBtnClick != null)
-      {
-        onBtnClick(actionName.DESTROY);
       }
     }
 
@@ -100,14 +93,6 @@ namespace MonoNS
       if (onBtnClick != null)
       {
         onBtnClick(actionName.POISION);
-      }
-    }
-
-    public void OnCampClick()
-    {
-      if (onBtnClick != null)
-      {
-        onBtnClick(actionName.CAMP);
       }
     }
 
@@ -217,40 +202,6 @@ namespace MonoNS
       }
     }
 
-    public void OnSupplyMgtClick()
-    {
-      if (onBtnClick != null)
-      {
-        onBtnClick(actionName.DISTSUPPLY);
-      }
-    }
-
-    public void OnAbandonClick()
-    {
-      if (onBtnClick != null)
-      {
-        onBtnClick(actionName.DISTLABOR);
-      }
-    }
-
-    public void OnTransferSupplyClick() {
-      if (onBtnClick != null) {
-        onBtnClick(actionName.TRANSFERSUPPLY);
-      }
-    }
-
-    public void OnTransferLaborClick() {
-      if (onBtnClick != null) {
-        onBtnClick(actionName.TRANSFERLABOR);
-      }
-    }
-
-    public void OnTransferLabor2UnitClick() {
-      if (onBtnClick != null) {
-        onBtnClick(actionName.LABOR2Unit);
-      }
-    }
-
     public void OnInputConfirmClick() {
       if (onBtnClick != null) {
         onBtnClick(actionName.INPUTCONFIRM);
@@ -275,18 +226,10 @@ namespace MonoNS
       }
     }
 
-    public void PerformImmediateAction(Unit unit, actionName action)
-    {
-      unit.SetEndState(action);
-      actionDone(unit, null, action);
-    }
-
     public enum actionName
     {
       MOVE,
       DEPLOYMENTDONE,
-      DESTROY,
-      STAND,
       ATTACK,
       REPOS,
       POISION,
@@ -299,23 +242,15 @@ namespace MonoNS
       ENCAMP,
       RETREAT,
       ForceRetreat,
-      CAMP,
       SHOWMINE,
       SHOWENEMY,
       WARGAME,
-      WGCONFIRM,
       WGCANCEL,
-      DECAMP,
       MGTGARRISON,
       GARRISONCANCEL,
       GARRISON1,
       GARRISON2,
       GARRISON3,
-      DISTSUPPLY,
-      DISTLABOR,
-      LABOR2Unit,
-      TRANSFERSUPPLY,
-      TRANSFERLABOR,
       INPUTCONFIRM,
       EVENTDIALOGCONFIRM,
       COMMENCEOP,
@@ -436,7 +371,7 @@ namespace MonoNS
       }
       while (unitAniController.MoveAnimating) { yield return null; }
       ActionOngoing = false;
-      if (actionDone != null) actionDone(unit, null, actionName.MOVE);
+      if (actionDone != null) actionDone(unit, actionName.MOVE);
     }
 
     IEnumerator DoCommenceOp()
@@ -482,9 +417,9 @@ namespace MonoNS
       ActionOngoing = false;
     }
 
-    IEnumerator DoAttackEmptySettlement(Unit unit, Settlement settlement, bool occupy = true)
+    IEnumerator DoAttackEmptySettlement(Unit unit, Settlement settlement)
     {
-      unitAniController.AttackEmpty(unit, settlement, occupy);
+      unitAniController.AttackEmpty(unit, settlement);
       while (unitAniController.AttackEmptyAnimating)
       {
         yield return null;

@@ -27,8 +27,6 @@ namespace MonoNS
     public bool windAdvantage = false;
     public bool windDisadvantage = false;
     public int dead = 0;
-    public int wounded = 0;
-    public int laborDead = 0;
     public int leastNum = 0;
   }
 
@@ -50,7 +48,6 @@ namespace MonoNS
       base.PreGameInit(hexMap, me);
       mouseController = hexMap.mouseController;
       actionController = hexMap.actionController;
-      actionController.actionDone += ActionDone;
       msgBox = hexMap.msgBox;
     }
 
@@ -304,22 +301,11 @@ namespace MonoNS
       }
     }
 
-    void Helper(UnitPredict up, int step, int maxWd) {
+    void Helper(UnitPredict up, int dead) {
       Unit unit = up.unit;
-      int wounded = Util.Rand(0, maxWd);
-      int dead = step - wounded;
-      up.wounded += wounded;
       up.dead += dead;
-
-      unit.rf.wounded += wounded;
       unit.kia += dead;
-      unit.rf.soldiers -= step;
-
-      if (unit.labor > 1) {
-        int laborDead = Util.Rand(0, 1);
-        up.laborDead += laborDead;
-        unit.labor -= laborDead;
-      }
+      unit.rf.soldiers -= dead;
     }
 
     int AllocateCasualty(int total, List<UnitPredict> units) {
@@ -342,9 +328,7 @@ namespace MonoNS
               total -= unit.rf.soldiers;
               up.dead += unit.rf.soldiers;
               unit.kia += unit.rf.soldiers;
-              up.laborDead += unit.labor;
               unit.rf.soldiers = 0;
-              unit.labor = 0;
             } else {
               up.dead += total;
               unit.kia += total;
@@ -360,9 +344,7 @@ namespace MonoNS
             total -= unit.rf.soldiers;
             up.dead += unit.rf.soldiers;
             unit.kia += unit.rf.soldiers;
-            up.laborDead += unit.labor;
             unit.rf.soldiers = 0;
-            unit.labor = 0;
             dryUnits++;
             continue;
           }
@@ -371,10 +353,10 @@ namespace MonoNS
           if (unit.rf.rank.Level() == 1) {
             if (!unit.IsCavalry()) {
               total -= 20;
-              Helper(up, 20, 0);
+              Helper(up, 20);
             } else {
               total -= 8;
-              Helper(up, 8, 0);
+              Helper(up, 8);
             }
           }
 
@@ -382,10 +364,10 @@ namespace MonoNS
           if (unit.rf.rank.Level() == 2) {
             if (!unit.IsCavalry()) {
               total -= 10;
-              Helper(up, 10, 0);
+              Helper(up, 10);
             } else {
               total -= 5;
-              Helper(up, 5, 0);
+              Helper(up, 5);
             }
           }
 
@@ -393,10 +375,10 @@ namespace MonoNS
           if (unit.rf.rank.Level() == 3) {
             if (!unit.IsCavalry()) {
               total -= 5;
-              Helper(up, 5, 0);
+              Helper(up, 5);
             } else {
               total -= 3;
-              Helper(up, 3, 0);
+              Helper(up, 3);
             }
           }
         }
@@ -657,26 +639,16 @@ namespace MonoNS
 
         List<UnitPredict> all = new List<UnitPredict>();
         int attackerInfDead = 0;
-        int attackerInfWnd = 0;
-        int attackerLaborDead = 0;
         int attackerCavDead = 0;
-        int attackerCavWnd = 0;
-
         int defenderInfDead = 0;
-        int defenderInfWnd = 0;
-        int defenderLaborDead = 0;
         int defenderCavDead = 0;
-        int defenderCavWnd = 0;
 
         foreach(UnitPredict up in predict.attackers) {
           up.unit.movementRemaining -= Unit.ActionCost;
           if (up.unit.IsCavalry()) {
             attackerCavDead += up.dead;
-            attackerCavWnd += up.wounded;
           } else {
             attackerInfDead += up.dead;
-            attackerInfWnd += up.wounded;
-            attackerLaborDead += up.laborDead;
           }
           all.Add(up);
         }
@@ -685,39 +657,25 @@ namespace MonoNS
           up.unit.movementRemaining -= Unit.DefenceCost;
           if (up.unit.IsCavalry()) {
             defenderCavDead += up.dead;
-            defenderCavWnd += up.wounded;
           } else {
             defenderInfDead += up.dead;
-            defenderInfWnd += up.wounded;
-            defenderLaborDead += up.laborDead;
           }
           all.Add(up);
         }
 
-        int settlementWounded = 0;
         int settlementDead = 0;
-        int settlementLaborDead = 0;
         foreach(UnitPredict up in all) {
           Unit unit = up.unit;
-          hexMap.UpdateWound(unit, up.wounded);
-          if(hexMap.IsAttackSide(unit.IsAI())) {
-            hexMap.settlementMgr.attackerLaborDead += up.laborDead;
-          } else {
-            hexMap.settlementMgr.defenderLaborDead += up.laborDead;
-          }
-
           if (up.operationPoint == 0 ||
             (defender.IsCamping() && Util.eq<Unit>(defender, up.unit))) {
             settlementDead += up.dead;
-            settlementWounded += up.wounded;
-            settlementLaborDead += up.laborDead;
           } else {
             View view = null;
             if (unit.IsCamping()) {
               view = hexMap.settlementMgr.GetView(unit.tile.settlement);
             }
             // morale, movement, wounded, killed, laborKilled, disserter, attack, def, discontent
-            int[] stats = new int[]{0,0,up.wounded,up.dead,up.laborDead,0,0,0,0};
+            int[] stats = new int[]{0,0,0,up.dead,0,0,0,0,0};
             hexMap.unitAniController.ShowEffects(unit, stats, view);
             while (hexMap.unitAniController.ShowAnimating) { yield return null; }
           }
@@ -730,7 +688,7 @@ namespace MonoNS
         }
 
         if (defender.IsCamping()) {
-            int[] stats = new int[]{0,0,settlementWounded,settlementDead,settlementLaborDead,0,0,0,0};
+            int[] stats = new int[]{0,0,0,settlementDead,0,0,0,0,0};
             hexMap.unitAniController.ShowEffects(null, stats, hexMap.settlementMgr.GetView(defender.tile.settlement));
             while (hexMap.unitAniController.ShowAnimating) { yield return null; }
         }
@@ -740,9 +698,7 @@ namespace MonoNS
 
         hexMap.eventDialogAlt.ShowOperationResult(resultLevel, atkWin, !attacker.IsAI(),
           attackerInfTotal, attackerCavTotal, defenderInfTotal, defenderCavTotal,
-          attackerInfDead, attackerInfWnd, attackerLaborDead, attackerCavDead, attackerCavWnd,
-          defenderInfDead, defenderInfWnd, defenderLaborDead, defenderCavDead, defenderCavWnd,
-          capturedHorse);
+          attackerInfDead, attackerCavDead, defenderInfDead,  defenderCavDead, capturedHorse);
         while(hexMap.eventDialogAlt.Animating) { yield return null; }
         CancelOperation();
 
@@ -883,10 +839,9 @@ namespace MonoNS
             hexMap.unitAniController.Riot(attacker, discontent);
             while (hexMap.unitAniController.riotAnimating) { yield return null; }
           }
-
         }
-        int deadToll = attackerInfDead + attackerCavDead + attackerLaborDead
-          + defenderInfDead + defenderCavDead + defenderLaborDead;
+
+        int deadToll = attackerInfDead + attackerCavDead + defenderInfDead + defenderCavDead;
         Tile tile = atkWin ? defender.tile : attacker.tile;
         if (tile.settlement == null) {
           tile.deadZone.Occur(deadToll);
@@ -1120,23 +1075,6 @@ namespace MonoNS
         CancelOperation();
       }
       commenceOpAnimating = false;
-    }
-
-    public void ActionDone(Unit unitUnderAttack, Unit[] attackers, ActionController.actionName actionName)
-    {
-      if (actionName == ActionController.actionName.ATTACK)
-      {
-        if (unitUnderAttack.attackReaction == Reaction.Disband)
-        {
-          //unitUnderAttack.Destroy(DestroyType.ByDisband);
-          return;
-        }
-        if (attackers[0].attackReaction == Reaction.Disband)
-        {
-          //attackers[0].Destroy(DestroyType.ByDisband);
-          return;
-        }
-      }
     }
 
     public List<Unit> GetKnownEnemies() {

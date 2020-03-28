@@ -11,7 +11,6 @@ namespace UnitNS
   public abstract class Unit : PFUnit, DataModel
   {
     public abstract bool IsCavalry();
-    protected abstract int GetBaseSupplySlots();
     protected abstract Unit Clone();
 
     public const int ActionCost = 15; // For actions like: attack, bury
@@ -21,7 +20,7 @@ namespace UnitNS
     public const int MovementcostOnPlain = 15;
     public const int MovementcostOnPlainRoad = 12;
     public const int MovementCostOnUnaccesible = -1;
-    public const int DisbandUnitUnder = 50;
+    public const int DisbandUnitUnder = 200;
 
     public const int L1Visibility = 2;
     public const int L2Visibility = 3;
@@ -55,18 +54,13 @@ namespace UnitNS
     public Vantage vantage;
     WeatherGenerator weatherGenerator;
     TurnController turnController;
-    int initSupply = 0;
     public bool chaos = false;
     public Unit(bool clone, Troop troop, Tile tile, State state,
-                int supply, int labor, int kia, int mia, int movement = -1)
+                int kia, int movement = -1)
     {
       rf = troop;
       this.clone = clone;
-      // must be after num is set
-      TakeInLabor(labor);
-      this.initSupply = supply;
       this.kia = kia;
-      this.mia = mia;
       hexMap = GameObject.FindObjectOfType<HexMap>();
       if (clone) {
         this.tile = tile;
@@ -76,7 +70,7 @@ namespace UnitNS
         turnController = hexMap.turnController;
 
         SetTile(tile);
-        SetState(rf.morale == 0 ? State.Routing : state);
+        SetState(state);
       }
       movementRemaining = movement;
     }
@@ -89,7 +83,7 @@ namespace UnitNS
       riot = new Riot(this);
       marchOnHeat = new MarchOnHeat(this);
       marchOnExhaustion = new MarchOnExhaustion(this);
-      supply = new Supply(this, initSupply);
+      supply = new Supply(this);
       weatherEffect = new WeatherEffect(this);
       unitConflict = new UnitConflict(this);
       plainSickness = new PlainSickness(this);
@@ -98,11 +92,10 @@ namespace UnitNS
       farmDestroy = new FarmDestroy(this);
     }
 
-    public void CloneInit(float disarmorDefDebuf, Supply supply, PlainSickness plainSickness, WarWeary warWeary) {
+    public void CloneInit(float disarmorDefDebuf, Supply supply, PlainSickness plainSickness) {
       this.disarmorDefDebuf = disarmorDefDebuf;
       this.supply = supply;
       this.plainSickness = plainSickness;
-      this.warWeary = warWeary;
     }
 
     public void SpawnOnMap() {
@@ -118,7 +111,7 @@ namespace UnitNS
       movementRemaining = GetFullMovement();
     }
 
-    State[] visibleStates = {State.Routing, State.Stand};
+    State[] visibleStates = {State.Stand};
     public void SetState(State state) {
       UnitActionBroker broker = UnitActionBroker.GetBroker();
       if (state == State.Stand && Concealable() && concealCoolDownTurn == 0) {
@@ -131,10 +124,6 @@ namespace UnitNS
       }
       if (state == State.Camping) {
         broker.BrokeChange(this, ActionType.UnitLeft, tile);
-        return;
-      }
-      if (state == State.Routing) {
-        broker.BrokeChange(this, ActionType.UnitVisible, tile);
         return;
       }
       // TODO: AI test
@@ -171,26 +160,12 @@ namespace UnitNS
         __movementRemaining = value < 0 ? 0 : (value > GetFullMovement() ? GetFullMovement() : value);
       }
     }
-    public Reaction attackReaction = Reaction.Stand;
     public Tile tile;
     public int kia;
-    public int mia;
-    public int labor
-    {
-      get
-      {
-        return __labor;
-      }
-      set
-      {
-        __labor = value < 0 ? 0 : value;
-      }
-    }
     public Troop rf;
     public State state = State.Stand;
     public bool defeating = false;
 
-    int __labor = 0;
     int __movementRemaining;
     Queue<Tile> path;
     // ==============================================================
@@ -247,10 +222,6 @@ namespace UnitNS
       {
         return txtLib.get("u_camping");
       }
-      if (state == State.Routing)
-      {
-        return txtLib.get("u_routing");
-      }
       if (state == State.Disbanded)
       {
         return txtLib.get("u_disbanded");
@@ -286,38 +257,14 @@ namespace UnitNS
       return altitudeSickness.lastTurns;
     }
 
-    public int GetHeatSickEffectNum()
-    {
-      return epidemic.GetEffectNum();
-    }
-
     public int GetPoisionTurns()
     {
       return unitPoisioned.GetIllTurns();
     }
 
-    public int GetPoisionEffectNum()
-    {
-      return unitPoisioned.GetEffectNum();
-    }
-
-    public int GetStarvingDessertNum()
-    {
-      return supply.GetStarvingDessertNum();
-    }
-
-    public int GetStarvingKillNum()
-    {
-      return supply.GetStarvingKillNum();
-    }
-
     public string GetDiscontent()
     {
       return riot.GetDescription();
-    }
-
-    public int GetTotalNum() {
-      return rf.soldiers + rf.wounded + labor;
     }
 
     public bool IsAI()
@@ -338,16 +285,8 @@ namespace UnitNS
       return unitPoisioned.IsValid();
     }
 
-    public bool IsHungry() {
-      return IsStarving() || IsHalfStarving();
-    }
-
     public bool IsStarving() {
-      return (supply != null && supply.isStarving) || false;
-    }
-
-    public bool IsHalfStarving() {
-      return supply != null && !supply.isStarving && supply.halfFeed;
+      return (supply != null && !supply.consumed) || false;
     }
 
     public bool IsWarWeary() {
@@ -413,22 +352,11 @@ namespace UnitNS
     // ================= Unit Settled&Refresh =======================
     // ==============================================================
 
-    // When unit ends in settlement
-    public int EndedInSettlement(int supply)
-    {
-      rf.morale = rf.morale > GetRetreatThreshold() ? rf.morale: GetRetreatThreshold();
-      if (state == State.Routing) {
-        SetState(State.Stand);
-      }
-      return this.supply.ReplenishSupply(supply);
-    }
-
     // Before new turn starts
     public int[] RefreshUnit()
     {
       if (chaos) {
         chaos = false;
-        //hexMap.GetUnitView(this).UpdateUnitInfo();
       }
 
       charged = false;
@@ -447,7 +375,6 @@ namespace UnitNS
         }
       }
 
-      supply.RefreshSupply();
       turnDone = false;
       movementRemaining = GetFullMovement();
       int[] ret = weatherEffect.Apply();
@@ -461,11 +388,6 @@ namespace UnitNS
     public bool TurnDone()
     {
       return turnDone;
-    }
-
-    public void SetEndState(ActionController.actionName action)
-    {
-      turnDone = true;
     }
 
     public bool CanRetreat() {
@@ -491,17 +413,6 @@ namespace UnitNS
 
     public void Retreat() {
       // TODO: move the queuing unit in
-      if (labor > 0) {
-        foreach (Settlement cityOrBase in
-          hexMap.IsAttackSide(IsAI()) ? hexMap.settlementMgr.attackerRoots
-          : hexMap.settlementMgr.defenderRoots) {
-          if (cityOrBase.type != Settlement.Type.camp) {
-            cityOrBase.labor += labor;
-            labor = 0;
-            break;
-          }
-        }
-      }
       if (rf.general != null) {
         rf.general.TroopRetreat();
       }
@@ -512,16 +423,9 @@ namespace UnitNS
     public int Destroy()
     {
       // TODO: move the queuing unit in
-      int killed = rf.soldiers + rf.wounded;
-      hexMap.UpdateWound(this, -rf.wounded);
+      int killed = rf.soldiers;
       kia += killed;
-      if (hexMap.IsAttackSide(IsAI())) {
-        hexMap.settlementMgr.attackerLaborDead += labor;
-      } else {
-        hexMap.settlementMgr.defenderLaborDead += labor;
-      }
-
-      rf.soldiers = rf.wounded = labor = 0;
+      rf.soldiers = 0;
       SetState(State.Disbanded);
       tile.RemoveUnit(this);
       if (tile.settlement != null && tile.settlement.owner.isAI == this.IsAI()) {
@@ -539,7 +443,7 @@ namespace UnitNS
     }
 
     public int[] TakeEffect(int reduceMorale, float movementDropRatio = 0f,
-      float disableRatio = 0f, float killRatio = 0f) {
+      float killRatio = 0f) {
       // morale, movement, wounded, killed, laborKilled, disserter, attack, def, discontent
       int[] reduced = new int[]{0,0,0,0,0,0,0,0,0};
       rf.morale -= reduceMorale;
@@ -547,25 +451,10 @@ namespace UnitNS
       int moveReduce = (int)(movementRemaining * movementDropRatio);
       movementRemaining = movementRemaining - moveReduce; 
       reduced[1] = -moveReduce;
-      int woundedNum = (int)(rf.soldiers * disableRatio);
-      hexMap.UpdateWound(this, woundedNum);
-      rf.wounded += woundedNum;
-      rf.soldiers -= woundedNum;
-      reduced[2] = woundedNum;
       int kiaNum = (int)(rf.soldiers * killRatio);
       kia += kiaNum;
       rf.soldiers -= kiaNum;
       reduced[3] = kiaNum;
-      int killLabor = (int)(kiaNum * 0.8f);
-      killLabor = killLabor > labor ? labor : killLabor;
-      if(hexMap.IsAttackSide(IsAI())) {
-        hexMap.settlementMgr.attackerLaborDead += killLabor;
-      } else {
-        hexMap.settlementMgr.defenderLaborDead += killLabor;
-      }
-
-      labor -= killLabor;
-      reduced[4] = killLabor;
       reduced[5] = 0;
       reduced[6] = 0;
       reduced[7] = 0;
@@ -581,7 +470,7 @@ namespace UnitNS
       return (int)(
         // ghost unit doesnt have vantage
         (vantage != null ? vantage.MovementPoint(rf.mov) : rf.mov) *
-        (IsHungry() ? 0.4f : 1) *
+        (IsStarving() ? 0.8f : 1) *
         (plainSickness != null && plainSickness.affected ? (1 - plainSickness.moveDebuf) : 1) *
         (IsSick() ? 0.5f : 1));
     }
@@ -597,42 +486,6 @@ namespace UnitNS
         return StaminaLvl.Tired;
       }
       return StaminaLvl.Exhausted;
-    }
-
-    public virtual int LaborCanTakeIn() {
-      return 0;
-    }
-
-    public int TakeInLabor(int labor) {
-      int canTakeIn = LaborCanTakeIn(); 
-      int gap = labor - canTakeIn;
-      if (gap > 0) {
-        this.labor += canTakeIn;
-        return gap;
-      }
-      this.labor += labor;
-      return 0;  
-    }
-
-    // ==============================================================
-    // ================= slots mangement ===========================
-    // ==============================================================
-
-    public virtual Dictionary<int, int> GetLaborSuggestion() {
-      return new Dictionary<int, int>();
-    }
-
-    public int slots
-    {
-      get
-      {
-        return supply.GetLastingTurns();
-      }
-    }
-
-    public int GetMaxSupplySlots()
-    {
-      return rf.province.region.ExtraSupplySlot() + GetBaseSupplySlots() - (IsWarWeary() ? 1 : 0);
     }
 
     // ==============================================================
@@ -793,11 +646,7 @@ namespace UnitNS
     {
       SetTile(tile);
       path = null;
-      if (rf.morale == 0) {
-        SetState(State.Routing);
-      } else {
-        SetState(State.Stand);
-      }
+      SetState(State.Stand);
     }
 
     public void DiscoveredByEnemy() {
@@ -920,9 +769,7 @@ namespace UnitNS
     // ==============================================================
     // ================= path finding ===============================
     // ==============================================================
-    public HashSet<Tile> enemyControlledTiles;
     public Tile[] GetPureAccessibleTiles(bool fullMovement = false) {
-      enemyControlledTiles = hexMap.settlementMgr.GetControlledTiles(!IsAI());
       return PFTile2Tile(PathFinder.FindAccessibleTiles(tile, this,
         fullMovement ? GetFullMovement() : movementRemaining));
     }
@@ -948,16 +795,9 @@ namespace UnitNS
       return area.ToArray();
     }
 
-    public Tile[] GetAccessibleTilesForSupply(Tile start, int remaining)
-    {
-      enemyControlledTiles = null;
-      return PFTile2Tile(PathFinder.FindAccessibleTiles(start, this, remaining, PathFind.Mode.Supply));
-    }
-
     // only for Ghost unit to pathfind settlement path
     public Tile[] FindPath(Tile source, Tile target)
     {
-      enemyControlledTiles = null;
       return PFTile2Tile(PathFinder.FindPath(source, target, this, PathFind.Mode.Supply));
     }
 
@@ -967,7 +807,6 @@ namespace UnitNS
       if (target.GetUnit() != null) {
         return new Tile[]{};
       }
-      enemyControlledTiles = hexMap.settlementMgr.GetControlledTiles(!IsAI());
       return PFTile2Tile(PathFinder.FindPath(tile, target, this));
     }
 

@@ -6,8 +6,6 @@ namespace UnitNS
     public Unit unit1;
     public Unit unit2;
     public int discontent = 0;
-    public int unit1Wound;
-    public int unit2Wound;
     public int unit1Dead;
     public int unit2Dead;
   }
@@ -22,6 +20,8 @@ namespace UnitNS
 
     public ConflictResult Occur() {
       ConflictResult result = new ConflictResult();
+      return result;
+      // TODO: for future
       if (unit.IsAI() || happened) {
         return result;
       }
@@ -55,18 +55,10 @@ namespace UnitNS
         result.unit1 = unit;
         result.unit2 = target;
 
-        result.unit1Wound = Util.Rand(10, Unit.DisbandUnitUnder - 10);
-        unit.rf.wounded += result.unit1Wound;
-        unit.rf.soldiers -= result.unit1Wound;
-        unit.hexMap.UpdateWound(unit, result.unit1Wound);
         result.unit1Dead = Util.Rand(0, 9);
         unit.kia += result.unit1Dead;
         unit.rf.soldiers -= result.unit1Dead;
 
-        result.unit2Wound = Util.Rand(10, Unit.DisbandUnitUnder - 10);
-        target.rf.wounded += result.unit2Wound;
-        target.rf.soldiers -= result.unit2Wound;
-        unit.hexMap.UpdateWound(target, result.unit2Wound);
         result.unit2Dead = Util.Rand(0, 9);
         target.kia += result.unit2Dead;
         target.rf.soldiers -= result.unit2Dead;

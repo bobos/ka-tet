@@ -4,6 +4,7 @@ using UnitNS;
 using FieldNS;
 using System.Collections.Generic;
 using MapTileNS;
+using static MonoNS.HexMap;
 
 namespace MonoNS
 {
@@ -17,14 +18,13 @@ namespace MonoNS
       mouseController = hexMap.mouseController;
       actionController = hexMap.actionController;
       turnController = hexMap.turnController;
-      actionController.actionDone += ActionDone;
       actionController.onBtnClick += OnBtnClick;
       turnController.onEndTurnClicked += OnEndTurnClicked;
       turnController.onNewTurn += OnNewTurn;
-      GameObject[] btns = {MoveButton, AttackButton, DefendButton, CampButton,
+      GameObject[] btns = {MoveButton, AttackButton, DefendButton,
                            SabotageButton, FireButton, SiegeButton, EncampButton,
-                           RetreatButton, TransferSupplyButton, TransferLaborButton,
-                           DecampButton, ReposButton, BuryButton, ChargeButton
+                           RetreatButton, DecampButton, ReposButton,
+                           BuryButton, ChargeButton
                            };
       buttons = btns;
       mouseController.onUnitSelect += OnUnitSelect;
@@ -45,7 +45,6 @@ namespace MonoNS
     public GameObject MoveButton;
     public GameObject AttackButton;
     public GameObject DefendButton; // Poison
-    public GameObject CampButton;
     public GameObject SabotageButton;
     public GameObject NextTurnButton;
     public GameObject DeploymentDoneButton;
@@ -53,8 +52,6 @@ namespace MonoNS
     public GameObject SiegeButton; // Siege
     public GameObject EncampButton;
     public GameObject RetreatButton;
-    public GameObject TransferSupplyButton;
-    public GameObject TransferLaborButton;
     public GameObject DecampButton;
     public GameObject ReposButton;
     public GameObject BuryButton;
@@ -167,10 +164,6 @@ namespace MonoNS
         if (deployableTiles.Count > 0) {
           DecampButton.SetActive(true);
         }
-        if (unit.labor > 0) {
-          TransferLaborButton.SetActive(true);
-        }
-        //SabotageSiegeButton.SetActive(true);
         return;
       }
 
@@ -230,38 +223,11 @@ namespace MonoNS
         DefendButton.SetActive(true);
       }
 
-      if (!hexMap.deployDone && mouseController.inCampField != null && !hexMap.wargameController.start) {
-        CampButton.SetActive(true);
-      }
-
       if (unit.type == Type.Infantry && !hexMap.wargameController.start) {
-        if (mouseController.inCampField != null && !hexMap.wargameController.start) {
-          CampButton.SetActive(true);
-        }
-
         if (hexMap.deployDone &&
           mouseController.nearEnemySettlement != null && !mouseController.nearEnemySettlement.IsEmpty()
           && !hexMap.wargameController.start && mouseController.nearEnemySettlement.type == Settlement.Type.city) {
           SiegeButton.SetActive(true);
-        }
-
-        if ((mouseController.nearAlly || mouseController.nearMySettlement != null) && 
-         !hexMap.wargameController.start) {
-          if (unit.labor > 0) {
-            TransferLaborButton.SetActive(true);
-          }
-          if (unit.supply.supply > 0) {
-            TransferSupplyButton.SetActive(true);
-          }
-        }
-      }
-
-      if (unit.type == Type.Cavalry && !hexMap.wargameController.start) {
-        if ((mouseController.nearAlly || mouseController.nearMySettlement != null) ||
-         !hexMap.wargameController.start) {
-          if (unit.supply.supply > 0) {
-            TransferSupplyButton.SetActive(true);
-          }
         }
       }
     }
@@ -308,8 +274,8 @@ namespace MonoNS
       movement.text = "移动力:" + (isPreflight ? mouseController.selectedUnit.movementRemaining + " -> " : "")
         + unit.movementRemaining + "/" + unit.GetFullMovement();
       stamina.text = "体力: " + unit.GetStaminaLvlName();
-      slots.text = "粮草: " + unit.supply.supply + "石" + " 可维持" + unit.slots + "/" + unit.GetMaxSupplySlots() + "回合" + " 每回合消耗:" + unit.supply.SupplyNeededPerTurn() + "石";
-      num.text = unit.Name() + "[兵:" + unit.rf.soldiers + "/伤:" + unit.rf.wounded + "/亡:" + unit.kia + "/逃:" + unit.mia + "/役:" + unit.labor + "]";
+      slots.text = "";
+      num.text = unit.Name() + "[兵:" + unit.rf.soldiers + "/亡:" + unit.kia + "]";
       morale.text = "士气: " + unit.rf.morale;
       offense.text = "单兵战力: " + GetCombatpointRate(unit.cp);
       if (unit.IsCamping()) {
@@ -323,15 +289,8 @@ namespace MonoNS
         (unit.tile.siegeWall != null && unit.tile.siegeWall.owner.isAI == unit.IsAI() ? ("建长围中:" + unit.tile.siegeWall.buildTurns + "回合完成 ") : "");
       stateStr += unit.IsWarWeary() ? "士气低落 " : "";
       stateStr += unit.GetDiscontent() + " ";
-      stateStr += unit.IsHungry() ? (unit.IsStarving() ? "饥饿 " : "半饥饿 ") : "";
+      stateStr += unit.IsStarving() ? "饥饿 " : "";
       stateStr += unit.GetStateName();
-      int desserter = unit.IsStarving() ? unit.GetStarvingDessertNum() : 0;
-      int killed = unit.IsStarving() ? unit.GetStarvingKillNum() : 0;
-      desserter += unit.IsWarWeary() ? unit.warWeary.GetWarWearyDissertNum() : 0;
-      state.text = "";
-      if (desserter != 0) {
-        stateStr += "[本轮" + desserter + "人逃亡" + (killed > 0 ? (killed + "人亡") : "") + "]";
-      }
       state.text = stateStr;
       illness.text = unit.GetHeatSickTurns() > 0 ? "痢疾: 将持续" + unit.GetHeatSickTurns() + "回合 " : "";
       illness.text += unit.GetAltitudeSickTurns() > 0 ? "高原反应: 将持续" + unit.GetAltitudeSickTurns() + "回合" : "";
@@ -351,8 +310,16 @@ namespace MonoNS
       FoW.Init(hexMap);
     }
 
+    bool toggled = false;
     public void OnBtnClick(ActionController.actionName action)
     {
+      if (toggled) {
+        toggled = false;
+        hexMap.DehighlightArea();
+        return;
+      }
+      toggled = true;
+
       if (action == ActionController.actionName.DEPLOYMENTDONE) {
         hexMap.turnController.DeploymentDone();
         hexMap.deployDone = true;
@@ -365,13 +332,6 @@ namespace MonoNS
       if (action == ActionController.actionName.SHOWMINE || action == ActionController.actionName.SHOWENEMY) {
         WarParty wp = action == ActionController.actionName.SHOWENEMY ? hexMap.GetAIParty() : hexMap.GetPlayerParty();
         WarPartyStat stat = wp.GetStat();
-        List<Settlement> roots = wp.attackside ? hexMap.settlementMgr.attackerRoots : hexMap.settlementMgr.defenderRoots;
-        int labor = stat.numOfLabor;
-        int count = 0;
-        foreach(Settlement s in roots) {
-          labor += s.labor;
-          count++;
-        }
         int attackerCP = 0;
         int defenderCP = 0;
         WarParty wp1 = hexMap.GetAIParty();
@@ -393,17 +353,11 @@ namespace MonoNS
 
         string info =
          "步兵: " + stat.numOfInfantryUnit + "都\n" +
-         "  战兵: " + stat.numOfInfantry + " 伤: " + stat.numOfInfantryWound +
-         " 亡: " + stat.numOfInfantryDead + "\n" +
+         "  战兵: " + stat.numOfInfantry + "/" + stat.numOfInfantryDead + "亡\n" +
          "骑兵: " + stat.numOfCavalryUnit + "都\n" +
-         "  战兵: " + stat.numOfCavalry + " 伤: " + stat.numOfCavalryWound +
-         " 亡: " + stat.numOfCavalryDead + "\n" +
-         "兵役: " + labor + " 亡: " +
-         (wp.attackside ? hexMap.settlementMgr.attackerLaborDead : hexMap.settlementMgr.defenderLaborDead) + "\n" + 
-         "控制城市: " + count + "\n" +  
-         "总计: 战兵 " + (stat.numOfInfantry + stat.numOfCavalry) +
-         " 伤 " + (stat.numOfInfantryWound + stat.numOfCavalryWound) +
-         " 亡 " + (stat.numOfInfantryDead + stat.numOfCavalryDead) + "\n";
+         "  战兵: " + stat.numOfCavalry + "/" + stat.numOfCavalryDead + "亡\n" +
+         "总计: 战兵 " + UnitInfoView.Shorten(stat.numOfInfantry + stat.numOfCavalry) +
+         "/" + UnitInfoView.Shorten(stat.numOfInfantryDead + stat.numOfCavalryDead) + "亡\n";
 
         if (!wp.attackside) {
           info += "平民死亡: \n" + "  男: " + hexMap.settlementMgr.totalMaleDead +
@@ -411,9 +365,12 @@ namespace MonoNS
            " 幼: " + hexMap.settlementMgr.totalChildDead + "\n";
         }
 
+        info += "粮草: " + UnitInfoView.Shorten(wp.supply) + "石\n";
         info += "党派关系： " + wp.faction.GetParties()[0].GetRelationDescription();
         info += "\n\n攻方: " + UnitInfoView.Shorten(attackerCP) + " VS 守方: " + UnitInfoView.Shorten(defenderCP);
         hexMap.hoverInfo.Show(info);
+
+        hexMap.HighlightArea(hexMap.settlementMgr.GetControlledTiles(wp.isAI).ToArray(), RangeType.supplyRange);
         return;
       }
 

@@ -20,7 +20,6 @@ namespace CourtNS
     public Faction faction;
     public Province province;
     public General general;
-    public int wounded = 0;
     public Unit onFieldUnit;
     public Type type;
     int _morale;
@@ -112,22 +111,22 @@ namespace CourtNS
     }
 
     public int Enlist(int rookies) {
-      int gap = Troop.MaxNum(type) - (soldiers + wounded);
+      int gap = Troop.MaxNum(type) - soldiers;
       if (rookies < gap) { gap = rookies; }
       int returned = rookies - gap;
       soldiers += gap;
       return returned;
     }
 
-    public bool EnterCampaign(Tile deploymentTile, int supply, int labor) {
+    public bool EnterCampaign(Tile deploymentTile) {
       if (state != TroopState.Idle) {
         return false;
       }
       state = TroopState.OnField;
       if(type == Type.Cavalry) {
-        onFieldUnit = Cavalry.Create(false, this, deploymentTile, supply);
+        onFieldUnit = Cavalry.Create(false, this, deploymentTile);
       } else {
-        onFieldUnit = Infantry.Create(false, this, deploymentTile, supply, labor);
+        onFieldUnit = Infantry.Create(false, this, deploymentTile);
       }
       return true;
     }

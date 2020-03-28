@@ -41,7 +41,6 @@ namespace MonoNS
     Vector3 lastMousePosition;
     int mouseDragThreshold = 4;
     Unit __selectedUnit = null;
-    Unit __transferedUnit = null;
     public mode mouseMode;
     public Unit selectedUnit
     {
@@ -52,15 +51,6 @@ namespace MonoNS
       }
     }
 
-    public Unit transferedUnit
-    {
-      get { return __transferedUnit; }
-      set
-      {
-        __transferedUnit = value;
-      }
-    }
-    public Settlement transferedSettlement = null;
     Settlement __selectedSettlement = null;
     public Settlement selectedSettlement
     {
@@ -102,7 +92,6 @@ namespace MonoNS
     public Settlement nearMySettlement = null;
     public Tile nearDam = null;
     public Tile nearFire = null;
-    public Tile inCampField = null;
     public bool nearAlly = false;
     public bool nearEnemy = false;
     public bool nearWater = false;
@@ -117,7 +106,6 @@ namespace MonoNS
       nearAlly = false;
       nearEnemy = false;
       nearWater = false;
-      inCampField = null;
       nearbyEnemey = new List<Unit>();
       nearbyAlly = new HashSet<Unit>();
     }
@@ -126,9 +114,6 @@ namespace MonoNS
       ResetUnitSelection();
       Settlement s = null;
       Tile t = selectedUnit.tile;
-      if (t.IsCampable()) {
-        inCampField = t;
-      }
 
       foreach(Tile tile in t.neighbours) {
         if (tile.settlement != null) {
@@ -181,21 +166,6 @@ namespace MonoNS
       {
         mouseMode = mode.move;
         Update_CurrentFunc = UpdateUnitMovement;
-      }
-
-      if (action == ActionController.actionName.CAMP)
-      {
-        if (settlementMgr.BuildCamp(inCampField,
-            selectedUnit.IsAI() ? hexMap.warParties[1] : hexMap.warParties[0],
-            selectedUnit))
-        {
-          popAniController.Show(hexMap.GetUnitView(selectedUnit), textLib.get("pop_buildingStarted"), Color.green);
-          Escape();
-        }
-        else
-        {
-          popAniController.Show(hexMap.GetUnitView(selectedUnit), textLib.get("pop_buildingFailed"), Color.white);
-        }
       }
 
       if (action == ActionController.actionName.POISION)
@@ -252,12 +222,6 @@ namespace MonoNS
         Escape();
       }
 
-      if (action == ActionController.actionName.DESTROY)
-      {
-        hexMap.settlementAniController.DestroySettlement(selectedSettlement, BuildingNS.DestroyType.BySelf);
-        Escape();
-      }
-
       if (action == ActionController.actionName.ATTACK)
       {
         mouseMode = mode.attack;
@@ -290,167 +254,18 @@ namespace MonoNS
         }
       }
 
-      if (action == ActionController.actionName.TRANSFERSUPPLY ||
-          action == ActionController.actionName.TRANSFERLABOR)
-      {
-        mouseMode = action == ActionController.actionName.TRANSFERLABOR ? mode.transferLabor : mode.transfer;
-        transferedUnit = null;
-        transferedSettlement = null;
-        if (action == ActionController.actionName.TRANSFERLABOR) {
-          Update_CurrentFunc = UpdateUnitTransferLabor;
-        } else {
-          Update_CurrentFunc = UpdateUnitTransferSupply;
-        }
-      }
-
-      if (action == ActionController.actionName.DISTSUPPLY || action == ActionController.actionName.DISTLABOR)
-      {
-        if (selectedSettlement.GetReachableSettlements().Length <= 0) {
-          popAniController.Show(settlementMgr.GetView(selectedSettlement), textLib.get("pop_noSettlementNearby"), Color.yellow);
-          return;
-        }
-        transferedSettlement = null;
-        mouseMode = action == ActionController.actionName.DISTSUPPLY ? mode.dist : mode.distLabor;
-        Update_CurrentFunc = UpdateSettlementDistSupply;
-      }
-
-      if (action == ActionController.actionName.LABOR2Unit)
-      {
-        bool allyNearBy = false;
-        foreach (Tile tile in selectedSettlement.baseTile.neighbours)
-        {
-          Unit u = tile.GetUnit();
-          if (selectedSettlement.IsFunctional() && u != null &&
-              u.IsAI() == selectedSettlement.owner.isAI) allyNearBy = true;
-        }
-        if (!allyNearBy) {
-          popAniController.Show(settlementMgr.GetView(selectedSettlement), textLib.get("pop_noAllyNearby"), Color.yellow);
-          return;
-        }
-        transferedUnit = null;
-        mouseMode = mode.labor2unit;
-        Update_CurrentFunc = UpdateDistLabor2Unit;
-      }
-
       if (action == ActionController.actionName.INPUTCONFIRM)
       {
-        if (mouseMode == mode.transfer) {
-          try {
-            int supply = hexMap.inputField.GetInput();
-            if (supply == 0 || supply > selectedUnit.supply.supply) {
-              msgBox.Show("invalid input");
-              return;
-            }
-            selectedUnit.supply.supply -= supply;
-            if (transferedUnit != null) {
-              selectedUnit.supply.supply += transferedUnit.supply.TakeTransferSupply(supply);
-              popAniController.Show(hexMap.GetUnitView(transferedUnit), textLib.get("pop_transferDone"), Color.green);
-            } else {
-              transferedSettlement.TakeInSupply(supply);
-              popAniController.Show(settlementMgr.GetView(transferedSettlement), textLib.get("pop_transferDone"), Color.green);
-            }
-            Escape();
-          } catch (System.Exception exception) {
-            msgBox.Show(exception.Message);
-            return;
-          }
-        }
-
-        if (mouseMode == mode.transferLabor) {
-          try {
-            int labor = hexMap.inputField.GetInput();
-            Unit unit = selectedUnit != null ? selectedUnit : hexMap.settlementViewPanel.selectedUnit;
-            if (labor == 0 || labor > unit.labor ||
-                (transferedUnit != null && labor > transferedUnit.LaborCanTakeIn())) {
-              msgBox.Show("invalid input");
-              return;
-            }
-            unit.labor -= labor;
-            if (transferedUnit != null) {
-              int remain = transferedUnit.TakeInLabor(labor);
-              selectedUnit.labor += remain;
-              popAniController.Show(hexMap.GetUnitView(transferedUnit), textLib.get("pop_transferDone"), Color.green);
-            } else {
-              transferedSettlement.TakeInLabor(labor);
-              popAniController.Show(settlementMgr.GetView(transferedSettlement), textLib.get("pop_transferDone"), Color.green);
-            }
-            Escape();
-          } catch (System.Exception exception) {
-            msgBox.Show(exception.Message);
-            return;
-          }
-        }
-
-        if (mouseMode == mode.dist) {
-          try {
-            int supply = hexMap.inputField.GetInput();
-            if (supply == 0 || supply > selectedSettlement.MaxDistSupply() ||
-                supply > transferedSettlement.SupplyCanTakeIn()) {
-              msgBox.Show("invalid input, max can dist supply " + selectedSettlement.MaxDistSupply() +
-                          " can take in " + transferedSettlement.SupplyCanTakeIn());
-              return;
-            }
-            if (!hexMap.deployDone) {
-              selectedSettlement.supplyDeposit -= supply;
-              transferedSettlement.supplyDeposit += supply;
-            } else {
-              settlementMgr.AddDistJob(selectedSettlement, transferedSettlement, supply, SettlementMgr.QueueJobType.DistSupply);
-              popAniController.Show(settlementMgr.GetView(selectedSettlement), textLib.get("pop_transferIssued"), Color.green);
-            }
-            Escape();
-          } catch (System.Exception exception) {
-            msgBox.Show(exception.Message);
-            return;
-          }
-        }
-
-        if (mouseMode == mode.distLabor) {
-          try {
-            int supply = hexMap.inputField.GetInput();
-            int canDist = supply > selectedSettlement.labor ? selectedSettlement.labor : supply;
-            if (supply == 0 || supply != canDist) {
-              msgBox.Show("invalid input, max labor can distribute " + canDist);
-              return;
-            }
-            if (!hexMap.deployDone) {
-              selectedSettlement.labor -= supply;
-              transferedSettlement.labor += supply;
-            } else {
-              settlementMgr.AddDistJob(selectedSettlement, transferedSettlement, supply, SettlementMgr.QueueJobType.DistLabor);
-              popAniController.Show(settlementMgr.GetView(selectedSettlement), textLib.get("pop_transferIssued"), Color.green);
-            }
-            Escape();
-          } catch (System.Exception exception) {
-            msgBox.Show(exception.Message);
-            return;
-          }
-        }
-
-        if (mouseMode == mode.labor2unit) {
-          try {
-            int supply = hexMap.inputField.GetInput();
-            if (supply == 0 || supply > selectedSettlement.labor || supply > transferedUnit.LaborCanTakeIn()) {
-              msgBox.Show("invalid input");
-              return;
-            }
-            int remain = transferedUnit.TakeInLabor(supply);
-            selectedSettlement.labor -= supply - remain;
-            popAniController.Show(hexMap.GetUnitView(transferedUnit), textLib.get("pop_transferDone"), Color.green);
-            Escape();
-          } catch (System.Exception exception) {
-            msgBox.Show(exception.Message);
-            return;
-          }
-        }
+        int _supply = hexMap.inputField.GetInput();
+        hexMap.inputField.DeactivateInput();
       }
     }
 
-    public void ActionDone(Unit unit, Unit[] units, ActionController.actionName actionName)
+    public void ActionDone(Unit unit, ActionController.actionName actionName)
     {
       if (selectedUnit == null) return;
-      if ((actionName == ActionController.actionName.ATTACK && unit.IsAI())
-        || (actionName == ActionController.actionName.MOVE
-          && Util.eq<Unit>(unit, selectedUnit) && !unit.IsAI()))
+      if (actionName == ActionController.actionName.MOVE
+          && Util.eq<Unit>(unit, selectedUnit) && !unit.IsAI())
       {
         Escape();
       }
@@ -463,12 +278,7 @@ namespace MonoNS
       move,
       attack,
       repos,
-      sabotage,
-      transfer,
-      transferLabor,
-      dist,
-      distLabor,
-      labor2unit
+      sabotage
     }
 
     public override void UpdateChild()
@@ -522,26 +332,13 @@ namespace MonoNS
         }
         else
         {
-          if (mouseMode == mode.transfer || mouseMode == mode.transferLabor) {
-            transferedUnit = null;
-            transferedSettlement = null;
-            hexMap.inputField.DeactivateInput();
-          }
           onModeQuit(selectedUnit);
         }
       }
-      if (selectedSettlement != null)
+      if (selectedSettlement != null && (mouseMode == mode.detect || mouseMode == mode.camera))
       {
-        if (mouseMode == mode.detect || mouseMode == mode.camera)
-        {
-          onSettlementDeselect(selectedSettlement);
-          selectedSettlement = null;
-        }
-        if (mouseMode == mode.dist || mouseMode == mode.distLabor || mouseMode == mode.labor2unit) {
-          transferedSettlement = null;
-          transferedUnit = null;
-          hexMap.inputField.DeactivateInput();
-        }
+        onSettlementDeselect(selectedSettlement);
+        selectedSettlement = null;
       }
       ResetUpdateFunc();
     }
@@ -680,37 +477,6 @@ namespace MonoNS
           Escape();
         }
       }
-
-      if (mouseMode == mode.transfer || mouseMode == mode.transferLabor)
-      {
-        Tile[] tiles = selectedUnit.tile.neighbours;
-        if ((u == null || u.IsAI() != selectedUnit.IsAI() || !tiles.Contains(u.tile)) &&
-            (s == null || s.owner.isAI != selectedUnit.IsAI() || !s.IsFunctional() ||
-             !tiles.Contains(s.baseTile))) return;
-        if (u != null) {
-          transferedSettlement = null;
-          transferedUnit = u;
-        } else {
-          transferedUnit = null;
-          transferedSettlement = s;
-        }
-      }
-
-      if (mouseMode == mode.labor2unit)
-      {
-        Tile[] tiles = selectedSettlement.baseTile.neighbours;
-        if (u == null || u.IsAI() != selectedSettlement.owner.isAI || !tiles.Contains(u.tile)) return;
-        transferedUnit = u;
-      }
-
-      if (mouseMode == mode.dist || mouseMode == mode.distLabor)
-      {
-        if(selectedSettlement.IsSettlementLinked(s)) {
-          transferedSettlement = s;
-        } else {
-          return;
-        }
-      }
     }
 
     void UpdateUnitAttack()
@@ -786,98 +552,6 @@ namespace MonoNS
           actionController.charge(selectedUnit, targetUnit);
           Escape();
         }
-      }
-    }
-
-    void UpdateUnitTransferSupply()
-    {
-      if (Input.GetMouseButtonUp(0) && tileUnderMouse != null)
-      {
-        ClickOnTile();
-        if (transferedUnit == null && transferedSettlement == null) {
-          return;
-        }
-        string needed = "" + (transferedUnit != null ? transferedUnit.supply.SupplyNeededPerTurn()
-          : transferedSettlement.SupplyNeeded());
-        int minNeeded = transferedUnit != null ? transferedUnit.supply.MinSupplyNeeded() : transferedSettlement.SupplyNeeded(); 
-        string suggestions = "needed " + needed + " supply for last one turn, at least " + minNeeded + " supply to support one turn\n";
-        if (transferedSettlement != null) {
-          foreach(Settlement.SupplySuggestion sug in transferedSettlement.GetSuggestion()) {
-            suggestions += "to support " + sug.supportTroop + " infantry per turn, need labor "
-              + sug.laborNeeded + " supply " + sug.supplyNeeded + "\n"; 
-          }
-        }
-        hover.Show(suggestions);
-        hexMap.inputField.ActivateInput();
-      }
-    }
-
-    void UpdateSettlementDistSupply()
-    {
-      if (Input.GetMouseButtonUp(0) && tileUnderMouse != null)
-      {
-        ClickOnTile();
-        if (transferedSettlement == null) {
-          return;
-        }
-        string suggestions = "";
-        if (transferedSettlement.SupplyNeeded() > 0) {
-          suggestions += "need " + transferedSettlement.SupplyNeeded() + " to support garrison\n";
-        }
-        foreach(Settlement.SupplySuggestion sug in transferedSettlement.GetSuggestion()) {
-          suggestions += "to support " + sug.supportTroop + " infantry per turn, need labor "
-            + sug.laborNeeded + " supply " + sug.supplyNeeded + "\n"; 
-        }
-        hover.Show(suggestions);
-        hexMap.inputField.ActivateInput();
-      }
-    }
-
-    void UpdateDistLabor2Unit()
-    {
-      if (Input.GetMouseButtonUp(0) && tileUnderMouse != null)
-      {
-        ClickOnTile();
-        if (transferedUnit == null) {
-          return;
-        }
-        string suggestion = "max taken " + transferedUnit.LaborCanTakeIn() + "\n";
-        foreach(KeyValuePair<int, int> kv in transferedUnit.GetLaborSuggestion()) {
-          suggestion += kv.Key + " turns of supply needs " + kv.Value + "\n";
-        }
-        hover.Show(suggestion);
-        hexMap.inputField.ActivateInput();
-      }
-    }
-
-    void UpdateUnitTransferLabor()
-    {
-      if (Input.GetMouseButtonUp(0) && tileUnderMouse != null || hexMap.settlementViewPanel.selectedUnit != null)
-      {
-        if (hexMap.settlementViewPanel.selectedUnit != null) {
-          transferedSettlement = selectedSettlement;
-        } else {
-          ClickOnTile();
-        }
-        if (transferedUnit == null && transferedSettlement == null) {
-          return;
-        }
-        string suggestion = "max taken " + (transferedUnit != null ?
-                            transferedUnit.LaborCanTakeIn() + "\n" :
-                            "No Limit\n");
-        if (transferedUnit != null) {
-          foreach(KeyValuePair<int, int> kv in transferedUnit.GetLaborSuggestion()) {
-            suggestion += kv.Key + " turns of supply needs " + kv.Value + "\n";
-          }
-        }
-        else {
-          foreach(Settlement.SupplySuggestion sug in transferedSettlement.GetSuggestion()) {
-            suggestion += "to support " + sug.supportTroop + " infantry per turn, need labor "
-              + sug.laborNeeded + " supply " + sug.supplyNeeded + "\n"; 
-          }
-        }
-        hover.Show(suggestion);
-        hexMap.inputField.ActivateInput();
       }
     }
 

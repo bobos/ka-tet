@@ -25,7 +25,7 @@ public class SiegeWall: Building
     Unit unit = baseTile.GetUnit();
     int labor = 0;
     if (unit != null && unit.IsAI() == owner.isAI) {
-      labor = unit.labor;
+      labor = unit.rf.soldiers;
     }
     return (int)(labor / 500);
   }

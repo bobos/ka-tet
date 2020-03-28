@@ -23,7 +23,6 @@ namespace MonoNS
     EventDialog eventDialog;
     PopTextAnimationController popAniController;
     TextLib textLib = Cons.GetTextLib();
-    public const int MinLaborBuryBody = 800;
 
     public override void UpdateChild() {}
 
@@ -45,9 +44,7 @@ namespace MonoNS
         hexMap.DestroyUnitView(unit);
       }
 
-      if (type == DestroyType.ByBurningCamp) {
-        eventDialog.Show(new MonoNS.Event(EventDialog.EventName.BurningCampDestroyUnit, unit, null, 0, 0, killed));
-      } else if (type == DestroyType.ByWildFire) {
+      if (type == DestroyType.ByWildFire) {
         eventDialog.Show(new MonoNS.Event(EventDialog.EventName.WildFireDestroyUnit, unit, null, 0, 0, killed));
       } else if (type == DestroyType.ByFlood) {
         eventDialog.Show(new MonoNS.Event(EventDialog.EventName.FloodDestroyUnit, unit, null, 0, 0, killed));
@@ -180,21 +177,11 @@ namespace MonoNS
 
     IEnumerator CoPostTurnAction(Unit unit) {
       UnitView view = hexMap.GetUnitView(unit);
-      if (unit.rf.morale == 0)
-      {
-        if (!unit.IsCamping()) {
-          // TODO: routing state should not go to any settlement, leave the campaign instead
-          unit.SetState(State.Routing);
-          unit.labor = 0;
-          if (unit.IsShowingAnimation()) {
-            popAniController.Show(view, textLib.get("pop_routing"), Color.white);
-            while (popAniController.Animating) { yield return null; }
-            view.RoutAnimation();
-            while (view.Animating) { yield return null; }
-          }
-        }
+      if (unit.IsCamping()) {
+        unit.rf.morale = unit.rf.morale > unit.GetRetreatThreshold() ? unit.rf.morale: unit.GetRetreatThreshold();
       }
-      else if (unit.IsWarWeary())
+
+      if (unit.IsWarWeary())
       {
         if (unit.IsShowingAnimation()) {
           popAniController.Show(view, textLib.get("pop_warWeary"), Color.yellow);
@@ -218,7 +205,7 @@ namespace MonoNS
           popAniController.Show(view, textLib.get("pop_altitudeSickness"), Color.yellow);
           while (popAniController.Animating) { yield return null; }
         }
-        ShowEffects(unit, new int[9]{0,0,unit.altitudeSickness.Apply(),0,0,0,0,0,0});
+        ShowEffects(unit, new int[9]{0,unit.altitudeSickness.Apply(),0,0,0,0,0,0,0});
         while (ShowAnimating) { yield return null; }
       }
 
@@ -239,59 +226,42 @@ namespace MonoNS
         while (riotAnimating) { yield return null; }
       }
 
+      if (unit.rf.morale == 0)
+      {
+        if (!unit.IsCamping()) {
+          hexMap.unitAniController.DestroyUnit(unit, DestroyType.ByDisband);
+          while (hexMap.unitAniController.DestroyAnimating) { yield return null; }
+        }
+      }
+
       hexMap.cameraKeyboardController.EnableCamera();
       PostAnimating = false;
     }
 
     public bool AttackEmptyAnimating = false;
-    public void AttackEmpty(Unit unit, Settlement settlement, bool occupy = true) {
+    public void AttackEmpty(Unit unit, Settlement settlement) {
       AttackEmptyAnimating = true;
-      StartCoroutine(CoAttackEmpty(unit, settlement, occupy));
+      StartCoroutine(CoAttackEmpty(unit, settlement));
     }
 
-    IEnumerator CoAttackEmpty(Unit unit, Settlement settlement, bool occupy) {
+    IEnumerator CoAttackEmpty(Unit unit, Settlement settlement) {
       hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(settlement.baseTile).transform.position);
       while (hexMap.cameraKeyboardController.fixingCamera) { yield return null; }
       hexMap.cameraKeyboardController.DisableCamera();
-      if (settlement.type != Settlement.Type.camp) {
-        occupy = true;
-      } else if (!unit.IsAI()) {
-        eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.EmptySettlement,
+      int[] afterMath = settlementMgr.OccupySettlement(unit, settlement);
+      if (settlement.type == Settlement.Type.city) {
+        eventDialog.Show(new MonoNS.Event(
+          unit.IsAI() ? MonoNS.EventDialog.EventName.EnemyCaptureCity : MonoNS.EventDialog.EventName.WeCaptureCity,
+        unit,
+        settlement,
+        afterMath[0], afterMath[1], afterMath[2]));
+      } else {
+        eventDialog.Show(new MonoNS.Event(
+          unit.IsAI() ? MonoNS.EventDialog.EventName.EnemyCaptureCamp : MonoNS.EventDialog.EventName.WeCaptureCamp,
         unit,
         settlement));
-        while (eventDialog.Animating) { yield return null; }
-        occupy = eventDialog.accepted;
-      }
-
-      if (occupy) {
-        int[] afterMath = settlementMgr.OccupySettlement(unit, settlement);
-        if (settlement.type == Settlement.Type.city) {
-          eventDialog.Show(new MonoNS.Event(
-            unit.IsAI() ? MonoNS.EventDialog.EventName.EnemyCaptureCity : MonoNS.EventDialog.EventName.WeCaptureCity,
-          unit,
-          settlement,
-          afterMath[0], afterMath[1], afterMath[2]));
-        } else {
-          eventDialog.Show(new MonoNS.Event(
-            unit.IsAI() ? MonoNS.EventDialog.EventName.EnemyCaptureCamp : MonoNS.EventDialog.EventName.WeCaptureCamp,
-          unit,
-          settlement,
-          afterMath[0]));
-        }
-      } else {
-        unit.supply.TakeInSupply(settlement.supplyDeposit);
-        eventDialog.Show(new MonoNS.Event(
-            unit.IsAI() ? MonoNS.EventDialog.EventName.EnemyBurnCamp : MonoNS.EventDialog.EventName.WeBurnCamp,
-          unit,
-          settlement));
       }
       while (eventDialog.Animating) { yield return null; }
-
-      if (!occupy) {
-        hexMap.settlementAniController.DestroySettlement(settlement, BuildingNS.DestroyType.ByFire);
-        while (hexMap.settlementAniController.Animating) { yield return null; }
-      }
-
       hexMap.cameraKeyboardController.EnableCamera();
       AttackEmptyAnimating = false;
     }
@@ -340,8 +310,8 @@ namespace MonoNS
       if (conflict.discontent != 0) {
         // unit conflict happens
         eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.UnitConflict, unit,
-          null, conflict.discontent, conflict.unit1Wound, conflict.unit1Dead,
-          conflict.unit2Wound, conflict.unit2Dead, null, null, conflict.unit2));
+          null, conflict.discontent, conflict.unit1Dead, conflict.unit2Dead,
+          0, 0, null, null, conflict.unit2));
         while (eventDialog.Animating) { yield return null; }
 
         Riot(unit, conflict.discontent);
@@ -395,30 +365,21 @@ namespace MonoNS
 
     public bool BuryAnimating = false;
     public void Bury(Unit unit) {
+      if (unit.IsCavalry()) {
+        return;
+      }
       BuryAnimating = true;
       hexMap.cameraKeyboardController.DisableCamera();
       StartCoroutine(CoBury(unit));
     }
 
     IEnumerator CoBury(Unit unit) {
-      if (unit.labor < MinLaborBuryBody) {
-        if (unit.IsShowingAnimation()) {
-          popAniController.Show(hexMap.GetUnitView(unit),
-          System.String.Format(
-            textLib.get("pop_insufficientLabor"),
-            MinLaborBuryBody
-          ),
-          Color.yellow);
-          while (popAniController.Animating) { yield return null; }
-        }
-      } else {
-        unit.movementRemaining -= Unit.ActionCost;
-        // TODO: apply trait
-        int discontent = 2;
-        Riot(unit, discontent);
-        while (riotAnimating) { yield return null; }
-        unit.tile.deadZone.Clean();
-      }
+      unit.movementRemaining -= Unit.ActionCost;
+      // TODO: apply trait
+      int discontent = 2;
+      Riot(unit, discontent);
+      while (riotAnimating) { yield return null; }
+      unit.tile.deadZone.Clean();
 
       hexMap.cameraKeyboardController.EnableCamera();
       BuryAnimating = false;
@@ -467,6 +428,7 @@ namespace MonoNS
             hexMap.unitAniController.DestroyUnit(to, DestroyType.ByDisband);
             while (hexMap.unitAniController.DestroyAnimating) { yield return null; }
           }
+          to.tile.deadZone.Occur(dead);
         }
 
         if (!to.IsGone()) {
@@ -559,16 +521,13 @@ namespace MonoNS
     IEnumerator CoCrashByAlly(Unit unit, int morale) {
       popAniController.Show(hexMap.GetUnitView(unit), textLib.get("pop_crashedByAlly"), Color.white);
       while (popAniController.Animating) { yield return null; }
-      int wounded = 0;
       int killed = Util.Rand(40, 100);
       // morale, movement, wounded, killed, laborKilled, disserter, attack, def, discontent
-      ShowEffects(unit, new int[]{morale,0,wounded,killed,0,0,0,0,0});
+      ShowEffects(unit, new int[]{morale,0,0,killed,0,0,0,0,0});
       while (ShowAnimating) { yield return null; }
-      unit.rf.soldiers -= (wounded + killed);
-      unit.rf.wounded += wounded;
+      unit.rf.soldiers -= killed;
       unit.kia += killed;
       unit.rf.morale += morale;
-      hexMap.UpdateWound(unit, wounded);
       if (unit.rf.soldiers <= Unit.DisbandUnitUnder) {
         // unit disbanded
         hexMap.unitAniController.DestroyUnit(unit, DestroyType.ByDisband);

@@ -262,10 +262,6 @@ namespace MonoNS
       return turnController.playerTurn ? GetPlayerParty() : GetAIParty();
     }
 
-    public void UpdateWound(Unit unit, int num) {
-      GetWarParty(unit).UpdateWound(unit, num);
-    }
-
     public void CaptureHorse(Unit unit, int num) {
       GetWarParty(unit).CaptureHorse(num);
     }
@@ -381,13 +377,16 @@ namespace MonoNS
       StaticBatchingUtility.Combine(this.gameObject);
     }
 
-    public void RerenderTileTxt() {
+    public void AddTiles2Settlements()
+    {
       for (int x = 0; x < numCols; x++)
       {
         for (int y = 0; y < numRows; y++)
         {
           Tile tile = tiles[x, y];
-          GetTileView(tile).RefreshVisual();
+          if (tile.Accessible()) {
+            settlementMgr.Add2Settlement(tile);
+          }
         }
       }
     }

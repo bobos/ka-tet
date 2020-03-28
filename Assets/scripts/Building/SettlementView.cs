@@ -33,13 +33,13 @@ public class SettlementView : View
     nameGO.GetComponent<UnitNS.UnitNameView>().settlement = settlement;
   }
 
-  public void DestroyAnimation(DestroyType type)
+  public void DestroyAnimation()
   {
     Animating = true;
-    StartCoroutine(CoDestroyAnimation(type));
+    StartCoroutine(CoDestroyAnimation());
   }
 
-  IEnumerator CoDestroyAnimation(DestroyType type) {
+  IEnumerator CoDestroyAnimation() {
     yield return new WaitForSeconds(1);
     Animating = false;
   }
@@ -59,10 +59,7 @@ public class SettlementView : View
       && Util.eq<Settlement>(settlement, this.settlement)
       && !settlement.IsUnderSiege())
     {
-      HashSet<Tile> tiles = settlementMgr.GetFullSupplyRangeTiles(settlement);
-      Tile[] tileArray = new Tile[tiles.Count];
-      tiles.CopyTo(tileArray);
-      hexMap.HighlightArea(tileArray, HexMap.RangeType.supplyRange);
+      hexMap.HighlightArea(settlement.myTiles.ToArray(), HexMap.RangeType.supplyRange);
     }
   }
 

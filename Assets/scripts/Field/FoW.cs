@@ -30,7 +30,6 @@ namespace FieldNS
         party = hexMap.turnController.playerTurn ? hexMap.GetPlayerParty() : hexMap.GetAIParty();
       }
       party.GetVisibleArea(tiles);
-      hexMap.settlementMgr.GetVisibleArea(party.attackside, tiles);
       return tiles;
     }
 

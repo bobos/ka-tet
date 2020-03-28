@@ -13,14 +13,11 @@ namespace FieldNS
     public int numOfCavalry;
     public int numOfInfantryDead;
     public int numOfCavalryDead;
-    public int numOfInfantryWound;
-    public int numOfCavalryWound;
-    public int numOfLabor;
   }
 
   public class WarParty
   {
-    public WarParty(bool attackside, Faction faction)
+    public WarParty(bool attackside, Faction faction, int supply)
     {
       this.isAI = faction.IsAI();
       this.attackside = attackside;
@@ -29,13 +26,22 @@ namespace FieldNS
       {
         fieldParties.Add(new FieldParty(party));   
       }
+      this.supply = supply;
     }
+
+    public bool ConsumeSupply(int amount) {
+      if (supply < amount) {
+        return false;
+      }
+      supply -= amount;
+      return true;
+    }
+
     public List<FieldParty> fieldParties = new List<FieldParty>();
-    public int infantryWounded;
-    public int cavalryWounded;
     public Faction faction;
     public General commanderGeneral;
     public Unit firstRemoveArmor;
+    public int supply;
 
     public bool isAI { get; private set; }
     public bool attackside { get; private set; }
@@ -45,15 +51,6 @@ namespace FieldNS
     // TODO: phase ends, add horses to faction and reset the horse to 0
     public void CaptureHorse(int num) {
       capturedHorse += num;
-    }
-
-    public void UpdateWound(Unit unit, int num) {
-      if (unit.type == Type.Infantry) {
-        infantryWounded += num;
-      }
-      if (unit.type == Type.Cavalry) {
-        cavalryWounded += num;
-      }
     }
 
     public void JoinCampaign(General general) {
@@ -87,15 +84,12 @@ namespace FieldNS
     {
       // TODO: for AI, consider fog of war
       WarPartyStat stat = new WarPartyStat();
-      stat.numOfInfantryWound = infantryWounded;
-      stat.numOfCavalryWound = cavalryWounded;
 
       foreach (Unit unit in units)
       {
-        int totalDead = unit.kia + unit.mia;
+        int totalDead = unit.kia;
         if (unit.type == Type.Infantry) {
           stat.numOfInfantryDead += totalDead;
-          stat.numOfLabor += unit.labor;
           if (!unit.IsGone()) {
             stat.numOfInfantry += unit.rf.soldiers;
             stat.numOfInfantryUnit++;

@@ -114,10 +114,10 @@ namespace CourtNS {
       stat = GeneralStat.Idle;
     }
 
-    public bool EnterCampaign(HexMap hexMap, Tile deploymentTile, int supply, int labor = 0) {
+    public bool EnterCampaign(HexMap hexMap, Tile deploymentTile) {
       this.hexMap = hexMap;
       if (commandUnit == null) return false;
-      bool ready = commandUnit.EnterCampaign(deploymentTile, supply, labor);
+      bool ready = commandUnit.EnterCampaign(deploymentTile);
       if (!ready) return ready;
       stat = GeneralStat.OnField;
       hexMap.GetWarParty(faction).JoinCampaign(this);

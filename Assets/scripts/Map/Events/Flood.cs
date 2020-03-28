@@ -59,7 +59,7 @@ namespace MapTileNS
           tile.flood.GetTile2Flood(tiles);
         }
         else if (tile.flood != null && tile.flood.CanBeFloodedByNearByTile() &&
-         (Cons.IsHeavyRain(tile.weatherGenerator.currentWeather) ? Cons.HighlyLikely() : Cons.MostLikely()))
+         (Cons.IsHeavyRain(tile.weatherGenerator.currentWeather) ? Cons.MostLikely() : Cons.FiftyFifty()))
         {
           tiles.Add(tile);
           tile.flood.GetTile2Flood(tiles);
@@ -77,23 +77,8 @@ namespace MapTileNS
 
     public bool CanBeFloodedByNearByTile()
     {
-      if (tile.terrian == TerrianType.Plain)
-      {
-        if (tile.field == FieldType.Settlement)
-        {
-          // camp can be flooded
-          if (tile.settlement.type == Settlement.Type.camp)
-          {
-            return true;
-          }
-          return false;
-        }
-        else
-        {
-          return true;
-        }
-      }
-      return false;
+      return tile.field != FieldType.Settlement &&
+        (tile.terrian == TerrianType.Plain || tile.terrian == TerrianType.Hill);
     }
 
     void FloodRecede()

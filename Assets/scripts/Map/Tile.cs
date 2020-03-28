@@ -29,7 +29,6 @@ namespace MapTileNS
     public bool vantagePoint = false;
     public SiegeWall siegeWall = null;
 
-    public Dictionary<Tile, Tile[]> roads = new Dictionary<Tile, Tile[]>();
     public Tile(int q, int r, HexMap hexMap) : base(q, r, hexMap) { }
     public void PostCreation()
     {
@@ -69,49 +68,6 @@ namespace MapTileNS
       }
     }
 
-    private string _name = "unnamed";
-    private int _storageLevel = 1;
-    public string name {
-      get {
-        return _name;
-      }
-    } 
-
-    public int storageLevel {
-      get {
-        return _storageLevel;
-      }
-    }
-
-    bool campField = false;
-    public void SetAsCampField(string name, int storageLevel) {
-      _name = name;
-      _storageLevel = storageLevel;
-      campField = true;
-    }
-
-    public bool IsCampable() {
-      return campField && Accessible(); 
-    }
-
-    public void BuildRoad() {
-      road = true;
-      SetFieldType(FieldType.Road);
-      // TODO: view animation
-    }
-
-    public bool RepairRoad() {
-      if (!road) {
-        return false;
-      }
-      if (field == FieldType.Road) {
-        // no need to repair
-        return false;
-      }
-      // repair road
-      return true;
-    }
-    
     public Vector3 GetSurfacePosition() {
       float y = 0f;
       if (terrian == TerrianType.Hill || terrian == TerrianType.Mountain) {
@@ -346,10 +302,6 @@ namespace MapTileNS
           }
         }
         ret = ret + (int)(ret * cnt * 0.25f);
-        if (unit.enemyControlledTiles != null && unit.enemyControlledTiles.Contains(this)) {
-          // this tile is controlled by enemy, extra cost is needed
-          ret = (int)(ret * 1.1f);
-        }
       }
 
       return ret > 0 ? ret : Unit.MovementCostOnUnaccesible;

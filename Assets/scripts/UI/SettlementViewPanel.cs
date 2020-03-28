@@ -12,8 +12,8 @@ namespace MonoNS
     {
       base.PreGameInit(hexMap, me);
       mouseController = hexMap.mouseController;
-      GameObject[] btns = {GarrisonButton, SupplyButton, AbandonButton, GarrisonCancel,
-        Garrison1Button, Garrison2Button, Garrison3Button, Labor2UnitButton, DestroyButton};
+      GameObject[] btns = {GarrisonButton,  GarrisonCancel,
+        Garrison1Button, Garrison2Button, Garrison3Button};
       buttons = btns;
       mouseController.onSettlementSelect += OnSettlementSelect;
       mouseController.onSettlementDeselect += OnSettlementDeselect;
@@ -27,14 +27,10 @@ namespace MonoNS
     MouseController mouseController;
     GameObject self;
     public GameObject GarrisonButton;
-    public GameObject SupplyButton;
-    public GameObject AbandonButton;
     public GameObject Garrison1Button;
     public GameObject Garrison2Button;
     public GameObject Garrison3Button;
     public GameObject GarrisonCancel;
-    public GameObject Labor2UnitButton;
-    public GameObject DestroyButton;
     GameObject[] buttons;
 
     public Text title;
@@ -139,11 +135,6 @@ namespace MonoNS
       } else {
         GarrisonButton.SetActive(true);
       }
-      EnableDestroy();
-    }
-
-    void EnableDestroy() {
-      DestroyButton.SetActive(hexMap.mouseController.selectedSettlement.CanBeAbandoned());
     }
 
     void ToggleGarrison(bool onOff) { 
@@ -155,14 +146,6 @@ namespace MonoNS
 
     void ToggleRest(bool onOff) {
       GarrisonButton.SetActive(onOff);
-      SupplyButton.SetActive(onOff);
-      AbandonButton.SetActive(onOff);
-      Labor2UnitButton.SetActive(onOff);
-      if (!onOff) {
-        DestroyButton.SetActive(onOff);
-      } else {
-        EnableDestroy();
-      }
     }
 
     public void OnSettlementSelect(Settlement s)
@@ -174,20 +157,14 @@ namespace MonoNS
       self.SetActive(true);
       Unit[] garrison = s.garrison.ToArray();
       title.text = s.name + "[驻扎部队: " + garrison.Length + "/" + s.room + "]";
-      population.text = "人口: 平民" + (s.civillian_male + s.civillian_child + s.civillian_female) + " 兵役" + s.labor;
-      supply.text = "粮草每回合消耗" + s.SupplyNeeded() + "石";
+      population.text = "人口: " + (s.civillian_male + s.civillian_child + s.civillian_female);
       defense.text = "城防: " + s.wall.GetLevelTxt() + "[" + s.wall.defensePoint + "/" + s.wall.MaxDefensePoint() + "]";
-      defenseWill.text = "粮仓: " + s.storageLvl.GetLevelTxt()
-        + " [" + s.supplyDeposit + "/" + s.storageLvl.MaxStorage() + "石]";
+      defenseWill.text = "粮草应急储备: " + s.lastingTurns + "回合";
       string state = s.IsUnderSiege() ? "被围困" : "正常";
-      if (s.state == Settlement.State.constructing)
-      {
-        state = "筑城中 预计" + s.buildTurns + "回合完成";
-      }
       this.state.text = state;
       this.inNetwork.text = "";
 
-      EnableButtons(s.IsFunctional());
+      EnableButtons(true);
       if (hexMap.wargameController.start) {
         DisableButtons();
       }

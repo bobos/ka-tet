@@ -11,11 +11,12 @@ namespace MonoNS
 {
   public class SettlementMgr : BaseController
   {
-    public int attackerLaborDead = 0;
-    public int defenderLaborDead = 0;
     public int totalMaleDead = 0;
     public int totalFemaleDead = 0;
     public int totalChildDead = 0;
+    public Settlement attackerRoot;
+    public Settlement defenderRoot;
+    public List<Settlement> allNodes = new List<Settlement>(); 
 
     public enum QueueJobType {
       DistSupply,
@@ -26,62 +27,18 @@ namespace MonoNS
     public override void PreGameInit(HexMap hexMap, BaseController me)
     {
       base.PreGameInit(hexMap, me);
-      attackerRoots = new List<Settlement>();
-      defenderRoots = new List<Settlement>();
       buildingQueue = new List<Building>();
       mouseController = hexMap.mouseController;
       popAniController = hexMap.popAniController;
       actionController = hexMap.actionController;
       cc = hexMap.cameraKeyboardController;
-      ghostUnit = GhostUnit.createGhostUnit();
+    }
+
+    public Settlement GetRoot(bool isAI) {
+      return hexMap.IsAttackSide(isAI) ? attackerRoot : defenderRoot;
     }
 
     public override void UpdateChild() {}
-
-    HashSet<Tile> campableTiles;
-
-    public void SetCampableField(HashSet<Tile> tiles) {
-      campableTiles = tiles;
-    }
-
-    // TODO: just for tmp test
-    public void BuildRoad(Tile from, Tile to) {
-      List<Tile> path = new List<Tile>(); 
-      foreach(Tile tile in ghostUnit.FindPath(from, to)) {
-        if (!Util.eq<Tile>(tile, from) && !Util.eq<Tile>(tile, to)) {
-          tile.BuildRoad();
-          path.Add(tile);
-        }
-      }
-      Tile[] road = path.ToArray();
-      from.roads[to] = road;
-      to.roads[from] = road;
-    }
-
-    class DistJob {
-      public Settlement from;
-      public Settlement to;
-      public int amount;
-      public QueueJobType type;
-
-      public DistJob(Settlement from, Settlement to, int amount, QueueJobType type) {
-        this.from = from;
-        this.to = to;
-        this.amount = amount;
-        this.type = type;
-      }
-    }
-
-    List<DistJob> attackerDistJobs = new List<DistJob>();
-    List<DistJob> defenderDistJobs = new List<DistJob>();
-    public void AddDistJob(Settlement from, Settlement to, int amount, QueueJobType type) {
-      DistJob job = new DistJob(from, to, amount, type);
-      if (from.owner.attackside) {
-        attackerDistJobs.Add(job);
-      } else {
-        defenderDistJobs.Add(job);
-      }
-    }
 
     public bool turnEndOngoing = false;
     public void TurnEnd(WarParty warParty) {
@@ -110,128 +67,52 @@ namespace MonoNS
         }
       }
       
-      List<DistJob> jobs = warParty.attackside ? attackerDistJobs : defenderDistJobs;
-      foreach(DistJob job in jobs) {
-        if (!job.from.IsFunctional() || !job.to.IsFunctional()) {
-          popAniController.Show(GetView(job.from),
-            textLib.get(
-              job.type == QueueJobType.DistSupply ?
-              "pop_failedToDistSupply" : "pop_failedToDistLabor"),
-            Color.white);
-          while (popAniController.Animating) { yield return null; }
-          continue;
-        }
-        // ambush supply caravans
-        if(!job.from.IsSettlementLinked(job.to)) {
-          hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.SupplyRouteBlocked, null, job.from, 0, 0, 0, 0, 0, job.to));
-          while (hexMap.eventDialog.Animating) { yield return null; }
-          continue;
-        }
-        //Tile[] route = job.from.baseTile.roads[job.to.baseTile];
-        //Unit ambusher = IsSupplyRouteAmbushed(route, warParty.isAI);
-        //if (ambusher != null) {
-        //  // There is enemy unit ambushed on the supply route
-        //  if (job.type == QueueJobType.DistSupply) {
-        //    job.from.SupplyIntercepted(ambusher, job.to, job.amount);
-        //  } else {
-        //    job.from.LaborIntercepted(ambusher, job.to, job.amount);
-        //  }
-        //  while (hexMap.eventDialog.Animating) { yield return null; }
-        //  continue;
-        //}
-
-        if (job.type == QueueJobType.DistSupply) {
-          job.from.DistSupply(job.amount, job.to);
-        } else {
-          job.from.DistLabor(job.amount, job.to);
-        }
-        while (hexMap.eventDialog.Animating) { yield return null; }
-      }
-
-      if (warParty.attackside) {
-        attackerDistJobs = new List<DistJob>();
-      } else {
-        defenderDistJobs = new List<DistJob>();
-      }
-
-      List<Settlement> roots = warParty.attackside ? attackerRoots : defenderRoots;
-      HashSet<Unit> units = warParty.GetUnits();
-      foreach (Settlement root in roots)
-      {
-        if (root.state != Settlement.State.constructing) {
-          View view = GetView(root);
-          List<List<Unit>> failedUnits = root.ReduceSupply();
-          foreach(Unit u in failedUnits[0]) {
-            popAniController.Show(view, 
-              System.String.Format(textLib.get("pop_failedToSupplyUnitInSettlement"), u.GeneralName()),
-              Color.yellow);
-            while (popAniController.Animating) { yield return null; }
-          }
-
-          foreach(Unit u in failedUnits[1]) {
-            popAniController.Show(hexMap.GetUnitView(u), 
-              textLib.get("pop_failedToSupplyUnitNearby"),
-              Color.yellow);
-            while (popAniController.Animating) { yield return null; }
-          }
-        }
-        root.availableLabor = root.labor;
-      }
-
       turnEndOngoing = false;
     }
 
-    public HashSet<Tile> GetControlledTiles(bool isAI) {
-      HashSet<Tile> tiles = new HashSet<Tile>();
-      foreach(Settlement settlement in hexMap.IsAttackSide(isAI) ? attackerRoots : defenderRoots) {
-        foreach(Tile tile in GetFullSupplyRangeTiles(settlement)) {
-          tiles.Add(tile);
+    public List<Tile> GetControlledTiles(bool isAI) {
+      List<Tile> tiles = new List<Tile>();
+      List<Settlement> nodes = new List<Settlement>();
+      (hexMap.IsAttackSide(isAI) ? attackerRoot : defenderRoot).GetLinked(nodes);
+      foreach(Settlement node in nodes) {
+        foreach(Tile tile in node.myTiles) {
+          if (!tiles.Contains(tile)) {
+            tiles.Add(tile);
+          }
         }
       }
       return tiles;
     }
 
-    public Unit IsSupplyRouteAmbushed(Tile[] route, bool isAI) {
-      foreach (Tile tile in route) {
-        if (tile.IsThereConcealedEnemy(isAI)) {
-          return tile.GetUnit();
-        }
-      }
-      return null;
-    }
-
     ActionController actionController;
     MouseController mouseController;
-    GhostUnit ghostUnit;
-    public List<Settlement> attackerRoots;
-    public List<Settlement> defenderRoots;
     List<Building> buildingQueue;
 
-    public bool BuildCamp(Tile location, WarParty warParty, Unit unit) {
-      return BuildSettlement(location.name, location, Settlement.Type.camp, warParty,
-        0, 0, 0, 0, 0,
-        location.storageLevel, 1, unit);
+    public Settlement BuildCamp(string name, Tile location, WarParty warParty, int storageLvl) {
+      return BuildSettlement(name, location, Settlement.Type.camp, warParty,
+        0, 0, 0,
+        storageLvl, 1, null);
     }
 
-    public bool BuildStrategyBase(Tile location, WarParty warParty, int supply, int labor) {
+    public Settlement BuildStrategyBase(Tile location, WarParty warParty) {
       return BuildSettlement(
         System.String.Format(
           textLib.get("settlement_strategyBase"),
           warParty.faction.Name()
         ),
-        location, Settlement.Type.strategyBase, warParty, supply, 0, 0, 0, labor, 3, 1, null);
+        location, Settlement.Type.strategyBase, warParty, 0, 0, 0, 3, 1, null);
     }
 
-    public bool BuildCity(string name, Tile location,
+    public Settlement BuildCity(string name, Tile location,
       WarParty warParty,
       int wallLevel,
-      int male, int female, int child, int labor, int supply) {
+      int male, int female, int child, int storageLvl) {
       return BuildSettlement(
         name,
         location,
         Settlement.Type.city,
         warParty,
-        supply, male, female, child, labor, 3, wallLevel, null);
+        male, female, child, storageLvl, wallLevel, null);
     }
 
     public bool BuildSiegeWall(Tile location, WarParty warParty) {
@@ -244,47 +125,53 @@ namespace MonoNS
       return true;
     }
 
-    private bool BuildSettlement(
+    private Settlement BuildSettlement(
       string name, Tile location, Settlement.Type type, WarParty warParty,
-      int supply, int male, int female, int child, int labor,
+      int male, int female, int child,
       int storageLevel,
       int wallLevel, Unit unit)
     {
-      if(location.Work2BuildSettlement() == -1) return false; // unbuildable tile
+      if(location.Work2BuildSettlement() == -1) return null; // unbuildable tile
       Settlement settlement = null;
       if (type == Settlement.Type.camp)
       {
         settlement = new Camp(name, location, warParty, storageLevel);
-        settlement.onBuildingReady += this.SettlementReady;
-        buildingQueue.Add(settlement);
       }
       else
       {
         if (type == Settlement.Type.city)
         {
-          settlement = new City(name, location, warParty, supply, male, female,
-            child, labor, wallLevel);
+          settlement = new City(name, location, warParty, male, female,
+            child, storageLevel, wallLevel);
         }
         if (type == Settlement.Type.strategyBase)
         {
-          settlement = new StrategyBase(name, location, warParty, supply, labor);
+          settlement = new StrategyBase(name, location, warParty);
         }
-      }
-
-      if (warParty.attackside)
-      {
-        attackerRoots.Add(settlement);
-      }
-      else
-      {
-        defenderRoots.Add(settlement);
       }
 
       CreateSettlement(settlement);
       settlement.Encamp(unit);
+      allNodes.Add(settlement);
+      return settlement;
+    }
 
-      if (type != Settlement.Type.camp || !hexMap.deployDone) SettlementReady(settlement);
-      return true;
+    public void Add2Settlement(Tile tile) {
+      Settlement settlement = null;
+      float score = -1f;
+      bool firstOne = true;
+      foreach (Settlement node in allNodes) {
+        float distance = Tile.Distance(node.baseTile, tile);
+        if (firstOne) {
+          firstOne = false;
+          score = distance;
+          settlement = node;
+        } else if (distance < score) {
+          score = distance;
+          settlement = node;
+        }
+      }
+      settlement.myTiles.Add(tile);
     }
 
     public Dictionary<Building, GameObject> settlement2GO = new Dictionary<Building, GameObject>();
@@ -301,6 +188,7 @@ namespace MonoNS
         SettlementView.NamePosition(position),
         Quaternion.identity, hexMap.GetTileView(settlement.baseTile).transform));
       settlement2GO[settlement] = GO;
+      SetBuildingSkinReady(GetView(settlement).gameObject);
     }
 
     void CreateSiegeWall(SiegeWall siegeWall)
@@ -346,14 +234,7 @@ namespace MonoNS
       settlement.owner = unit.IsAI() ? hexMap.GetAIParty() : hexMap.GetPlayerParty();
       settlement.Encamp(unit);
       if (settlement.owner.attackside) {
-        attackerRoots.Add(settlement);
-        defenderRoots.Remove(settlement);
         if (settlement.type == Settlement.Type.city) {
-          // labor returns to male
-          int returnedMale = (int)(settlement.labor * 0.9f);
-          settlement.civillian_male += returnedMale;
-          settlement.labor -= returnedMale;
-
           int maleDead = unit.rf.soldiers * 2;
           int femaleDead = unit.rf.soldiers;
           int childDead = (int)(unit.rf.soldiers * 0.05f);
@@ -372,87 +253,9 @@ namespace MonoNS
           deathNum[0] = maleDead;
           deathNum[1] = femaleDead;
           deathNum[2] = childDead;
-        } else {
-          int laborDead = (int)(settlement.labor * 0.7f);
-          defenderLaborDead += laborDead;
-          settlement.labor -= laborDead;
-
-          deathNum[0] = laborDead;
-        }
-      } else {
-        defenderRoots.Add(settlement);
-        attackerRoots.Remove(settlement);
-        if (settlement.type != Settlement.Type.city) {
-          int laborDead = (int)(settlement.labor * 0.8f);
-          attackerLaborDead += laborDead;
-          settlement.labor -= laborDead;
-
-          deathNum[0] = laborDead;
         }
       }
-
       return deathNum;
-    }
-
-    HashSet<Tile> GetSupplyRangeTiles(Settlement settlement) {
-      SetGhostOwner(settlement);
-      HashSet<Tile> ret = new HashSet<Tile>();
-      if (!settlement.IsNormal()) {
-        ret.Add(settlement.baseTile);
-        return ret;
-      }
-      foreach(Tile tile in ghostUnit.GetAccessibleTilesForSupply(settlement.baseTile,
-                            GetGhostUnitRangeForSettlementSupply())) {
-        ret.Add(tile);
-      }
-      return ret;
-    }
-
-    public HashSet<Tile> GetFullSupplyRangeTiles(Settlement settlement) {
-      HashSet<Tile> tiles = GetSupplyRangeTiles(settlement);
-      foreach(Tile tile in settlement.GetExtraSupplyRange()) {
-        tiles.Add(tile);
-      }
-      return tiles;
-    }
-
-    public HashSet<Tile> GetSupplyRangeTiles4SiegeWall(Building siegeWall) {
-      SetGhostOwner(siegeWall);
-      HashSet<Tile> ret = new HashSet<Tile>();
-      ret.Add(siegeWall.baseTile);
-      foreach(Tile tile in ghostUnit.GetAccessibleTilesForSupply(siegeWall.baseTile,
-                            (int)(GetGhostUnitRangeForSettlementSupply() * 0.35))) {
-        ret.Add(tile);
-      }
-      return ret;
-    }
-
-    public Tile[] GetCampableFields() {
-      List<Tile> tiles = new List<Tile>();
-      foreach(Tile tile in campableTiles) {
-        if (tile.Work2BuildSettlement() != -1) {
-          tiles.Add(tile);
-        }
-      }
-      return tiles.ToArray();
-    }
-
-    public void DestroySettlement(Settlement camp)
-    {
-      buildingQueue.Remove(camp);
-      if (camp.owner.attackside)
-      {
-        attackerRoots.Remove(camp);
-      }
-      else
-      {
-        defenderRoots.Remove(camp);
-      }
-      if (camp.owner.attackside) {
-        attackerLaborDead += camp.labor;
-      } else {
-        defenderLaborDead += camp.labor;
-      }
     }
 
     public void DestroySiegeWall(SiegeWall sw)
@@ -460,32 +263,15 @@ namespace MonoNS
       buildingQueue.Remove(sw);
     }
 
-    public void GetVisibleArea(bool attackSide, HashSet<Tile> tiles) {
-      foreach(Settlement settlement in attackSide ? attackerRoots : defenderRoots) {
-        foreach(Tile tile in settlement.GetVisibleArea()) {
-          tiles.Add(tile);
-        }
-      }
-    }
-
     public bool IsThereSiegedCity() {
       bool yes = false;
-      foreach(Settlement s in defenderRoots) {
-        if (s.type == Settlement.Type.city && s.IsUnderSiege()) {
+      foreach(Settlement s in allNodes) {
+        if (!s.owner.attackside && s.type == Settlement.Type.city && s.IsUnderSiege()) {
           yes = true;
           break;
         }
       }
       return yes;
-    }
-
-    int GetGhostUnitRangeForSettlementSupply()
-    {
-      return (int)(ghostUnit.GetFullMovement() * 1.3f);
-    }
-
-    void SetGhostOwner(Building settlement) {
-      ghostUnit.SetPlayer(!settlement.owner.isAI);
     }
 
     public static bool Ready4Refresh = false;
