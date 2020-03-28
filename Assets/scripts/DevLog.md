@@ -48,19 +48,15 @@ Game Tips:
 
 偃月阵
 
-cavalry: charge&attack remain just one
 map bigbigbig, unit manymanymany
 mist: 骑兵夜袭, visibility--
-on enemy territory, unit -4 morale per turn, half-starving state
 map skeleton for AI(supply route, point, value tiles, dam, supply range etc.)
-cavalry surround camp
 build watch tower
 fire escape through
 放火选地点
 每月一回合，10个战斗回合
 河北 接大阵 大兵团 平原战  河西/陕西 堡垒群 山地 小兵团 
 capture city on victory
-defender boring??
 
 ai主帅等级决定ai战斗等级
 

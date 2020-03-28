@@ -293,7 +293,7 @@ namespace MapTileNS
         foreach (Tile t in neighbours) {
           Unit u1 = t.GetUnit();
           Settlement s = t.settlement;
-          if (u1 != null && u1.IsAI() != unit.IsAI() && !u1.chaos && !u1.defeating) {
+          if (u1 != null && u1.IsAI() != unit.IsAI() && !u1.IsVulnerable()) {
             cnt++;
           }
 

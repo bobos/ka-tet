@@ -500,7 +500,10 @@ namespace MonoNS
           }
         }
 
-        if (targetUnit != null || targetSettlement != null) {
+        if (targetUnit != null && targetUnit.IsVulnerable() && selectedUnit.IsCavalry()) {
+          actionController.charge(selectedUnit, targetUnit);
+          Escape();
+        } else if (targetUnit != null || targetSettlement != null) {
           msgBox.Show("");
           hexMap.combatController.StartOperation(selectedUnit, targetUnit, targetSettlement);
           hexMap.actionController.commenceOperation();
@@ -548,7 +551,6 @@ namespace MonoNS
         ClickOnTile();
         if (targetUnit != null && targetUnit.CanBeShaked(selectedUnit) > 0) {
           msgBox.Show("");
-          Tile tile1 = selectedUnit.tile;
           actionController.charge(selectedUnit, targetUnit);
           Escape();
         }

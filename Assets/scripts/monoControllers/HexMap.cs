@@ -62,7 +62,7 @@ namespace MonoNS
       supplyRange,
       PoisionRange
     }
-    public int numRows = 20;
+    public int numRows = 40;
     public int numCols = 40;
     public Material MatOcean;
     public Material MatPlain;
@@ -459,7 +459,7 @@ namespace MonoNS
 
     public void TargetUnit(Unit unit) {
       if (unit == null && unit2GO.ContainsKey(unit)) return;
-      SetTroopSkin(unit2GO[unit], AttackRange);
+      SetTroopSkin(unit2GO[unit], unit.IsVulnerable() ? CampRange : AttackRange);
     }
 
     public void UnhighlightUnit(Unit unit)

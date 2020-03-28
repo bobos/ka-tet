@@ -227,7 +227,7 @@ namespace TextNS
       {"pop_discontent", @"不满+{0}"},
       {"pop_content", @"不满-{0}"},
       {"pop_builded", "建造完成!"},
-      {"pop_starving", "部队饥饿!"},
+      {"pop_starving", "后勤不济!"},
       {"pop_damBroken", "决堤!"},
       {"pop_morale", "士气"},
       {"pop_movement", "移动力"},
@@ -267,6 +267,7 @@ namespace TextNS
       {"pop_noRetreatBuf", "战力翻番！"},
       {"pop_retreat", "撤退!"},
       {"pop_charging", "冲阵!"},
+      {"pop_chasing", "乘胜追击!"},
       {"pop_shaked", "阵脚松动!"},
       {"pop_holding", "稳住阵脚"},
 

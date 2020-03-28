@@ -388,7 +388,10 @@ namespace MonoNS
     public bool ChargeAnimating = false;
     public const int chargePoint = Unit.ActionCost;
     public void Charge(Unit from, Unit to) {
-      if (!from.CanCharge()) {
+      if (!from.IsCavalry()) {
+        return;
+      }
+      if (!from.CanCharge() && !to.IsVulnerable()) {
         return;
       }
       ChargeAnimating = true;
@@ -399,13 +402,17 @@ namespace MonoNS
     IEnumerator CoCharge(Unit from, Unit to) {
       from.movementRemaining -= chargePoint;
       from.charged = true;
-      popAniController.Show(hexMap.GetUnitView(from), textLib.get("pop_charging"), Color.green);
+      from.attacked = true;
+      bool defeatingUnit = to.IsVulnerable();
+      popAniController.Show(hexMap.GetUnitView(from),
+        defeatingUnit ? textLib.get("pop_chasing") : textLib.get("pop_charging"),
+        Color.green);
       while (popAniController.Animating) { yield return null; }
-      bool defeatingUnit = to.defeating || to.chaos;
       bool scared = to.CanBeShaked(from) >= Util.Rand(1, 100);
-      if (scared && to.tile.terrian != TerrianType.Plain && !defeatingUnit) {
+      if (scared && to.tile.terrian != TerrianType.Plain) {
         scared = Cons.FiftyFifty();
       }
+      scared = defeatingUnit ? true : scared;
       int killed = Util.Rand(0, 11);
       from.rf.soldiers -= killed;
       from.kia += killed;
@@ -458,7 +465,8 @@ namespace MonoNS
           if (tile == null && ally.Count == 0) {
             scared = false;
           } else {
-            popAniController.Show(hexMap.GetUnitView(to), textLib.get("pop_shaked"), Color.white);
+            popAniController.Show(hexMap.GetUnitView(to),
+              defeatingUnit ? textLib.get("pop_retreat") : textLib.get("pop_shaked"), Color.white);
             while (popAniController.Animating) { yield return null; }
             if (tile == null) {
               foreach(Unit u in ally) {
@@ -498,7 +506,7 @@ namespace MonoNS
         }
       }
 
-      if (!scared && !defeatingUnit) {
+      if (!scared) {
         popAniController.Show(hexMap.GetUnitView(to), textLib.get("pop_holding"), Color.green);
         while (popAniController.Animating) { yield return null; }
         int morale = 5;

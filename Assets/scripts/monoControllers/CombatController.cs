@@ -493,39 +493,30 @@ namespace MonoNS
           predict.defenderOptimPoints += u.operationPoint;
         }
         hexMap.CleanLines();
+        foreach(UnitPredict up in newAttackers) {
+          hexMap.ShowAttackArrow(up.unit, defender, up);
+        }
         foreach(Unit unit in giveupAttackers) {
           hexMap.popAniController.Show(hexMap.GetUnitView(unit), 
             Cons.GetTextLib().get("pop_notJoinOperation"),
             Color.white);
           while (hexMap.popAniController.Animating) { yield return null; }
         }
-        foreach(UnitPredict up in newAttackers) {
-          hexMap.popAniController.Show(
-            up.unit.IsCamping() ? (View)hexMap.settlementMgr.GetView(up.unit.tile.settlement) : hexMap.GetUnitView(up.unit), 
-            Cons.GetTextLib().get("pop_joinOperation"),
-            Color.green);
-          while (hexMap.popAniController.Animating) { yield return null; }
-          hexMap.ShowAttackArrow(up.unit, defender, up);
-        }
 
-        foreach(Unit unit in giveupDefenders) {
-          hexMap.popAniController.Show(hexMap.GetUnitView(unit), 
-            Cons.GetTextLib().get("pop_notJoinOperation"),
-            Color.white);
-          while (hexMap.popAniController.Animating) { yield return null; }
-        }
         foreach(UnitPredict up in newDefenders) {
           if (!up.unit.IsCamping()) {
-            hexMap.popAniController.Show(hexMap.GetUnitView(up.unit), 
-              Cons.GetTextLib().get("pop_joinOperation"),
-              Color.green);
-            while (hexMap.popAniController.Animating) { yield return null; }
             if (Util.eq<Unit>(up.unit, defender)) {
               hexMap.ShowDefenderStat(defender, up);
             } else {
               hexMap.ShowDefendArrow(up.unit, defender, up);
             }
           }
+        }
+        foreach(Unit unit in giveupDefenders) {
+          hexMap.popAniController.Show(hexMap.GetUnitView(unit), 
+            Cons.GetTextLib().get("pop_notJoinOperation"),
+            Color.white);
+          while (hexMap.popAniController.Animating) { yield return null; }
         }
 
         if (!defender.IsCamping() && predict.defenders.Count == 1) {
@@ -538,7 +529,7 @@ namespace MonoNS
           }
 
           // TODO: apply general trait to increase the chance
-          if (noRetreat && !defender.defeating && !defender.chaos
+          if (noRetreat && !defender.IsVulnerable()
             && !defender.IsWarWeary()
             && (predict.attackerOptimPoints > (int)(predict.defenderOptimPoints * 1.5f)) && Cons.FiftyFifty()) {
             predict.defenderOptimPoints = predict.defenderOptimPoints * 3;

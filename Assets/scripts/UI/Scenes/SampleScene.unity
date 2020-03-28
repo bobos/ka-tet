@@ -4885,8 +4885,8 @@ MonoBehaviour:
   tileAniController: {fileID: 0}
   popAniController: {fileID: 0}
   eventStasher: {fileID: 0}
-  numRows: 20
-  numCols: 30
+  numRows: 40
+  numCols: 40
   MatOcean: {fileID: 2100000, guid: 75df011dacb6d464a9e0ee5173c7135b, type: 2}
   MatPlain: {fileID: 2100000, guid: 69259e7d8008543b39c4aafcbcc7b64b, type: 2}
   MatLessPlain: {fileID: 2100000, guid: bd3ea563e20fc49c7b5e4c4fa273045d, type: 2}

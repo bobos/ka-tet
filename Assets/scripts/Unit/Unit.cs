@@ -186,8 +186,8 @@ namespace UnitNS
     }
 
     public int CanBeShaked(Unit charger) {
-      if (defeating || chaos) {
-        return 100;
+      if (IsVulnerable()) {
+        return 0;
       }
       // TODO: apply general trait
       if(charger.rf.royalGuard && !rf.royalGuard && !IsCommander() && IsOnField() && !tile.vantagePoint) {
@@ -201,9 +201,13 @@ namespace UnitNS
       }
     }
 
+    public bool IsVulnerable() {
+      return chaos || defeating;
+    }
+
     public bool charged = false;
     public bool CanCharge() {
-      return CanAttack() && !charged && rf.soldiers >= 800 && movementRemaining >= ActionCost; 
+      return rf.royalGuard && CanAttack() && !charged && rf.soldiers >= 800 && movementRemaining >= ActionCost; 
     }
 
     public bool retreated = false;
@@ -355,17 +359,12 @@ namespace UnitNS
     // Before new turn starts
     public int[] RefreshUnit()
     {
-      if (chaos) {
-        chaos = false;
-      }
+      chaos = false;
+      defeating = false;
 
       charged = false;
       attacked = false;
       retreated = false;
-
-      if (defeating) {
-        defeating = false;
-      }
 
       if (concealCoolDownTurn > 0) {
         concealCoolDownTurn--;
