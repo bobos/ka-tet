@@ -1,0 +1,7 @@
+*.meta
+/Library/
+*.log
+*.asset
+obj/Debug/Assembly-CSharp.csprojAssemblyReference.cache
+Assembly-CSharp.csproj
+ka-tet.sln
