@@ -173,7 +173,7 @@ namespace MonoNS
         MoveButton.SetActive(true);
       }
 
-      if (!hexMap.wargameController.start && hexMap.deployDone) {
+      if (!hexMap.wargameController.start && hexMap.deployDone && !unit.retreated) {
         NextTurnButton.SetActive(true);
         RetreatButton.SetActive(true);
       }

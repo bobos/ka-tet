@@ -80,7 +80,8 @@ namespace TextNS
       {"u_cavalryName", @"{0}骑兵"},
       {"rank_rookie", "厢兵"},
       {"rank_veteran", "禁军"},
-      {"rank_royalGuard", "大全装"},
+      {"rank_lightCav", "轻骑"},
+      {"rank_heavyCav", "重骑"},
 
       // region
       {"r_heHuang", "河湟"},

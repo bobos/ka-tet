@@ -273,7 +273,7 @@ namespace MapTileNS
           Cavalry.MovementCostModifierOnPlainOrRoad : Cavalry.MovementCostModifierOnHill));
         if (unit.IsHeavyCavalry()) {
           // movement punishment on elite cavalry
-          ret = (int)(ret * 1.5f);
+          ret = (int)(ret * 1.8f);
         }
       }
 
@@ -394,6 +394,10 @@ namespace MapTileNS
 
     public int UnitCount() {
       return units == null ? 0 : units.Count;
+    }
+
+    public HashSet<Unit> GetUnits() {
+      return units;
     }
 
     public Tile Escape() {

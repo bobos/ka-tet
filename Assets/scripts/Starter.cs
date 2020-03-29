@@ -131,12 +131,12 @@ public class Starter : MonoBehaviour {
     zhaoyun.CreateTroop(hexMap, 6000, Cons.heBei, Type.Infantry, Cons.veteran);
     guanyu.CreateTroop(hexMap, 4500, Cons.heBei, Type.Infantry, Cons.rookie);
     machao.CreateTroop(hexMap, 3000, Cons.heDong, Type.Infantry, Cons.veteran);
-    zhangfei.CreateTroop(hexMap, 1500, Cons.shanXi, Type.Cavalry, Cons.rookie);
+    zhangfei.CreateTroop(hexMap, 3000, Cons.shanXi, Type.Cavalry, Cons.rookie);
 
     caocao.CreateTroop(hexMap, 10000, Cons.xiJing, Type.Infantry, Cons.veteran);
-    xuchu.CreateTroop(hexMap, 2500, Cons.zhongJing, Type.Cavalry, Cons.veteran);
+    xuchu.CreateTroop(hexMap, 3000, Cons.zhongJing, Type.Cavalry, Cons.veteran);
     abc.CreateTroop(hexMap, 8000, Cons.xiJing, Type.Infantry, Cons.veteran);
-    x1.CreateTroop(hexMap, 1000, Cons.shangJing, Type.Cavalry, Cons.rookie);
+    x1.CreateTroop(hexMap, 3000, Cons.shangJing, Type.Cavalry, Cons.rookie);
     x2.CreateTroop(hexMap, 10000, Cons.xiJing, Type.Infantry, Cons.rookie);
     x3.CreateTroop(hexMap, 8000, Cons.xiJing, Type.Infantry, Cons.rookie);
     x4.CreateTroop(hexMap, 4000, Cons.zhongJing, Type.Infantry, Cons.rookie);

@@ -839,32 +839,9 @@ namespace MonoNS
           if (resultLevel == ResultType.Crushing) {
             drop = -10;
           }
-          // TODO: apply general trait to stop dropping for -20 and above
-          foreach(Unit u in hexMap.GetWarParty(loser).GetUnits()) {
-            if (u.IsCommander()) {
-              continue;
-            }
-            int[] stats = new int[]{drop,0,0,0,0,0,0,0,0};
-            u.rf.morale += drop;
-            if (u.IsShowingAnimation()) {
-              hexMap.unitAniController.ShowEffects(u, stats, null, true);
-            }
-          }
-        } else {
-          foreach(Tile t in loser.tile.GetNeighboursWithinRange<Tile>(4, (Tile tt) => true)) {
-            Unit unit = t.GetUnit();
-            if (unit != null && unit.IsAI() == loser.IsAI() && !supporters.Contains(unit)) {
-              int drop = -1;
-              int[] stats = new int[]{drop,0,0,0,0,0,0,0,0};
-              unit.rf.morale += drop;
-              if (unit.IsShowingAnimation()) {
-                hexMap.unitAniController.ShowEffects(unit, stats, null, true);
-              }
-            }
-          }
+          hexMap.unitAniController.ShakeNearbyAllies(loser, drop);
+          while (hexMap.unitAniController.ShakeAnimating) { yield return null; }
         }
-        hexMap.turnController.Sleep(1);
-        while(hexMap.turnController.sleeping) { yield return null; }
 
         // TODO: when defender is in city, capture the city on victory
         if (resultLevel != ResultType.Close) {

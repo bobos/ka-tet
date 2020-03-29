@@ -49,17 +49,13 @@ Game Tips:
 偃月阵
 
 骑兵佯败
-map bigbigbig, unit manymanymany
 多加技能破局
 mist: 骑兵夜袭, visibility--
 map skeleton for AI(supply route, point, value tiles, dam, supply range etc.)
 fire escape through
 放火选地点
 每月一回合，10个战斗回合
-河北 接大阵 大兵团 平原战  河西/陕西 堡垒群 山地 小兵团 
 capture city on victory
-
-ai主帅等级决定ai战斗等级
 
 战场瘟疫爆发时，每只部队随机确定时候染病，染病几率由低到高在到低变化
 战略回合，ai借助战斗回合战果施压，换取停战条约

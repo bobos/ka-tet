@@ -60,8 +60,37 @@ namespace MonoNS
         eventDialog.Show(new MonoNS.Event(EventDialog.EventName.GeneralKilledInBattle, null, null, 0, 0, 0, 0, 0, null, general));
         while (eventDialog.Animating) { yield return null; }
       }
+
+      ShakeNearbyAllies(unit, -10);
+      while (ShakeAnimating) { yield return null; }
       hexMap.cameraKeyboardController.EnableCamera();
       DestroyAnimating = false;
+    }
+
+    public bool ShakeAnimating = false;
+    public void ShakeNearbyAllies(Unit unit, int moraleDrop) {
+      ShakeAnimating = true;
+      StartCoroutine(CoShakeNearbyAllies(unit, moraleDrop));
+    } 
+
+    IEnumerator CoShakeNearbyAllies(Unit unit, int moraleDrop) {
+      foreach(Tile t in unit.tile.GetNeighboursWithinRange<Tile>(10, (Tile tt) => true)) {
+        Unit u = t.GetUnit();
+        if (u != null && u.IsAI() == unit.IsAI()) {
+          int[] stats = new int[]{moraleDrop,0,0,0,0,0,0,0,0};
+          u.rf.morale += moraleDrop;
+          if (u.IsShowingAnimation()) {
+            hexMap.unitAniController.ShowEffects(u, stats, null, true);
+          }
+          // TODO: apply general trait
+          if (!u.IsCommander() && (u.rf.morale <= Util.Rand(1, 79))&& u.SetRetreatPath()) {
+            ForceRetreat(u);
+            while(ForceRetreatAnimating) { yield return null; }
+          }
+        }
+      }
+      ShakeAnimating = false;
+      hexMap.cameraKeyboardController.EnableCamera();
     }
 
     public bool MoveAnimating = false;
@@ -605,6 +634,9 @@ namespace MonoNS
 
     public bool ForceRetreatAnimating = false;
     public void ForceRetreat(Unit unit) {
+      if (unit.retreated) {
+        return;
+      }
       ForceRetreatAnimating = true;
       unit.retreated = true;
       hexMap.cameraKeyboardController.DisableCamera();
@@ -617,7 +649,7 @@ namespace MonoNS
       while(hexMap.cameraKeyboardController.fixingCamera) { yield return null; }
       hexMap.dialogue.ShowRetreat(unit);
       while(hexMap.dialogue.Animating) { yield return null; }
-      unit.movementRemaining = (int)(unit.GetFullMovement() * 1.5);
+      unit.__movementRemaining = 150;
       while (unit.movementRemaining > 0 && unit.GetPath().Length > 0) {
         MoveUnit(unit);
         while(MoveAnimating) { yield return null; }
@@ -634,7 +666,7 @@ namespace MonoNS
       unit.movementRemaining = 0;
       Riot(unit, 2);
       while(riotAnimating) { yield return null; }
-      unit.SetPath(new Tile[]{});
+      unit.SetPath(new Tile[]{unit.tile});
       hexMap.cameraKeyboardController.EnableCamera();
       ForceRetreatAnimating = false;
     }

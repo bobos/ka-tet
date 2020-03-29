@@ -3,6 +3,7 @@ using UnityEngine;
 using UnitNS;
 using MapTileNS;
 using TextNS;
+using System.Collections.Generic;
 
 namespace MonoNS
 {
@@ -17,6 +18,8 @@ namespace MonoNS
 
     public override void UpdateChild() { }
 
+    public Dictionary<Tile, Unit> movingLock = new Dictionary<Tile, Unit>();
+    public Dictionary<Unit, Tile> reverseMovingLock = new Dictionary<Unit, Tile>();
     public delegate void BtnClicked(actionName btn);
     public event BtnClicked onBtnClick;
     public delegate void ActionDone(Unit unit, actionName btn);

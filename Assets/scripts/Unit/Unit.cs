@@ -150,13 +150,10 @@ namespace UnitNS
     public int concealCoolDownTurn = 0;
     public int movementRemaining {
       get {
-        if (__movementRemaining > GetFullMovement()) {
-          __movementRemaining = GetFullMovement();
-        }
         return __movementRemaining;
       }
       set {
-        __movementRemaining = value < 0 ? 0 : (value > GetFullMovement() ? GetFullMovement() : value);
+        __movementRemaining = value < 0 ? 0 : (value > 100 ? 100 : value);
       }
     }
     public Tile tile;
@@ -165,7 +162,7 @@ namespace UnitNS
     public State state = State.Stand;
     public bool defeating = false;
 
-    int __movementRemaining;
+    public int __movementRemaining;
     Queue<Tile> path;
     // ==============================================================
     // ================= Unit Stat ==================================
@@ -173,6 +170,18 @@ namespace UnitNS
     public string Name()
     {
       return rf.name;
+    }
+
+    public string GetUnitName() {
+      if (IsHeavyCavalry()) {
+        return Cons.textLib.get("rank_heavyCav");
+      }
+
+      if (IsCavalry()) {
+        return Cons.textLib.get("rank_lightCav");
+      }
+
+      return rf.rank.Name();
     }
 
     public string GeneralName()
