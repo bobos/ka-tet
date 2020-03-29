@@ -49,9 +49,9 @@ Game Tips:
 偃月阵
 
 map bigbigbig, unit manymanymany
+多加技能破局
 mist: 骑兵夜袭, visibility--
 map skeleton for AI(supply route, point, value tiles, dam, supply range etc.)
-build watch tower
 fire escape through
 放火选地点
 每月一回合，10个战斗回合

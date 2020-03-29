@@ -98,7 +98,6 @@ namespace MapTileNS
       string prefix = "";
       if (field == FieldType.Wild) prefix = "Wild";
       if (field == FieldType.Village) prefix = "Village";
-      if (field == FieldType.Road) prefix = "Road";
       if (field == FieldType.Settlement) prefix = "Settelment On";
       if (field == FieldType.Schorched) prefix = "Schorched";
       if (field == FieldType.Burning) prefix = "Burning";
@@ -237,16 +236,10 @@ namespace MapTileNS
       if (terrian == TerrianType.Hill)
       {
         movementCost = Unit.MovementcostOnHill;
-        if (field == FieldType.Road) {
-          movementCost = Unit.MovementcostOnHillRoad;
-        }
       }
       else if (terrian == TerrianType.Plain)
       {
         movementCost = Unit.MovementcostOnPlain;
-        if (field == FieldType.Road) {
-          movementCost = Unit.MovementcostOnPlainRoad;
-        }
       }
       else
       {
@@ -276,11 +269,11 @@ namespace MapTileNS
       {
         // apply movement modifier for calvary unit
         ret = (int)(mov * (
-          (terrian == TerrianType.Plain || field == FieldType.Road) ?
+          (terrian == TerrianType.Plain) ?
           Cavalry.MovementCostModifierOnPlainOrRoad : Cavalry.MovementCostModifierOnHill));
-        if (unit.rf.royalGuard) {
+        if (unit.IsHeavyCavalry()) {
           // movement punishment on elite cavalry
-          ret = (int)(ret * 1.3f);
+          ret = (int)(ret * 1.5f);
         }
       }
 
@@ -353,7 +346,6 @@ namespace MapTileNS
     {
       if ((terrian == TerrianType.Plain || terrian == TerrianType.Hill) &&
         (field == FieldType.Wild || field == FieldType.Village || field == FieldType.Flooded
-         || field == FieldType.Road
          || field == FieldType.Schorched) && siegeWall == null)
       {
         return Work2BuildCamp;

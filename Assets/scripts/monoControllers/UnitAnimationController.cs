@@ -421,8 +421,8 @@ namespace MonoNS
       while (ShowAnimating) { yield return null; }
       if (scared) {
         if (defeatingUnit) {
-          int dead = to.chaos ? (from.rf.soldiers / (from.rf.royalGuard ? 2 : 3))
-            : (from.rf.soldiers / (from.rf.royalGuard ? 4 : 6));
+          int dead = to.chaos ? (from.rf.soldiers / (from.IsHeavyCavalry() ? 2 : 3))
+            : (from.rf.soldiers / (from.IsHeavyCavalry() ? 4 : 6));
           dead = dead > to.rf.soldiers ? to.rf.soldiers : dead;
           int morale = -5;
           to.rf.soldiers -= dead;
@@ -634,7 +634,7 @@ namespace MonoNS
       unit.movementRemaining = 0;
       Riot(unit, 2);
       while(riotAnimating) { yield return null; }
-      unit.SetPath(new Tile[]{unit.tile});
+      unit.SetPath(new Tile[]{});
       hexMap.cameraKeyboardController.EnableCamera();
       ForceRetreatAnimating = false;
     }

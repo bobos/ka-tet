@@ -66,25 +66,4 @@ namespace UnitNS
     }
   }
 
-  public class Elite: Rank {
-    public override int Level() {
-      return 3;
-    }
-
-    public override string Name() {
-      return Cons.GetTextLib().get("rank_elite");
-    }
-
-    public override string Description() {
-      return Cons.GetTextLib().get("rank_elite_description");
-    }
-
-    public override float Buf(int morale) {
-      return 1f * (1 - Rank.GetMoralePunish(morale));
-    }
-
-    public override int RecoverPerTurn() {
-      return 100;
-    }
-  }
 }

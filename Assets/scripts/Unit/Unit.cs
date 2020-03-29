@@ -18,7 +18,6 @@ namespace UnitNS
     public const int MovementcostOnHill = 25;
     public const int MovementcostOnHillRoad = 15;
     public const int MovementcostOnPlain = 15;
-    public const int MovementcostOnPlainRoad = 12;
     public const int MovementCostOnUnaccesible = -1;
     public const int DisbandUnitUnder = 200;
 
@@ -190,7 +189,7 @@ namespace UnitNS
         return 0;
       }
       // TODO: apply general trait
-      if(charger.rf.royalGuard && !rf.royalGuard && !IsCommander() && IsOnField() && !tile.vantagePoint) {
+      if(charger.IsHeavyCavalry() && !IsHeavyCavalry() && !IsCommander() && IsOnField() && !tile.vantagePoint) {
         if (Util.eq<Rank>(rf.rank, Cons.rookie)) {
           return 70;
         } else {
@@ -201,13 +200,18 @@ namespace UnitNS
       }
     }
 
+    public bool IsHeavyCavalry() {
+      return IsCavalry() && rf.rank == Cons.veteran;
+    }
+
     public bool IsVulnerable() {
       return chaos || defeating;
     }
 
     public bool charged = false;
     public bool CanCharge() {
-      return rf.royalGuard && CanAttack() && !charged && rf.soldiers >= 800 && movementRemaining >= ActionCost; 
+      return IsHeavyCavalry() &&
+        CanAttack() && !charged && rf.soldiers >= 800 && movementRemaining >= ActionCost; 
     }
 
     public bool retreated = false;
@@ -471,7 +475,7 @@ namespace UnitNS
         (vantage != null ? vantage.MovementPoint(rf.mov) : rf.mov) *
         (IsStarving() ? 0.8f : 1) *
         (plainSickness != null && plainSickness.affected ? (1 - plainSickness.moveDebuf) : 1) *
-        (IsSick() ? 0.5f : 1));
+        (IsSick() ? 0.4f : 1));
     }
 
     public StaminaLvl GetStaminaLevel()

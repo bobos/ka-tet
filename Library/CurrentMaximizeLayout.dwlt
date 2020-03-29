@@ -22,10 +22,10 @@ MonoBehaviour:
     y: 30
     width: 1920
     height: 947
-  m_MinSize: {x: 608, y: 492}
-  m_MaxSize: {x: 18003, y: 14042}
+  m_MinSize: {x: 608, y: 471}
+  m_MaxSize: {x: 18003, y: 14021}
   vertical: 0
-  controlID: 699
+  controlID: 331
 --- !u!114 &2
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -280,10 +280,10 @@ MonoBehaviour:
     y: 0
     width: 292
     height: 947
-  m_MinSize: {x: 232, y: 492}
-  m_MaxSize: {x: 10002, y: 14042}
+  m_MinSize: {x: 232, y: 471}
+  m_MaxSize: {x: 10002, y: 14021}
   vertical: 1
-  controlID: 674
+  controlID: 332
 --- !u!114 &6
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -341,7 +341,7 @@ MonoBehaviour:
       scrollPos: {x: 0, y: 0}
       m_SelectedIDs: 
       m_LastClickedID: 0
-      m_ExpandedIDs: 0afbffffda3a0000
+      m_ExpandedIDs: 32fbffff
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -442,7 +442,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: ac310000
     m_LastClickedID: 12716
-    m_ExpandedIDs: ffffffff000000000c3e000046440000484400004a4400004c4400004e44000050440000524400005444000056440000584400005a4400005c4400005e44000060440000624400006444000066440000684400006a4400006c4400006e440000704400007244000074440000
+    m_ExpandedIDs: ffffffff00000000123e00004c4400004e44000050440000524400005444000056440000584400005a4400005c4400005e44000060440000624400006444000066440000684400006a4400006c4400006e44000070440000724400007444000076440000784400007a440000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -470,7 +470,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 1044}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: ffffffff000000000c3e000046440000484400004a4400004c4400004e44000050440000524400005444000056440000584400005a4400005c4400005e44000060440000624400006444000066440000684400006a4400006c4400006e440000704400007244000074440000
+    m_ExpandedIDs: ffffffff00000000123e00004c4400004e44000050440000524400005444000056440000584400005a4400005c4400005e44000060440000624400006444000066440000684400006a4400006c4400006e44000070440000724400007444000076440000784400007a440000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 

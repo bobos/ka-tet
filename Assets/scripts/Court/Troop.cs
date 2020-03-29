@@ -27,7 +27,6 @@ namespace CourtNS
     public int combatPoint;
     public int movementPoint;
     public Level level = new Level();
-    public bool royalGuard = false;
     TroopState state;
 
     public static int MaxNum(Type type) {
@@ -46,20 +45,6 @@ namespace CourtNS
       morale = province.region.Will();
       this.province = province;
       state = TroopState.Idle;
-    }
-
-    public bool SetAsRoyalGuard() {
-      if (type != Type.Cavalry || !Util.eq<Rank>(Cons.veteran, rank)) {
-        return false;
-      }
-      morale += 20;
-      royalGuard = true;
-      return true;
-    }
-
-    public void RemoveAsRoyalGuard() {
-      royalGuard = false;
-      morale -= 30;
     }
 
     public bool IsRest() {
@@ -86,7 +71,7 @@ namespace CourtNS
 
     public float lvlBuf {
       get {
-        return royalGuard ? Cons.elite.Buf(morale) : rank.Buf(morale);
+        return rank.Buf(morale);
       }
     }
 
@@ -104,9 +89,6 @@ namespace CourtNS
       }
       set {
         _rank = value;
-        if (Util.eq<Rank>(_rank, Cons.elite)) {
-          this._rank = Cons.veteran;
-        }
       }
     }
 

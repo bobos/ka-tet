@@ -127,7 +127,6 @@ public class Cons {
 
   public static UnitNS.Rank rookie = new UnitNS.Rookie();
   public static UnitNS.Rank veteran = new UnitNS.Veteran();
-  public static UnitNS.Rank elite = new UnitNS.Elite();
 
   public static Region han = new HanRegion();
   public static Region qidan = new QidanRegion();

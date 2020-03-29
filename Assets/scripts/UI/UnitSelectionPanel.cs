@@ -277,7 +277,7 @@ namespace MonoNS
       slots.text = "";
       num.text = unit.Name() + "[兵:" + unit.rf.soldiers + "/亡:" + unit.kia + "]";
       morale.text = "士气: " + unit.rf.morale;
-      offense.text = "单兵战力: " + GetCombatpointRate(unit.cp);
+      offense.text = "单兵战力: " + GetCombatpointRate((int)(unit.cp * (1 + unit.rf.lvlBuf)));
       if (unit.IsCamping()) {
         defense.text = "部队战力: " + UnitInfoView.Shorten(unit.unitCampingAttackCombatPoint)
         + " ♙" + UnitInfoView.Shorten(unit.GetUnitDefendCombatPoint(true));

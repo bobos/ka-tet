@@ -57,7 +57,7 @@ namespace UnitNS
         + "[" + unit.rf.general.party.Name() + "]"
         + "\n";
       textMesh.text = title + unit.rf.province.Name() + "-"
-        + (unit.rf.royalGuard ? Cons.textLib.get("rank_royalGuard") : unit.rf.rank.Name())
+        + (unit.IsHeavyCavalry() ? Cons.textLib.get("rank_royalGuard") : unit.rf.rank.Name())
         + "[" + unit.rf.soldiers + "]\n"
         + Shorten(unit.GetUnitAttackCombatPoint()) + "/" + Shorten(unit.unitPureCombatPoint) + "\n"
         + "♟" + Shorten(totalDefendPoint) + "♙" + Shorten(unit.unitPureDefendCombatPoint);

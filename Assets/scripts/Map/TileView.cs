@@ -90,10 +90,6 @@ public class TileView : View
     {
       mat = hexMap.MatGrassland;
     }
-    else if (tile.field == FieldType.Road)
-    {
-      mat = hexMap.MatLessPlain;
-    }
     else if (tile.terrian != TerrianType.Water && tile.field == FieldType.Wild)
     {
       mat = hexMap.MatPlain;
