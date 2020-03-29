@@ -198,7 +198,7 @@ namespace UnitNS
         return 0;
       }
       // TODO: apply general trait
-      if(charger.IsHeavyCavalry() && !IsHeavyCavalry() && !IsCommander() && IsOnField() && !tile.vantagePoint) {
+      if(charger.IsHeavyCavalry() && !IsCavalry() && !IsCommander() && IsOnField() && !tile.vantagePoint) {
         if (Util.eq<Rank>(rf.rank, Cons.rookie)) {
           return 70;
         } else {
@@ -359,6 +359,17 @@ namespace UnitNS
         v = vantage.IsAtVantagePoint() ? VantageVisibility : L2Visibility;
       }
       return tile.GetNeighboursWithinRange<Tile>(v, (Tile _tile) => true);
+    }
+
+    public bool InCommanderRange() {
+      bool inRange = false;
+      foreach(Tile t in hexMap.GetWarParty(this).commanderGeneral.commandUnit.onFieldUnit.GetVisibleArea()) {
+        if (Util.eq<Tile>(tile, t)) {
+          inRange = true;
+          break;
+        }
+      }
+      return inRange;
     }
 
     protected virtual bool Concealable() {
@@ -667,6 +678,10 @@ namespace UnitNS
     }
 
     bool AfterMoveUpdate(List<Unit> knownUnit, bool allyOnTile) {
+      foreach(Tile t in GetVisibleArea()) {
+        hexMap.GetWarParty(this).DiscoverTile(t);
+      }
+
       bool continueMoving = true;
 
       if (IsConcealed() && hexMap.GetRangeForDiscoveryCheck(this.IsAI()).Contains(tile)) {

@@ -198,17 +198,15 @@ namespace MonoNS
           WarParty atkParty = playerParty.attackside ? playerParty : aiParty;
           WarParty defParty = playerParty.attackside ? aiParty : playerParty;
           foreach (Unit unit in atkParty.GetUnits()) {
-            // drop 5 morale point for attack units per turn
             if (unit.rf.morale >= Rank.MoralePunishLine) {
-              unit.rf.morale -= 4;
+              unit.rf.morale -= 2;
             }
           }
 
           if ((turnNum % 2) != 0) {
             foreach(Unit unit in defParty.GetUnits()) {
-              // drop 5 morale point for defense side on odd turn
               if (unit.rf.morale >= Rank.MoralePunishLine) {
-                unit.rf.morale -= 4;
+                unit.rf.morale -= 2;
               }
             }
           }
@@ -216,6 +214,7 @@ namespace MonoNS
       }
 
       // TODO
+      p.ResetDiscoveredTiles();
       FoW.Get().Fog();
       foreach(Unit u in playerParty.GetUnits()) {
         if (!u.IsCamping()) {

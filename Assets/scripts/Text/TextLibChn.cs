@@ -124,13 +124,6 @@ namespace TextNS
       {"g_machao", "夏鲁奇"},
       {"g_abc", "牛存节"},
 
-      // party report
-      {"pr_sloppyOnDrill", "疏于操练"},
-      {"pr_sloppyOnDrill_d", "General is sloppy on drill, which leads the shameful defeat"},
-
-      // building
-      {"b_ownedCamp", "所部所筑营寨"},
-
       // event
       {"event_disbandDestroyUnit_title", "全军覆没"},
       {"event_disbandDestroyUnit", @"{0}所部{1}全军覆没！"},

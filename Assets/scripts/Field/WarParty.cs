@@ -108,6 +108,7 @@ namespace FieldNS
       return stat;
     }
 
+    HashSet<Tile> discoveredTiles = new HashSet<Tile>();
     public void GetVisibleArea(HashSet<Tile> tiles) {
       foreach (Unit u in GetUnits())
       {
@@ -115,6 +116,18 @@ namespace FieldNS
           tiles.Add(tile);
         }
       }
+
+      foreach (Tile tile in discoveredTiles) {
+        tiles.Add(tile);
+      }
+    }
+
+    public void DiscoverTile(Tile tile) {
+      discoveredTiles.Add(tile);
+    }
+
+    public void ResetDiscoveredTiles() {
+      discoveredTiles = new HashSet<Tile>();
     }
 
   }

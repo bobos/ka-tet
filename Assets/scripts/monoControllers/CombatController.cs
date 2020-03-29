@@ -273,25 +273,26 @@ namespace MonoNS
         mainParty = hexMap.warProvince.ownerParty;
       }
 
-      // TODO: apply commander range and general triats to adjust possibility 
+      bool inRange = unit2.InCommanderRange();
+      // TODO: apply general triats to adjust possibility 
       if (Util.eq<Party>(mainParty, unit2.rf.general.party)) {
         return 100;
       }
 
       //Party.Relation relation = mainParty.GetRelation();
       if (result == ResultType.Close) {
-        return 100;
+        return inRange ? 90 : 70;
       }
 
       if (result == ResultType.Small) {
-        return 80;
+        return inRange ? 80 : 60;
       }
 
       if (result == ResultType.Great) {
-        return 50;
+        return inRange ? 70 : 50;
       }
 
-      return 20;
+      return inRange ? 40 : 20;
     }
 
     public void CancelOperation() {
@@ -557,19 +558,19 @@ namespace MonoNS
 // 1.9 to 2.2 - atk: (x - 1.2) * (0.25 - 0.4)
         if (resultLevel == ResultType.Close) {
           // 1 - 2x odds
-          float m = 0.04f;
-          float m1 = 0.035f;
+          float m = 0.035f;
+          float m1 = 0.03f;
           if (Cons.SlimChance()) {
-            m = 0.05f;
-            m = 0.01f;
+            m = 0.04f;
+            m1 = 0.01f;
           }
           defenderCasualty = (int)(defenderTotal * (attackerBigger ? m : m1));
           attackerCasualty = (int)(attackerTotal * (attackerBigger ? m1 : m));
         } else {
           if (attackerBigger) {
-            defenderCasualty = (int)(defenderTotal * 0.01f);
+            defenderCasualty = (int)(defenderTotal * 0.02f);
           } else {
-            attackerCasualty = (int)(attackerTotal * 0.01f);
+            attackerCasualty = (int)(attackerTotal * 0.02f);
           }
 
           if (resultLevel == ResultType.Small) {

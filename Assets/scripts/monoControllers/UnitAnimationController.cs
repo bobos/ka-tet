@@ -257,10 +257,8 @@ namespace MonoNS
 
       if (unit.rf.morale == 0)
       {
-        if (!unit.IsCamping()) {
-          hexMap.unitAniController.DestroyUnit(unit, DestroyType.ByDisband);
-          while (hexMap.unitAniController.DestroyAnimating) { yield return null; }
-        }
+        hexMap.unitAniController.DestroyUnit(unit, DestroyType.ByDisband);
+        while (hexMap.unitAniController.DestroyAnimating) { yield return null; }
       }
 
       hexMap.cameraKeyboardController.EnableCamera();

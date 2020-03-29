@@ -9,7 +9,7 @@
     }
 
     public float GetBuf() {
-      return IsWarWeary() ? -0.8f : 0;
+      return IsWarWeary() ? -1f : 0;
     }
 
     public bool IsWarWeary() {
