@@ -48,6 +48,7 @@ Game Tips:
 
 偃月阵
 
+骑兵佯败
 map bigbigbig, unit manymanymany
 多加技能破局
 mist: 骑兵夜袭, visibility--

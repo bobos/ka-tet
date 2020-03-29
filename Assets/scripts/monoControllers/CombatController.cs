@@ -418,9 +418,9 @@ namespace MonoNS
         return new int[]{-4, -4, 1};
       }
       if (type == ResultType.Great) {
-        return new int[]{-6, -5, 3};
+        return new int[]{-5, -5, 2};
       }
-      return new int[]{-20, -20, 6};
+      return new int[]{-10, -10, 4};
     }
 
     public bool commenceOpAnimating = false;
@@ -547,18 +547,9 @@ namespace MonoNS
         int attackerCasualty = 0;
         int defenderCasualty = 0;
         bool attackerBigger = true;
-        int factor = 0;
         ResultType resultLevel = predict.suggestedResultType;
         predict.attackerOptimPoints = predict.attackerOptimPoints <= 0 ? 1 : predict.attackerOptimPoints;
         predict.defenderOptimPoints = predict.defenderOptimPoints <= 0 ? 1 : predict.defenderOptimPoints;
-
-        if (predict.attackerOptimPoints > predict.defenderOptimPoints) {
-          factor = (int)((predict.attackerOptimPoints / predict.defenderOptimPoints) * 10) - 10;
-        } else {
-          attackerBigger = false;
-          factor = (int)((predict.defenderOptimPoints / predict.attackerOptimPoints) * 10) - 10;
-        }
-        factor = factor > 95 ? 95 : factor;
 
         bool atkWin = predict.sugguestedResult.chance == 10;
 // 1.0 to 1.3 - 0.01(both)
@@ -569,16 +560,16 @@ namespace MonoNS
           float m = 0.04f;
           float m1 = 0.035f;
           if (Cons.SlimChance()) {
-            m = 0.1f;
-            m = 0.095f;
+            m = 0.05f;
+            m = 0.01f;
           }
           defenderCasualty = (int)(defenderTotal * (attackerBigger ? m : m1));
           attackerCasualty = (int)(attackerTotal * (attackerBigger ? m1 : m));
         } else {
           if (attackerBigger) {
-            defenderCasualty = (int)(defenderTotal * factor * 0.012f);
+            defenderCasualty = (int)(defenderTotal * 0.01f);
           } else {
-            attackerCasualty = (int)(attackerTotal * factor * 0.012f);
+            attackerCasualty = (int)(attackerTotal * 0.01f);
           }
 
           if (resultLevel == ResultType.Small) {
@@ -602,22 +593,12 @@ namespace MonoNS
           }
 
           if (resultLevel == ResultType.Crushing) {
-            if (factor < 30) {
-              // 3.9x - 6x odds
-              int modifier = Util.Rand(1, 3);
-              if (attackerBigger) {
-                attackerCasualty = (int)(defenderCasualty * modifier * 0.1f);
-              } else {
-                defenderCasualty = (int)(attackerCasualty * modifier * 0.1f);
-              }
+            // 3.9x - 6x odds
+            int modifier = Util.Rand(1, 3);
+            if (attackerBigger) {
+              attackerCasualty = (int)(defenderCasualty * modifier * 0.1f);
             } else {
-              // 6x larger
-              float modifier = 0.05f;
-              if (attackerBigger) {
-                attackerCasualty = (int)(defenderCasualty * modifier);
-              } else {
-                defenderCasualty = (int)(attackerCasualty * modifier);
-              }
+              defenderCasualty = (int)(attackerCasualty * modifier * 0.1f);
             }
           }
         }
@@ -848,15 +829,15 @@ namespace MonoNS
 
         // affected all allies
         if (loser.IsCommander()) {
-          int drop = -5;
+          int drop = -3;
           if (resultLevel == ResultType.Small) {
-            drop = -10;
+            drop = -5;
           }
           if (resultLevel == ResultType.Great) {
-            drop = -20;
+            drop = -8;
           }
           if (resultLevel == ResultType.Crushing) {
-            drop = -30;
+            drop = -10;
           }
           // TODO: apply general trait to stop dropping for -20 and above
           foreach(Unit u in hexMap.GetWarParty(loser).GetUnits()) {
