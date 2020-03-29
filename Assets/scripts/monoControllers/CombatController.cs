@@ -567,10 +567,18 @@ namespace MonoNS
           defenderCasualty = (int)(defenderTotal * (attackerBigger ? m : m1));
           attackerCasualty = (int)(attackerTotal * (attackerBigger ? m1 : m));
         } else {
+          float factor = 0.02f;
+          if (resultLevel == ResultType.Great) {
+            factor = 0.03f;
+          }
+          if (resultLevel == ResultType.Crushing) {
+            factor = 0.7f;
+          }
+
           if (attackerBigger) {
-            defenderCasualty = (int)(defenderTotal * 0.02f);
+            defenderCasualty = (int)(defenderTotal * factor);
           } else {
-            attackerCasualty = (int)(attackerTotal * 0.02f);
+            attackerCasualty = (int)(attackerTotal * factor);
           }
 
           if (resultLevel == ResultType.Small) {

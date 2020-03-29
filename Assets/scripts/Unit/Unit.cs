@@ -516,7 +516,7 @@ namespace UnitNS
     // ==============================================================
     public int GetRetreatThreshold()
     {
-      return Rank.MoralePunishLine - 10;
+      return rf.province.region.RetreatThreshold();
     }
 
     // ==============================================================
