@@ -164,7 +164,6 @@ namespace MonoNS
       unitPredict.percentOfEffectiveForce = GetEffectiveForcePercentage(attacker, false);
       unitPredict.joinPossibility = 100;
       SetGaleVantage(attacker, defender, unitPredict);
-      // TODO:tmp morale buff from commander
       unitPredict.operationPoint = attacker.IsCamping() ? attacker.unitCampingAttackCombatPoint : attacker.GetUnitAttackCombatPoint();
       predict.attackers.Add(unitPredict);
       predict.attackerOptimPoints += unitPredict.operationPoint;

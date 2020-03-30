@@ -626,7 +626,6 @@ namespace UnitNS
 
     public void PreflightSetTile(Tile tile)
     {
-      // TODO: add unit to virtual hex
       this.tile = tile;
     }
 
