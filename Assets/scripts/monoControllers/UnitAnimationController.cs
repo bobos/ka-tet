@@ -210,51 +210,6 @@ namespace MonoNS
         unit.rf.morale = unit.rf.morale > unit.GetRetreatThreshold() ? unit.rf.morale: unit.GetRetreatThreshold();
       }
 
-      if (unit.IsWarWeary())
-      {
-        if (unit.IsShowingAnimation()) {
-          popAniController.Show(view, textLib.get("pop_warWeary"), Color.yellow);
-          while (popAniController.Animating) { yield return null; }
-        }
-        ShowEffects(unit, unit.warWeary.Apply());
-        while (ShowAnimating) { yield return null; }
-      }
-
-      if (unit.IsHeatSicknessAffected()) {
-        if (unit.IsShowingAnimation()) {
-          popAniController.Show(view, textLib.get("pop_sickness"), Color.yellow);
-          while (popAniController.Animating) { yield return null; }
-        }
-        ShowEffects(unit, unit.epidemic.Apply());
-        while (ShowAnimating) { yield return null; }
-      }
-
-      if (unit.altitudeSickness.lastTurns > 0) {
-        if (unit.IsShowingAnimation()) {
-          popAniController.Show(view, textLib.get("pop_altitudeSickness"), Color.yellow);
-          while (popAniController.Animating) { yield return null; }
-        }
-        ShowEffects(unit, new int[9]{0,unit.altitudeSickness.Apply(),0,0,0,0,0,0,0});
-        while (ShowAnimating) { yield return null; }
-      }
-
-      if (unit.IsPoisioned()) {
-        if (unit.IsShowingAnimation()) {
-          popAniController.Show(view, textLib.get("pop_poisioned"), Color.yellow);
-          while (popAniController.Animating) { yield return null; }
-        }
-        ShowEffects(unit, unit.unitPoisioned.Apply());
-        while (ShowAnimating) { yield return null; }
-      }
-
-      if (unit.tile.deadZone.Apply(unit)) {
-        // epimedic caused by decomposing corpse
-        eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.Epidemic, unit, null));
-        while (eventDialog.Animating) { yield return null; }
-        Riot(unit, unit.epidemic.Occur());
-        while (riotAnimating) { yield return null; }
-      }
-
       if (unit.rf.morale == 0)
       {
         hexMap.unitAniController.DestroyUnit(unit, DestroyType.ByDisband);
@@ -303,6 +258,53 @@ namespace MonoNS
     IEnumerator CoRefreshUnit(Unit unit) {
       ShowEffects(unit, unit.RefreshUnit());
       while (ShowAnimating) { yield return null; }
+
+      UnitView view = hexMap.GetUnitView(unit);
+      if (unit.IsWarWeary())
+      {
+        if (unit.IsShowingAnimation()) {
+          popAniController.Show(view, textLib.get("pop_warWeary"), Color.yellow);
+          while (popAniController.Animating) { yield return null; }
+        }
+        ShowEffects(unit, unit.warWeary.Apply());
+        while (ShowAnimating) { yield return null; }
+      }
+
+      if (unit.IsHeatSicknessAffected()) {
+        if (unit.IsShowingAnimation()) {
+          popAniController.Show(view, textLib.get("pop_sickness"), Color.yellow);
+          while (popAniController.Animating) { yield return null; }
+        }
+        ShowEffects(unit, unit.epidemic.Apply());
+        while (ShowAnimating) { yield return null; }
+      }
+
+      if (unit.altitudeSickness.lastTurns > 0) {
+        if (unit.IsShowingAnimation()) {
+          popAniController.Show(view, textLib.get("pop_altitudeSickness"), Color.yellow);
+          while (popAniController.Animating) { yield return null; }
+        }
+        ShowEffects(unit, new int[9]{0,unit.altitudeSickness.Apply(),0,0,0,0,0,0,0});
+        while (ShowAnimating) { yield return null; }
+      }
+
+      if (unit.IsPoisioned()) {
+        if (unit.IsShowingAnimation()) {
+          popAniController.Show(view, textLib.get("pop_poisioned"), Color.yellow);
+          while (popAniController.Animating) { yield return null; }
+        }
+        ShowEffects(unit, unit.unitPoisioned.Apply());
+        while (ShowAnimating) { yield return null; }
+      }
+
+      if (unit.tile.deadZone.Apply(unit)) {
+        // epimedic caused by decomposing corpse
+        eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.Epidemic, unit, null));
+        while (eventDialog.Animating) { yield return null; }
+        Riot(unit, unit.epidemic.Occur());
+        while (riotAnimating) { yield return null; }
+      }
+
       if (Cons.IsHeat(hexMap.weatherGenerator.currentWeather)) {
         int ret = unit.armorRemEvent.Occur();
         WarParty wp = hexMap.GetWarParty(unit);
@@ -436,9 +438,6 @@ namespace MonoNS
         Color.green);
       while (popAniController.Animating) { yield return null; }
       bool scared = to.CanBeShaked(from) >= Util.Rand(1, 100);
-      if (scared && to.tile.terrian != TerrianType.Plain) {
-        scared = Cons.FiftyFifty();
-      }
       scared = defeatingUnit ? true : scared;
       int killed = Util.Rand(0, 11);
       from.rf.soldiers -= killed;

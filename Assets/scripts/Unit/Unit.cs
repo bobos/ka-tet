@@ -197,16 +197,32 @@ namespace UnitNS
       if (IsVulnerable()) {
         return 0;
       }
+      int chance = 0;
+      if (Cons.IsGale(hexMap.windGenerator.current)) {
+        UnitPredict up = new UnitPredict();
+        hexMap.combatController.SetGaleVantage(charger, this, up);
+        if (up.windAdvantage) {
+          chance = 30;
+        }
+        if (up.windDisadvantage) {
+          chance = -20;
+        }
+      }
+      if (tile.terrian == TerrianType.Hill) {
+        chance += -30;
+      }
       // TODO: apply general trait
       if(charger.IsHeavyCavalry() && !IsCavalry() && !IsCommander() && IsOnField() && !tile.vantagePoint) {
         if (Util.eq<Rank>(rf.rank, Cons.rookie)) {
-          return 70;
+          chance += 70;
         } else {
-          return 30;
+          chance += 40;
         }
       } else {
-        return 0;
+        chance = 0;
       }
+
+      return chance < 0 ? 0 : (chance > 100 ? 100 : chance);
     }
 
     public bool IsHeavyCavalry() {

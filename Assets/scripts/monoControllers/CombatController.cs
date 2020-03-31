@@ -66,7 +66,7 @@ namespace MonoNS
       return (int)((1 + unit.GetStaminaDebuf(asMainDefender)) * 100);
     }
 
-    void SetGaleVantage(Unit unit, Unit target, UnitPredict predict) {
+    public void SetGaleVantage(Unit unit, Unit target, UnitPredict predict) {
       if (Cons.IsGale(hexMap.windGenerator.current)) {
         if (hexMap.windGenerator.direction == Cons.Direction.dueNorth) {
           if(Util.eq<Tile>(target.tile.SouthTile<Tile>(), unit.tile)) {

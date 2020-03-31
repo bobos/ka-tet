@@ -53,7 +53,7 @@ namespace MapTileNS
     {
       foreach (Tile tile in this.tile.DownstreamTiles<Tile>())
       {
-        if ((tile.terrian == TerrianType.Water || tile.field == FieldType.Flooding) && Cons.EvenChance())
+        if ((tile.terrian == TerrianType.Water || tile.field == FieldType.Flooding) && Cons.FairChance())
         {
           tiles.Add(tile);
           tile.flood.GetTile2Flood(tiles);
