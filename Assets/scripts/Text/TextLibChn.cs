@@ -29,6 +29,7 @@ namespace TextNS
       {"w_blizard_d", "Blizard will slow down a marching army tremendously and cause heavy losses on an army due to frozen death, " +
                 "and punish the morale of an army\n" +
                 "but blizard can also provide drinkable water if army is low on water"},
+      {"w_mist", "大雾"},
 
       // Season
       {"s_spring", "春"},

@@ -129,7 +129,6 @@ public class Starter : MonoBehaviour {
     // step 3, assign general to units
     liubei.CreateTroop(hexMap, 8000, Cons.heNan, Type.Infantry, Cons.veteran);
     zhaoyun.CreateTroop(hexMap, 6000, Cons.heBei, Type.Infantry, Cons.veteran);
-    zhaoyun.commandUnit.morale = 0;
     guanyu.CreateTroop(hexMap, 4500, Cons.heBei, Type.Infantry, Cons.rookie);
     machao.CreateTroop(hexMap, 3000, Cons.heDong, Type.Infantry, Cons.veteran);
     zhangfei.CreateTroop(hexMap, 3000, Cons.shanXi, Type.Cavalry, Cons.rookie);

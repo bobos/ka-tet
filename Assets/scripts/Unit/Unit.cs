@@ -21,6 +21,7 @@ namespace UnitNS
     public const int MovementCostOnUnaccesible = -1;
     public const int DisbandUnitUnder = 200;
 
+    public const int L0Visibility = 1;
     public const int L1Visibility = 2;
     public const int L2Visibility = 3;
     public const int VantageVisibility = 5;
@@ -371,7 +372,9 @@ namespace UnitNS
     public Tile[] GetVisibleArea() {
       // TODO: apply commander lvl and vantage point
       int v = L1Visibility;
-      if (IsCommander()) {
+      if (Cons.IsMist(weatherGenerator.currentWeather)) {
+        v = L0Visibility;
+      } else if (IsCommander()) {
         v = vantage.IsAtVantagePoint() ? VantageVisibility : L2Visibility;
       }
       return tile.GetNeighboursWithinRange<Tile>(v, (Tile _tile) => true);

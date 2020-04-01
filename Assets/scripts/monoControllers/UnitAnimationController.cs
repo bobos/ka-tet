@@ -210,7 +210,7 @@ namespace MonoNS
         unit.rf.morale = unit.rf.morale > unit.GetRetreatThreshold() ? unit.rf.morale: unit.GetRetreatThreshold();
       }
 
-      if (unit.rf.morale == 0)
+      if (unit.rf.morale == 0 || unit.rf.soldiers <= Unit.DisbandUnitUnder)
       {
         hexMap.unitAniController.DestroyUnit(unit, DestroyType.ByDisband);
         while (hexMap.unitAniController.DestroyAnimating) { yield return null; }
@@ -538,8 +538,12 @@ namespace MonoNS
         int morale = 5;
         to.rf.morale += morale;
         // morale, movement, wounded, killed, laborKilled, disserter, attack, def, discontent
-        ShowEffects(to, new int[]{morale,0,0,0,0,0,0,0,0});
-        while (ShowAnimating) { yield return null; }
+        ShowEffects(to, new int[]{morale,0,0,0,0,0,0,0,0}, null, true);
+        int morale1 = -2;
+        from.rf.morale += morale1;
+        ShowEffects(to, new int[]{morale1,0,0,0,0,0,0,0,0}, null, true);
+        hexMap.turnController.Sleep(1);
+        while(hexMap.turnController.sleeping) { yield return null; }
       }
       hexMap.cameraKeyboardController.EnableCamera();
       ChargeAnimating = false;

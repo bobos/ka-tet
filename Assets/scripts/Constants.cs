@@ -81,6 +81,10 @@ public class Cons {
   public static bool IsBlizard(Weather weather) {
     return Util.eq<Weather>(weather, blizard);
   }
+  public static Weather mist = new Mist();
+  public static bool IsMist(Weather weather) {
+    return Util.eq<Weather>(weather, mist);
+  }
 
   public static Current nowind = new Nowind();
   public static bool IsNowind(Current current) {

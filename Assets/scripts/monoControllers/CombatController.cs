@@ -210,7 +210,7 @@ namespace MonoNS
         unitPredict = new UnitPredict();
         unitPredict.unit = unit;
         unitPredict.percentOfEffectiveForce = GetEffectiveForcePercentage(unit, false);
-        unitPredict.joinPossibility = 100;
+        unitPredict.joinPossibility = Cons.IsMist(hexMap.weatherGenerator.currentWeather) ? 60 : 100;
         unitPredict.operationPoint = unit.GetUnitDefendCombatPoint(false);
         predict.defenders.Add(unitPredict);
         predict.defenderOptimPoints += unitPredict.operationPoint;
@@ -221,7 +221,11 @@ namespace MonoNS
       Unit initiator = atkWin ? defender : attacker; 
       List<UnitPredict> ups = atkWin ? predict.defenders : predict.attackers;
       foreach (UnitPredict up in ups) {
-        up.joinPossibility = GetJoinPossibility(initiator, up.unit, predict.suggestedResultType);
+        if (Util.eq<Unit>(up.unit, defender) || Util.eq<Unit>(up.unit, attacker)) {
+          continue;
+        }
+        int pos = GetJoinPossibility(up.unit, predict.suggestedResultType);
+        up.joinPossibility = pos < up.joinPossibility ? pos : up.joinPossibility;
       }
 
       foreach(UnitPredict up in predict.attackers) {
@@ -266,29 +270,19 @@ namespace MonoNS
       }
     }
 
-    int GetJoinPossibility(Unit unit1, Unit unit2, ResultType result) {
-      Party mainParty = unit1.rf.general.party; 
-      if (Util.eq<Unit>(unit1, defender) && defender.IsCamping()) {
-        mainParty = hexMap.warProvince.ownerParty;
-      }
-
-      bool inRange = unit2.InCommanderRange();
+    int GetJoinPossibility(Unit unit, ResultType result) {
+      bool inRange = unit.InCommanderRange();
       // TODO: apply general triats to adjust possibility 
-      if (Util.eq<Party>(mainParty, unit2.rf.general.party)) {
-        return 100;
-      }
-
-      //Party.Relation relation = mainParty.GetRelation();
       if (result == ResultType.Close) {
-        return inRange ? 90 : 70;
+        return inRange ? 100 : 80;
       }
 
       if (result == ResultType.Small) {
-        return inRange ? 80 : 60;
+        return inRange ? 80 : 70;
       }
 
       if (result == ResultType.Great) {
-        return inRange ? 70 : 50;
+        return inRange ? 70 : 60;
       }
 
       return inRange ? 40 : 20;

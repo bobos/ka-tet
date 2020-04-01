@@ -39,6 +39,10 @@ namespace MonoNS
 
     TurnController turnController;
 
+    public bool IsTomorrowMist() {
+      return Cons.IsMist(tomorrowWeather);
+    }
+
     public Weather NextDay()
     {
       if (weatherLastingTurns == 0)
@@ -92,20 +96,26 @@ namespace MonoNS
         return Cons.GetTextLib().get("weather_blizardReminder");
       }
 
+      if (Cons.IsMist(currentWeather)) {
+        return Cons.GetTextLib().get("weather_mistReminder");
+      }
       return "";
     }
 
     Weather GenerateWeather()
     {
+      return Cons.mist;
       int luckNum = Util.Rand(1, 10);
       if (Cons.IsSpring(season))
       {
         // clear sky for most of Spring time
-        if (luckNum < 5)
+        if (luckNum < 6)
         {
           return Cons.cloudy;
-        } else if (luckNum < 9) {
+        } else if (luckNum < 8) {
           return Cons.rain;
+        } else if (luckNum < 9) {
+          return Cons.mist;
         } else {
           return Cons.heavyRain;
         }
@@ -140,6 +150,8 @@ namespace MonoNS
           return Cons.rain;
         } else if (luckNum < 7) {
           return Cons.heat;
+        } else if (luckNum < 8) {
+          return Cons.mist;
         }
         else
         {
@@ -171,6 +183,10 @@ namespace MonoNS
         return Util.Rand(1, 5);
       }
       else if (Cons.IsHeavyRain(weather))
+      {
+        return Util.Rand(1, 1);
+      }
+      else if (Cons.IsMist(weather))
       {
         return Util.Rand(1, 1);
       }

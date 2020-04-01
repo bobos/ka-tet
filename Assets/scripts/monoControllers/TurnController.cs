@@ -169,11 +169,6 @@ namespace MonoNS
         }
         unitAniController.PostTurnAction(unit);
         while (unitAniController.PostAnimating) { yield return null; };
-        if (unit.rf.soldiers <= Unit.DisbandUnitUnder)
-        {
-          unitAniController.DestroyUnit(unit, DestroyType.ByDisband);
-          while (unitAniController.DestroyAnimating) { yield return null; };
-        }
       }
 
       player = !player;
@@ -182,7 +177,7 @@ namespace MonoNS
         cnt = 0;
         turnNum++;
         weatherGenerator.NextDay();
-        hexMap.windGenerator.NextDay();
+        hexMap.windGenerator.NextDay(weatherGenerator.IsTomorrowMist());
         if (onNewTurn != null) { 
           onNewTurn();
         }

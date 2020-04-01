@@ -24,7 +24,7 @@ namespace MonoNS
     Current nextCurrent = null;
     Cons.Direction nextDirection;
 
-    public void NextDay()
+    public void NextDay(bool noWind = false)
     {
       if (nextCurrent == null)
       {
@@ -36,7 +36,7 @@ namespace MonoNS
       {
         direction = nextDirection;
         current = nextCurrent;
-        nextCurrent = GenerateWind();
+        nextCurrent = noWind ? Cons.nowind : GenerateWind();
         nextDirection = DecideDirection();
       }
     }

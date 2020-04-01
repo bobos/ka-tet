@@ -83,4 +83,13 @@ namespace NatureNS
       weatherDescription = textLib.get("w_blizard_d");
     }
   }
+
+  public class Mist : Weather
+  {
+    public Mist() : base()
+    {
+      weatherName = textLib.get("w_mist");
+      weatherDescription = textLib.get("w_mist_d");
+    }
+  }
 }
