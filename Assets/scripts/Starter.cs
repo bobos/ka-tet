@@ -67,6 +67,8 @@ public class Starter : MonoBehaviour {
     controllers.Add(unitAniController);
     TileAnimationController tileAniController = GameObject.FindObjectOfType<TileAnimationController>();
     controllers.Add(tileAniController);
+    ImgLibrary imgLibrary = GameObject.FindObjectOfType<ImgLibrary>();
+    controllers.Add(imgLibrary);
 
     // controllers that will emit event on initialization, initiate it at last, as order matters
     TurnController turnController = GameObject.FindObjectOfType<TurnController>();
@@ -100,24 +102,24 @@ public class Starter : MonoBehaviour {
     dam.BuildDam();
     
     // init generals
-    General liubei = new General("g_liubei", "g_liubei_d", Cons.heNan, new Traits[0]); 
-    General guanyu = new General("g_guanyu", "g_guanyu_d", Cons.heNan, new Traits[0]); 
-    General zhangfei = new General("g_zhangfei", "g_zhangfei_d", Cons.heDong, new Traits[0]); 
-    General zhaoyun = new General("g_zhaoyun", "g_zhaoyun_d", Cons.heDong, new Traits[0]); 
-    General machao = new General("g_machao", "g_machao_d", Cons.heBei, new Traits[0]); 
+    General liubei = new General("g_liubei", "g_liubei_d", Cons.heNan, new Traits[0], new CommandSkill(3)); 
+    General guanyu = new General("g_guanyu", "g_guanyu_d", Cons.heNan, new Traits[0], new CommandSkill(1)); 
+    General zhangfei = new General("g_zhangfei", "g_zhangfei_d", Cons.heDong, new Traits[0], new CommandSkill(1)); 
+    General zhaoyun = new General("g_zhaoyun", "g_zhaoyun_d", Cons.heDong, new Traits[0], new CommandSkill(1)); 
+    General machao = new General("g_machao", "g_machao_d", Cons.heBei, new Traits[0], new CommandSkill(1)); 
     liubei.JoinFaction(Cons.Song, Cons.NewParty);
     guanyu.JoinFaction(Cons.Song, Cons.NewParty);
     zhangfei.JoinFaction(Cons.Song, Cons.OldParty);
     zhaoyun.JoinFaction(Cons.Song, Cons.OldParty);
     machao.JoinFaction(Cons.Song, Cons.OldParty);
 
-    General caocao = new General("g_caocao", "g_caocao_d", Cons.xiJing, new Traits[0]); 
-    General xuchu = new General("g_xuchu", "g_xuchu_d", Cons.xiJing, new Traits[0]); 
-    General abc = new General("g_abc", "g_abc", Cons.zhongJing, new Traits[0]); 
-    General x1 = new General("g_x1", "g_1", Cons.zhongJing, new Traits[0]); 
-    General x2 = new General("g_x2", "g_1", Cons.shangJing, new Traits[0]); 
-    General x3 = new General("g_x3", "g_1", Cons.shangJing, new Traits[0]); 
-    General x4 = new General("g_x4", "g_1", Cons.shangJing, new Traits[0]); 
+    General caocao = new General("g_caocao", "g_caocao_d", Cons.xiJing, new Traits[0], new CommandSkill(3)); 
+    General xuchu = new General("g_xuchu", "g_xuchu_d", Cons.xiJing, new Traits[0], new CommandSkill(2)); 
+    General abc = new General("g_abc", "g_abc", Cons.zhongJing, new Traits[0], new CommandSkill(1)); 
+    General x1 = new General("g_x1", "g_1", Cons.zhongJing, new Traits[0], new CommandSkill(1)); 
+    General x2 = new General("g_x2", "g_1", Cons.shangJing, new Traits[0], new CommandSkill(1)); 
+    General x3 = new General("g_x3", "g_1", Cons.shangJing, new Traits[0], new CommandSkill(1)); 
+    General x4 = new General("g_x4", "g_1", Cons.shangJing, new Traits[0], new CommandSkill(1)); 
     caocao.JoinFaction(Cons.Liao, Cons.NorthCourt);
     xuchu.JoinFaction(Cons.Liao, Cons.NorthCourt);
     abc.JoinFaction(Cons.Liao, Cons.NorthCourt);

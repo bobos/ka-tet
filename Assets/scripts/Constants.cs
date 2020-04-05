@@ -186,4 +186,13 @@ public class Cons {
   public static Faction Xia = new Xia(true, 2000000);
   public static Faction GF = new Ghost();
 
+  // abilities
+  public static Ability masterOfMist = new MasterOfMist();
+  public static Ability forecaster = new Forecaster();
+  public static Ability obey = new Obey();
+  public static Ability turningTide = new TurningTheTide();
+  public static Ability backStabber = new BackStabber();
+  public static Ability outOfControl = new OutOfControl();
+  public static Ability outOfOrder = new OutOfOrder();
+
 }

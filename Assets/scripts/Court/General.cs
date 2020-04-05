@@ -43,6 +43,7 @@ namespace CourtNS {
     public FieldEvent[] fieldRecords;
     public LinkedList<General> nemesis = new LinkedList<General>();
     public GeneralStat stat = GeneralStat.Idle;
+    public CommandSkill commandSkill;
 
     HexMap hexMap;
     WarParty warParty;
@@ -50,12 +51,13 @@ namespace CourtNS {
     string biography;
     TextLib txtLib = Cons.GetTextLib();
 
-    public General(string name, string biography, Province province, Traits[] traits) {
+    public General(string name, string biography, Province province, Traits[] traits, CommandSkill commandSkill) {
       this.name = name;
       this.biography = biography;
       this.province = province;
       this.bornTraits = traits;
       developedTraits = new List<Traits>();
+      this.commandSkill = commandSkill;
     }
 
     // General Stats

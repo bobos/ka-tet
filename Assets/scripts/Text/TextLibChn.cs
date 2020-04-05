@@ -296,6 +296,20 @@ namespace TextNS
       {"weather_mistReminder", "厚雾结长空"},
       {"weather_citySieged", "黑云压城城欲摧"},
 
+      {"ability_outOfOrder", "首尾失序"},
+      {"ability_outOfOrder_description", "协同作战友军一定几率不参与行动"},
+      {"ability_outOfControl", "不听调度"},
+      {"ability_outOfControl_description", "所统率各部在战争开局会不听调度，擅自出击"},
+      {"ability_masterOfMist", "雾中指挥"},
+      {"ability_masterOfMist_description", "即使是在大雾笼罩之下，仍能指挥部队组织协同防御"},
+      {"ability_forecaster", "知天象"},
+      {"ability_forecaster_description", "擅观天象，能推测翌日的风向与气候"},
+      {"ability_backStabber", "深入敌后"},
+      {"ability_backStabber_description", "深入敌军控制区域，周围友军补给不济影响减半"},
+      {"ability_mustObey", "如山军令"},
+      {"ability_mustObey_description", "指挥范围内所有友军参与作战几率100%"},
+      {"ability_turningTheTide", "力挽狂澜"},
+      {"ability_turningTheTide_description", "破阵发生时，50%几率阻止指挥范围内友军发生溃败"},
       };
     }
   }

@@ -11,7 +11,7 @@ namespace UnitNS
     }
 
     public static GhostUnit createGhostUnit() {
-      General gen = new General("x", "x", Cons.heBei, new Traits[]{});
+      General gen = new General("x", "x", Cons.heBei, new Traits[]{}, new CommandSkill(1));
       gen.JoinFaction(Cons.GF, Cons.NoParty);
 
       return new GhostUnit(new Troop(3800, Cons.heBei, Type.Infantry, Cons.veteran, gen));

@@ -24,7 +24,7 @@ namespace MonoNS
       GameObject[] btns = {MoveButton, AttackButton, DefendButton,
                            SabotageButton, FireButton, SiegeButton, EncampButton,
                            RetreatButton, DecampButton, ReposButton,
-                           BuryButton, ChargeButton
+                           BuryButton, ChargeButton, TroopButton, GeneralButton
                            };
       buttons = btns;
       mouseController.onUnitSelect += OnUnitSelect;
@@ -56,19 +56,22 @@ namespace MonoNS
     public GameObject ReposButton;
     public GameObject BuryButton;
     public GameObject ChargeButton;
+    public GameObject TroopButton;
+    public GameObject GeneralButton;
     GameObject[] buttons;
 
     public Text title;
     public Text movement;
-    public Text slots;
+    public Text command;
     public Text num;
     public Text morale;
     public Text offense;
     public Text defense;
-    public Text stamina;
+    public Text skill;
     public Text state;
     public Text illness;
     public Text poision;
+    public Image generalPortrait; 
 
     public void OnEndTurnClicked()
     {
@@ -141,6 +144,8 @@ namespace MonoNS
       {
         button.SetActive(false);
       }
+      TroopButton.SetActive(true);
+      GeneralButton.SetActive(true);
 
       // TODO: uncomment
       //if (!state || hexMap.combatController.start || unit.IsAI()) return;
@@ -252,6 +257,7 @@ namespace MonoNS
     public void OnUnitSelect(Unit unit, bool isGarrison = false)
     {
       self.SetActive(true);
+      generalPortrait.sprite = hexMap.imgLibrary.GetGeneralPortrait(unit.rf.general);
       bool isPreflight = !isGarrison && !Util.eq<Unit>(unit, mouseController.selectedUnit);
 
       // set attack, defense details
@@ -271,9 +277,9 @@ namespace MonoNS
       title.text = unit.GeneralName();
       movement.text = "移动力:" + (isPreflight ? mouseController.selectedUnit.movementRemaining + " -> " : "")
         + unit.movementRemaining + "/" + unit.GetFullMovement();
-      stamina.text = "";
-      slots.text = "";
-      num.text = unit.Name() + "[兵:" + unit.rf.soldiers + "/亡:" + unit.kia + "]";
+      skill.text = "指挥度:";
+      command.text = "统帅度:";
+      num.text = unit.Name() + "[" + unit.GetUnitName() + " 兵:" + unit.rf.soldiers + "/亡:" + unit.kia + "]";
       morale.text = "士气: " + unit.rf.morale;
       offense.text = "单兵战力: " + GetCombatpointRate((int)(unit.cp * (1 + unit.rf.lvlBuf)));
       if (unit.IsCamping()) {
