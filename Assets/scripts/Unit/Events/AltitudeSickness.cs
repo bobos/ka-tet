@@ -12,22 +12,7 @@ namespace UnitNS
     }
 
     public int Occur() {
-      // TODO: for DLC
-      return 0;
-      if (!Util.eq<Province>(unit.hexMap.warProvince, Cons.heHuang) || triggered ||
-       (unit.GetStaminaLevel() != StaminaLvl.Exhausted &&
-        unit.GetStaminaLevel() != StaminaLvl.Tired)) {
-        return 0;
-      }
-
-      if ((unit.GetStaminaLevel() == StaminaLvl.Tired && Cons.EvenChance()) ||
-       (unit.GetStaminaLevel() == StaminaLvl.Exhausted && Cons.MostLikely())) {
-        triggered = true;
-        lastTurns = Util.Rand(3, 6);
-        unit.movementRemaining = 0;
-        return 2;
-      }
-
+      // TODO: for DLC, check remaining of movement point
       return 0;
     }
 

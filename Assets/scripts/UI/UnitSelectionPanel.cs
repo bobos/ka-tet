@@ -179,8 +179,7 @@ namespace MonoNS
       }
       
       if (mouseController.nearEnemy || mouseController.nearEnemySettlement != null) {
-        if (!hexMap.combatController.start && unit.GetStaminaLevel() != StaminaLvl.Exhausted
-         && hexMap.deployDone && unit.CanAttack()) {
+        if (!hexMap.combatController.start && hexMap.deployDone && unit.CanAttack()) {
           AttackButton.SetActive(true);
         }
       }
@@ -262,28 +261,27 @@ namespace MonoNS
       + "%\n厌战惩罚:" + unit.GetWarwearyBuf() * 100
       + "%\n无胄惩罚:" + unit.disarmorDefDebuf * 100
       + "%\n平原反应:" + unit.plainSickness.debuf * 100
-      + "%\n疲惫惩罚:" + unit.GetStaminaDebuf(false) * 100
       + "%\n加成:\n"
       + "等级加成:" + unit.rf.lvlBuf * 100
       + "%\n地形加成:" + unit.vantage.Buf() * 100
-      + "%\n总计加成:" + (unit.GetBuff() + unit.GetStaminaDebuf(false)) *100 + "%\n\n"
+      + "%\n总计加成:" + (unit.GetBuff() *100) + "%\n\n"
       + "有效作战人数:" + unit.vantage.GetEffective();
       hexMap.hoverInfo.Show(details);
 
       title.text = unit.GeneralName();
       movement.text = "移动力:" + (isPreflight ? mouseController.selectedUnit.movementRemaining + " -> " : "")
         + unit.movementRemaining + "/" + unit.GetFullMovement();
-      stamina.text = "体力: " + unit.GetStaminaLvlName();
+      stamina.text = "";
       slots.text = "";
       num.text = unit.Name() + "[兵:" + unit.rf.soldiers + "/亡:" + unit.kia + "]";
       morale.text = "士气: " + unit.rf.morale;
       offense.text = "单兵战力: " + GetCombatpointRate((int)(unit.cp * (1 + unit.rf.lvlBuf)));
       if (unit.IsCamping()) {
         defense.text = "部队战力: " + UnitInfoView.Shorten(unit.unitCampingAttackCombatPoint)
-        + " ♙" + UnitInfoView.Shorten(unit.GetUnitDefendCombatPoint(true));
+        + " ♙" + UnitInfoView.Shorten(unit.GetUnitDefendCombatPoint());
       } else {
-        defense.text = "部队战力: " + UnitInfoView.Shorten(unit.GetUnitAttackCombatPoint()) + "/" + UnitInfoView.Shorten(unit.unitPureCombatPoint)
-        + " ♙" + UnitInfoView.Shorten(unit.GetUnitDefendCombatPoint(true));
+        defense.text = "部队战力: " + UnitInfoView.Shorten(unit.unitCombatPoint) + "/" + UnitInfoView.Shorten(unit.unitPureCombatPoint)
+        + " ♙" + UnitInfoView.Shorten(unit.GetUnitDefendCombatPoint());
       }
       string stateStr = unit.tile.siegeWall != null && unit.tile.siegeWall.IsFunctional() ? "围城中 " :
         (unit.tile.siegeWall != null && unit.tile.siegeWall.owner.isAI == unit.IsAI() ? ("建长围中:" + unit.tile.siegeWall.buildTurns + "回合完成 ") : "");

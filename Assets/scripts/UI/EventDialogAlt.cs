@@ -149,7 +149,6 @@ namespace MonoNS
 
       foreach (UnitPredict u in predict.attackers) {
         atkGenerals += u.unit.GeneralName()
-        + (u.unit.GetStaminaLevel() != StaminaLvl.Fresh ? ("[" + u.unit.GetStaminaLvlName() + "]") : "")
         + (u.windAdvantage ? ("[" + textLib.get("misc_windAdvantage") + "]") : "")
         + (u.windDisadvantage ? ("[" + textLib.get("misc_windDisadvantage") + "]") : "")
         + "\n";
@@ -162,9 +161,7 @@ namespace MonoNS
       }
 
       foreach (UnitPredict u in predict.defenders) {
-        defGenerals += u.unit.GeneralName()
-        + (u.unit.GetStaminaLevel() != StaminaLvl.Fresh ? ("(" + u.unit.GetStaminaLvlName() + ") ") : "")
-        + "\n";
+        defGenerals += u.unit.GeneralName() + "\n";
 
         if (u.unit.IsCavalry()) {
           defCav += u.unit.rf.soldiers;

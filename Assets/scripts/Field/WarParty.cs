@@ -108,6 +108,50 @@ namespace FieldNS
       return stat;
     }
 
+    void UpdateUnitFreeSpace(HashSet<Unit> units, HashSet<Tile> tiles, Unit unit) {
+      if (units.Contains(unit)) {
+        return;
+      }
+      units.Add(unit);
+
+      foreach(Tile tile in unit.tile.neighbours) {
+        Unit u = tile.GetUnit();
+        if (tile.Deployable(unit) || tile.settlement != null && tile.settlement.owner.isAI == unit.IsAI()) {
+          tiles.Add(tile);
+        } else if (u != null && u.IsAI() == unit.IsAI()) {
+          UpdateUnitFreeSpace(units, tiles, u);
+        }
+      }
+    }
+
+    public Dictionary<HashSet<Unit>, HashSet<Tile>> GetFreeSpaces() {
+      Dictionary<HashSet<Unit>, HashSet<Tile>> info = new Dictionary<HashSet<Unit>, HashSet<Tile>>();
+      foreach(Unit unit in GetUnits()) {
+        if (unit.IsCamping()) {
+          continue;
+        }
+
+        bool found = false;
+        foreach(var key in info.Keys) {
+          if (key.Contains(unit)) {
+            found = true;
+            break;
+          }
+        }
+        if (found) {
+          continue;
+        }
+
+        HashSet<Unit> units = new HashSet<Unit>();
+        HashSet<Tile> tiles = new HashSet<Tile>(); 
+        UpdateUnitFreeSpace(units, tiles, unit);
+
+        info[units] = tiles;
+      }
+
+      return info;
+    }
+
     HashSet<Tile> discoveredTiles = new HashSet<Tile>();
     public void GetVisibleArea(HashSet<Tile> tiles) {
       foreach (Unit u in GetUnits())

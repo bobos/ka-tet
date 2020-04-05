@@ -180,7 +180,7 @@ public abstract class Settlement: Building
     }
 
     foreach(Unit unit in garrison) {
-      force += unit.GetUnitDefendCombatPoint(true);
+      force += unit.GetUnitDefendCombatPoint();
     }
 
     return force;

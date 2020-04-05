@@ -474,9 +474,7 @@ namespace MonoNS
       if (!fromUnit.IsCamping()) {
         txt = fromUnit.GeneralName() + "\n" + predict.joinPossibility + "%\n" + UnitInfoView.Shorten(predict.operationPoint)
           + "(" + predict.percentOfEffectiveForce + "%)" +
-          (predict.windAdvantage ? "↑↑↑" : (predict.windDisadvantage ? "↓↓": "")) +
-         (fromUnit.GetStaminaLevel() == StaminaLvl.Tired ? "☹"
-          : (fromUnit.GetStaminaLevel() == StaminaLvl.Exhausted ? "☹☹" : ""));
+          (predict.windAdvantage ? "↑↑↑" : (predict.windDisadvantage ? "↓↓": ""));
         UnitView view = GetUnitView(fromUnit);
         toggledUnitViews.Add(view);
         view.ToggleText(false);
@@ -487,9 +485,7 @@ namespace MonoNS
 
     public void ShowDefendArrow(Unit fromUnit, Unit toUnit, UnitPredict predict) {
       string txt = fromUnit.GeneralName() + "\n" + predict.joinPossibility + "%\n"
-        + UnitInfoView.Shorten(predict.operationPoint) + "(" + predict.percentOfEffectiveForce + "%)" +
-       (fromUnit.GetStaminaLevel() == StaminaLvl.Tired ? "☹"
-        : (fromUnit.GetStaminaLevel() == StaminaLvl.Exhausted ? "☹☹" : ""));
+        + UnitInfoView.Shorten(predict.operationPoint) + "(" + predict.percentOfEffectiveForce + "%)";
       UnitView view = GetUnitView(fromUnit);
       toggledUnitViews.Add(view);
       view.ToggleText(false);
@@ -499,9 +495,7 @@ namespace MonoNS
 
      public void ShowDefenderStat(Unit defender, UnitPredict predict) {
        string txt = defender.GeneralName() + "\n" + predict.joinPossibility + "%\n"
-         + UnitInfoView.Shorten(predict.operationPoint) + "(" + predict.percentOfEffectiveForce + "%)" +
-        (defender.GetStaminaLevel() == StaminaLvl.Tired ? "☹"
-         : (defender.GetStaminaLevel() == StaminaLvl.Exhausted ? "☹☹" : ""));
+         + UnitInfoView.Shorten(predict.operationPoint) + "(" + predict.percentOfEffectiveForce + "%)";
        UnitView view = GetUnitView(defender);
        toggledUnitViews.Add(view);
        view.ToggleText(false);

@@ -63,7 +63,7 @@ namespace MonoNS
     List<Unit> supportDefenders;
 
     int GetEffectiveForcePercentage(Unit unit, bool asMainDefender) {
-      return (int)((1 + unit.GetStaminaDebuf(asMainDefender)) * 100);
+      return 100;
     }
 
     public void SetGaleVantage(Unit unit, Unit target, UnitPredict predict) {
@@ -148,13 +148,11 @@ namespace MonoNS
           continue;
         }
 
-        if (u.IsAI() == attacker.IsAI() && u.GetStaminaLevel() != StaminaLvl.Exhausted
-          && !Util.eq<Unit>(u, attacker) && u.CanAttack()) {
+        if (u.IsAI() == attacker.IsAI() && !Util.eq<Unit>(u, attacker) && u.CanAttack()) {
           supportAttackers.Add(u);
         }
 
-        if (u.IsAI() != attacker.IsAI() && u.GetStaminaLevel() != StaminaLvl.Exhausted
-          && !Util.eq<Unit>(u, attacker)) {
+        if (u.IsAI() != attacker.IsAI() && !Util.eq<Unit>(u, attacker)) {
           supportDefenders.Add(u);
         }
       }
@@ -164,7 +162,7 @@ namespace MonoNS
       unitPredict.percentOfEffectiveForce = GetEffectiveForcePercentage(attacker, false);
       unitPredict.joinPossibility = 100;
       SetGaleVantage(attacker, defender, unitPredict);
-      unitPredict.operationPoint = attacker.IsCamping() ? attacker.unitCampingAttackCombatPoint : attacker.GetUnitAttackCombatPoint();
+      unitPredict.operationPoint = attacker.IsCamping() ? attacker.unitCampingAttackCombatPoint : attacker.unitCombatPoint;
       predict.attackers.Add(unitPredict);
       predict.attackerOptimPoints += unitPredict.operationPoint;
       hexMap.ShowAttackArrow(attacker, targetUnit, unitPredict);
@@ -175,7 +173,7 @@ namespace MonoNS
         unitPredict.percentOfEffectiveForce = GetEffectiveForcePercentage(unit, false);
         SetGaleVantage(unit, defender, unitPredict);
         unitPredict.joinPossibility = 100;
-        unitPredict.operationPoint = unit.GetUnitAttackCombatPoint();
+        unitPredict.operationPoint = unit.unitCombatPoint;
         predict.attackers.Add(unitPredict);
         predict.attackerOptimPoints += unitPredict.operationPoint;
       }
@@ -185,7 +183,7 @@ namespace MonoNS
       unitPredict.unit = defender;
       unitPredict.percentOfEffectiveForce = GetEffectiveForcePercentage(defender, true);
       unitPredict.joinPossibility = 100;
-      unitPredict.operationPoint = targetSettlement != null ? targetSettlement.GetDefendForce() : defender.GetUnitDefendCombatPoint(true);
+      unitPredict.operationPoint = targetSettlement != null ? targetSettlement.GetDefendForce() : defender.GetUnitDefendCombatPoint();
       predict.defenders.Add(unitPredict);
       predict.defenderOptimPoints += unitPredict.operationPoint;
       if (targetSettlement == null) {
@@ -211,7 +209,7 @@ namespace MonoNS
         unitPredict.unit = unit;
         unitPredict.percentOfEffectiveForce = GetEffectiveForcePercentage(unit, false);
         unitPredict.joinPossibility = Cons.IsMist(hexMap.weatherGenerator.currentWeather) ? 60 : 100;
-        unitPredict.operationPoint = unit.GetUnitDefendCombatPoint(false);
+        unitPredict.operationPoint = unit.GetUnitDefendCombatPoint();
         predict.defenders.Add(unitPredict);
         predict.defenderOptimPoints += unitPredict.operationPoint;
       }
@@ -540,7 +538,7 @@ namespace MonoNS
         // combat starts
         int attackerCasualty = 0;
         int defenderCasualty = 0;
-        bool attackerBigger = true;
+        bool attackerBigger = predict.sugguestedResult.chance == 10;
         ResultType resultLevel = predict.suggestedResultType;
         predict.attackerOptimPoints = predict.attackerOptimPoints <= 0 ? 1 : predict.attackerOptimPoints;
         predict.defenderOptimPoints = predict.defenderOptimPoints <= 0 ? 1 : predict.defenderOptimPoints;
@@ -565,7 +563,7 @@ namespace MonoNS
             factor = 0.03f;
           }
           if (resultLevel == ResultType.Crushing) {
-            factor = 0.7f;
+            factor = 0.5f;
           }
 
           if (attackerBigger) {
@@ -576,7 +574,7 @@ namespace MonoNS
 
           if (resultLevel == ResultType.Small) {
             // 2x - 2.4x
-            int modifier = Util.Rand(7, 8);
+            int modifier = Util.Rand(5, 6);
             if (attackerBigger) {
               attackerCasualty = (int)(defenderCasualty * modifier * 0.1f);
             } else {
@@ -586,7 +584,7 @@ namespace MonoNS
 
           if (resultLevel == ResultType.Great) {
             // 2.4x - 3.9x
-            int modifier = Util.Rand(5, 6);
+            int modifier = Util.Rand(4, 5);
             if (attackerBigger) {
               attackerCasualty = (int)(defenderCasualty * modifier* 0.1f);
             } else {
@@ -596,7 +594,7 @@ namespace MonoNS
 
           if (resultLevel == ResultType.Crushing) {
             // 3.9x - 6x odds
-            int modifier = Util.Rand(1, 3);
+            int modifier = Util.Rand(1, 2);
             if (attackerBigger) {
               attackerCasualty = (int)(defenderCasualty * modifier * 0.1f);
             } else {

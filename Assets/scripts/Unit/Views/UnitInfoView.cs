@@ -38,18 +38,19 @@ namespace UnitNS
     }
 
     public void SetName(Unit unit) {
-      int totalDefendPoint = unit.GetUnitDefendCombatPoint(true);
+      int totalDefendPoint = unit.GetUnitDefendCombatPoint();
       foreach(Tile tile in unit.tile.neighbours) {
         Unit u = tile.GetUnit();
         if (u != null && u.IsAI() == unit.IsAI()) {
-          totalDefendPoint += u.GetUnitDefendCombatPoint(false);
+          totalDefendPoint += u.GetUnitDefendCombatPoint();
         }
       }
 
       TextMesh textMesh = this.transform.GetComponent<TextMesh>();
       Color color = unit.hexMap.GetWarParty(unit).attackside ? Color.yellow : Color.white;
-      string title = (unit.defeating ? "☠" : (unit.chaos ? "☠☠": ""))
+      string title = (unit.defeating ? "☹" : (unit.chaos ? "☹☹": ""))
         + "\n"
+        + (unit.InCommanderRange() ? "[*]" : "")
         + (unit.IsCavalry() ? "♞" : "♜")
         + (unit.hexMap.wargameController.start ? "[推演]\n" : "")
         + unit.GeneralName()
@@ -59,7 +60,7 @@ namespace UnitNS
       textMesh.text = title + unit.rf.province.Name() + "-"
         + unit.GetUnitName()
         + "[" + unit.rf.soldiers + "]\n"
-        + Shorten(unit.GetUnitAttackCombatPoint()) + "/" + Shorten(unit.unitPureCombatPoint) + "\n"
+        + Shorten(unit.unitCombatPoint) + "/" + Shorten(unit.unitPureCombatPoint) + "\n"
         + "♟" + Shorten(totalDefendPoint) + "♙" + Shorten(unit.unitPureDefendCombatPoint);
       textMesh.fontSize = 45;
       textMesh.color = color;

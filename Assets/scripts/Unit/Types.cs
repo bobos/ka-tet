@@ -15,13 +15,6 @@
     Retreated
   }
 
-  public enum StaminaLvl
-  {
-    Fresh,
-    Tired,
-    Exhausted
-  }
-
   public enum ActionType {
     UnitVisible,
     UnitLeft,

@@ -251,6 +251,7 @@ namespace MonoNS
         return (int)(Tile.Distance(tile, a.tile) - Tile.Distance(tile, b.tile));
       });
 
+      // Refresh unit at new turn
       foreach (Unit unit in units)
       {
         // consume supply
@@ -282,6 +283,14 @@ namespace MonoNS
         unitAniController.RefreshUnit(unit);
         while (unitAniController.RefreshAnimating) { yield return null; }
         hexMap.SetUnitSkin(unit);
+      }
+      Dictionary<HashSet<Unit>, HashSet<Tile>> spaces = otherP.GetFreeSpaces();
+      foreach(KeyValuePair<HashSet<Unit>, HashSet<Tile>> kvp in spaces) {
+        if (kvp.Value.Count == 0) {
+          // unit group is surrounded
+          unitAniController.UnitSurrounded(kvp.Key);
+          while (unitAniController.SurroundAnimating) { yield return null; }
+        }
       }
 
       // AI Stuff

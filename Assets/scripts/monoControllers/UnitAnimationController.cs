@@ -108,7 +108,6 @@ namespace MonoNS
 
       if (tile == null) {
         discontent = unit.marchOnHeat.Occur();
-        discontent += unit.marchOnExhaustion.Occur();
       }
       if (unit.IsShowingAnimation() && !dontFixCamera) {
         hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(unit.tile).transform.position);
@@ -246,6 +245,32 @@ namespace MonoNS
       while (eventDialog.Animating) { yield return null; }
       hexMap.cameraKeyboardController.EnableCamera();
       AttackEmptyAnimating = false;
+    }
+
+    public bool SurroundAnimating = false;
+    public void UnitSurrounded (HashSet<Unit> units) {
+      SurroundAnimating = true;
+      hexMap.cameraKeyboardController.DisableCamera();
+      StartCoroutine(CoUnitSurrounded(units));
+    }
+
+    IEnumerator CoUnitSurrounded(HashSet<Unit> units) {
+      const int moraleDrop = -10;
+      bool first = true;
+      foreach(Unit unit in units) {
+        if (first) {
+          hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(unit.tile).transform.position);
+          hexMap.turnController.ShowTitle(Cons.GetTextLib().get("title_noWayOut"), Color.white);
+          while(hexMap.turnController.showingTitle) { yield return null; }
+          first = false;
+        }
+        unit.rf.morale += moraleDrop;
+        ShowEffects(unit, new int[]{moraleDrop,0,0,0,0,0,0,0,0});
+      }
+      hexMap.turnController.Sleep(1);
+      while(hexMap.turnController.sleeping) { yield return null; }
+      hexMap.cameraKeyboardController.EnableCamera();
+      SurroundAnimating = false;
     }
 
     public bool RefreshAnimating = false;
@@ -640,6 +665,7 @@ namespace MonoNS
       }
       ForceRetreatAnimating = true;
       unit.retreated = true;
+      unit.defeating = true;
       hexMap.cameraKeyboardController.DisableCamera();
       StartCoroutine(CoForceRetreat(unit));
     }

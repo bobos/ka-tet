@@ -67,9 +67,6 @@ namespace TextNS
       {"d_southWest", "西南 ↘"},
 
   //   unit
-  	  {"u_exhausted", "精疲力竭"},
-  	  {"u_tired", "人困马乏"},
-  	  {"u_fresh", "充沛"},
       {"u_concealing", "隐蔽中"},
       {"u_camping", "驻扎中"},
       {"u_disbanded", "被歼灭"},
@@ -280,6 +277,7 @@ namespace TextNS
       {"title_wargame_committed", "执行完毕"},
       {"title_formationBreaking", "破阵!"},
       {"title_formationCrushing", "一溃千里"},
+      {"title_noWayOut", "身陷重围"},
       {"title_deployment", "战前部署"},
       {"title_days", @"第{0}日 · {1}"},
 

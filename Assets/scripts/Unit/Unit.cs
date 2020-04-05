@@ -44,7 +44,6 @@ namespace UnitNS
     public UnitPoisioned unitPoisioned;
     public Riot riot;
     public MarchOnHeat marchOnHeat;
-    public MarchOnExhaustion marchOnExhaustion;
     public FarmDestroy farmDestroy;
     public Supply supply;
     public WeatherEffect weatherEffect;
@@ -82,7 +81,6 @@ namespace UnitNS
       unitPoisioned = new UnitPoisioned(this);
       riot = new Riot(this);
       marchOnHeat = new MarchOnHeat(this);
-      marchOnExhaustion = new MarchOnExhaustion(this);
       supply = new Supply(this);
       weatherEffect = new WeatherEffect(this);
       unitConflict = new UnitConflict(this);
@@ -243,7 +241,7 @@ namespace UnitNS
     public bool retreated = false;
     public bool attacked = false;
     public bool CanAttack() {
-      return !attacked && GetStaminaLevel() != StaminaLvl.Exhausted;
+      return !attacked;
     }
 
     public string GetStateName()
@@ -265,20 +263,6 @@ namespace UnitNS
         return txtLib.get("u_retreated");
       }
       return txtLib.get("u_standing");
-    }
-
-    public string GetStaminaLvlName()
-    {
-      StaminaLvl lvl = GetStaminaLevel();
-      if (lvl == StaminaLvl.Exhausted)
-      {
-        return txtLib.get("u_exhausted");
-      }
-      if (lvl == StaminaLvl.Tired)
-      {
-        return txtLib.get("u_tired");
-      }
-      return txtLib.get("u_fresh");
     }
 
     public int GetHeatSickTurns()
@@ -517,19 +501,6 @@ namespace UnitNS
         (IsSick() ? 0.4f : 1));
     }
 
-    public StaminaLvl GetStaminaLevel()
-    {
-      if (movementRemaining >= 40)
-      {
-        return StaminaLvl.Fresh;
-      }
-      if (movementRemaining >= ActionCost)
-      {
-        return StaminaLvl.Tired;
-      }
-      return StaminaLvl.Exhausted;
-    }
-
     // ==============================================================
     // ================= morale mangement ===========================
     // ==============================================================
@@ -558,13 +529,8 @@ namespace UnitNS
       }
     }
 
-    public int GetUnitAttackCombatPoint() {
-      return (int)(unitCombatPoint * (1 + GetStaminaDebuf(false)));
-    }
-
-    public int GetUnitDefendCombatPoint(bool asMainDefender) {
-      return (int)((IsCavalry() ? unitCombatPoint : (int)(unitCombatPoint * CombatController.DefendModifier))
-                   * (1 + GetStaminaDebuf(asMainDefender)));
+    public int GetUnitDefendCombatPoint() {
+      return (int)((IsCavalry() ? unitCombatPoint : (int)(unitCombatPoint * CombatController.DefendModifier)));
     }
 
     public int unitPureCombatPoint {
@@ -578,7 +544,7 @@ namespace UnitNS
     public int unitCampingAttackCombatPoint {
       get {
         int total = vantage.TotalPoints(cp);
-        total = (int)((total + total * GetCampingAttackBuff()) * 0.1f * (1 + GetStaminaDebuf(false)));
+        total = (int)((total + total * GetCampingAttackBuff()) * 0.1f);
         return total < 0 ? 0 : total;
       }
     }
@@ -593,7 +559,7 @@ namespace UnitNS
       return unitPoisioned.Poision();
     }
 
-    public float GetCampingAttackBuff()
+    float GetCampingAttackBuff()
     {
       return GetChaosBuf() + GetWarwearyBuf() - plainSickness.debuf + rf.lvlBuf - disarmorDefDebuf;
     }
@@ -601,16 +567,6 @@ namespace UnitNS
     public float GetBuff()
     {
       return GetCampingAttackBuff() + vantage.Buf();
-    }
-
-    public float GetStaminaDebuf(bool asMainDefender) {
-      if (GetStaminaLevel() == StaminaLvl.Tired) {
-        return -0.3f;
-      } else if (GetStaminaLevel() == StaminaLvl.Exhausted) {
-        return asMainDefender ? -0.5f : -1f;
-      } else {
-         return 0f;
-      }
     }
 
     public float GetWarwearyBuf()
@@ -695,50 +651,6 @@ namespace UnitNS
       SetState(State.Stand);
     }
 
-    bool AfterMoveUpdate(List<Unit> knownUnit, bool allyOnTile) {
-      foreach(Tile t in GetVisibleArea()) {
-        hexMap.GetWarParty(this).DiscoverTile(t);
-      }
-
-      bool continueMoving = true;
-
-      if (IsConcealed() && hexMap.GetRangeForDiscoveryCheck(this.IsAI()).Contains(tile)) {
-        DiscoveredByEnemy();
-        continueMoving = false;
-      }
-
-      // discover nearby enemies
-      foreach(Tile t in GetScoutArea()) {
-        Unit candidate = t.GetUnit();
-        if (candidate != null && candidate.IsAI() != IsAI() && candidate.IsConcealed()) {
-          candidate.DiscoveredByEnemy();
-        }
-      }
-
-      if (stopAtNextMove) {
-        stopAtNextMove = false;
-        if (!allyOnTile) {
-          return false;
-        }
-      }
-
-      // Unit should stop once spots new enemy
-      foreach(Tile t in GetVisibleArea()) {
-        Unit u = t.GetUnit();
-        if (u != null && u.IsAI() != IsAI() && u.IsVisible() && !knownUnit.Contains(u)) {
-          continueMoving = false;
-        }
-      }
-
-      if (!continueMoving && allyOnTile) {
-        stopAtNextMove = true;
-        continueMoving = true;
-      }
-
-      return continueMoving;
-    }
-
-    bool stopAtNextMove = false;
     public bool DoMove(Tile toTile = null)
     {
       Tile next = null;
@@ -776,12 +688,12 @@ namespace UnitNS
         return false;
       }
 */
-      int takenMovement = CostToEnterTile(next, PathFind.Mode.Normal);
-      List<Unit> knownUnits = hexMap.combatController.GetKnownEnemies();
-      movementRemaining -= takenMovement;
-      bool allyOnTile = next.GetUnit() != null;
+      movementRemaining -= CostToEnterTile(next, PathFind.Mode.Normal);
       SetTile(next);
-      return AfterMoveUpdate(knownUnits, allyOnTile);
+      foreach(Tile t in GetVisibleArea()) {
+        hexMap.GetWarParty(this).DiscoverTile(t);
+      }
+      return true;
     }
 
     public void SetWargameTile(Tile h) {
@@ -817,6 +729,14 @@ namespace UnitNS
     public Tile[] GetPureAccessibleTiles(bool fullMovement = false) {
       return PFTile2Tile(PathFinder.FindAccessibleTiles(tile, this,
         fullMovement ? GetFullMovement() : movementRemaining));
+    }
+
+    List<Tile> GetSurroundedTiles() {
+      List<Tile> tiles = new List<Tile>();
+      foreach(Tile tile in PFTile2Tile(PathFinder.FindAccessibleTiles(tile, this, 50))) {
+        tiles.Add(tile);
+      }
+      return tiles;
     }
 
     public Tile[] GetAccessibleTiles(bool fullMovement = false)

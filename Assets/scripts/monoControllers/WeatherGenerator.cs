@@ -104,7 +104,6 @@ namespace MonoNS
 
     Weather GenerateWeather()
     {
-      return Cons.mist;
       int luckNum = Util.Rand(1, 10);
       if (Cons.IsSpring(season))
       {
