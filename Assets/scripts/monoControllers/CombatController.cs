@@ -550,7 +550,7 @@ namespace MonoNS
           if (noRetreat && !defender.IsVulnerable()
             && !defender.IsWarWeary()
             && (predict.attackerOptimPoints > (int)(predict.defenderOptimPoints * 1.5f))
-            && (defender.rf.general.Has(Cons.counterAttack) || Cons.FairChance())) {
+            && (defender.rf.general.Has(Cons.formidable) || Cons.FairChance())) {
             predict.defenderOptimPoints = predict.defenderOptimPoints * 3;
             hexMap.dialogue.ShowNoRetreatEvent(defender);
             while (hexMap.dialogue.Animating) { yield return null; }

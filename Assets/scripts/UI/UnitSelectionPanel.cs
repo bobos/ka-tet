@@ -274,6 +274,7 @@ namespace MonoNS
       + "%\n加成:\n"
       + "等级加成:" + unit.rf.lvlBuf * 100
       + "%\n地形加成:" + unit.vantage.Buf() * 100
+      + "%\n将领加成:" + unit.GetGeneralBuf() * 100
       + "%\n总计加成:" + (unit.GetBuff() *100) + "%\n\n"
       + "有效作战人数:" + unit.vantage.GetEffective();
       hexMap.hoverInfo.Show(details);

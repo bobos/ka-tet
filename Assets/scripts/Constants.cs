@@ -209,7 +209,7 @@ public class Cons {
   public static Ability breaker = new Breaker();
   public static Ability unshaken = new Unshaken();
   public static Ability easyTarget = new EasyTarget();
-  public static Ability counterAttack = new CounterAttack();
+  public static Ability formidable = new CounterAttack();
   public static Ability attender = new Attender();
   public static Ability refuseToRetreat = new RefuseToRetreat();
   public static Ability retreater = new Retreater();

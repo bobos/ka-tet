@@ -59,7 +59,7 @@ namespace CourtNS {
 
     public override List<Ability> Abilities() {
       return new List<Ability>(){Cons.breaker, Cons.unshaken,
-        Cons.holdTheGround, Cons.easyTarget, Cons.counterAttack};
+        Cons.holdTheGround, Cons.easyTarget, Cons.formidable};
     }
   }
 

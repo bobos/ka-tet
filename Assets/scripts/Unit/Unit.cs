@@ -553,7 +553,7 @@ namespace UnitNS
 
     float GetCampingAttackBuff()
     {
-      return GetChaosBuf() + GetWarwearyBuf() - plainSickness.debuf + rf.lvlBuf - disarmorDefDebuf;
+      return GetGeneralBuf() + GetChaosBuf() + GetWarwearyBuf() - plainSickness.debuf + rf.lvlBuf - disarmorDefDebuf;
     }
 
     public float GetBuff()
@@ -564,6 +564,10 @@ namespace UnitNS
     public float GetWarwearyBuf()
     {
       return warWeary.GetBuf();
+    }
+
+    public float GetGeneralBuf() {
+      return rf.general.Has(Cons.formidable) ? 0.25f : 0f;
     }
 
     public float GetChaosBuf() {

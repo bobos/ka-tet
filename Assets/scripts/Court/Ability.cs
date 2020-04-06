@@ -270,11 +270,11 @@ namespace CourtNS {
     }
 
     public override string Name() {
-      return Cons.GetTextLib().get("ability_counterAttack");
+      return Cons.GetTextLib().get("ability_formidable");
     }
 
     public override string Description() {
-      return Cons.GetTextLib().get("ability_counterAttack_description");
+      return Cons.GetTextLib().get("ability_formidable_description");
     }
   }
 
