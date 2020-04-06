@@ -110,7 +110,6 @@ namespace CourtNS
     }
 
     public void LeaveCampaign() {
-      // TODO: return labor to faction
       state = TroopState.Rest;
       onFieldUnit = null;
     }

@@ -24,10 +24,6 @@ namespace CourtNS
       );
     }
 
-    public void DeductOneAgriculturePoint() {
-      // TODO: update this
-    }
-
   }
 
   // 河湟 吐蕃

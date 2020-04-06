@@ -315,7 +315,7 @@ namespace TextNS
       {"ability_easyTarget", "身先士卒"},
       {"ability_easyTarget_description", "将领战死几率增加50%"},
       {"ability_counterAttack", "背水一战"},
-      {"ability_counterAttack_description", "作为防御方实力悬殊时本部兵马60%几率战力翻番"},
+      {"ability_counterAttack_description", "当所部被完全包围时战斗力提升3倍"},
       {"ability_attender", "永不缺席"},
       {"ability_attender_description", "100%几率参加协同作战"},
       {"ability_refuseToRetreat", "绝不撤退"},
@@ -327,7 +327,7 @@ namespace TextNS
       {"ability_opportunist", "见风使舵"},
       {"ability_opportunist_description", "在本方明显劣势时60%几率不参与协同作战"},
       {"ability_playSafe", "步步为营"},
-      {"ability_playSafe_description", "敌方战败时本部兵马不会擅自追击"},
+      {"ability_playSafe_description", "敌方战败时本部兵马不会擅自追击将领不易战死"},
 
       {"trait_reckless", "鲁莽"},
       {"trait_brave", "英勇"},

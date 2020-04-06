@@ -53,7 +53,6 @@ namespace MapTileNS
              || Util.eq<Province>(hexMap.warProvince, Cons.heDong)) && Cons.FiftyFifty()) {
           epidemic = new Epidemic(this);
         }
-        //TODO poison horse
       }
 
       if (flood != null || wildFire != null || epidemic != null || deadZone != null) {
@@ -81,7 +80,6 @@ namespace MapTileNS
     // ==============================================================
     // ================= Information ================================
     // ==============================================================
-    // TODO: textLib
     Tile[] _neighbours;
     public Tile[] neighbours {
       get {

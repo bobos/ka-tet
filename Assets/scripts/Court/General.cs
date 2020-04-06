@@ -166,28 +166,24 @@ namespace CourtNS {
       commandUnit.general = null;
       commandUnit = null;
       LeaveCampaign();
-      // TODO: apply traits
-      if (Cons.FairChance()) {
+      if ((Has(Cons.easyTarget) && Cons.FiftyFifty()) ||
+          (Has(Cons.playSafe) && Cons.TinyChance()) ||
+          Cons.FairChance()
+          ) {
         // Killed in battle
         Die();
       }
     }
 
     void Die() {
-      // TODO: assign new commanderGeneral in warparty
       hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.GeneralKilledInBattle, null, null, 0, 0, 0, 0, 0, null, this));
       LeaveFaction();
       stat = GeneralStat.Dead;
     }
 
     void LeaveCampaign() {
-      // TODO: assign new commanderGeneral in warparty
       if (onGeneralLeaveCampaign != null) onGeneralLeaveCampaign(this);
       stat = GeneralStat.Rest;
-    }
-
-    void Treason() {
-      // TODO: assign new commanderGeneral in warparty
     }
 
     public List<FieldEvent> GetFieldRecords() {

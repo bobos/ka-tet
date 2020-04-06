@@ -357,13 +357,17 @@ namespace UnitNS
 
     public bool InCommanderRange() {
       bool inRange = false;
-      foreach(Tile t in hexMap.GetWarParty(this).commanderGeneral.commandUnit.onFieldUnit.GetVisibleArea()) {
+      foreach(Tile t in MyCommander().commandUnit.onFieldUnit.GetVisibleArea()) {
         if (Util.eq<Tile>(tile, t)) {
           inRange = true;
           break;
         }
       }
       return inRange;
+    }
+
+    public General MyCommander() {
+      return hexMap.GetWarParty(this).commanderGeneral;
     }
 
     protected virtual bool Concealable() {

@@ -172,7 +172,7 @@ namespace MonoNS
         unitPredict.unit = unit;
         unitPredict.percentOfEffectiveForce = GetEffectiveForcePercentage(unit, false);
         SetGaleVantage(unit, defender, unitPredict);
-        unitPredict.joinPossibility = 100;
+        unitPredict.joinPossibility = JoinPossibility(unit, true);
         unitPredict.operationPoint = unit.unitCombatPoint;
         predict.attackers.Add(unitPredict);
         predict.attackerOptimPoints += unitPredict.operationPoint;
@@ -208,7 +208,7 @@ namespace MonoNS
         unitPredict = new UnitPredict();
         unitPredict.unit = unit;
         unitPredict.percentOfEffectiveForce = GetEffectiveForcePercentage(unit, false);
-        unitPredict.joinPossibility = Cons.IsMist(hexMap.weatherGenerator.currentWeather) ? 60 : 100;
+        unitPredict.joinPossibility = JoinPossibility(unit, false);
         unitPredict.operationPoint = unit.GetUnitDefendCombatPoint();
         predict.defenders.Add(unitPredict);
         predict.defenderOptimPoints += unitPredict.operationPoint;
@@ -222,7 +222,7 @@ namespace MonoNS
         if (Util.eq<Unit>(up.unit, defender) || Util.eq<Unit>(up.unit, attacker)) {
           continue;
         }
-        int pos = GetJoinPossibility(up.unit, predict.suggestedResultType);
+        int pos = JoinPossibilityBaseOnOdds(up.unit, predict.suggestedResultType);
         up.joinPossibility = pos < up.joinPossibility ? pos : up.joinPossibility;
       }
 
@@ -268,11 +268,38 @@ namespace MonoNS
       }
     }
 
-    int GetJoinPossibility(Unit unit, ResultType result) {
+    int JoinPossibility(Unit unit, bool attacker) {
+      int ret = 100;
       bool inRange = unit.InCommanderRange();
-      // TODO: apply general triats to adjust possibility 
+      if (!attacker && Cons.IsMist(hexMap.weatherGenerator.currentWeather)) {
+        if (inRange && unit.MyCommander().Has(Cons.masterOfMist)) {
+          ret = 100;
+        } else {
+          ret = 60;
+        }
+      }
+
+      if (attacker && unit.MyCommander().Has(Cons.outOfOrder)) {
+        ret = ret < 50 ? ret : 50;
+      }
+
+      return ret;
+    }
+
+    int JoinPossibilityBaseOnOdds(Unit unit, ResultType result) {
+      bool inRange = unit.InCommanderRange();
+      if (unit.rf.general.Has(Cons.attender) || 
+        (inRange && unit.MyCommander().Has(Cons.obey))) {
+        return 100;
+      }
+
       if (result == ResultType.Close) {
         return inRange ? 100 : 80;
+      }
+
+      // when odds is greater than close
+      if (unit.rf.general.Has(Cons.opportunist) && result != ResultType.Crushing) {
+        return 50;
       }
 
       if (result == ResultType.Small) {
@@ -520,10 +547,10 @@ namespace MonoNS
             }
           }
 
-          // TODO: apply general trait to increase the chance
           if (noRetreat && !defender.IsVulnerable()
             && !defender.IsWarWeary()
-            && (predict.attackerOptimPoints > (int)(predict.defenderOptimPoints * 1.5f)) && Cons.FiftyFifty()) {
+            && (predict.attackerOptimPoints > (int)(predict.defenderOptimPoints * 1.5f))
+            && (defender.rf.general.Has(Cons.counterAttack) || Cons.FairChance())) {
             predict.defenderOptimPoints = predict.defenderOptimPoints * 3;
             hexMap.dialogue.ShowNoRetreatEvent(defender);
             while (hexMap.dialogue.Animating) { yield return null; }
@@ -678,9 +705,10 @@ namespace MonoNS
         int[] vicBuf = GetVicBuf(resultLevel);
         int[] dftBuf = GetDftBuf(resultLevel);
         if (atkWin) {
-          // TODO
-          // 1. accumulate operation result(kill+wounded vs enemy kill+wounded) for per commander for party influence update
-          // 6. kill general
+          if (!defender.IsGone() && defender.rf.general.Has(Cons.easyTarget) && Cons.SlimChance()) {
+            hexMap.unitAniController.GeneralDied(defender);
+            while (hexMap.unitAniController.generalDieAnimating) { yield return null; }
+          }
           int morale = vicBuf[0];
           int morale1 = vicBuf[1];
           View view = null;
@@ -734,6 +762,10 @@ namespace MonoNS
           hexMap.turnController.Sleep(1);
           while(hexMap.turnController.sleeping) { yield return null; }
         } else {
+          if (!attacker.IsGone() && attacker.rf.general.Has(Cons.easyTarget) && Cons.SlimChance()) {
+            hexMap.unitAniController.GeneralDied(attacker);
+            while (hexMap.unitAniController.generalDieAnimating) { yield return null; }
+          }
           // defender win
           int morale = vicBuf[0];
           int morale1 = vicBuf[1];
