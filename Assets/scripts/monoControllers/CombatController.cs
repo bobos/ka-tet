@@ -420,26 +420,26 @@ namespace MonoNS
         return new int[]{-1, -1};
       }
       if (type == ResultType.Small) {
-        return new int[]{0, 0};
-      }
-      if (type == ResultType.Great) {
         return new int[]{1, 0};
       }
-      return new int[]{2, 1};
+      if (type == ResultType.Great) {
+        return new int[]{2, 1};
+      }
+      return new int[]{3, 2};
     }
 
     // initiatorMorale, supporterMorale, initiatorDiscontent
     int[] GetDftBuf(ResultType type) {
       if (type == ResultType.Close) {
-        return new int[]{-2, -2};
+        return new int[]{-2, -1};
       }
       if (type == ResultType.Small) {
-        return new int[]{-4, -4};
+        return new int[]{-5, -3};
       }
       if (type == ResultType.Great) {
-        return new int[]{-5, -5};
+        return new int[]{-6, -4};
       }
-      return new int[]{-10, -10};
+      return new int[]{-10, -8};
     }
 
     public bool commenceOpAnimating = false;
