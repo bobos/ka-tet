@@ -5,6 +5,7 @@ using FieldNS;
 using System.Collections.Generic;
 using MapTileNS;
 using static MonoNS.HexMap;
+using CourtNS;
 
 namespace MonoNS
 {
@@ -61,16 +62,6 @@ namespace MonoNS
     GameObject[] buttons;
 
     public Text title;
-    public Text movement;
-    public Text command;
-    public Text num;
-    public Text morale;
-    public Text offense;
-    public Text defense;
-    public Text skill;
-    public Text state;
-    public Text illness;
-    public Text poision;
     public Image generalPortrait; 
 
     public void OnEndTurnClicked()
@@ -254,8 +245,21 @@ namespace MonoNS
       return rate;
     }
 
+    string GetStarRate(int stars) {
+      string rate = "";
+      while(stars-- > 0) {
+        rate += "★";
+      }
+      return rate;
+    }
+
+    Unit currentUnit;
+    bool isCurrentGarrison;
     public void OnUnitSelect(Unit unit, bool isGarrison = false)
     {
+      title.fontSize = 20;
+      currentUnit = unit;
+      isCurrentGarrison = isGarrison;
       self.SetActive(true);
       generalPortrait.sprite = hexMap.imgLibrary.GetGeneralPortrait(unit.rf.general);
       bool isPreflight = !isGarrison && !Util.eq<Unit>(unit, mouseController.selectedUnit);
@@ -275,36 +279,68 @@ namespace MonoNS
       hexMap.hoverInfo.Show(details);
 
       title.text = unit.GeneralName();
-      movement.text = "移动力:" + (isPreflight ? mouseController.selectedUnit.movementRemaining + " -> " : "")
+      title.text += "\n统帅度:" + GetStarRate(unit.rf.general.commandSkill.commandSkill);
+      title.text += "\n指挥度:" + GetStarRate(unit.rf.general.size.troopSize);
+      title.text += "\n移动力:" + (isPreflight ? mouseController.selectedUnit.movementRemaining + " -> " : "")
         + unit.movementRemaining + "/" + unit.GetFullMovement();
-      skill.text = "指挥度:";
-      command.text = "统帅度:";
-      num.text = unit.Name() + "[" + unit.GetUnitName() + " 兵:" + unit.rf.soldiers + "/亡:" + unit.kia + "]";
-      morale.text = "士气: " + unit.rf.morale;
-      offense.text = "单兵战力: " + GetCombatpointRate((int)(unit.cp * (1 + unit.rf.lvlBuf)));
+      title.text += "\n" + unit.Name() + "[" + unit.GetUnitName() + " 兵:" + unit.rf.soldiers + "/亡:" + unit.kia + "]";
+      title.text += "\n士气: " + unit.rf.morale;
+      title.text += "\n单兵战力: " + GetCombatpointRate((int)(unit.cp * (1 + unit.rf.lvlBuf)));
       if (unit.IsCamping()) {
-        defense.text = "部队战力: " + UnitInfoView.Shorten(unit.unitCampingAttackCombatPoint)
+        title.text += "\n部队战力: " + UnitInfoView.Shorten(unit.unitCampingAttackCombatPoint)
         + " ♙" + UnitInfoView.Shorten(unit.GetUnitDefendCombatPoint());
       } else {
-        defense.text = "部队战力: " + UnitInfoView.Shorten(unit.unitCombatPoint) + "/" + UnitInfoView.Shorten(unit.unitPureCombatPoint)
+        title.text += "\n部队战力: " + UnitInfoView.Shorten(unit.unitCombatPoint) + "/" + UnitInfoView.Shorten(unit.unitPureCombatPoint)
         + " ♙" + UnitInfoView.Shorten(unit.GetUnitDefendCombatPoint());
       }
       string stateStr = unit.tile.siegeWall != null && unit.tile.siegeWall.IsFunctional() ? "围城中 " :
         (unit.tile.siegeWall != null && unit.tile.siegeWall.owner.isAI == unit.IsAI() ? ("建长围中:" + unit.tile.siegeWall.buildTurns + "回合完成 ") : "");
       stateStr += unit.IsWarWeary() ? "士气低落 " : "";
-      stateStr += unit.GetDiscontent() + " ";
       stateStr += unit.IsStarving() ? "饥饿 " : "";
       stateStr += unit.GetStateName();
-      state.text = stateStr;
-      illness.text = unit.GetHeatSickTurns() > 0 ? "痢疾: 将持续" + unit.GetHeatSickTurns() + "回合 " : "";
-      illness.text += unit.GetAltitudeSickTurns() > 0 ? "高原反应: 将持续" + unit.GetAltitudeSickTurns() + "回合" : "";
-      illness.text += unit.plainSickness.affected  ? "平原反应" : "";
-      poision.text = unit.GetPoisionTurns() > 0 ? "中毒: 将持续" + unit.GetPoisionTurns() + "回合" : "";
+      title.text += "\n" + stateStr;
+      title.text += unit.GetHeatSickTurns() > 0 ? "\n痢疾: 将持续" + unit.GetHeatSickTurns() + "回合 " : "";
+      title.text += unit.GetAltitudeSickTurns() > 0 ? "\n高原反应: 将持续" + unit.GetAltitudeSickTurns() + "回合" : "";
+      title.text += unit.plainSickness.affected  ? "\n平原反应" : "";
+      title.text += unit.GetPoisionTurns() > 0 ? "\n中毒: 将持续" + unit.GetPoisionTurns() + "回合" : "";
       if (unit.clone) {
         return;
       }
 
       ToggleButtons(unit.IsAI() == !turnController.player, unit, isGarrison);
+    }
+
+    void ShowAbilityInfo(Unit unit) {
+      title.fontSize = 18;
+      title.text = "";
+      foreach(Ability ability in unit.rf.general.acquiredAbilities) {
+        title.text += "{" + ability.Name() + "}: " + ability.Description() + "\n";
+      }
+    }
+
+    void ShowTraitInfo(Unit unit) {
+      title.fontSize = 18;
+      title.text = "";
+      if (unit.IsCommander()) {
+        title.text += "统帅属性:\n";
+        foreach(Ability ability in unit.rf.general.commandSkill.abilities) {
+          title.text += " {" + ability.Name() + "}: " + ability.Description() + "\n";
+        }
+      }
+      title.text += "性格:";
+      if (unit.rf.general.traits.Count == 0) {
+        title.text += "无\n";
+      } else {
+        string traits = "";
+        string abilities = "性格技能: \n";
+        foreach(Trait trait in unit.rf.general.traits) {
+          traits += " " + trait.Name();
+          foreach(Ability ability in trait.Abilities()) {
+            abilities += " {" + ability.Name() + "}: " + ability.Description() + "\n";
+          }
+        }
+        title.text += traits + "\n" + abilities;
+      }
     }
 
     public void OnUnitDeselect(Unit unit)
@@ -317,12 +353,13 @@ namespace MonoNS
     bool toggled = false;
     public void OnBtnClick(ActionController.actionName action)
     {
-      if (toggled) {
-        toggled = false;
-        hexMap.DehighlightArea();
-        return;
+      if (action == ActionController.actionName.TroopInfo) {
+        OnUnitSelect(currentUnit, isCurrentGarrison);
+      } else if (action == ActionController.actionName.AbilityInfo) {
+        ShowAbilityInfo(currentUnit);
+      } else if (action == ActionController.actionName.TraitInfo) {
+        ShowTraitInfo(currentUnit);
       }
-      toggled = true;
 
       if (action == ActionController.actionName.DEPLOYMENTDONE) {
         hexMap.turnController.DeploymentDone();
@@ -334,6 +371,13 @@ namespace MonoNS
       }
 
       if (action == ActionController.actionName.SHOWMINE || action == ActionController.actionName.SHOWENEMY) {
+        if (toggled) {
+          toggled = false;
+          hexMap.DehighlightArea();
+          return;
+        }
+        toggled = true;
+
         WarParty wp = action == ActionController.actionName.SHOWENEMY ? hexMap.GetAIParty() : hexMap.GetPlayerParty();
         WarPartyStat stat = wp.GetStat();
         int attackerCP = 0;

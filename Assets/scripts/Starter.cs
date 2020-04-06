@@ -75,7 +75,7 @@ public class Starter : MonoBehaviour {
     controllers.Add(turnController);
 
     // for 100k man fight for 6 months
-    const int supply = 10 * Infantry.MaxTroopNum * 60;
+    const int supply = 100000 * 60;
     //initialization all controllers
     hexMap.PreGameInit();
     hexMap.SetWarParties(
@@ -102,24 +102,24 @@ public class Starter : MonoBehaviour {
     dam.BuildDam();
     
     // init generals
-    General liubei = new General("g_liubei", "g_liubei_d", Cons.heNan, new Traits[0], new CommandSkill(3)); 
-    General guanyu = new General("g_guanyu", "g_guanyu_d", Cons.heNan, new Traits[0], new CommandSkill(1)); 
-    General zhangfei = new General("g_zhangfei", "g_zhangfei_d", Cons.heDong, new Traits[0], new CommandSkill(1)); 
-    General zhaoyun = new General("g_zhaoyun", "g_zhaoyun_d", Cons.heDong, new Traits[0], new CommandSkill(1)); 
-    General machao = new General("g_machao", "g_machao_d", Cons.heBei, new Traits[0], new CommandSkill(1)); 
+    General liubei = new General("g_liubei", "g_liubei_d", Cons.heNan, new CommandSkill(3), new TroopSize(3)); 
+    General guanyu = new General("g_guanyu", "g_guanyu_d", Cons.heNan, new CommandSkill(1), new TroopSize(3)); 
+    General zhangfei = new General("g_zhangfei", "g_zhangfei_d", Cons.heDong, new CommandSkill(1), new TroopSize(2)); 
+    General zhaoyun = new General("g_zhaoyun", "g_zhaoyun_d", Cons.heDong, new CommandSkill(1), new TroopSize(2)); 
+    General machao = new General("g_machao", "g_machao_d", Cons.heBei, new CommandSkill(1), new TroopSize(2)); 
     liubei.JoinFaction(Cons.Song, Cons.NewParty);
     guanyu.JoinFaction(Cons.Song, Cons.NewParty);
     zhangfei.JoinFaction(Cons.Song, Cons.OldParty);
     zhaoyun.JoinFaction(Cons.Song, Cons.OldParty);
     machao.JoinFaction(Cons.Song, Cons.OldParty);
 
-    General caocao = new General("g_caocao", "g_caocao_d", Cons.xiJing, new Traits[0], new CommandSkill(3)); 
-    General xuchu = new General("g_xuchu", "g_xuchu_d", Cons.xiJing, new Traits[0], new CommandSkill(2)); 
-    General abc = new General("g_abc", "g_abc", Cons.zhongJing, new Traits[0], new CommandSkill(1)); 
-    General x1 = new General("g_x1", "g_1", Cons.zhongJing, new Traits[0], new CommandSkill(1)); 
-    General x2 = new General("g_x2", "g_1", Cons.shangJing, new Traits[0], new CommandSkill(1)); 
-    General x3 = new General("g_x3", "g_1", Cons.shangJing, new Traits[0], new CommandSkill(1)); 
-    General x4 = new General("g_x4", "g_1", Cons.shangJing, new Traits[0], new CommandSkill(1)); 
+    General caocao = new General("g_caocao", "g_caocao_d", Cons.xiJing, new CommandSkill(3), new TroopSize(4)); 
+    General xuchu = new General("g_xuchu", "g_xuchu_d", Cons.xiJing, new CommandSkill(2), new TroopSize(3)); 
+    General abc = new General("g_abc", "g_abc", Cons.zhongJing, new CommandSkill(1), new TroopSize(2)); 
+    General x1 = new General("g_x1", "g_1", Cons.zhongJing, new CommandSkill(1), new TroopSize(3)); 
+    General x2 = new General("g_x2", "g_1", Cons.shangJing, new CommandSkill(1), new TroopSize(2)); 
+    General x3 = new General("g_x3", "g_1", Cons.shangJing, new CommandSkill(1), new TroopSize(1)); 
+    General x4 = new General("g_x4", "g_1", Cons.shangJing, new CommandSkill(1), new TroopSize(1)); 
     caocao.JoinFaction(Cons.Liao, Cons.NorthCourt);
     xuchu.JoinFaction(Cons.Liao, Cons.NorthCourt);
     abc.JoinFaction(Cons.Liao, Cons.NorthCourt);
@@ -129,19 +129,19 @@ public class Starter : MonoBehaviour {
     x4.JoinFaction(Cons.Liao, Cons.SouthCourt);
 
     // step 3, assign general to units
-    liubei.CreateTroop(hexMap, 8000, Cons.heNan, Type.Infantry, Cons.veteran);
-    zhaoyun.CreateTroop(hexMap, 6000, Cons.heBei, Type.Infantry, Cons.veteran);
-    guanyu.CreateTroop(hexMap, 4500, Cons.heBei, Type.Infantry, Cons.rookie);
-    machao.CreateTroop(hexMap, 3000, Cons.heDong, Type.Infantry, Cons.veteran);
-    zhangfei.CreateTroop(hexMap, 3000, Cons.shanXi, Type.Cavalry, Cons.rookie);
+    liubei.CreateTroop(hexMap, 15000, Cons.heNan, Type.Infantry, Cons.veteran);
+    zhaoyun.CreateTroop(hexMap, 15000, Cons.heBei, Type.Infantry, Cons.veteran);
+    guanyu.CreateTroop(hexMap, 15000, Cons.heBei, Type.Infantry, Cons.rookie);
+    machao.CreateTroop(hexMap, 15000, Cons.heDong, Type.Infantry, Cons.veteran);
+    zhangfei.CreateTroop(hexMap, 15000, Cons.shanXi, Type.Cavalry, Cons.rookie);
 
-    caocao.CreateTroop(hexMap, 10000, Cons.xiJing, Type.Infantry, Cons.veteran);
-    xuchu.CreateTroop(hexMap, 3000, Cons.zhongJing, Type.Cavalry, Cons.veteran);
-    abc.CreateTroop(hexMap, 8000, Cons.xiJing, Type.Infantry, Cons.veteran);
-    x1.CreateTroop(hexMap, 3000, Cons.shangJing, Type.Cavalry, Cons.rookie);
-    x2.CreateTroop(hexMap, 10000, Cons.xiJing, Type.Infantry, Cons.rookie);
-    x3.CreateTroop(hexMap, 8000, Cons.xiJing, Type.Infantry, Cons.rookie);
-    x4.CreateTroop(hexMap, 4000, Cons.zhongJing, Type.Infantry, Cons.rookie);
+    caocao.CreateTroop(hexMap, 20000, Cons.xiJing, Type.Infantry, Cons.veteran);
+    xuchu.CreateTroop(hexMap, 20000, Cons.zhongJing, Type.Cavalry, Cons.veteran);
+    abc.CreateTroop(hexMap, 20000, Cons.xiJing, Type.Infantry, Cons.veteran);
+    x1.CreateTroop(hexMap, 20000, Cons.shangJing, Type.Cavalry, Cons.rookie);
+    x2.CreateTroop(hexMap, 20000, Cons.xiJing, Type.Infantry, Cons.rookie);
+    x3.CreateTroop(hexMap, 20000, Cons.xiJing, Type.Infantry, Cons.rookie);
+    x4.CreateTroop(hexMap, 20000, Cons.zhongJing, Type.Infantry, Cons.rookie);
 
     // create settlements
     // * tactical phase starts *

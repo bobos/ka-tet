@@ -22,9 +22,9 @@
     }
 
     public int[] Apply() {
-      int[] effects = new int[9]{0,0,0,0,0,0,0,0,0};
+      int[] effects = new int[5]{0,0,0,0,0};
       int miaNum = GetWarWearyDissertNum();
-      effects[5] = miaNum;
+      effects[2] = miaNum;
       unit.kia += miaNum;
       unit.rf.soldiers -= miaNum;
 

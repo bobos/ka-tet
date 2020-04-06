@@ -42,9 +42,7 @@ namespace UnitNS
     public ArmyEpidemic epidemic;
     public AltitudeSickness altitudeSickness;
     public UnitPoisioned unitPoisioned;
-    public Riot riot;
     public MarchOnHeat marchOnHeat;
-    public FarmDestroy farmDestroy;
     public Supply supply;
     public WeatherEffect weatherEffect;
     public UnitConflict unitConflict;
@@ -79,7 +77,6 @@ namespace UnitNS
       altitudeSickness = new AltitudeSickness(this);
       armorRemEvent = new ArmorRemEvent(this);
       unitPoisioned = new UnitPoisioned(this);
-      riot = new Riot(this);
       marchOnHeat = new MarchOnHeat(this);
       supply = new Supply(this);
       weatherEffect = new WeatherEffect(this);
@@ -87,7 +84,6 @@ namespace UnitNS
       plainSickness = new PlainSickness(this);
       warWeary = new WarWeary(this);
       vantage = new Vantage(this);
-      farmDestroy = new FarmDestroy(this);
     }
 
     public void CloneInit(float disarmorDefDebuf, Supply supply, PlainSickness plainSickness) {
@@ -280,11 +276,6 @@ namespace UnitNS
       return unitPoisioned.GetIllTurns();
     }
 
-    public string GetDiscontent()
-    {
-      return riot.GetDescription();
-    }
-
     public bool IsAI()
     {
       return rf.faction.IsAI();
@@ -470,8 +461,8 @@ namespace UnitNS
 
     public int[] TakeEffect(int reduceMorale, float movementDropRatio = 0f,
       float killRatio = 0f) {
-      // morale, movement, wounded, killed, laborKilled, disserter, attack, def, discontent
-      int[] reduced = new int[]{0,0,0,0,0,0,0,0,0};
+      // morale, movement, killed, attack, def
+      int[] reduced = new int[]{0,0,0,0,0};
       rf.morale -= reduceMorale;
       reduced[0] = -reduceMorale;
       int moveReduce = (int)(movementRemaining * movementDropRatio);
@@ -480,10 +471,7 @@ namespace UnitNS
       int kiaNum = (int)(rf.soldiers * killRatio);
       kia += kiaNum;
       rf.soldiers -= kiaNum;
-      reduced[3] = kiaNum;
-      reduced[5] = 0;
-      reduced[6] = 0;
-      reduced[7] = 0;
+      reduced[2] = kiaNum;
       return reduced;
     }
 

@@ -6,11 +6,11 @@ public class Cons {
   
   public const int InterceptMoraleImpact = 5;
   public static bool HighlyLikely() {
-    return Util.Rand(0f, 1f) < 0.8f;
+    return Util.Rand(0f, 1f) < 0.9f;
   }
 
   public static bool MostLikely() {
-    return Util.Rand(0f, 1f) < 0.65f;
+    return Util.Rand(0f, 1f) < 0.7f;
   }
 
   public static bool FiftyFifty() {
@@ -18,19 +18,19 @@ public class Cons {
   }
 
   public static bool EvenChance() {
-    return Util.Rand(0f, 1f) < 0.45f;
+    return MostLikely() && MostLikely();
   }
 
   public static bool FairChance() {
-    return Util.Rand(0f, 1f) < 0.25f;
+    return FiftyFifty() && FiftyFifty();
   }
 
   public static bool SlimChance() {
-    return Util.Rand(0f, 1f) < 0.1f;
+    return FairChance() && FairChance();
   }
 
   public static bool TinyChance() {
-    return Util.Rand(0f, 1f) < 0.06f;
+    return SlimChance() && SlimChance();
   }
 
   public static Season spring = new Spring();
@@ -188,11 +188,40 @@ public class Cons {
 
   // abilities
   public static Ability masterOfMist = new MasterOfMist();
-  public static Ability forecaster = new Forecaster();
   public static Ability obey = new Obey();
   public static Ability turningTide = new TurningTheTide();
   public static Ability backStabber = new BackStabber();
   public static Ability outOfControl = new OutOfControl();
   public static Ability outOfOrder = new OutOfOrder();
+
+  // gained
+  public static Ability forecaster = new Forecaster();
+  public static Ability discipline = new Discipline();
+  public static Ability pursuer = new Pursuer();
+  public static Ability hammer = new Hammer();
+  public static Ability builder = new Builder();
+  public static Ability breacher = new Breacher();
+  public static Ability noPanic = new NoPanic();
+
+  // come with traits
+  public static Ability forwarder = new Forwarder();
+  public static Ability holdTheGround = new HoldTheGround();
+  public static Ability breaker = new Breaker();
+  public static Ability unshaken = new Unshaken();
+  public static Ability easyTarget = new EasyTarget();
+  public static Ability counterAttack = new CounterAttack();
+  public static Ability attender = new Attender();
+  public static Ability refuseToRetreat = new RefuseToRetreat();
+  public static Ability retreater = new Retreater();
+  public static Ability feintDefeat = new FeintDefeat();
+  public static Ability opportunist = new Opportunist();
+  public static Ability playSafe = new PlaySafe();
+
+  // trait
+  public static Trait reckless = new Reckless();
+  public static Trait brave = new Brave();
+  public static Trait loyal = new Loyal();
+  public static Trait conservative = new Conservative();
+  public static Trait cunning = new Cunning();
 
 }

@@ -19,7 +19,7 @@
           && !unit.IsAI() && !fired && unit.IsOnField() && Cons.HighlyLikely()) {
         fired = true;
         // TODO totally depends on general trait, normally, allowed
-        return Cons.FiftyFifty() ? Discontent() : DefReduce();
+        return Cons.FiftyFifty() ? MoraleDrop() : DefReduce();
       }
       return 0;
     }
@@ -28,8 +28,8 @@
       return 20;
     } 
 
-    int Discontent() {
-      return -4;
+    int MoraleDrop() {
+      return -8;
     } 
 
     public void Destroy() {}

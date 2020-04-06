@@ -36,7 +36,7 @@
     }
 
     public int[] Apply() {
-      int[] effects = new int[9]{0,0,0,0,0,0,0,0,0};
+      int[] effects = new int[5]{0,0,0,0,0};
       if (IsValid())
       {
         lastTurns--;
@@ -47,7 +47,7 @@
         int kiaNum = Util.Rand(1, 15);
         unit.kia += kiaNum;
         unit.rf.soldiers -= kiaNum;
-        effects[3] = kiaNum;
+        effects[2] = kiaNum;
       }
       return effects;
     }

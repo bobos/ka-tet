@@ -6,7 +6,6 @@ namespace  UnitNS
 {
   public class Infantry : Unit
   {
-    public const int MaxTroopNum = 10000;
     public const int MinTroopNum = 1000;
 
     public static Unit Create(bool clone, Troop troop, Tile tile, State state = State.Stand, 

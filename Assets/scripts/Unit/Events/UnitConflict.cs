@@ -5,7 +5,7 @@ namespace UnitNS
   public class ConflictResult {
     public Unit unit1;
     public Unit unit2;
-    public int discontent = 0;
+    public int moralDrop = 0;
     public int unit1Dead;
     public int unit2Dead;
   }
@@ -51,7 +51,7 @@ namespace UnitNS
       relation == CourtNS.Party.Relation.xTense && Cons.EvenChance()) {
         happened = true;
         target.unitConflict.happened = true;
-        result.discontent = Util.Rand(3,5);
+        result.moralDrop = -Util.Rand(5, 10);
         result.unit1 = unit;
         result.unit2 = target;
 
@@ -62,10 +62,11 @@ namespace UnitNS
         result.unit2Dead = Util.Rand(0, 9);
         target.kia += result.unit2Dead;
         target.rf.soldiers -= result.unit2Dead;
+        unit.rf.morale += result.moralDrop;
+        target.rf.morale += result.moralDrop;
       }
 
       return result;
-
     }
   }
 }

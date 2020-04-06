@@ -72,11 +72,7 @@ namespace MonoNS
       Epidemic,
       Disbanded,
       UnitConflict,
-      AltitudeSickness,
-      PlainSickness,
-      Riot,
       GeneralKilledInBattle,
-      FarmDestroyed,
       FarmDestroyedReported,
       UnderSiege,
       Null
@@ -185,13 +181,6 @@ namespace MonoNS
         image.sprite = CityLost;
       }
 
-      if (name == EventName.Riot) {
-        title.text = textLib.get("event_riot_title");
-        description.text = System.String.Format(textLib.get("event_riot"),
-          unit.GeneralName(), unit.Name(), argu1);
-        image.sprite = Riot;
-      }
-
       if (name == EventName.GeneralKilledInBattle) {
         title.text = textLib.get("event_generalKilled_title");
         description.text = System.String.Format(textLib.get("event_generalKilled"),
@@ -220,13 +209,6 @@ namespace MonoNS
         image.sprite = GeneralSwapped;
       }
 
-      if (name == EventName.FarmDestroyed) {
-        title.text = textLib.get("event_farmDestroyed_title");
-        description.text = System.String.Format(textLib.get("event_farmDestroyed"),
-          unit.GeneralName(), unit.rf.general.party.Name(), argu1);
-        image.sprite = GeneralSwapped;
-      }
-
       if (name == EventName.UnderSiege) {
         title.text = textLib.get("event_underSiege_title");
         description.text = System.String.Format(textLib.get("event_underSiege"),
@@ -239,20 +221,6 @@ namespace MonoNS
         description.text = System.String.Format(textLib.get("event_unitConflict"),
           unit.rf.general.Name(), unit1.rf.general.Name(), argu2 + argu3, argu1);
         image.sprite = drown;
-      }
-
-      if (name == EventName.AltitudeSickness) {
-        title.text = textLib.get("event_altitudeSickness_title");
-        description.text = System.String.Format(textLib.get("event_altitudeSickness"),
-          unit.rf.general.Name());
-        image.sprite = Retreat;
-      }
-
-      if (name == EventName.PlainSickness) {
-        title.text = textLib.get("event_plainSickness_title");
-        description.text = System.String.Format(textLib.get("event_plainSickness"),
-          unit.rf.general.Name());
-        image.sprite = Retreat;
       }
     }
 

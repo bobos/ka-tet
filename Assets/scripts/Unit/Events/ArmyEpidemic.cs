@@ -22,12 +22,10 @@ namespace UnitNS
       this.unit = unit;
     }
 
-    public int Occur() {
+    public void Occur() {
       if (!unit.IsHeatSicknessAffected()) {
         lastTurns += GetLastTurns();
-        return 3;
       }
-      return 0;
     }
 
     public void Destroy() {}
@@ -37,7 +35,7 @@ namespace UnitNS
     }
 
     public int[] Apply() {
-      int[] effects = new int[9]{0,0,0,0,0,0,0,0,0};
+      int[] effects = new int[5]{0,0,0,0,0};
       if (IsValid())
       {
         lastTurns--;
@@ -47,7 +45,7 @@ namespace UnitNS
         int kiaNum = (int)(unit.rf.soldiers * KillRate);
         unit.kia += kiaNum;
         unit.rf.soldiers -= kiaNum;
-        effects[3] = kiaNum;
+        effects[2] = kiaNum;
       }
 
       return effects;

@@ -390,29 +390,29 @@ namespace MonoNS
 
     int[] GetVicBuf(ResultType type) {
       if (type == ResultType.Close) {
-        return new int[]{-1, -1, 0};
+        return new int[]{-1, -1};
       }
       if (type == ResultType.Small) {
-        return new int[]{0, 0, 0};
+        return new int[]{0, 0};
       }
       if (type == ResultType.Great) {
-        return new int[]{1, 0, -2};
+        return new int[]{1, 0};
       }
-      return new int[]{2, 1, -3};
+      return new int[]{2, 1};
     }
 
     // initiatorMorale, supporterMorale, initiatorDiscontent
     int[] GetDftBuf(ResultType type) {
       if (type == ResultType.Close) {
-        return new int[]{-2, -2, 0};
+        return new int[]{-2, -2};
       }
       if (type == ResultType.Small) {
-        return new int[]{-4, -4, 1};
+        return new int[]{-4, -4};
       }
       if (type == ResultType.Great) {
-        return new int[]{-5, -5, 2};
+        return new int[]{-5, -5};
       }
-      return new int[]{-10, -10, 4};
+      return new int[]{-10, -10};
     }
 
     public bool commenceOpAnimating = false;
@@ -646,9 +646,9 @@ namespace MonoNS
             if (unit.IsCamping()) {
               view = hexMap.settlementMgr.GetView(unit.tile.settlement);
             }
-            // morale, movement, wounded, killed, laborKilled, disserter, attack, def, discontent
-            int[] stats = new int[]{0,0,0,up.dead,0,0,0,0,0};
-            hexMap.unitAniController.ShowEffects(unit, stats, view);
+            // morale, movement, killed, attack, def
+            int[] stats = new int[]{0,0,up.dead,0,0};
+            hexMap.unitAniController.ShowEffect(unit, stats, view);
             while (hexMap.unitAniController.ShowAnimating) { yield return null; }
           }
 
@@ -660,8 +660,8 @@ namespace MonoNS
         }
 
         if (defender.IsCamping()) {
-            int[] stats = new int[]{0,0,0,settlementDead,0,0,0,0,0};
-            hexMap.unitAniController.ShowEffects(null, stats, hexMap.settlementMgr.GetView(defender.tile.settlement));
+            int[] stats = new int[]{0,0,settlementDead,0,0};
+            hexMap.unitAniController.ShowEffect(null, stats, hexMap.settlementMgr.GetView(defender.tile.settlement));
             while (hexMap.unitAniController.ShowAnimating) { yield return null; }
         }
 
@@ -683,14 +683,13 @@ namespace MonoNS
           // 6. kill general
           int morale = vicBuf[0];
           int morale1 = vicBuf[1];
-          int discontent = vicBuf[2];
           View view = null;
           foreach (UnitPredict up in predict.attackers) {
             Unit unit = up.unit;
             if (unit.IsGone()) {
               continue;
             }
-            int[] stats = new int[]{0,0,0,0,0,0,0,0,0};
+            int[] stats = new int[]{0,0,0,0,0};
             if (Util.eq<Unit>(unit, attacker)) {
               unit.rf.morale += morale;
               stats[0] = morale;
@@ -704,28 +703,20 @@ namespace MonoNS
               view = hexMap.settlementMgr.GetView(unit.tile.settlement);
             }
 
-            hexMap.unitAniController.ShowEffects(unit, stats, view, true);
+            hexMap.unitAniController.ShowEffect(unit, stats, view, true);
           }
 
           hexMap.turnController.Sleep(1);
           while(hexMap.turnController.sleeping) { yield return null; }
-          attacker.riot.Discontent(discontent); 
-          view = null;
-          if (attacker.IsCamping()) {
-            view = hexMap.settlementMgr.GetView(attacker.tile.settlement);
-          }
-          hexMap.unitAniController.ShowEffects(attacker, new int[]{0,0,0,0,0,0,0,0,discontent}, view);
-          while(hexMap.unitAniController.ShowAnimating) { yield return null; }
 
           morale = dftBuf[0];
           morale1 = dftBuf[1];
-          discontent = dftBuf[2];
           foreach (UnitPredict up in predict.defenders) {
             Unit unit = up.unit;
             if (unit.IsGone()) {
               continue;
             }
-            int[] stats = new int[]{0,0,0,0,0,0,0,0,0};
+            int[] stats = new int[]{0,0,0,0,0};
             if (Util.eq<Unit>(unit, defender)) {
               unit.rf.morale += morale;
               stats[0] = morale;
@@ -738,26 +729,21 @@ namespace MonoNS
             if (unit.IsCamping()) {
               view = hexMap.settlementMgr.GetView(unit.tile.settlement);
             }
-            hexMap.unitAniController.ShowEffects(unit, stats, view, true);
+            hexMap.unitAniController.ShowEffect(unit, stats, view, true);
           }
           hexMap.turnController.Sleep(1);
           while(hexMap.turnController.sleeping) { yield return null; }
-          if (!defender.IsCamping() && !defender.IsGone()) {
-            hexMap.unitAniController.Riot(defender, discontent);
-            while (hexMap.unitAniController.riotAnimating) { yield return null; }
-          }
         } else {
           // defender win
           int morale = vicBuf[0];
           int morale1 = vicBuf[1];
-          int discontent = vicBuf[2];
           View view = null;
           foreach (UnitPredict up in predict.defenders) {
             Unit unit = up.unit;
             if (unit.IsGone()) {
               continue;
             }
-            int[] stats = new int[]{0,0,0,0,0,0,0,0,0};
+            int[] stats = new int[]{0,0,0,0,0};
             if (Util.eq<Unit>(unit, defender)) {
               unit.rf.morale += morale;
               stats[0] = morale;
@@ -770,27 +756,19 @@ namespace MonoNS
             if (unit.IsCamping()) {
               view = hexMap.settlementMgr.GetView(unit.tile.settlement);
             }
-            hexMap.unitAniController.ShowEffects(unit, stats, view, true);
+            hexMap.unitAniController.ShowEffect(unit, stats, view, true);
           }
           hexMap.turnController.Sleep(1);
           while(hexMap.turnController.sleeping) { yield return null; }
-          defender.riot.Discontent(discontent); 
-          view = null;
-          if (defender.IsCamping()) {
-            view = hexMap.settlementMgr.GetView(defender.tile.settlement);
-          }
-          hexMap.unitAniController.ShowEffects(defender, new int[]{0,0,0,0,0,0,0,0,discontent}, view);
-          while(hexMap.unitAniController.ShowAnimating) { yield return null; }
 
           morale = dftBuf[0];
           morale1 = dftBuf[1];
-          discontent = dftBuf[2];
           foreach (UnitPredict up in predict.attackers) {
             Unit unit = up.unit;
             if (unit.IsGone()) {
               continue;
             }
-            int[] stats = new int[]{0,0,0,0,0,0,0,0,0};
+            int[] stats = new int[]{0,0,0,0,0};
             if (Util.eq<Unit>(unit, attacker)) {
               unit.rf.morale += morale;
               stats[0] = morale;
@@ -803,14 +781,10 @@ namespace MonoNS
             if (unit.IsCamping()) {
               view = hexMap.settlementMgr.GetView(unit.tile.settlement);
             }
-            hexMap.unitAniController.ShowEffects(unit, stats, view, true);
+            hexMap.unitAniController.ShowEffect(unit, stats, view, true);
           }
           hexMap.turnController.Sleep(1);
           while(hexMap.turnController.sleeping) { yield return null; }
-          if (!attacker.IsCamping() && !attacker.IsGone()) {
-            hexMap.unitAniController.Riot(attacker, discontent);
-            while (hexMap.unitAniController.riotAnimating) { yield return null; }
-          }
         }
 
         int deadToll = attackerInfDead + attackerCavDead + defenderInfDead + defenderCavDead;

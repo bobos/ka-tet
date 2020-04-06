@@ -80,7 +80,7 @@ namespace MonoNS
             unitAniController.DestroyUnit(unit, DestroyType.ByFlood);
             while (unitAniController.DestroyAnimating) { yield return null; }
           } else {
-            unitAniController.ShowEffects(unit, DisasterEffect.Apply(DisasterType.Flood, unit));
+            unitAniController.ShowEffect(unit, DisasterEffect.Apply(DisasterType.Flood, unit));
             while(unitAniController.ShowAnimating) { yield return null; }
             unitAniController.MoveUnit(unit, newTile);
             while (unitAniController.MoveAnimating) { yield return null; }
@@ -131,7 +131,7 @@ namespace MonoNS
             unitAniController.DestroyUnit(unit, DestroyType.ByWildFire);
             while (unitAniController.DestroyAnimating) { yield return null; }
           } else {
-            unitAniController.ShowEffects(unit, DisasterEffect.Apply(DisasterType.WildFire, unit));
+            unitAniController.ShowEffect(unit, DisasterEffect.Apply(DisasterType.WildFire, unit));
             while(unitAniController.ShowAnimating) { yield return null; }
             unitAniController.MoveUnit(unit, newTile);
             while (unitAniController.MoveAnimating) { yield return null; }
@@ -166,8 +166,6 @@ namespace MonoNS
         )) {
           eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.Epidemic, unit, null));
           while (eventDialog.Animating) { yield return null; }
-          unitAniController.Riot(unit, unit.epidemic.Occur());
-          while (unitAniController.riotAnimating) { yield return null; }
         }
       }
 

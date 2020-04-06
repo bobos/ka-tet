@@ -29,18 +29,17 @@ namespace UnitNS
         // TODO: apply general trait
         int moraleReduce = -5;
         unit.rf.morale += moraleReduce;
-        int deathNum = Util.Rand(0, 10);
+        int deathNum = Util.Rand(0, 30);
         unit.kia += deathNum;
         unit.rf.soldiers -= deathNum;
         effects[0] = moraleReduce;
-        effects[3] = deathNum;
-        effects[8] = Cons.EvenChance() ? 1 : 0;
+        effects[2] = deathNum;
       }
     }
 
     public int SupplyNeededPerTurn()
     {
-      return (int)(unit.rf.soldiers * unit.hexMap.FoodPerTenMenPerTurn(unit.IsAI()));
+      return (int)(unit.rf.soldiers * unit.hexMap.FoodPerManPerTurn(unit.IsAI()));
     }
 
   }

@@ -33,8 +33,8 @@ namespace CourtNS {
 
     public Faction faction;
     public Party party;
-    public Traits[] bornTraits;
-    public List<Traits> developedTraits;
+    public List<Trait> traits;
+    public List<Ability> acquiredAbilities;
     public int age;
     public Province province;
     public Troop commandUnit;
@@ -44,20 +44,28 @@ namespace CourtNS {
     public LinkedList<General> nemesis = new LinkedList<General>();
     public GeneralStat stat = GeneralStat.Idle;
     public CommandSkill commandSkill;
+    public HashSet<Ability> onFieldAbilities;
 
     HexMap hexMap;
     WarParty warParty;
     string name;
     string biography;
     TextLib txtLib = Cons.GetTextLib();
+    public TroopSize size;
 
-    public General(string name, string biography, Province province, Traits[] traits, CommandSkill commandSkill) {
+    public General(string name, string biography, Province province, CommandSkill commandSkill, TroopSize size,
+      List<Trait> traits = null, List<Ability> acquired = null) {
       this.name = name;
       this.biography = biography;
       this.province = province;
-      this.bornTraits = traits;
-      developedTraits = new List<Traits>();
+      this.traits = traits == null ? Trait.RandomTraits() : traits;
+      acquiredAbilities = acquired == null ? Ability.RandomAcquiredAbilities() : acquired;
       this.commandSkill = commandSkill;
+      this.size = size;
+    }
+
+    public bool Has(Ability ability) {
+      return onFieldAbilities.Contains(ability);
     }
 
     // General Stats
@@ -89,7 +97,12 @@ namespace CourtNS {
     public void CreateTroop(HexMap hexMap, int num, Province province, UnitNS.Type type, UnitNS.Rank rank) {
       ResetFieldRecords();
       this.hexMap = hexMap;
-      commandUnit = new Troop(num, province, type, rank, this);
+      int maxNum = MaxNum(type);
+      commandUnit = new Troop(num > maxNum ? maxNum : num, province, type, rank, this);
+    }
+
+    public int MaxNum(UnitNS.Type type) {
+      return size.GetTroopSize(type == UnitNS.Type.Infantry);
     }
 
     public void JoinParty(Party party) {
@@ -123,6 +136,21 @@ namespace CourtNS {
       if (!ready) return ready;
       stat = GeneralStat.OnField;
       hexMap.GetWarParty(faction).JoinCampaign(this);
+      onFieldAbilities = new HashSet<Ability>();
+      if (commandUnit.onFieldUnit.IsCommander()) {
+        foreach(Ability ability in commandSkill.abilities) {
+          onFieldAbilities.Add(ability);
+        }
+      }
+      foreach(Trait trait in traits) {
+        foreach(Ability ability in trait.Abilities()) {
+          onFieldAbilities.Add(ability);
+        }
+      }
+      foreach(Ability ability in acquiredAbilities) {
+        onFieldAbilities.Add(ability);
+      }
+
       return true;
     }
 
@@ -143,11 +171,6 @@ namespace CourtNS {
         // Killed in battle
         Die();
       }
-    }
-
-    public void UnitRiot() {
-      int rand = Util.Rand(1, 10);
-      party.influence -= 400;
     }
 
     void Die() {

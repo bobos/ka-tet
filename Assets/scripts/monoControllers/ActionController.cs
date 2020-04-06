@@ -229,6 +229,24 @@ namespace MonoNS
       }
     }
 
+    public void OnTroopInfoClick() {
+      if (onBtnClick != null) {
+        onBtnClick(actionName.TroopInfo);
+      }
+    }
+
+    public void OnTraitInfoClick() {
+      if (onBtnClick != null) {
+        onBtnClick(actionName.TraitInfo);
+      }
+    }
+
+    public void OnAbilityInfoClick() {
+      if (onBtnClick != null) {
+        onBtnClick(actionName.AbilityInfo);
+      }
+    }
+
     public enum actionName
     {
       MOVE,
@@ -258,7 +276,10 @@ namespace MonoNS
       EVENTDIALOGCONFIRM,
       COMMENCEOP,
       MIDBTN1,
-      MIDBTN2
+      MIDBTN2,
+      TroopInfo,
+      TraitInfo,
+      AbilityInfo
     }
 
     // Make sure this is sequential

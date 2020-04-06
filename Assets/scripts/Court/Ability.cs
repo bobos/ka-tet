@@ -1,9 +1,34 @@
 ﻿
+using System.Collections.Generic;
+
 namespace CourtNS {
 
   public abstract class Ability {
     public abstract string Name();
     public abstract string Description();
+    public static Ability LuckyDraw() {
+      Ability[] candidates = new Ability[]{Cons.forecaster, Cons.discipline, Cons.pursuer,
+        Cons.hammer, Cons.builder, Cons.breacher, Cons.noPanic};
+      int total = candidates.Length;
+      int luckNum = Util.Rand(0, total * 3);
+      if (luckNum < total) {
+        return candidates[luckNum];
+      }
+      return null;
+    }
+
+    public static List<Ability> RandomAcquiredAbilities() {
+      List<Ability> abilities = new List<Ability>();
+      int num = Util.Rand(1, 4);
+      for (int i = 0; i < num; i++)
+      {
+        Ability ability = LuckyDraw();
+        if (ability != null && !abilities.Contains(ability)) {
+          abilities.Add(ability);
+        }
+      }
+      return abilities;
+    }
   }
 
   public class OutOfControl: Ability {
@@ -97,4 +122,237 @@ namespace CourtNS {
     }
   }
 
+  public class Discipline: Ability {
+    public Discipline() {
+    }
+
+    public override string Name() {
+      return Cons.GetTextLib().get("ability_discipline");
+    }
+
+    public override string Description() {
+      return Cons.GetTextLib().get("ability_discipline_description");
+    }
+  }
+
+  public class Pursuer: Ability {
+    public Pursuer() {
+    }
+
+    public override string Name() {
+      return Cons.GetTextLib().get("ability_pursuer");
+    }
+
+    public override string Description() {
+      return Cons.GetTextLib().get("ability_pursuer_description");
+    }
+  }
+
+  public class Hammer: Ability {
+    public Hammer() {
+    }
+
+    public override string Name() {
+      return Cons.GetTextLib().get("ability_hammer");
+    }
+
+    public override string Description() {
+      return Cons.GetTextLib().get("ability_hammer_description");
+    }
+  }
+
+  public class Builder: Ability {
+    public Builder() {
+    }
+
+    public override string Name() {
+      return Cons.GetTextLib().get("ability_builder");
+    }
+
+    public override string Description() {
+      return Cons.GetTextLib().get("ability_builder_description");
+    }
+  }
+
+  public class Breacher: Ability {
+    public Breacher() {
+    }
+
+    public override string Name() {
+      return Cons.GetTextLib().get("ability_breacher");
+    }
+
+    public override string Description() {
+      return Cons.GetTextLib().get("ability_breacher_description");
+    }
+  }
+
+  public class NoPanic: Ability {
+    public NoPanic() {
+    }
+
+    public override string Name() {
+      return Cons.GetTextLib().get("ability_noPanic");
+    }
+
+    public override string Description() {
+      return Cons.GetTextLib().get("ability_noPanic_description");
+    }
+  }
+
+  public class Forwarder: Ability {
+    public Forwarder() {
+    }
+
+    public override string Name() {
+      return Cons.GetTextLib().get("ability_forwarder");
+    }
+
+    public override string Description() {
+      return Cons.GetTextLib().get("ability_forwarder_description");
+    }
+  }
+
+  public class HoldTheGround: Ability {
+    public HoldTheGround() {
+    }
+
+    public override string Name() {
+      return Cons.GetTextLib().get("ability_holdTheGround");
+    }
+
+    public override string Description() {
+      return Cons.GetTextLib().get("ability_holdTheGround_description");
+    }
+  }
+
+  public class Breaker: Ability {
+    public Breaker() {
+    }
+
+    public override string Name() {
+      return Cons.GetTextLib().get("ability_breaker");
+    }
+
+    public override string Description() {
+      return Cons.GetTextLib().get("ability_breaker_description");
+    }
+  }
+
+  public class Unshaken: Ability {
+    public Unshaken() {
+    }
+
+    public override string Name() {
+      return Cons.GetTextLib().get("ability_unshaken");
+    }
+
+    public override string Description() {
+      return Cons.GetTextLib().get("ability_unshaken_description");
+    }
+  }
+
+  public class EasyTarget: Ability {
+    public EasyTarget() {
+    }
+
+    public override string Name() {
+      return Cons.GetTextLib().get("ability_easyTarget");
+    }
+
+    public override string Description() {
+      return Cons.GetTextLib().get("ability_easyTarget_description");
+    }
+  }
+
+  public class CounterAttack: Ability {
+    public CounterAttack() {
+    }
+
+    public override string Name() {
+      return Cons.GetTextLib().get("ability_counterAttack");
+    }
+
+    public override string Description() {
+      return Cons.GetTextLib().get("ability_counterAttack_description");
+    }
+  }
+
+  public class Attender: Ability {
+    public Attender() {
+    }
+
+    public override string Name() {
+      return Cons.GetTextLib().get("ability_attender");
+    }
+
+    public override string Description() {
+      return Cons.GetTextLib().get("ability_attender_description");
+    }
+  }
+
+  public class RefuseToRetreat: Ability {
+    public RefuseToRetreat() {
+    }
+
+    public override string Name() {
+      return Cons.GetTextLib().get("ability_refuseToRetreat");
+    }
+
+    public override string Description() {
+      return Cons.GetTextLib().get("ability_refuseToRetreat_description");
+    }
+  }
+
+  public class Retreater: Ability {
+    public Retreater() {
+    }
+
+    public override string Name() {
+      return Cons.GetTextLib().get("ability_retreater");
+    }
+
+    public override string Description() {
+      return Cons.GetTextLib().get("ability_retreater_description");
+    }
+  }
+
+  public class FeintDefeat: Ability {
+    public FeintDefeat() {
+    }
+
+    public override string Name() {
+      return Cons.GetTextLib().get("ability_feintDefeat");
+    }
+
+    public override string Description() {
+      return Cons.GetTextLib().get("ability_feintDefeat_description");
+    }
+  }
+
+  public class Opportunist: Ability {
+    public Opportunist() {
+    }
+
+    public override string Name() {
+      return Cons.GetTextLib().get("ability_opportunist");
+    }
+
+    public override string Description() {
+      return Cons.GetTextLib().get("ability_opportunist_description");
+    }
+  }
+
+  public class PlaySafe: Ability {
+    public PlaySafe() {
+    }
+
+    public override string Name() {
+      return Cons.GetTextLib().get("ability_playSafe");
+    }
+
+    public override string Description() {
+      return Cons.GetTextLib().get("ability_playSafe_description");
+    }
+  }
 }

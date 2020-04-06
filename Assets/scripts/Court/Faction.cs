@@ -17,7 +17,6 @@ namespace CourtNS {
 		void AddSubLord(Faction faction);
 		void RemSubLord(Faction faction);
 		void SetOverLord(Faction faction);
-    int MaxUnitSize(Type unitType);
     Party[] GetParties();
     HashSet<Province> GetProvinces();
     void AddProvince(Province province);
@@ -74,14 +73,6 @@ namespace CourtNS {
       return null;
     }
 	  
-    public int MaxUnitSize(Type unitType) {
-      int num = (int)(population * (unitType == Type.Cavalry ? MaxCavUnitSizeRatio : MaxInfanUnitSizeRatio));
-      if (unitType == Type.Cavalry) {
-        return num > Cavalry.MaxTroopNum ? Cavalry.MaxTroopNum : num;
-      }
-      return num > Infantry.MaxTroopNum ? Infantry.MaxTroopNum : num;
-    }
-
     // ==============================================================
     // ================= Faction Relation ===========================
     // ==============================================================

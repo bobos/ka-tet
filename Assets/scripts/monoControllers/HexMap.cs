@@ -243,7 +243,7 @@ namespace MonoNS
       return warParties[1];
     }
 
-    public int FoodPerTenMenPerTurn(bool isAI) {
+    public int FoodPerManPerTurn(bool isAI) {
       return IsAttackSide(isAI) ? 2 : 1;
     }
 

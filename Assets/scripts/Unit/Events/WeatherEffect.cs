@@ -8,7 +8,7 @@
     }
 
     public int[] Apply() {
-      int[] effects = new int[9]{0,0,0,0,0,0,0,0,0};
+      int[] effects = new int[5]{0,0,0,0,0};
       if (Cons.IsHeavyRain(unit.hexMap.weatherGenerator.currentWeather)) {
         int movement = (int)(unit.movementRemaining / (-2));
         unit.movementRemaining += movement;
@@ -24,7 +24,7 @@
           unit.kia += kiaNum;
           unit.rf.soldiers -= kiaNum;
           effects[0] = morale;
-          effects[3] = kiaNum;
+          effects[2] = kiaNum;
         }
       } else if (Cons.IsBlizard(unit.hexMap.weatherGenerator.currentWeather)) {
         int movement = (int)(unit.movementRemaining / (-4)) * 3;
@@ -38,7 +38,7 @@
           unit.kia += kiaNum;
           unit.rf.soldiers -= kiaNum;
           effects[0] = morale;
-          effects[3] = kiaNum;
+          effects[2] = kiaNum;
         }
       }
       return effects;

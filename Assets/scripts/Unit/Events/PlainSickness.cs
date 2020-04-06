@@ -29,7 +29,7 @@ namespace UnitNS
       if (Cons.FairChance()) {
         affected = true;
         debuf = moveDebuf = 0.3f;
-        return 2;
+        return -5;
       }
 
       return 0;

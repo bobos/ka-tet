@@ -255,7 +255,7 @@ namespace MonoNS
       foreach (Unit unit in units)
       {
         // consume supply
-        int[] effects = new int[9]{0,0,0,0,0,0,0,0,0};
+        int[] effects = new int[5]{0,0,0,0,0};
         unit.supply.Consume(effects, controlledTiles);
         if (!unit.supply.consumed) {
           View view;
@@ -271,13 +271,8 @@ namespace MonoNS
           {
             yield return null;
           }
-          int discontent = effects[8];
-          effects[8] = 0;
-          unitAniController.ShowEffects(unit, effects);
+          unitAniController.ShowEffect(unit, effects);
           while (unitAniController.ShowAnimating) { yield return null; }
-
-          unitAniController.Riot(unit, discontent);
-          while (unitAniController.riotAnimating) { yield return null; }
         }
         
         unitAniController.RefreshUnit(unit);

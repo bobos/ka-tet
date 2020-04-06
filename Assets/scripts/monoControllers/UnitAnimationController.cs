@@ -77,10 +77,10 @@ namespace MonoNS
       foreach(Tile t in unit.tile.GetNeighboursWithinRange<Tile>(10, (Tile tt) => true)) {
         Unit u = t.GetUnit();
         if (u != null && u.IsAI() == unit.IsAI()) {
-          int[] stats = new int[]{moraleDrop,0,0,0,0,0,0,0,0};
+          int[] stats = new int[]{moraleDrop,0,0,0,0};
           u.rf.morale += moraleDrop;
           if (u.IsShowingAnimation()) {
-            hexMap.unitAniController.ShowEffects(u, stats, null, true);
+            hexMap.unitAniController.ShowEffect(u, stats, null, true);
           }
           // TODO: apply general trait
           if (!u.IsCommander() && (u.rf.morale <= Util.Rand(1, 79))&& u.SetRetreatPath()) {
@@ -100,60 +100,46 @@ namespace MonoNS
       bool hiddenB4 = unit.IsConcealed();
       bool continuing = unit.DoMove(tile);
       bool discovered = hiddenB4 && !unit.IsConcealed();
-      int discontent = 0;
+      int moraleDrop = 0;
       if (Util.eq<Tile>(old, unit.tile)) {
         MoveAnimating = false;
         return false;
       }
 
       if (tile == null) {
-        discontent = unit.marchOnHeat.Occur();
+        moraleDrop = unit.marchOnHeat.Occur();
       }
       if (unit.IsShowingAnimation() && !dontFixCamera) {
         hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(unit.tile).transform.position);
       }
       hexMap.cameraKeyboardController.DisableCamera();
-      StartCoroutine(CoMoveUnit(unit, discontent, discovered));
+      StartCoroutine(CoMoveUnit(unit, moraleDrop, discovered));
       return continuing;
     }
 
-    IEnumerator CoMoveUnit(Unit unit, int discontent, bool discovered) {
+    IEnumerator CoMoveUnit(Unit unit, int moraleDrop, bool discovered) {
       UnitView view = hexMap.GetUnitView(unit);
       view.Move(unit.tile);
       while (view.Animating) { yield return null; }
       int r = unit.altitudeSickness.Occur();
       if (r != 0) {
         // altitude sickness
-        discontent = r;
-        if (!unit.IsAI()) {
-          eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.AltitudeSickness, unit,
-            null));
-          while (eventDialog.Animating) { yield return null; }
-        } else if (unit.IsShowingAnimation()) {
+        if (unit.IsShowingAnimation()) {
           popAniController.Show(view, textLib.get("pop_altitudeSickness"), Color.white);
           while(popAniController.Animating) { yield return null; }
         }
+        ShowEffect(unit, new int[]{r,0,0,0,0});
+        unit.rf.morale += r;
+        while(ShowAnimating) { yield return null; }
       }
-      Riot(unit, discontent);
-      while (riotAnimating) { yield return null; }
+      if (moraleDrop != 0) {
+        unit.rf.morale += moraleDrop;
+        ShowEffect(unit, new int[]{moraleDrop,0,0,0,0});
+        while(ShowAnimating) { yield return null; }
+      }
       if (!unit.IsAI() && discovered) {
         popAniController.Show(view, textLib.get("pop_discovered"), Color.yellow);
         while(popAniController.Animating) { yield return null; }
-      }
-      FarmDestryResult ret = unit.farmDestroy.Occur();
-      if (ret.destroyed) {
-        if (unit.IsShowingAnimation()) {
-          popAniController.Show(view, textLib.get("pop_farmDestroyed"), Color.yellow);
-          while(popAniController.Animating) { yield return null; }
-        }
-        unit.tile.SetFieldType(FieldType.Wild);
-      }
-      if (ret.discontent != 0) {
-        eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.FarmDestroyed, unit,
-          null, ret.influence));
-        while (eventDialog.Animating) { yield return null; }
-        Riot(unit, ret.discontent);
-        while (riotAnimating) { yield return null; }
       }
       // stash event
       // hexMap.eventStasher.Add(unit.rf.general, MonoNS.EventDialog.EventName.FarmDestroyed);
@@ -163,36 +149,6 @@ namespace MonoNS
       FoW.Get().Fog();
       hexMap.mouseController.RefreshUnitPanel(unit);
       MoveAnimating = false;
-    }
-
-    public bool riotAnimating = false;
-    public void Riot(Unit unit, int discontent) {
-      if (discontent == 0) {
-        return;
-      }
-      riotAnimating = true;
-      hexMap.cameraKeyboardController.DisableCamera();
-      StartCoroutine(CoRiot(unit, discontent));
-    }
-
-    IEnumerator CoRiot(Unit unit, int discontent) {
-      int moraleReduce = unit.riot.Discontent(discontent);
-      UnitView view = hexMap.GetUnitView(unit);
-      if (unit.IsShowingAnimation()) {
-        popAniController.Show(view, 
-          System.String.Format(textLib.get("pop_discontent"), discontent),
-          Color.yellow);
-        while (popAniController.Animating) { yield return null; }
-      }
-      
-      if (moraleReduce != 0) {
-        // Riot
-        eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.Riot, unit, null, moraleReduce));
-        while (eventDialog.Animating) { yield return null; }
-        unit.rf.general.UnitRiot();
-      }
-      hexMap.cameraKeyboardController.EnableCamera();
-      riotAnimating = false;
     }
 
     public bool PostAnimating = false;
@@ -265,7 +221,7 @@ namespace MonoNS
           first = false;
         }
         unit.rf.morale += moraleDrop;
-        ShowEffects(unit, new int[]{moraleDrop,0,0,0,0,0,0,0,0});
+        ShowEffect(unit, new int[]{moraleDrop,0,0,0,0});
       }
       hexMap.turnController.Sleep(1);
       while(hexMap.turnController.sleeping) { yield return null; }
@@ -281,7 +237,7 @@ namespace MonoNS
     }
 
     IEnumerator CoRefreshUnit(Unit unit) {
-      ShowEffects(unit, unit.RefreshUnit());
+      ShowEffect(unit, unit.RefreshUnit());
       while (ShowAnimating) { yield return null; }
 
       UnitView view = hexMap.GetUnitView(unit);
@@ -291,7 +247,7 @@ namespace MonoNS
           popAniController.Show(view, textLib.get("pop_warWeary"), Color.yellow);
           while (popAniController.Animating) { yield return null; }
         }
-        ShowEffects(unit, unit.warWeary.Apply());
+        ShowEffect(unit, unit.warWeary.Apply());
         while (ShowAnimating) { yield return null; }
       }
 
@@ -300,7 +256,7 @@ namespace MonoNS
           popAniController.Show(view, textLib.get("pop_sickness"), Color.yellow);
           while (popAniController.Animating) { yield return null; }
         }
-        ShowEffects(unit, unit.epidemic.Apply());
+        ShowEffect(unit, unit.epidemic.Apply());
         while (ShowAnimating) { yield return null; }
       }
 
@@ -309,7 +265,7 @@ namespace MonoNS
           popAniController.Show(view, textLib.get("pop_altitudeSickness"), Color.yellow);
           while (popAniController.Animating) { yield return null; }
         }
-        ShowEffects(unit, new int[9]{0,unit.altitudeSickness.Apply(),0,0,0,0,0,0,0});
+        ShowEffect(unit, new int[5]{0,0,unit.altitudeSickness.Apply(),0,0});
         while (ShowAnimating) { yield return null; }
       }
 
@@ -318,7 +274,7 @@ namespace MonoNS
           popAniController.Show(view, textLib.get("pop_poisioned"), Color.yellow);
           while (popAniController.Animating) { yield return null; }
         }
-        ShowEffects(unit, unit.unitPoisioned.Apply());
+        ShowEffect(unit, unit.unitPoisioned.Apply());
         while (ShowAnimating) { yield return null; }
       }
 
@@ -326,8 +282,7 @@ namespace MonoNS
         // epimedic caused by decomposing corpse
         eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.Epidemic, unit, null));
         while (eventDialog.Animating) { yield return null; }
-        Riot(unit, unit.epidemic.Occur());
-        while (riotAnimating) { yield return null; }
+        unit.epidemic.Occur();
       }
 
       if (Cons.IsHeat(hexMap.weatherGenerator.currentWeather)) {
@@ -336,15 +291,15 @@ namespace MonoNS
         if(ret != 0) {
           if (ret < 0) {
             // disarmor not allowed
-            int discontent = -ret;
             if (wp.firstRemoveArmor == null) {
               hexMap.dialogue.ShowRemoveHelmet(unit, false);
             } else {
               hexMap.dialogue.ShowRemoveHelmetFollow(unit, false);
             }
             while (hexMap.dialogue.Animating) { yield return null; }
-            Riot(unit, discontent);
-            while (riotAnimating) { yield return null; }
+            unit.rf.morale += ret;
+            ShowEffect(unit, new int[]{ret,0,0,0,0});
+            while(ShowAnimating) { yield return null; }
           } else {
             // disarmor allowed
             int defReduce = ret;
@@ -361,31 +316,24 @@ namespace MonoNS
       }
 
       ConflictResult conflict = unit.unitConflict.Occur();
-      if (conflict.discontent != 0) {
+      if (conflict.moralDrop != 0) {
         // unit conflict happens
         eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.UnitConflict, unit,
-          null, conflict.discontent, conflict.unit1Dead, conflict.unit2Dead,
+          null, conflict.moralDrop, conflict.unit1Dead, conflict.unit2Dead,
           0, 0, null, null, conflict.unit2));
         while (eventDialog.Animating) { yield return null; }
-
-        Riot(unit, conflict.discontent);
-        while (riotAnimating) { yield return null; }
-        Riot(conflict.unit2, conflict.discontent);
-        while (riotAnimating) { yield return null; }
       }
 
       if (Cons.FiftyFifty()) {
         int ret = unit.plainSickness.Occur();
-        if (ret > 0) {
-          if (!unit.IsAI()) {
-            eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.PlainSickness, unit, null));
-            while (eventDialog.Animating) { yield return null; }
-          } else if (unit.IsShowingAnimation()) {
+        if (ret != 0) {
+          unit.rf.morale += ret;
+          if (unit.IsShowingAnimation()) {
             popAniController.Show(hexMap.GetUnitView(unit), textLib.get("pop_plainSickness"), Color.yellow);
             while (popAniController.Animating) { yield return null; }
+            ShowEffect(unit, new int[]{ret,0,0,0,0});
+            while (ShowAnimating) { yield return null; }
           }
-          Riot(unit, ret);
-          while (riotAnimating) { yield return null; }
         }
       }
       hexMap.cameraKeyboardController.EnableCamera();
@@ -430,9 +378,10 @@ namespace MonoNS
     IEnumerator CoBury(Unit unit) {
       unit.movementRemaining -= Unit.ActionCost;
       // TODO: apply trait
-      int discontent = 2;
-      Riot(unit, discontent);
-      while (riotAnimating) { yield return null; }
+      int moraleDrop = -5;
+      unit.rf.morale += moraleDrop;
+      ShowEffect(unit, new int[]{moraleDrop,0,0,0,0});
+      while(ShowAnimating) { yield return null; }
       unit.tile.deadZone.Clean();
 
       hexMap.cameraKeyboardController.EnableCamera();
@@ -467,8 +416,8 @@ namespace MonoNS
       int killed = Util.Rand(0, 11);
       from.rf.soldiers -= killed;
       from.kia += killed;
-      // morale, movement, wounded, killed, laborKilled, disserter, attack, def, discontent
-      ShowEffects(from, new int[]{0,0,0,killed,0,0,0,0,0});
+      // morale, movement, killed, attack, def
+      ShowEffect(from, new int[]{0,0,killed,0,0});
       while (ShowAnimating) { yield return null; }
       if (scared) {
         if (defeatingUnit) {
@@ -479,7 +428,7 @@ namespace MonoNS
           to.rf.soldiers -= dead;
           to.kia += dead;
           to.rf.morale += morale;
-          ShowEffects(to, new int[]{morale,0,0,dead,0,0,0,0,0});
+          ShowEffect(to, new int[]{morale,0,dead,0,0});
           while (ShowAnimating) { yield return null; }
           if (to.rf.soldiers <= Unit.DisbandUnitUnder) {
             // unit disbanded
@@ -537,8 +486,8 @@ namespace MonoNS
               Unit conflicted = ally[Util.Rand(0, ally.Count - 1)];
               killed = Util.Rand(20, 50);
               int morale = -2;
-              // morale, movement, wounded, killed, laborKilled, disserter, attack, def, discontent
-              ShowEffects(to, new int[]{morale,0,0,killed,0,0,0,0,0});
+              // morale, movement, killed, attack, def
+              ShowEffect(to, new int[]{morale,0,killed,0,0});
               while (ShowAnimating) { yield return null; }
               to.rf.soldiers -= killed;
               to.kia += killed;
@@ -563,10 +512,10 @@ namespace MonoNS
         int morale = 5;
         to.rf.morale += morale;
         // morale, movement, wounded, killed, laborKilled, disserter, attack, def, discontent
-        ShowEffects(to, new int[]{morale,0,0,0,0,0,0,0,0}, null, true);
+        ShowEffect(to, new int[]{morale,0,0,0,0}, null, true);
         int morale1 = -2;
         from.rf.morale += morale1;
-        ShowEffects(to, new int[]{morale1,0,0,0,0,0,0,0,0}, null, true);
+        ShowEffect(to, new int[]{morale1,0,0,0,0}, null, true);
         hexMap.turnController.Sleep(1);
         while(hexMap.turnController.sleeping) { yield return null; }
       }
@@ -585,8 +534,8 @@ namespace MonoNS
       popAniController.Show(hexMap.GetUnitView(unit), textLib.get("pop_crashedByAlly"), Color.white);
       while (popAniController.Animating) { yield return null; }
       int killed = Util.Rand(40, 100);
-      // morale, movement, wounded, killed, laborKilled, disserter, attack, def, discontent
-      ShowEffects(unit, new int[]{morale,0,0,killed,0,0,0,0,0});
+      // morale, movement, killed, attack, def
+      ShowEffect(unit, new int[]{morale,0,killed,0,0});
       while (ShowAnimating) { yield return null; }
       unit.rf.soldiers -= killed;
       unit.kia += killed;
@@ -691,15 +640,17 @@ namespace MonoNS
         while(MoveAnimating) { yield return null; }
       }
       unit.movementRemaining = 0;
-      Riot(unit, 2);
-      while(riotAnimating) { yield return null; }
+      int moraleDrop = -5;
+      unit.rf.morale += moraleDrop;
+      ShowEffect(unit, new int[]{moraleDrop,0,0,0,0});
+      while(ShowAnimating) { yield return null; }
       unit.SetPath(new Tile[]{unit.tile});
       hexMap.cameraKeyboardController.EnableCamera();
       ForceRetreatAnimating = false;
     }
 
     public bool ShowAnimating = false;
-    public void ShowEffects(Unit unit, int[] effects, View view = null, bool noFix = false) {
+    public void ShowEffect(Unit unit, int[] effects, View view = null, bool noFix = false) {
       if (view == null && !unit.IsShowingAnimation()) { return; }
       ShowAnimating = true;
       hexMap.cameraKeyboardController.DisableCamera();
@@ -711,13 +662,9 @@ namespace MonoNS
       View view = theView != null ? theView : hexMap.GetUnitView(unit);
       int morale = effects[0];
       int movement = effects[1];
-      int wounded = effects[2];
-      int killed = effects[3];
-      int laborKilled = effects[4];
-      int desserter = effects[5];
-      int atk = effects[6];
-      int def = effects[7];
-      int discontent = effects[8];
+      int killed = effects[2];
+      int atk = effects[3];
+      int def = effects[4];
       if (morale != 0) {
         popAniController.Show(view,
           textLib.get("pop_morale") + (morale > 0 ? ("+" + morale) : ("" + morale)),
@@ -739,27 +686,6 @@ namespace MonoNS
         while (popAniController.Animating) { yield return null; }
       }
 
-      if (wounded != 0) {
-        popAniController.Show(view,
-          textLib.get("pop_wounded") + wounded,
-          Color.white, noFix);
-        while (popAniController.Animating) { yield return null; }
-      }
-
-      if (laborKilled != 0) {
-        popAniController.Show(view,
-          textLib.get("pop_laborKilled") + laborKilled,
-          Color.white);
-        while (popAniController.Animating) { yield return null; }
-      }
-
-      if (desserter != 0) {
-        popAniController.Show(view,
-          textLib.get("pop_desserter") + desserter,
-          Color.white, noFix);
-        while (popAniController.Animating) { yield return null; }
-      }
-
       if (atk != 0) {
         popAniController.Show(view,
           textLib.get("pop_atk") + (atk > 0 ? ("+" + atk) : ("" + atk)),
@@ -771,19 +697,6 @@ namespace MonoNS
         popAniController.Show(view,
           textLib.get("pop_def") + (def > 0 ? ("+" + def) : ("" + def)),
           def > 0 ? Color.green : Color.white, noFix);
-        while (popAniController.Animating) { yield return null; }
-      }
-
-      if (discontent != 0) {
-        if (discontent < 0) {
-          popAniController.Show(view, 
-            System.String.Format(textLib.get("pop_content"), -discontent),
-            Color.green, noFix);
-        } else {
-          popAniController.Show(view, 
-            System.String.Format(textLib.get("pop_discontent"), discontent),
-            Color.yellow, noFix);
-        }
         while (popAniController.Animating) { yield return null; }
       }
 

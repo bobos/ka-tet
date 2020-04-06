@@ -174,6 +174,17 @@ namespace FieldNS
       discoveredTiles = new HashSet<Tile>();
     }
 
+    public bool Forecast() {
+      bool found = false;
+      foreach(Unit unit in GetUnits()) {
+        if (unit.rf.general.Has(Cons.forecaster)) {
+          found = true;
+          break;
+        }
+      }
+      return found && Cons.MostLikely();
+    } 
+
   }
 
 }

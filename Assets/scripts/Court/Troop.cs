@@ -29,10 +29,6 @@ namespace CourtNS
     public Level level = new Level();
     TroopState state;
 
-    public static int MaxNum(Type type) {
-      return type == Type.Cavalry ? Cavalry.MaxTroopNum : Infantry.MaxTroopNum;
-    }
-
     public Troop(int soldiers, Province province, Type type, Rank rank, General general) {
       this.rank = rank;
       this.type = type;
@@ -65,7 +61,7 @@ namespace CourtNS
         return _soldiers;
       }
       set {
-        _soldiers = value < 0 ? 0 : (value > Troop.MaxNum(type) ? Troop.MaxNum(type) : value);
+        _soldiers = value < 0 ? 0 : value;
       }
     }
 
@@ -93,7 +89,7 @@ namespace CourtNS
     }
 
     public int Enlist(int rookies) {
-      int gap = Troop.MaxNum(type) - soldiers;
+      int gap = general.MaxNum(type) - soldiers;
       if (rookies < gap) { gap = rookies; }
       int returned = rookies - gap;
       soldiers += gap;

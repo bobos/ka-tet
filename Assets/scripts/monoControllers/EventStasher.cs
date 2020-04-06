@@ -46,7 +46,7 @@ namespace MonoNS {
           newStash.Add(s);
         } else if (s.general.IsOnField()) {
 
-          if (s.eventName == EventDialog.EventName.FarmDestroyed) {
+          //if (s.eventName == EventDialog.EventName.FarmDestroyed) {
             if ((s.general.party.GetRelation() == Party.Relation.tense && Cons.MostLikely())
               || (s.general.party.GetRelation() == Party.Relation.xTense) && Cons.FiftyFifty()) {
               UnitNS.Unit unit = s.general.commandUnit.onFieldUnit;
@@ -57,7 +57,7 @@ namespace MonoNS {
                 null, influence));
               while (eventDialog.Animating) { yield return null; }
             }
-          }
+          //}
 
         }
       }
