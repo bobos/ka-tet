@@ -90,9 +90,13 @@ namespace FieldNS
           general = gen;
         }
       }
-      commanderGeneral = general;
-      general.InitOnFieldAbilities();
+      AssignCommander(general);
       return general.commandUnit.onFieldUnit;
+    }
+
+    public void AssignCommander(General general) {
+      commanderGeneral = general;
+      general.InitOnFieldAbilities(true);
     }
 
     public WarPartyStat GetStat()

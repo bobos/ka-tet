@@ -10,7 +10,7 @@ public class Cons {
   }
 
   public static bool MostLikely() {
-    return Util.Rand(0f, 1f) < 0.7f;
+    return Util.Rand(0f, 1f) < 0.75f;
   }
 
   public static bool FiftyFifty() {
@@ -202,6 +202,9 @@ public class Cons {
   public static Ability builder = new Builder();
   public static Ability breacher = new Breacher();
   public static Ability noPanic = new NoPanic();
+  public static Ability mechanician = new Mechanician();
+  public static Ability diminisher = new Diminisher();
+  public static Ability staminaManager = new StaminaManager();
 
   // come with traits
   public static Ability forwarder = new Forwarder();

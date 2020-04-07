@@ -23,8 +23,8 @@ public class WallDefense {
     return 150;
   }
 
-  public void DepleteDefense() {
-    defensePoint -= DefenseDrop;
+  public void DepleteDefense(int factor) {
+    defensePoint -= DefenseDrop * factor;
     defensePoint = defensePoint < 0 ? 0 : defensePoint;
   }
 

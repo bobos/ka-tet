@@ -132,17 +132,17 @@ namespace CourtNS {
     public bool EnterCampaign(HexMap hexMap, Tile deploymentTile) {
       this.hexMap = hexMap;
       if (commandUnit == null) return false;
+      InitOnFieldAbilities();
       bool ready = commandUnit.EnterCampaign(deploymentTile);
       if (!ready) return ready;
       stat = GeneralStat.OnField;
       hexMap.GetWarParty(faction).JoinCampaign(this);
-      InitOnFieldAbilities();
       return true;
     }
 
-    public void InitOnFieldAbilities() {
+    public void InitOnFieldAbilities(bool isCommander = false) {
       onFieldAbilities = new HashSet<Ability>();
-      if (commandUnit.onFieldUnit.IsCommander()) {
+      if (isCommander) {
         foreach(Ability ability in commandSkill.abilities) {
           onFieldAbilities.Add(ability);
         }

@@ -19,7 +19,7 @@ public abstract class Building: DataModel {
     normal
   }
   public Tile baseTile;
-  protected int buildWork = 0;
+  public int buildWork = 0;
   protected MonoNS.HexMap hexMap;
   protected MonoNS.SettlementMgr settlementMgr;
   protected virtual void TurnEndCB() {}

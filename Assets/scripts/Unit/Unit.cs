@@ -84,6 +84,7 @@ namespace UnitNS
       plainSickness = new PlainSickness(this);
       warWeary = new WarWeary(this);
       vantage = new Vantage(this);
+      InitAllowedAtmpt();
     }
 
     public void CloneInit(float disarmorDefDebuf, Supply supply, PlainSickness plainSickness) {
@@ -228,16 +229,25 @@ namespace UnitNS
       return chaos || defeating;
     }
 
-    public bool charged = false;
+    public int allowedAtmpt = 1;
+    void InitAllowedAtmpt() {
+      allowedAtmpt = 1;
+      if (IsCavalry() && rf.general.Has(Cons.staminaManager)) {
+        allowedAtmpt = 2;
+      }
+    }
+    public void UseAtmpt() {
+      allowedAtmpt--;
+    }
+
     public bool CanCharge() {
       return IsHeavyCavalry() &&
-        CanAttack() && !charged && rf.soldiers >= 800 && movementRemaining >= ActionCost; 
+        CanAttack() && allowedAtmpt > 0 && rf.soldiers >= 800 && movementRemaining >= ActionCost; 
     }
 
     public bool retreated = false;
-    public bool attacked = false;
     public bool CanAttack() {
-      return !attacked;
+      return allowedAtmpt > 0;
     }
 
     public string GetStateName()
@@ -357,6 +367,10 @@ namespace UnitNS
 
     public bool InCommanderRange() {
       bool inRange = false;
+      if (IsCommander()) {
+        return true;
+      }
+
       foreach(Tile t in MyCommander().commandUnit.onFieldUnit.GetVisibleArea()) {
         if (Util.eq<Tile>(tile, t)) {
           inRange = true;
@@ -364,6 +378,39 @@ namespace UnitNS
         }
       }
       return inRange;
+    }
+
+    public bool ImproviseOnSupply() {
+      if (!MyCommander().Has(Cons.backStabber)) {
+        return false;
+      }
+      if (IsCommander()) {
+        return true;
+      }
+
+      bool nearbyCommander = false;
+      foreach(Tile tile in MyCommander().commandUnit.onFieldUnit.tile.neighbours) {
+        if (tile.GetUnit() != null && Util.eq<Unit>(tile.GetUnit(), this)) {
+          nearbyCommander = true;
+          break;
+        }
+      }
+      return nearbyCommander;
+    }
+
+    public bool StickAsNailWhenDefeat() {
+      return (InCommanderRange() &&
+              MyCommander().Has(Cons.turningTide) &&
+              Cons.FiftyFifty()) ||
+              (rf.general.Has(Cons.unshaken) && Cons.FiftyFifty());
+    }
+
+    public bool RetreatOnDefeat() {
+      return rf.general.Has(Cons.retreater) && Cons.EvenChance();
+    }
+
+    public bool ApplyDiscipline() {
+      return rf.general.Has(Cons.discipline) && Cons.FiftyFifty();
     }
 
     public General MyCommander() {
@@ -383,10 +430,8 @@ namespace UnitNS
     {
       chaos = false;
       defeating = false;
-
-      charged = false;
-      attacked = false;
       retreated = false;
+      InitAllowedAtmpt();
 
       if (concealCoolDownTurn > 0) {
         concealCoolDownTurn--;

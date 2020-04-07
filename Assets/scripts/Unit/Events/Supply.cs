@@ -26,10 +26,10 @@ namespace UnitNS
         false;
 
       if (!consumed) {
-        // TODO: apply general trait
-        int moraleReduce = -5;
+        bool improvise = unit.ImproviseOnSupply();
+        int moraleReduce = improvise ? -1 : -5;
         unit.rf.morale += moraleReduce;
-        int deathNum = Util.Rand(0, 30);
+        int deathNum = Util.Rand(0, improvise ? 10 : 30);
         unit.kia += deathNum;
         unit.rf.soldiers -= deathNum;
         effects[0] = moraleReduce;

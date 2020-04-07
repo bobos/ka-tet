@@ -7,10 +7,11 @@ namespace CourtNS {
     public abstract string Name();
     public abstract string Description();
     public static Ability LuckyDraw() {
-      Ability[] candidates = new Ability[]{Cons.forecaster, Cons.discipline, Cons.pursuer,
-        Cons.hammer, Cons.builder, Cons.breacher, Cons.noPanic};
+      Ability[] candidates = new Ability[]{Cons.forecaster, Cons.discipline,
+        Cons.pursuer, Cons.hammer, Cons.builder, Cons.breacher, Cons.noPanic,
+        Cons.mechanician, Cons.diminisher, Cons.staminaManager};
       int total = candidates.Length;
-      int luckNum = Util.Rand(0, total * 3);
+      int luckNum = Util.Rand(0, total * 2);
       if (luckNum < total) {
         return candidates[luckNum];
       }
@@ -353,6 +354,45 @@ namespace CourtNS {
 
     public override string Description() {
       return Cons.GetTextLib().get("ability_playSafe_description");
+    }
+  }
+
+  public class Mechanician: Ability {
+    public Mechanician() {
+    }
+
+    public override string Name() {
+      return Cons.GetTextLib().get("ability_mechanician");
+    }
+
+    public override string Description() {
+      return Cons.GetTextLib().get("ability_mechanician_description");
+    }
+  }
+
+  public class Diminisher: Ability {
+    public Diminisher() {
+    }
+
+    public override string Name() {
+      return Cons.GetTextLib().get("ability_diminisher");
+    }
+
+    public override string Description() {
+      return Cons.GetTextLib().get("ability_diminisher_description");
+    }
+  }
+
+  public class StaminaManager: Ability {
+    public StaminaManager() {
+    }
+
+    public override string Name() {
+      return Cons.GetTextLib().get("ability_staminaManager");
+    }
+
+    public override string Description() {
+      return Cons.GetTextLib().get("ability_staminaManager_description");
     }
   }
 }

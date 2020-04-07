@@ -58,7 +58,7 @@ namespace CourtNS {
     }
 
     public override List<Ability> Abilities() {
-      return new List<Ability>(){Cons.breaker, Cons.unshaken,
+      return new List<Ability>(){Cons.breaker, Cons.unshaken, Cons.forwarder,
         Cons.holdTheGround, Cons.easyTarget, Cons.formidable};
     }
   }

@@ -374,7 +374,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &119255074
 RectTransform:
   m_ObjectHideFlags: 0
@@ -10522,7 +10522,6 @@ MonoBehaviour:
   DestroyAnimating: 0
   ShakeAnimating: 0
   MoveAnimating: 0
-  riotAnimating: 0
   PostAnimating: 0
   AttackEmptyAnimating: 0
   SurroundAnimating: 0

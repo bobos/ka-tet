@@ -90,8 +90,9 @@ namespace MonoNS
           if (u.IsShowingAnimation()) {
             hexMap.unitAniController.ShowEffect(u, stats, null, true);
           }
-          // TODO: apply general trait
-          if (!u.IsCommander() && (u.rf.morale <= Util.Rand(1, 79))&& u.SetRetreatPath()) {
+          if (!u.StickAsNailWhenDefeat()
+            && (u.RetreatOnDefeat() || Cons.FiftyFifty())
+            && u.SetRetreatPath()) {
             ForceRetreat(u);
             while(ForceRetreatAnimating) { yield return null; }
           }
@@ -385,11 +386,12 @@ namespace MonoNS
 
     IEnumerator CoBury(Unit unit) {
       unit.movementRemaining -= Unit.ActionCost;
-      // TODO: apply trait
-      int moraleDrop = -5;
-      unit.rf.morale += moraleDrop;
-      ShowEffect(unit, new int[]{moraleDrop,0,0,0,0});
-      while(ShowAnimating) { yield return null; }
+      if (!unit.ApplyDiscipline()) {
+        int moraleDrop = -5;
+        unit.rf.morale += moraleDrop;
+        ShowEffect(unit, new int[]{moraleDrop,0,0,0,0});
+        while(ShowAnimating) { yield return null; }
+      }
       unit.tile.deadZone.Clean();
 
       hexMap.cameraKeyboardController.EnableCamera();
@@ -412,8 +414,7 @@ namespace MonoNS
 
     IEnumerator CoCharge(Unit from, Unit to) {
       from.movementRemaining -= chargePoint;
-      from.charged = true;
-      from.attacked = true;
+      from.UseAtmpt();
       bool defeatingUnit = to.IsVulnerable();
       popAniController.Show(hexMap.GetUnitView(from),
         defeatingUnit ? textLib.get("pop_chasing") : textLib.get("pop_charging"),
@@ -421,6 +422,9 @@ namespace MonoNS
       while (popAniController.Animating) { yield return null; }
       bool scared = to.CanBeShaked(from) >= Util.Rand(1, 100);
       scared = defeatingUnit ? true : scared;
+      if (!scared) {
+        scared = from.rf.general.Has(Cons.hammer) ? Cons.FiftyFifty() : scared;
+      }
       int killed = Util.Rand(0, 11);
       from.rf.soldiers -= killed;
       from.kia += killed;
@@ -431,8 +435,9 @@ namespace MonoNS
         if (defeatingUnit) {
           int dead = to.chaos ? (from.rf.soldiers / (from.IsHeavyCavalry() ? 2 : 3))
             : (from.rf.soldiers / (from.IsHeavyCavalry() ? 4 : 6));
+          dead = from.rf.general.Has(Cons.pursuer) ? (int)(dead * 1.5f) : dead;
           dead = dead > to.rf.soldiers ? to.rf.soldiers : dead;
-          int morale = -5;
+          int morale = from.rf.general.Has(Cons.pursuer) ? -8 : -5;
           to.rf.soldiers -= dead;
           to.kia += dead;
           to.rf.morale += morale;
@@ -581,13 +586,19 @@ namespace MonoNS
     }
 
     IEnumerator CoSiege(Unit unit) {
-      if(!hexMap.settlementMgr.BuildSiegeWall(unit.tile, hexMap.GetWarParty(unit))) {
+      if(!hexMap.settlementMgr.BuildSiegeWall(unit, hexMap.GetWarParty(unit))) {
         if (unit.IsShowingAnimation()) {
           popAniController.Show(hexMap.GetUnitView(unit),
           textLib.get("pop_buildFail"), Color.yellow);
           while (popAniController.Animating) { yield return null; }
         }
       } else {
+        if (!unit.ApplyDiscipline()) {
+          int moraleDrop = -3;
+          unit.rf.morale += moraleDrop;
+          ShowEffect(unit, new int[]{moraleDrop,0,0,0,0});
+          while(ShowAnimating) { yield return null; }
+        }
         if (unit.IsShowingAnimation()) {
           popAniController.Show(hexMap.GetUnitView(unit),
           textLib.get("pop_sieging"), Color.green);

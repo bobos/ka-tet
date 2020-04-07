@@ -210,7 +210,7 @@ public class Starter : MonoBehaviour {
     guanyu.EnterCampaign(hexMap, hexMap.GetTile(35, 31));
     machao.EnterCampaign(hexMap, hexMap.GetTile(36, 31));
     zhangfei.EnterCampaign(hexMap, hexMap.GetTile(37, 31));
-    hexMap.GetWarParty(liubei.faction).commanderGeneral = liubei;
+    hexMap.GetWarParty(liubei.faction).AssignCommander(liubei);
 
     // * AI *
     caocao.EnterCampaign(hexMap, hexMap.GetTile(0, 9));
@@ -220,7 +220,7 @@ public class Starter : MonoBehaviour {
     x2.EnterCampaign(hexMap, hexMap.GetTile(4, 9));
     x3.EnterCampaign(hexMap, hexMap.GetTile(5, 9));
     x4.EnterCampaign(hexMap, hexMap.GetTile(6, 9));
-    hexMap.GetWarParty(caocao.faction).commanderGeneral = caocao;
+    hexMap.GetWarParty(caocao.faction).AssignCommander(caocao);
     SettlementMgr.Ready4Refresh = true;
     FoW.Init(hexMap);
     Unit commander = hexMap.GetPlayerParty().commanderGeneral.commandUnit.onFieldUnit;

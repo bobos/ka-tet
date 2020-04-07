@@ -97,7 +97,15 @@ public abstract class Settlement: Building
       (lastingTurns > storageLvl.LastingTurnsUnderSiege() ? storageLvl.LastingTurnsUnderSiege() : lastingTurns);
 
     if (IsUnderSiege()) {
-      wall.DepleteDefense();
+      bool found = false;
+      foreach(Tile tile in baseTile.neighbours) {
+        Unit u = tile.GetUnit();
+        if (u != null && u.IsAI() != owner.isAI && !u.IsCavalry() && u.rf.general.Has(Cons.diminisher)) {
+          found = true;
+          break;
+        }
+      }
+      wall.DepleteDefense(found ? 2 : 1);
     } else {
       wall.RepairDefense();
     }
@@ -180,7 +188,10 @@ public abstract class Settlement: Building
     }
 
     foreach(Unit unit in garrison) {
-      force += unit.GetUnitDefendCombatPoint();
+      int point = (int)(unit.GetUnitDefendCombatPoint() * (
+        unit.rf.general.Has(Cons.mechanician) ? 1.5f : 1f
+      ));
+      force += point;
     }
 
     return force;

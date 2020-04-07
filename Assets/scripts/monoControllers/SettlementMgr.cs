@@ -115,9 +115,13 @@ namespace MonoNS
         male, female, child, storageLvl, wallLevel, null);
     }
 
-    public bool BuildSiegeWall(Tile location, WarParty warParty) {
+    public bool BuildSiegeWall(Unit builder, WarParty warParty) {
+      Tile location = builder.tile;
       if(location.Work2BuildSettlement() == -1) return false; // unbuildable tile
       SiegeWall siegeWall = new SiegeWall(location, warParty);
+      if (builder.rf.general.Has(Cons.builder)) {
+        siegeWall.buildWork = (int)(siegeWall.buildWork * 0.5f);
+      }
       siegeWall.onBuildingReady += this.SettlementReady;
       buildingQueue.Add(siegeWall);
       CreateSiegeWall(siegeWall);

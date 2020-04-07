@@ -124,6 +124,14 @@ namespace MonoNS
       }
     }
 
+    int AttackerPoint(Unit unit, Settlement targetSettlement) {
+      if (targetSettlement != null && unit.rf.general.Has(Cons.breacher)) {
+        return (int)(unit.unitCombatPoint * 1.5f);
+      }
+
+      return unit.unitCombatPoint;
+    }
+
     OperationPredict predict;
     public OperationPredict StartOperation(Unit attacker, Unit targetUnit, Settlement targetSettlement) {
       if (!attacker.CanAttack()) {
@@ -162,7 +170,8 @@ namespace MonoNS
       unitPredict.percentOfEffectiveForce = GetEffectiveForcePercentage(attacker, false);
       unitPredict.joinPossibility = 100;
       SetGaleVantage(attacker, defender, unitPredict);
-      unitPredict.operationPoint = attacker.IsCamping() ? attacker.unitCampingAttackCombatPoint : attacker.unitCombatPoint;
+      unitPredict.operationPoint = attacker.IsCamping() ?
+        attacker.unitCampingAttackCombatPoint : AttackerPoint(attacker, targetSettlement);
       predict.attackers.Add(unitPredict);
       predict.attackerOptimPoints += unitPredict.operationPoint;
       hexMap.ShowAttackArrow(attacker, targetUnit, unitPredict);
@@ -173,7 +182,7 @@ namespace MonoNS
         unitPredict.percentOfEffectiveForce = GetEffectiveForcePercentage(unit, false);
         SetGaleVantage(unit, defender, unitPredict);
         unitPredict.joinPossibility = JoinPossibility(unit, true);
-        unitPredict.operationPoint = unit.unitCombatPoint;
+        unitPredict.operationPoint = AttackerPoint(unit, targetSettlement);
         predict.attackers.Add(unitPredict);
         predict.attackerOptimPoints += unitPredict.operationPoint;
       }
@@ -310,7 +319,7 @@ namespace MonoNS
         return inRange ? 70 : 60;
       }
 
-      return inRange ? 40 : 20;
+      return inRange ? 60 : 50;
     }
 
     public void CancelOperation() {
@@ -485,7 +494,7 @@ namespace MonoNS
         foreach (UnitPredict u in predict.attackers) {
           if (u.joinPossibility >= Util.Rand(0, 100)) {
             newAttackers.Add(u);
-            u.unit.attacked = true; 
+            u.unit.UseAtmpt(); 
           } else {
             giveupAttackers.Add(u.unit);
           }
@@ -836,9 +845,40 @@ namespace MonoNS
 
         Unit loser = atkWin ? defender : attacker;
         List<Unit> supporters = new List<Unit>();
+        HashSet<Unit> chasers = new HashSet<Unit>();
         foreach(UnitPredict up in atkWin ? predict.defenders : predict.attackers) {
           if (!up.unit.IsGone()) {
             supporters.Add(up.unit);
+          }
+        }
+
+        bool cunningLoser = loser.rf.general.Has(Cons.feintDefeat);
+        foreach(UnitPredict up in atkWin ? predict.attackers : predict.defenders) {
+          if (!up.unit.IsGone() && up.unit.rf.general.Has(Cons.forwarder) && Cons.HighlyLikely()) {
+            chasers.Add(up.unit);
+          } else if (cunningLoser && Cons.SlimChance()) {
+            chasers.Add(up.unit);
+          }
+        }
+
+        HashSet<Unit> extra = new HashSet<Unit>();
+        foreach(Unit u in chasers) {
+          foreach(Tile t in u.tile.neighbours) {
+            Unit ut = t.GetUnit();
+            if (ut != null && ut.IsAI() == u.IsAI()
+              && !ut.rf.general.Has(Cons.playSafe) && Cons.FiftyFifty()) {
+              extra.Add(ut);
+            }
+          }
+        }
+        foreach(Unit u in extra) {
+          chasers.Add(u);
+        }
+
+        List<Unit> retreaters = new List<Unit>();
+        foreach(Unit u in hexMap.GetWarParty(loser).GetUnits()) {
+          if (u.RetreatOnDefeat() && !supporters.Contains(u)) {
+            retreaters.Add(u);
           }
         }
 
@@ -858,6 +898,7 @@ namespace MonoNS
           while (hexMap.unitAniController.ShakeAnimating) { yield return null; }
         }
 
+        List<Unit> geese = new List<Unit>();
         // TODO: when defender is in city, capture the city on victory
         if (resultLevel != ResultType.Close) {
           Dictionary<Tile, bool> tiles = new Dictionary<Tile, bool>();
@@ -873,8 +914,14 @@ namespace MonoNS
             return (int)(Tile.Distance(baseTile, b.tile) - Tile.Distance(baseTile, a.tile));
           });
 
+          List<Unit> gonnaStick = new List<Unit>();
           foreach(Unit unit in supporters) {
-            if (unit.IsCamping()) { 
+            bool notMoving = unit.StickAsNailWhenDefeat();
+            if (notMoving) {
+              gonnaStick.Add(unit);
+            }
+
+            if (unit.IsCamping() || notMoving) { 
               plan[unit] = null;
               continue;
             }
@@ -915,6 +962,9 @@ namespace MonoNS
           }
 
           foreach (Unit unit in supporters) {
+            if (gonnaStick.Contains(unit)) {
+              continue;
+            }
             if (resultLevel == ResultType.Crushing) {
               unit.chaos = true;
             } else if (resultLevel == ResultType.Great) {
@@ -922,7 +972,7 @@ namespace MonoNS
             }
           }
 
-          if (resultLevel == ResultType.Small) {
+          if (resultLevel == ResultType.Small && !gonnaStick.Contains(loser)) {
             loser.defeating = true;
           }
 
@@ -942,6 +992,10 @@ namespace MonoNS
           // move all unit at once
           List<Unit> failedToMove = new List<Unit>();
           foreach(Unit unit in supporters) {
+            if (unit.rf.general.Has(Cons.noPanic) && Cons.FiftyFifty()) {
+              unit.defeating = unit.chaos = false;
+            }
+
             List<Tile> path = plan[unit];
             if (path == null) {
               if (!unit.IsCamping()) {
@@ -950,14 +1004,17 @@ namespace MonoNS
               continue;
             }
             foreach(Tile t in path) {
+              geese.Add(unit);
               hexMap.unitAniController.MoveUnit(unit, path[path.Count - 1], true);
             }
           }
           hexMap.turnController.Sleep(1);
           while(hexMap.turnController.sleeping) { yield return null; }
 
-          // TODO: 力挽狂澜
           foreach(Unit unit in failedToMove) {
+            if (gonnaStick.Contains(unit)) {
+              continue;
+            }
             foreach(Tile t in unit.tile.neighbours) {
               Unit u = t.GetUnit();
               if (u != null && u.IsAI() == unit.IsAI() && !supporters.Contains(u)) {
@@ -967,12 +1024,21 @@ namespace MonoNS
               }
             }
           }
-        } else {
-          if (Cons.FiftyFifty() &&
-            //(!loser.rf.general.Has(Cons.unshaken) || !Cons.HighlyLikely())) {
-            loser.defeating = true;
+
+          // conservative generals retreat
+          foreach(Unit u in retreaters) {
+            if (u.SetRetreatPath()) {
+              hexMap.unitAniController.ForceRetreat(u);
+              while(hexMap.unitAniController.ForceRetreatAnimating) { yield return null; }
+            }
           }
-          if (!loser.IsCamping()) {
+        } else {
+          bool notGonnaMove = loser.StickAsNailWhenDefeat();
+          if (Cons.FiftyFifty() && !notGonnaMove) {
+            loser.defeating = (loser.rf.general.Has(Cons.noPanic) && Cons.FiftyFifty())
+              ? false : true;
+          }
+          if (!loser.IsCamping() && !notGonnaMove) {
             int escapeDistance =  2;
             hexMap.popAniController.Show(hexMap.GetUnitView(loser), 
              Cons.GetTextLib().get("pop_retreat"),
@@ -1022,6 +1088,7 @@ namespace MonoNS
                     hexMap.unitAniController.CrashByAlly(ally[Util.Rand(0, ally.Count-1)], -10);
                     while (hexMap.unitAniController.CrashAnimating) { yield return null; }
                   } else {
+                    geese.Add(loser);
                     hexMap.unitAniController.MoveUnit(loser, escapeTile);
                     while (hexMap.unitAniController.MoveAnimating) { yield return null; }
                   }
@@ -1030,6 +1097,33 @@ namespace MonoNS
               }
             }
           }
+        }
+
+        // goose chase
+        HashSet<Unit> occupied = new HashSet<Unit>();
+        foreach(Unit u in chasers) {
+          Tile[] path = new Tile[]{};
+          foreach(Unit goose in geese) {
+            foreach(Tile t in goose.tile.neighbours) {
+              if (!t.Deployable(u)) {
+                continue;
+              }
+
+              path = u.FindPath(t);
+              if (path.Length > 0) {
+                break;
+              }
+            }
+            if (path.Length > 0) {
+              break;
+            }
+          }
+          if (path.Length == 0) {
+            break;
+          }
+          u.SetPath(path);
+          hexMap.actionController.move(u);
+          while (hexMap.actionController.ActionOngoing) { yield return null; }
         }
       } else {
       // TODO: uncomment

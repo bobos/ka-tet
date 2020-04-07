@@ -14,11 +14,13 @@
         return 0;
       }
 
-      // TODO: displined general, this never happens
       if ((unit.rf.rank == Cons.rookie || first != null)
+          && !unit.ApplyDiscipline()
           && !unit.IsAI() && !fired && unit.IsOnField() && Cons.HighlyLikely()) {
         fired = true;
-        // TODO totally depends on general trait, normally, allowed
+        if (unit.rf.general.Has(Cons.discipline)) {
+          return MoraleDrop();
+        }
         return Cons.FiftyFifty() ? MoraleDrop() : DefReduce();
       }
       return 0;
