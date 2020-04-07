@@ -244,6 +244,7 @@ namespace TextNS
       {"pop_chasing", "乘胜追击!"},
       {"pop_shaked", "阵脚松动!"},
       {"pop_holding", "稳住阵脚"},
+      {"pop_newCommander", "新主帅"},
 
       // settlement
       {"settlement_storageLvl1", "初级粮仓"},
@@ -296,7 +297,7 @@ namespace TextNS
       {"ability_discipline_description", "一定几率减少部队各种不满发生"},
       {"ability_pursuer", "乘胜追击"},
       {"ability_pursuer_description", "增加50%对敌方溃败单位追击杀伤率"},
-      {"ability_hammer", "猛张飞"},
+      {"ability_hammer", "气吞万里"},
       {"ability_hammer_description", "统帅骑兵部队时冲阵成功率加50%"},
       {"ability_builder", "鲁班再世"},
       {"ability_builder_description", "筑长围时间减半"},
@@ -304,7 +305,7 @@ namespace TextNS
       {"ability_breacher_description", "攻城时所部兵士战斗力增加50%"},
       {"ability_noPanic", "有序撤退"},
       {"ability_noPanic_description", "被击退时减少部队崩溃或者发生溃败几率50%"},
-      {"ability_forwarder", "追名逐利"},
+      {"ability_forwarder", "不暇思索"},
       {"ability_forwarder_description", "当敌军退败时80%几率擅自追击并影响周围友军"},
       {"ability_holdTheGround", "纹丝不动"},
       {"ability_holdTheGround_description", "面对敌军冲阵时减少冲阵成功率50%"},

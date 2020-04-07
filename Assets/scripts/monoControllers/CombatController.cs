@@ -332,10 +332,12 @@ namespace MonoNS
         up.leastNum = (int)(up.unit.rf.soldiers * (up.unit.IsCavalry() ? 0.2f : 0.12f)); 
       }
 
+      bool dieMore = false; 
       while (total > 0) {
         int dryUnits = 0;
         foreach(UnitPredict up in units) {
           Unit unit = up.unit;
+          dieMore = Util.eq<Unit>(unit, attacker) || Util.eq<Unit>(unit, defender);
 
           if (unit.rf.soldiers <= up.leastNum) {
             dryUnits++;
@@ -369,35 +371,42 @@ namespace MonoNS
           }
 
           // rookie
+          int toll = 0;
           if (unit.rf.rank.Level() == 1) {
             if (!unit.IsCavalry()) {
-              total -= 20;
-              Helper(up, 20);
+              toll = dieMore ? 40 : 20;
+              total -= toll;
+              Helper(up, toll);
             } else {
-              total -= 8;
-              Helper(up, 8);
+              toll = dieMore ? 16 : 8;
+              total -= toll;
+              Helper(up, toll);
             }
           }
 
           // veteran
           if (unit.rf.rank.Level() == 2) {
             if (!unit.IsCavalry()) {
-              total -= 10;
-              Helper(up, 10);
+              toll = dieMore ? 20 : 10;
+              total -= toll;
+              Helper(up, toll);
             } else {
-              total -= 5;
-              Helper(up, 5);
+              toll = dieMore ? 10 : 5;
+              total -= toll;
+              Helper(up, toll);
             }
           }
 
           // elite
           if (unit.rf.rank.Level() == 3) {
             if (!unit.IsCavalry()) {
-              total -= 5;
-              Helper(up, 5);
+              toll = dieMore ? 10 : 5;
+              total -= toll;
+              Helper(up, toll);
             } else {
-              total -= 3;
-              Helper(up, 3);
+              toll = dieMore ? 6 : 3;
+              total -= toll;
+              Helper(up, toll);
             }
           }
         }
@@ -706,8 +715,8 @@ namespace MonoNS
         int[] dftBuf = GetDftBuf(resultLevel);
         if (atkWin) {
           if (!defender.IsGone() && defender.rf.general.Has(Cons.easyTarget) && Cons.SlimChance()) {
-            hexMap.unitAniController.GeneralDied(defender);
-            while (hexMap.unitAniController.generalDieAnimating) { yield return null; }
+            hexMap.unitAniController.DestroyUnit(defender, DestroyType.ByDisband, true);
+            while (hexMap.unitAniController.DestroyAnimating) { yield return null; }
           }
           int morale = vicBuf[0];
           int morale1 = vicBuf[1];
@@ -763,8 +772,8 @@ namespace MonoNS
           while(hexMap.turnController.sleeping) { yield return null; }
         } else {
           if (!attacker.IsGone() && attacker.rf.general.Has(Cons.easyTarget) && Cons.SlimChance()) {
-            hexMap.unitAniController.GeneralDied(attacker);
-            while (hexMap.unitAniController.generalDieAnimating) { yield return null; }
+            hexMap.unitAniController.DestroyUnit(attacker, DestroyType.ByDisband, true);
+            while (hexMap.unitAniController.DestroyAnimating) { yield return null; }
           }
           // defender win
           int morale = vicBuf[0];
@@ -959,8 +968,8 @@ namespace MonoNS
             }
           }
         } else {
-          if (Cons.FiftyFifty()) {
-            // TODO: general trait apply to stop defeating 
+          if (Cons.FiftyFifty() &&
+            //(!loser.rf.general.Has(Cons.unshaken) || !Cons.HighlyLikely())) {
             loser.defeating = true;
           }
           if (!loser.IsCamping()) {

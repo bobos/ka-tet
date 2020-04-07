@@ -136,6 +136,11 @@ namespace CourtNS {
       if (!ready) return ready;
       stat = GeneralStat.OnField;
       hexMap.GetWarParty(faction).JoinCampaign(this);
+      InitOnFieldAbilities();
+      return true;
+    }
+
+    public void InitOnFieldAbilities() {
       onFieldAbilities = new HashSet<Ability>();
       if (commandUnit.onFieldUnit.IsCommander()) {
         foreach(Ability ability in commandSkill.abilities) {
@@ -150,8 +155,6 @@ namespace CourtNS {
       foreach(Ability ability in acquiredAbilities) {
         onFieldAbilities.Add(ability);
       }
-
-      return true;
     }
 
     public void TroopRetreat() {
@@ -160,7 +163,7 @@ namespace CourtNS {
       LeaveCampaign();
     }
 
-    public void TroopDestroyed() {
+    public void TroopDestroyed(bool generalDead = false) {
       ReportFieldEvent(FieldEvent.Destroyed);
       commandUnit.Destroy();
       commandUnit.general = null;
@@ -168,7 +171,7 @@ namespace CourtNS {
       LeaveCampaign();
       if ((Has(Cons.easyTarget) && Cons.FiftyFifty()) ||
           (Has(Cons.playSafe) && Cons.TinyChance()) ||
-          Cons.FairChance()
+          Cons.FairChance() || generalDead
           ) {
         // Killed in battle
         Die();
@@ -176,7 +179,6 @@ namespace CourtNS {
     }
 
     void Die() {
-      hexMap.eventDialog.Show(new MonoNS.Event(EventDialog.EventName.GeneralKilledInBattle, null, null, 0, 0, 0, 0, 0, null, this));
       LeaveFaction();
       stat = GeneralStat.Dead;
     }

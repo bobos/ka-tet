@@ -80,6 +80,21 @@ namespace FieldNS
       return _units;
     }
 
+    public Unit AssignNewCommander() {
+      int lvl = 0;
+      General general = null;
+      foreach(Unit unit in GetUnits()) {
+        General gen = unit.rf.general;
+        if (gen.commandSkill.commandSkill > lvl) {
+          lvl = gen.commandSkill.commandSkill;
+          general = gen;
+        }
+      }
+      commanderGeneral = general;
+      general.InitOnFieldAbilities();
+      return general.commandUnit.onFieldUnit;
+    }
+
     public WarPartyStat GetStat()
     {
       // TODO: for AI, consider fog of war

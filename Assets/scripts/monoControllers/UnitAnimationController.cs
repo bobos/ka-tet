@@ -27,15 +27,16 @@ namespace MonoNS
     public override void UpdateChild() {}
 
     public bool DestroyAnimating = false;
-    public void DestroyUnit(Unit unit, DestroyType type)
+    public void DestroyUnit(Unit unit, DestroyType type, bool generalDead = false)
     {
+      // TODO: check if this is the last unit, if so, campaign ends
       DestroyAnimating = true;
       int killed = unit.Destroy();
       hexMap.cameraKeyboardController.DisableCamera();
-      StartCoroutine(CoDestroy(unit, type, killed));
+      StartCoroutine(CoDestroy(unit, type, killed, generalDead));
     }
 
-    IEnumerator CoDestroy(Unit unit, DestroyType type, int killed)
+    IEnumerator CoDestroy(Unit unit, DestroyType type, int killed, bool generalDead)
     {
       if (!unit.IsCamping()) {
         UnitView view = hexMap.GetUnitView(unit);
@@ -54,14 +55,21 @@ namespace MonoNS
       while (eventDialog.Animating) { yield return null; }
 
       General general = unit.rf.general;
-      general.TroopDestroyed();
+      general.TroopDestroyed(generalDead);
 
       if (general.IsDead()) {
         eventDialog.Show(new MonoNS.Event(EventDialog.EventName.GeneralKilledInBattle, null, null, 0, 0, 0, 0, 0, null, general));
         while (eventDialog.Animating) { yield return null; }
+        if (unit.IsCommander()) {
+          Unit newCommander = hexMap.GetWarParty(unit).AssignNewCommander();
+          if (newCommander.IsOnField()) {
+            popAniController.Show(hexMap.GetUnitView(newCommander), textLib.get("pop_newCommander"), Color.white);
+            while(popAniController.Animating) { yield return null; }
+          }
+        }
       }
 
-      ShakeNearbyAllies(unit, -10);
+      ShakeNearbyAllies(unit, unit.IsCommander() ? -20 : -8);
       while (ShakeAnimating) { yield return null; }
       hexMap.cameraKeyboardController.EnableCamera();
       DestroyAnimating = false;
