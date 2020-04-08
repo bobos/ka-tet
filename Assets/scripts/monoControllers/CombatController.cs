@@ -303,23 +303,23 @@ namespace MonoNS
       }
 
       if (result == ResultType.Close) {
-        return inRange ? 100 : 80;
+        return inRange ? 100 : 90;
       }
 
       // when odds is greater than close
-      if (unit.rf.general.Has(Cons.opportunist) && result != ResultType.Crushing) {
+      if (unit.rf.general.Has(Cons.opportunist)) {
         return 50;
       }
 
       if (result == ResultType.Small) {
-        return inRange ? 80 : 70;
+        return inRange ? 90 : 80;
       }
 
       if (result == ResultType.Great) {
-        return inRange ? 70 : 60;
+        return inRange ? 80 : 65;
       }
 
-      return inRange ? 60 : 50;
+      return inRange ? 65 : 50;
     }
 
     public void CancelOperation() {
@@ -583,7 +583,6 @@ namespace MonoNS
         // combat starts
         int attackerCasualty = 0;
         int defenderCasualty = 0;
-        bool attackerBigger = predict.sugguestedResult.chance == 10;
         ResultType resultLevel = predict.suggestedResultType;
         predict.attackerOptimPoints = predict.attackerOptimPoints <= 0 ? 1 : predict.attackerOptimPoints;
         predict.defenderOptimPoints = predict.defenderOptimPoints <= 0 ? 1 : predict.defenderOptimPoints;
@@ -594,14 +593,21 @@ namespace MonoNS
 // 1.9 to 2.2 - atk: (x - 1.2) * (0.25 - 0.4)
         if (resultLevel == ResultType.Close) {
           // 1 - 2x odds
-          float m = 0.035f;
-          float m1 = 0.03f;
+          float m = 0.01f;
           if (Cons.SlimChance()) {
             m = 0.04f;
-            m1 = 0.01f;
           }
-          defenderCasualty = (int)(defenderTotal * (attackerBigger ? m : m1));
-          attackerCasualty = (int)(attackerTotal * (attackerBigger ? m1 : m));
+          if (atkWin) {
+            defenderCasualty = (int)(defenderTotal * m);
+          } else {
+            attackerCasualty = (int)(attackerTotal * m);
+          }
+
+          if (atkWin) {
+            attackerCasualty = (int)(defenderCasualty * 0.8f);
+          } else {
+            defenderCasualty = (int)(attackerCasualty * 0.8f);
+          }
         } else {
           float factor = 0.02f;
           if (resultLevel == ResultType.Great) {
@@ -611,7 +617,7 @@ namespace MonoNS
             factor = 0.5f;
           }
 
-          if (attackerBigger) {
+          if (atkWin) {
             defenderCasualty = (int)(defenderTotal * factor);
           } else {
             attackerCasualty = (int)(attackerTotal * factor);
@@ -620,7 +626,7 @@ namespace MonoNS
           if (resultLevel == ResultType.Small) {
             // 2x - 2.4x
             int modifier = Util.Rand(5, 6);
-            if (attackerBigger) {
+            if (atkWin) {
               attackerCasualty = (int)(defenderCasualty * modifier * 0.1f);
             } else {
               defenderCasualty = (int)(attackerCasualty * modifier * 0.1f);
@@ -630,7 +636,7 @@ namespace MonoNS
           if (resultLevel == ResultType.Great) {
             // 2.4x - 3.9x
             int modifier = Util.Rand(4, 5);
-            if (attackerBigger) {
+            if (atkWin) {
               attackerCasualty = (int)(defenderCasualty * modifier* 0.1f);
             } else {
               defenderCasualty = (int)(attackerCasualty * modifier * 0.1f);
@@ -640,7 +646,7 @@ namespace MonoNS
           if (resultLevel == ResultType.Crushing) {
             // 3.9x - 6x odds
             int modifier = Util.Rand(1, 2);
-            if (attackerBigger) {
+            if (atkWin) {
               attackerCasualty = (int)(defenderCasualty * modifier * 0.1f);
             } else {
               defenderCasualty = (int)(attackerCasualty * modifier * 0.1f);
@@ -898,7 +904,7 @@ namespace MonoNS
           while (hexMap.unitAniController.ShakeAnimating) { yield return null; }
         }
 
-        List<Unit> geese = new List<Unit>();
+        HashSet<Unit> geese = new HashSet<Unit>();
         // TODO: when defender is in city, capture the city on victory
         if (resultLevel != ResultType.Close) {
           Dictionary<Tile, bool> tiles = new Dictionary<Tile, bool>();
@@ -1056,6 +1062,7 @@ namespace MonoNS
                   hexMap.unitAniController.MoveUnit(loser, t);
                   while (hexMap.unitAniController.MoveAnimating) { yield return null; }
                   moved = true;
+                  geese.Add(loser);
                   break;
                 }
               }
@@ -1118,12 +1125,10 @@ namespace MonoNS
               break;
             }
           }
-          if (path.Length == 0) {
-            break;
+          if (path.Length > 0) {
+            hexMap.unitAniController.MoveUnit(u, path[path.Length - 1]);
+            while (hexMap.unitAniController.MoveAnimating) { yield return null; }
           }
-          u.SetPath(path);
-          hexMap.actionController.move(u);
-          while (hexMap.actionController.ActionOngoing) { yield return null; }
         }
       } else {
       // TODO: uncomment

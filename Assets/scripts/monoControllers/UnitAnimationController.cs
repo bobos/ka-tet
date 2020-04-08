@@ -60,12 +60,12 @@ namespace MonoNS
       if (general.IsDead()) {
         eventDialog.Show(new MonoNS.Event(EventDialog.EventName.GeneralKilledInBattle, null, null, 0, 0, 0, 0, 0, null, general));
         while (eventDialog.Animating) { yield return null; }
-        if (unit.IsCommander()) {
-          Unit newCommander = hexMap.GetWarParty(unit).AssignNewCommander();
-          if (newCommander.IsOnField()) {
-            popAniController.Show(hexMap.GetUnitView(newCommander), textLib.get("pop_newCommander"), Color.white);
-            while(popAniController.Animating) { yield return null; }
-          }
+      }
+      if (unit.IsCommander()) {
+        Unit newCommander = hexMap.GetWarParty(unit).AssignNewCommander();
+        if (newCommander.IsOnField()) {
+          popAniController.Show(hexMap.GetUnitView(newCommander), textLib.get("pop_newCommander"), Color.white);
+          while(popAniController.Animating) { yield return null; }
         }
       }
 
@@ -84,7 +84,7 @@ namespace MonoNS
     IEnumerator CoShakeNearbyAllies(Unit unit, int moraleDrop) {
       foreach(Tile t in unit.tile.GetNeighboursWithinRange<Tile>(10, (Tile tt) => true)) {
         Unit u = t.GetUnit();
-        if (u != null && u.IsAI() == unit.IsAI()) {
+        if (u != null && u.IsAI() == unit.IsAI() && !Util.eq<Unit>(unit, u)) {
           int[] stats = new int[]{moraleDrop,0,0,0,0};
           u.rf.morale += moraleDrop;
           if (u.IsShowingAnimation()) {
@@ -213,24 +213,27 @@ namespace MonoNS
     }
 
     public bool SurroundAnimating = false;
-    public void UnitSurrounded (HashSet<Unit> units) {
+    public void UnitSurrounded (HashSet<Unit> units, HashSet<Unit> accu) {
       SurroundAnimating = true;
       hexMap.cameraKeyboardController.DisableCamera();
-      StartCoroutine(CoUnitSurrounded(units));
+      StartCoroutine(CoUnitSurrounded(units, accu));
     }
 
-    IEnumerator CoUnitSurrounded(HashSet<Unit> units) {
-      const int moraleDrop = -10;
+    IEnumerator CoUnitSurrounded(HashSet<Unit> units, HashSet<Unit> accu) {
+      const int moraleDrop = -8;
       bool first = true;
       foreach(Unit unit in units) {
+        accu.Add(unit);
         if (first) {
           hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(unit.tile).transform.position);
           hexMap.turnController.ShowTitle(Cons.GetTextLib().get("title_noWayOut"), Color.white);
           while(hexMap.turnController.showingTitle) { yield return null; }
           first = false;
         }
-        unit.rf.morale += moraleDrop;
-        ShowEffect(unit, new int[]{moraleDrop,0,0,0,0});
+        unit.surroundCnt++;
+        int drop = moraleDrop * unit.surroundCnt;
+        unit.rf.morale += drop;
+        ShowEffect(unit, new int[]{drop,0,0,0,0});
       }
       hexMap.turnController.Sleep(1);
       while(hexMap.turnController.sleeping) { yield return null; }

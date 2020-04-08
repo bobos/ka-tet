@@ -35,6 +35,7 @@ Game Tips:
 37. 部队在山地上被冲阵几率低
 38. 主帅和重骑兵无法被冲阵
 
+load sprit from folder to mem in imgLirary
 more discipline events
 帅:
 1. 0星  乱跑，部队不听协同

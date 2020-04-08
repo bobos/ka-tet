@@ -280,11 +280,18 @@ namespace MonoNS
         hexMap.SetUnitSkin(unit);
       }
       Dictionary<HashSet<Unit>, HashSet<Tile>> spaces = otherP.GetFreeSpaces();
+      HashSet<Unit> surroundedUnits = new HashSet<Unit>();
       foreach(KeyValuePair<HashSet<Unit>, HashSet<Tile>> kvp in spaces) {
         if (kvp.Value.Count == 0) {
           // unit group is surrounded
-          unitAniController.UnitSurrounded(kvp.Key);
+          unitAniController.UnitSurrounded(kvp.Key, surroundedUnits);
           while (unitAniController.SurroundAnimating) { yield return null; }
+        }
+      }
+      foreach(Unit u in units) {
+        if (!surroundedUnits.Contains(u)) {
+          // reset surround count
+          u.surroundCnt = 0;
         }
       }
 

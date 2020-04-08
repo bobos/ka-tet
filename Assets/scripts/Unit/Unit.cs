@@ -52,6 +52,7 @@ namespace UnitNS
     WeatherGenerator weatherGenerator;
     TurnController turnController;
     public bool chaos = false;
+    public int surroundCnt = 0;
     public Unit(bool clone, Troop troop, Tile tile, State state,
                 int kia, int movement = -1)
     {
@@ -207,7 +208,6 @@ namespace UnitNS
       if (tile.terrian == TerrianType.Hill) {
         chance += -30;
       }
-      // TODO: apply general trait
       if(charger.IsHeavyCavalry() && !IsCavalry() && !IsCommander() && IsOnField() && !tile.vantagePoint) {
         if (Util.eq<Rank>(rf.rank, Cons.rookie)) {
           chance += 70;
@@ -355,7 +355,6 @@ namespace UnitNS
     }
 
     public Tile[] GetVisibleArea() {
-      // TODO: apply commander lvl and vantage point
       int v = L1Visibility;
       if (Cons.IsMist(weatherGenerator.currentWeather)) {
         v = L0Visibility;
@@ -770,14 +769,6 @@ namespace UnitNS
     public Tile[] GetPureAccessibleTiles(bool fullMovement = false) {
       return PFTile2Tile(PathFinder.FindAccessibleTiles(tile, this,
         fullMovement ? GetFullMovement() : movementRemaining));
-    }
-
-    List<Tile> GetSurroundedTiles() {
-      List<Tile> tiles = new List<Tile>();
-      foreach(Tile tile in PFTile2Tile(PathFinder.FindAccessibleTiles(tile, this, 50))) {
-        tiles.Add(tile);
-      }
-      return tiles;
     }
 
     public Tile[] GetAccessibleTiles(bool fullMovement = false)

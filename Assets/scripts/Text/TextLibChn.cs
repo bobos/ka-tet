@@ -309,14 +309,13 @@ namespace TextNS
       {"ability_mechanician_description", "守城时增加本部兵马战力50%"},
       {"ability_diminisher", "破城之法"},
       {"ability_diminisher_description", "当统帅步兵围城时城防能力每回合衰减速度加倍"},
-      {"ability_staminaManager", "回马枪"},
+      {"ability_staminaManager", "洪荒之力"},
       {"ability_staminaManager_description", "统帅骑兵部队时能发起两次进攻"},
       {"ability_forwarder", "杀红眼"},
       {"ability_forwarder_description", "当敌军退败时80%几率擅自追击"},
-
-
       {"ability_holdTheGround", "纹丝不动"},
       {"ability_holdTheGround_description", "面对敌军冲阵时减少冲阵成功率50%"},
+
       {"ability_breaker", "气势如虹"},
       {"ability_breaker_description", "所部冲阵成功时50%几率对临近敌军产生连锁反应"},
       {"ability_unshaken", "寸步不让"},
