@@ -401,6 +401,116 @@ namespace MonoNS
       BuryAnimating = false;
     }
 
+    public bool ScatterAnimating = false;
+    public void Scatter(List<Unit> units, List<Unit> failedToMove, int moraleDrop) {
+      ScatterAnimating = true;
+      hexMap.cameraKeyboardController.DisableCamera();
+      StartCoroutine(CoScatter(units, failedToMove, moraleDrop));
+    }
+
+    IEnumerator CoScatter(List<Unit> units, List<Unit> failedToMove, int moraleDrop) {
+      Dictionary<Tile, bool> tiles = new Dictionary<Tile, bool>();
+      Dictionary<Unit, List<Tile>> plan = new Dictionary<Unit, List<Tile>>();
+      Unit loser = units[0];
+      Tile baseTile = loser.tile;
+      foreach(Tile t in baseTile.GetNeighboursWithinRange(10, (Tile _tile) => true)) {
+        tiles[t] = !t.Deployable(loser);
+      }
+
+      // sort units from far to near
+      units.Sort(delegate (Unit a, Unit b)
+      {
+        return (int)(Tile.Distance(baseTile, b.tile) - Tile.Distance(baseTile, a.tile));
+      });
+
+      foreach(Unit unit in units) {
+        // first step
+        Tile step1 = null;
+        List<Unit> ally = new List<Unit>();
+        foreach (Tile t in unit.tile.neighbours) {
+          // already taken
+          if (tiles[t]) { 
+            Unit u = t.GetUnit();
+            if (u != null && u.IsAI() == unit.IsAI()) {
+              ally.Add(u);
+            }
+            continue;
+          }
+          step1 = t;
+          break;
+        }
+
+        if (step1 == null) {
+          // look for ally's nearby tile
+          foreach(Unit u in ally) {
+            foreach(Tile t in u.tile.neighbours) {
+              if (!Util.eq<Tile>(t, unit.tile) && t.Deployable(unit)) {
+                step1 = t;
+                break;
+              }
+            }
+          }
+          if (step1 == null) {
+            plan[unit] = null;
+            continue;
+          }
+        }
+
+        List<Tile> path = new List<Tile>();
+        path.Add(step1);
+        // second step
+        Tile step2 = null;
+        foreach (Tile t in step1.neighbours) {
+          // already taken
+          if (tiles[t]) { continue; }
+          step2 = t;
+          break;
+        }
+
+        if (step2 == null) {
+          tiles[step1] = true;
+        } else {
+          path.Add(step2);
+          tiles[step2] = true;
+        }
+        tiles[unit.tile] = false;
+
+        plan[unit] = path;
+      }
+
+      // move all unit at once
+      foreach(Unit unit in units) {
+        List<Tile> path = plan[unit];
+        if (path == null) {
+          if (!unit.IsCamping()) {
+            failedToMove.Add(unit);
+          }
+          continue;
+        }
+
+        foreach(Tile t in path) {
+          hexMap.unitAniController.MoveUnit(unit, path[path.Count - 1], true);
+        }
+      }
+
+      hexMap.turnController.Sleep(1);
+      while(hexMap.turnController.sleeping) { yield return null; }
+
+      foreach(Unit unit in failedToMove) {
+        foreach(Tile t in unit.tile.neighbours) {
+          Unit u = t.GetUnit();
+          if (u != null && u.IsAI() == unit.IsAI() && !units.Contains(u)) {
+            hexMap.unitAniController.CrashByAlly(u, moraleDrop);
+            while (hexMap.unitAniController.CrashAnimating) { yield return null; }
+            continue;
+          }
+        }
+      }
+      
+      hexMap.cameraKeyboardController.EnableCamera();
+      ScatterAnimating = false;
+    }
+
     public bool ChargeAnimating = false;
     public const int chargePoint = Unit.ActionCost;
     public void Charge(Unit from, Unit to) {
@@ -424,6 +534,9 @@ namespace MonoNS
         Color.green);
       while (popAniController.Animating) { yield return null; }
       bool scared = to.CanBeShaked(from) >= Util.Rand(1, 100);
+      if (!defeatingUnit && scared && to.rf.general.Has(Cons.holdTheGround) && Cons.FiftyFifty()) {
+        scared = false;
+      }
       scared = defeatingUnit ? true : scared;
       if (!scared) {
         scared = from.rf.general.Has(Cons.hammer) ? Cons.FiftyFifty() : scared;
@@ -455,69 +568,24 @@ namespace MonoNS
         }
 
         if (!to.IsGone()) {
-          Tile tile = null;
-          List<Unit> ally = new List<Unit>();
-          int allyNum = 0;
+          List<Unit> affectedAllies = new List<Unit>();
+          affectedAllies.Add(to);
           foreach(Tile t in to.tile.neighbours) {
-            if (t.Deployable(to)) {
-              int count = 0;
-              foreach(Tile t1 in t.neighbours) {
-                Unit uu = t1.GetUnit();
-                if (!Util.eq<Tile>(t1, to.tile) && uu != null && uu.IsAI() == to.IsAI()) {
-                  count++;
-                }
-              }
-              if (count >= allyNum) {
-                allyNum = count;
-                tile = t;
-              }
-            }
             Unit u = t.GetUnit();
-            if (u != null && u.IsAI() == to.IsAI()) {
-              ally.Add(u);
+            if (u != null && u.IsAI() == to.IsAI() && !u.StickAsNailWhenDefeat() && Cons.FiftyFifty()) {
+              if (u.rf.general.Has(Cons.holdTheGround) && Cons.FiftyFifty()) {
+                affectedAllies.Add(u);
+              }
             }
           }
 
-          if (tile == null && ally.Count == 0) {
-            scared = false;
-          } else {
-            popAniController.Show(hexMap.GetUnitView(to),
-              defeatingUnit ? textLib.get("pop_retreat") : textLib.get("pop_shaked"), Color.white);
-            while (popAniController.Animating) { yield return null; }
-            if (tile == null) {
-              foreach(Unit u in ally) {
-                foreach(Tile t in u.tile.neighbours) {
-                  if (t.Deployable(to)) {
-                    tile = t;
-                    break;
-                  }
-                }
-                if (tile != null) {
-                  break;
-                }
-              }
-            }
-
-            if (tile == null) {
-              Unit conflicted = ally[Util.Rand(0, ally.Count - 1)];
-              killed = Util.Rand(20, 50);
-              int morale = -2;
-              // morale, movement, killed, attack, def
-              ShowEffect(to, new int[]{morale,0,killed,0,0});
-              while (ShowAnimating) { yield return null; }
-              to.rf.soldiers -= killed;
-              to.kia += killed;
-              to.rf.morale += morale;
-
-              CrashByAlly(conflicted, morale);
-              while (CrashAnimating) { yield return null; }
-            } else {
-              Tile toTile = to.tile;
-              MoveUnit(to, tile);
-              while (MoveAnimating) { yield return null; }
-              MoveUnit(from, toTile);
-              while (MoveAnimating) { yield return null; }
-            }
+          Tile toTile = to.tile;
+          List<Unit> notMoved = new List<Unit>();
+          Scatter(affectedAllies, notMoved, -4);
+          while(ScatterAnimating) { yield return null; }
+          if (toTile.Deployable(from)) {
+            MoveUnit(from, toTile);
+            while (MoveAnimating) { yield return null; }
           }
         }
       }

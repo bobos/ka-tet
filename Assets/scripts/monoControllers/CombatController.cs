@@ -258,7 +258,7 @@ namespace MonoNS
       int smaller = predict.attackerOptimPoints > predict.defenderOptimPoints ? predict.defenderOptimPoints : predict.attackerOptimPoints;
       smaller = smaller < 1 ? 1 : smaller;
       float odds = bigger / smaller;
-      if (odds <= 1.4f) {
+      if (odds <= 1.1f) {
         // 1 - 2x odds
         predict.suggestedResultType = ResultType.Close;
       } else if (odds <= 1.6f) {
@@ -593,9 +593,9 @@ namespace MonoNS
 // 1.9 to 2.2 - atk: (x - 1.2) * (0.25 - 0.4)
         if (resultLevel == ResultType.Close) {
           // 1 - 2x odds
-          float m = 0.01f;
+          float m = 0.04f;
           if (Cons.SlimChance()) {
-            m = 0.04f;
+            m = 0.06f;
           }
           if (atkWin) {
             defenderCasualty = (int)(defenderTotal * m);
@@ -609,9 +609,9 @@ namespace MonoNS
             defenderCasualty = (int)(attackerCasualty * 0.8f);
           }
         } else {
-          float factor = 0.02f;
+          float factor = 0.05f;
           if (resultLevel == ResultType.Great) {
-            factor = 0.03f;
+            factor = 0.08f;
           }
           if (resultLevel == ResultType.Crushing) {
             factor = 0.5f;
@@ -862,7 +862,7 @@ namespace MonoNS
         foreach(UnitPredict up in atkWin ? predict.attackers : predict.defenders) {
           if (!up.unit.IsGone() && up.unit.rf.general.Has(Cons.forwarder) && Cons.HighlyLikely()) {
             chasers.Add(up.unit);
-          } else if (cunningLoser && Cons.SlimChance()) {
+          } else if (cunningLoser && Cons.FairChance()) {
             chasers.Add(up.unit);
           }
         }
@@ -906,83 +906,19 @@ namespace MonoNS
 
         HashSet<Unit> geese = new HashSet<Unit>();
         // TODO: when defender is in city, capture the city on victory
+        List<Unit> gonnaStick = new List<Unit>();
+        List<Unit> gonnaMove = new List<Unit>();
+        List<Unit> failedToMove = new List<Unit>();
         if (resultLevel != ResultType.Close) {
-          Dictionary<Tile, bool> tiles = new Dictionary<Tile, bool>();
-          Dictionary<Unit, List<Tile>> plan = new Dictionary<Unit, List<Tile>>();
-          Tile baseTile = loser.tile;
-          foreach(Tile t in baseTile.GetNeighboursWithinRange(10, (Tile _tile) => true)) {
-            tiles[t] = !t.Deployable(loser);
-          }
-
-          // sort units from far to near
-          supporters.Sort(delegate (Unit a, Unit b)
-          {
-            return (int)(Tile.Distance(baseTile, b.tile) - Tile.Distance(baseTile, a.tile));
-          });
-
-          List<Unit> gonnaStick = new List<Unit>();
           foreach(Unit unit in supporters) {
             bool notMoving = unit.StickAsNailWhenDefeat();
             if (notMoving) {
               gonnaStick.Add(unit);
-            }
-
-            if (unit.IsCamping() || notMoving) { 
-              plan[unit] = null;
-              continue;
-            }
-            // first step
-            Tile step1 = null;
-            foreach (Tile t in unit.tile.neighbours) {
-              // already taken
-              if (tiles[t]) { continue; }
-              step1 = t;
-              break;
-            }
-
-            if (step1 == null) {
-              plan[unit] = null;
-              continue;
-            }
-
-            List<Tile> path = new List<Tile>();
-            path.Add(step1);
-            // second step
-            Tile step2 = null;
-            foreach (Tile t in step1.neighbours) {
-              // already taken
-              if (tiles[t]) { continue; }
-              step2 = t;
-              break;
-            }
-
-            if (step2 == null) {
-              tiles[step1] = true;
             } else {
-              path.Add(step2);
-              tiles[step2] = true;
-            }
-            tiles[unit.tile] = false;
-
-            plan[unit] = path;
-          }
-
-          foreach (Unit unit in supporters) {
-            if (gonnaStick.Contains(unit)) {
-              continue;
-            }
-            if (resultLevel == ResultType.Crushing) {
-              unit.chaos = true;
-            } else if (resultLevel == ResultType.Great) {
-              unit.defeating = true;
+              gonnaMove.Add(unit);
             }
           }
-
-          if (resultLevel == ResultType.Small && !gonnaStick.Contains(loser)) {
-            loser.defeating = true;
-          }
-
-          if (supporters.Count > 2) {
+          if (gonnaMove.Count > 2) {
             if (resultLevel == ResultType.Crushing) {
               hexMap.turnController.ShowTitle(Cons.GetTextLib().get("title_formationCrushing"), Color.black);
             } else {
@@ -995,39 +931,28 @@ namespace MonoNS
             while(hexMap.cameraKeyboardController.fixingCamera) { yield return null; }
           }
 
-          // move all unit at once
-          List<Unit> failedToMove = new List<Unit>();
+          hexMap.unitAniController.Scatter(gonnaMove, failedToMove, -10);
+          while(hexMap.unitAniController.ScatterAnimating) { yield return null; }
+
+          foreach (Unit unit in gonnaMove) {
+            if (resultLevel == ResultType.Crushing) {
+              unit.chaos = true;
+            } else if (resultLevel == ResultType.Great) {
+              unit.defeating = true;
+            }
+
+            if (!failedToMove.Contains(unit)) {
+              geese.Add(unit);
+            }
+          }
+
+          if (resultLevel == ResultType.Small && gonnaMove.Contains(loser)) {
+            loser.defeating = true;
+          }
+
           foreach(Unit unit in supporters) {
             if (unit.rf.general.Has(Cons.noPanic) && Cons.FiftyFifty()) {
               unit.defeating = unit.chaos = false;
-            }
-
-            List<Tile> path = plan[unit];
-            if (path == null) {
-              if (!unit.IsCamping()) {
-                failedToMove.Add(unit);
-              }
-              continue;
-            }
-            foreach(Tile t in path) {
-              geese.Add(unit);
-              hexMap.unitAniController.MoveUnit(unit, path[path.Count - 1], true);
-            }
-          }
-          hexMap.turnController.Sleep(1);
-          while(hexMap.turnController.sleeping) { yield return null; }
-
-          foreach(Unit unit in failedToMove) {
-            if (gonnaStick.Contains(unit)) {
-              continue;
-            }
-            foreach(Tile t in unit.tile.neighbours) {
-              Unit u = t.GetUnit();
-              if (u != null && u.IsAI() == unit.IsAI() && !supporters.Contains(u)) {
-                hexMap.unitAniController.CrashByAlly(u, -10);
-                while (hexMap.unitAniController.CrashAnimating) { yield return null; }
-                continue;
-              }
             }
           }
 
@@ -1045,63 +970,10 @@ namespace MonoNS
               ? false : true;
           }
           if (!loser.IsCamping() && !notGonnaMove) {
-            int escapeDistance =  2;
-            hexMap.popAniController.Show(hexMap.GetUnitView(loser), 
-             Cons.GetTextLib().get("pop_retreat"),
-             Color.white);
-            while (hexMap.popAniController.Animating) { yield return null; }
-            HashSet<Tile> from = new HashSet<Tile>{loser.tile};
-            bool moved = false;
-            while (escapeDistance > 0) {
-              moved = false;
-              foreach(Tile t in loser.tile.neighbours) {
-                Unit u = t.GetUnit();
-                if (t.Deployable(loser) && !from.Contains(t)) {
-                  escapeDistance--;
-                  from.Add(t);
-                  hexMap.unitAniController.MoveUnit(loser, t);
-                  while (hexMap.unitAniController.MoveAnimating) { yield return null; }
-                  moved = true;
-                  geese.Add(loser);
-                  break;
-                }
-              }
-
-              if (!moved) {
-                // Failed to find escape tile
-                List<Unit> ally = new List<Unit>();
-                foreach(Tile t in loser.tile.neighbours) {
-                  Unit u = t.GetUnit();
-                  if (u != null && u.IsAI() == loser.IsAI()) {
-                    ally.Add(u);
-                  }
-                }
-
-                if (ally.Count > 0) {
-                  Tile escapeTile = null;
-                  foreach (Unit u in ally) {
-                    foreach(Tile t1 in u.tile.neighbours) {
-                      if (t1.Deployable(loser) && !from.Contains(t1)) {
-                        escapeTile = t1;
-                        break;
-                      }
-                      if (escapeTile != null) {
-                        break;
-                      }
-                    }
-                  }
-
-                  if (escapeTile == null) {
-                    hexMap.unitAniController.CrashByAlly(ally[Util.Rand(0, ally.Count-1)], -10);
-                    while (hexMap.unitAniController.CrashAnimating) { yield return null; }
-                  } else {
-                    geese.Add(loser);
-                    hexMap.unitAniController.MoveUnit(loser, escapeTile);
-                    while (hexMap.unitAniController.MoveAnimating) { yield return null; }
-                  }
-                }
-                break;
-              }
+            hexMap.unitAniController.Scatter(new List<Unit>(){loser}, failedToMove, -10);
+            while (hexMap.unitAniController.ScatterAnimating) { yield return null; }
+            if (!failedToMove.Contains(loser)) {
+              geese.Add(loser);
             }
           }
         }

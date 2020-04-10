@@ -191,7 +191,7 @@ namespace UnitNS
     }
 
     public int CanBeShaked(Unit charger) {
-      if (IsVulnerable()) {
+      if (IsVulnerable() || !charger.IsHeavyCavalry() || !IsOnField() || tile.vantagePoint) {
         return 0;
       }
       int chance = 0;
@@ -208,14 +208,14 @@ namespace UnitNS
       if (tile.terrian == TerrianType.Hill) {
         chance += -30;
       }
-      if(charger.IsHeavyCavalry() && !IsCavalry() && !IsCommander() && IsOnField() && !tile.vantagePoint) {
-        if (Util.eq<Rank>(rf.rank, Cons.rookie)) {
-          chance += 70;
-        } else {
-          chance += 40;
-        }
+      if (Util.eq<Rank>(rf.rank, Cons.rookie)) {
+        chance += 70;
       } else {
-        chance = 0;
+        chance += 40;
+      }
+
+      if (rf.general.Has(Cons.retreater)) {
+        chance += 50;
       }
 
       return chance < 0 ? 0 : (chance > 100 ? 100 : chance);
@@ -241,8 +241,7 @@ namespace UnitNS
     }
 
     public bool CanCharge() {
-      return IsHeavyCavalry() &&
-        CanAttack() && allowedAtmpt > 0 && rf.soldiers >= 800 && movementRemaining >= ActionCost; 
+      return IsHeavyCavalry() && CanAttack() && rf.soldiers >= 800; 
     }
 
     public bool retreated = false;
@@ -401,7 +400,7 @@ namespace UnitNS
       return (InCommanderRange() &&
               MyCommander().Has(Cons.turningTide) &&
               Cons.FiftyFifty()) ||
-              (rf.general.Has(Cons.unshaken) && Cons.FiftyFifty());
+              (rf.general.Has(Cons.unshaken) && Cons.MostLikely());
     }
 
     public bool RetreatOnDefeat() {

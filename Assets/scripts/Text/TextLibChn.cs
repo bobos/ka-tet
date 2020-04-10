@@ -315,11 +315,10 @@ namespace TextNS
       {"ability_forwarder_description", "当敌军退败时80%几率擅自追击"},
       {"ability_holdTheGround", "纹丝不动"},
       {"ability_holdTheGround_description", "面对敌军冲阵时减少冲阵成功率50%"},
-
       {"ability_breaker", "气势如虹"},
       {"ability_breaker_description", "所部冲阵成功时50%几率对临近敌军产生连锁反应"},
       {"ability_unshaken", "寸步不让"},
-      {"ability_unshaken_description", "部队战败时50%几率不会退败"},
+      {"ability_unshaken_description", "部队战败时75%几率不会退败"},
       {"ability_easyTarget", "身先士卒"},
       {"ability_easyTarget_description", "将领战死几率增加50%"},
       {"ability_formidable", "骁勇善战"},

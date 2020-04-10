@@ -118,7 +118,7 @@ public class Starter : MonoBehaviour {
     General abc = new General("g_abc", "g_abc", Cons.zhongJing, new CommandSkill(1), new TroopSize(2)); 
     General x1 = new General("g_x1", "g_1", Cons.zhongJing, new CommandSkill(1), new TroopSize(3)); 
     General x2 = new General("g_x2", "g_1", Cons.shangJing, new CommandSkill(1), new TroopSize(2)); 
-    General x3 = new General("g_x3", "g_1", Cons.shangJing, new CommandSkill(1), new TroopSize(1)); 
+    General x3 = new General("g_x3", "g_1", Cons.shangJing, new CommandSkill(1), new TroopSize(2)); 
     General x4 = new General("g_x4", "g_1", Cons.shangJing, new CommandSkill(1), new TroopSize(1)); 
     caocao.JoinFaction(Cons.Liao, Cons.NorthCourt);
     xuchu.JoinFaction(Cons.Liao, Cons.NorthCourt);

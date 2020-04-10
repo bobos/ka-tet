@@ -143,19 +143,12 @@ namespace MonoNS
       if (!state || hexMap.combatController.start) return;
 
       if (isGarrison) {
-        bool hasEnemy = false;
         deployableTiles = new List<Tile>();
         foreach(Tile tile in mouseController.selectedSettlement.baseTile.neighbours) {
           Unit u = tile.GetUnit();
-          if (u != null && u.IsAI() != unit.IsAI()) {
-            hasEnemy = true;
-          }
           if (tile.Deployable(unit)) {
             deployableTiles.Add(tile);
           }
-        }
-        if (hasEnemy && hexMap.deployDone) {
-          AttackButton.SetActive(true);
         }
         if (deployableTiles.Count > 0) {
           DecampButton.SetActive(true);
@@ -174,10 +167,8 @@ namespace MonoNS
         RetreatButton.SetActive(true);
       }
       
-      if (mouseController.nearEnemy || mouseController.nearEnemySettlement != null) {
-        if (!hexMap.combatController.start && hexMap.deployDone && unit.CanAttack()) {
-          AttackButton.SetActive(true);
-        }
+      if (!hexMap.combatController.start && hexMap.deployDone && unit.CanAttack()) {
+        AttackButton.SetActive(true);
       }
 
       if (mouseController.nearAlly && hexMap.deployDone && !hexMap.wargameController.IsWargameUnit(unit)) {
