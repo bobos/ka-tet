@@ -60,6 +60,8 @@ namespace MonoNS
         // player win
         if (result == CombatController.ResultType.Close) {
           finalResult = "event_operationResult_weCloseWin";
+        } else if (result == CombatController.ResultType.FeintDefeat) {
+          finalResult = "event_operationResult_theyFeintDefeat";
         } else if (result == CombatController.ResultType.Small) {
           finalResult = "event_operationResult_weSmallWin";
         } else if (result == CombatController.ResultType.Great) {
@@ -70,6 +72,8 @@ namespace MonoNS
       } else {
         if (result == CombatController.ResultType.Close) {
           finalResult = "event_operationResult_theyCloseWin";
+        } else if (result == CombatController.ResultType.FeintDefeat) {
+          finalResult = "event_operationResult_weFeintDefeat";
         } else if (result == CombatController.ResultType.Small) {
           finalResult = "event_operationResult_theySmallWin";
         } else if (result == CombatController.ResultType.Great) {

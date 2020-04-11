@@ -499,7 +499,7 @@ namespace MonoNS
       foreach(Unit unit in failedToMove) {
         foreach(Tile t in unit.tile.neighbours) {
           Unit u = t.GetUnit();
-          if (u != null && u.IsAI() == unit.IsAI() && !units.Contains(u)) {
+          if (u != null && u.IsAI() == unit.IsAI() && !units.Contains(u) && moraleDrop != 0) {
             hexMap.unitAniController.CrashByAlly(u, moraleDrop);
             while (hexMap.unitAniController.CrashAnimating) { yield return null; }
             continue;
@@ -599,7 +599,7 @@ namespace MonoNS
         ShowEffect(to, new int[]{morale,0,0,0,0}, null, true);
         int morale1 = -2;
         from.rf.morale += morale1;
-        ShowEffect(to, new int[]{morale1,0,0,0,0}, null, true);
+        ShowEffect(from, new int[]{morale1,0,0,0,0}, null, true);
         hexMap.turnController.Sleep(1);
         while(hexMap.turnController.sleeping) { yield return null; }
       }
@@ -704,7 +704,6 @@ namespace MonoNS
       }
       ForceRetreatAnimating = true;
       unit.retreated = true;
-      unit.defeating = true;
       hexMap.cameraKeyboardController.DisableCamera();
       StartCoroutine(CoForceRetreat(unit));
     }
@@ -713,28 +712,34 @@ namespace MonoNS
       Tile lastTile = unit.GetPath()[unit.GetPath().Length - 1];
       hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(unit.tile).transform.position);
       while(hexMap.cameraKeyboardController.fixingCamera) { yield return null; }
-      hexMap.dialogue.ShowRetreat(unit);
-      while(hexMap.dialogue.Animating) { yield return null; }
-      unit.__movementRemaining = 150;
-      while (unit.movementRemaining > 0 && unit.GetPath().Length > 0) {
-        MoveUnit(unit);
-        while(MoveAnimating) { yield return null; }
-      }
-      while(MoveAnimating) { yield return null; }
-      if (unit.tile.UnitCount() > 1) {
-        Tile tile = unit.tile.FindDeployableTile(unit);
-        if (tile == null) {
-          tile = lastTile;
+      if (unit.rf.general.Has(Cons.refuseToRetreat) && Cons.MostLikely()) {
+        hexMap.dialogue.ShowRefuseToRetreat(unit);
+        while(hexMap.dialogue.Animating) { yield return null; }
+      } else {
+        unit.defeating = true;
+        hexMap.dialogue.ShowRetreat(unit);
+        while(hexMap.dialogue.Animating) { yield return null; }
+        unit.__movementRemaining = 150;
+        while (unit.movementRemaining > 0 && unit.GetPath().Length > 0) {
+          MoveUnit(unit);
+          while(MoveAnimating) { yield return null; }
         }
-        MoveUnit(unit, tile);
         while(MoveAnimating) { yield return null; }
+        if (unit.tile.UnitCount() > 1) {
+          Tile tile = unit.tile.FindDeployableTile(unit);
+          if (tile == null) {
+            tile = lastTile;
+          }
+          MoveUnit(unit, tile);
+          while(MoveAnimating) { yield return null; }
+        }
+        unit.movementRemaining = 0;
+        int moraleDrop = -5;
+        unit.rf.morale += moraleDrop;
+        ShowEffect(unit, new int[]{moraleDrop,0,0,0,0});
+        while(ShowAnimating) { yield return null; }
+        unit.SetPath(new Tile[]{unit.tile});
       }
-      unit.movementRemaining = 0;
-      int moraleDrop = -5;
-      unit.rf.morale += moraleDrop;
-      ShowEffect(unit, new int[]{moraleDrop,0,0,0,0});
-      while(ShowAnimating) { yield return null; }
-      unit.SetPath(new Tile[]{unit.tile});
       hexMap.cameraKeyboardController.EnableCamera();
       ForceRetreatAnimating = false;
     }

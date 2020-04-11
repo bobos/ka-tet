@@ -38,11 +38,11 @@ namespace UnitNS
     }
 
     public void SetName(Unit unit) {
-      int totalDefendPoint = unit.GetUnitDefendCombatPoint();
+      int totalDefendPoint = unit.unitCombatPoint;
       foreach(Tile tile in unit.tile.neighbours) {
         Unit u = tile.GetUnit();
         if (u != null && u.IsAI() == unit.IsAI()) {
-          totalDefendPoint += u.GetUnitDefendCombatPoint();
+          totalDefendPoint += u.unitCombatPoint;
         }
       }
 
@@ -60,8 +60,7 @@ namespace UnitNS
       textMesh.text = title + unit.rf.province.Name() + "-"
         + unit.GetUnitName()
         + "[" + unit.rf.soldiers + "]\n"
-        + Shorten(unit.unitCombatPoint) + "/" + Shorten(unit.unitPureCombatPoint) + "\n"
-        + "♟" + Shorten(totalDefendPoint) + "♙" + Shorten(unit.unitPureDefendCombatPoint);
+        + "攻: " + Shorten(unit.unitCombatPoint) + "/防: " + Shorten(totalDefendPoint);
       textMesh.fontSize = 45;
       textMesh.color = color;
     }

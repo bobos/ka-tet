@@ -279,11 +279,9 @@ namespace MonoNS
       title.text += "\n士气: " + unit.rf.morale;
       title.text += "\n单兵战力: " + GetCombatpointRate((int)(unit.cp * (1 + unit.rf.lvlBuf)));
       if (unit.IsCamping()) {
-        title.text += "\n部队战力: " + UnitInfoView.Shorten(unit.unitCampingAttackCombatPoint)
-        + " ♙" + UnitInfoView.Shorten(unit.GetUnitDefendCombatPoint());
+        title.text += "\n部队战力: " + UnitInfoView.Shorten(unit.unitCampingAttackCombatPoint);
       } else {
-        title.text += "\n部队战力: " + UnitInfoView.Shorten(unit.unitCombatPoint) + "/" + UnitInfoView.Shorten(unit.unitPureCombatPoint)
-        + " ♙" + UnitInfoView.Shorten(unit.GetUnitDefendCombatPoint());
+        title.text += "\n部队战力: " + UnitInfoView.Shorten(unit.unitCombatPoint);
       }
       string stateStr = unit.tile.siegeWall != null && unit.tile.siegeWall.IsFunctional() ? "围城中 " :
         (unit.tile.siegeWall != null && unit.tile.siegeWall.owner.isAI == unit.IsAI() ? ("建长围中:" + unit.tile.siegeWall.buildTurns + "回合完成 ") : "");
@@ -379,7 +377,7 @@ namespace MonoNS
           if (wp1.attackside) {
             attackerCP += u.unitPureCombatPoint;
           } else {
-            defenderCP += u.unitPureDefendCombatPoint;
+            defenderCP += u.unitPureCombatPoint;
           }
         }
         wp1 = hexMap.GetPlayerParty();
@@ -387,7 +385,7 @@ namespace MonoNS
           if (wp1.attackside) {
             attackerCP += u.unitPureCombatPoint;
           } else {
-            defenderCP += u.unitPureDefendCombatPoint;
+            defenderCP += u.unitPureCombatPoint;
           }
         }
 

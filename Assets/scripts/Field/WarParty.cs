@@ -201,7 +201,7 @@ namespace FieldNS
           break;
         }
       }
-      return found && Cons.MostLikely();
+      return found && Cons.HighlyLikely();
     } 
 
   }

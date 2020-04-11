@@ -159,7 +159,60 @@ namespace MonoNS
         rightImg.sprite = DefenderGeneral;
         rightText.text = text;
       }
+    }
 
+    public void ShowRefuseToRetreat(Unit unit) {
+      phase = 2;
+      Animating = true;
+      self.SetActive(true);
+      string text = System.String.Format(textLib.get("event_RefuseToRetreat"), unit.GeneralName());
+      if (hexMap.IsAttackSide(unit.IsAI())) {
+        right.SetActive(false);
+        left.SetActive(true);
+        leftImg.sprite = AttackGeneral;
+        leftText.text = text;
+      } else {
+        left.SetActive(false);
+        right.SetActive(true);
+        rightImg.sprite = DefenderGeneral;
+        rightText.text = text;
+      }
+    }
+
+    public void ShowChaseDialogue(Unit unit) {
+      phase = 2;
+      Animating = true;
+      self.SetActive(true);
+      string text = System.String.Format(textLib.get("event_ChaseDialogue"), unit.GeneralName());
+      if (hexMap.IsAttackSide(unit.IsAI())) {
+        right.SetActive(false);
+        left.SetActive(true);
+        leftImg.sprite = AttackGeneral;
+        leftText.text = text;
+      } else {
+        left.SetActive(false);
+        right.SetActive(true);
+        rightImg.sprite = DefenderGeneral;
+        rightText.text = text;
+      }
+    }
+
+    public void ShowFeintDefeat(Unit unit) {
+      phase = 2;
+      Animating = true;
+      self.SetActive(true);
+      string text = System.String.Format(textLib.get("event_FeintDefeat"), unit.GeneralName());
+      if (hexMap.IsAttackSide(unit.IsAI())) {
+        right.SetActive(false);
+        left.SetActive(true);
+        leftImg.sprite = AttackGeneral;
+        leftText.text = text;
+      } else {
+        left.SetActive(false);
+        right.SetActive(true);
+        rightImg.sprite = DefenderGeneral;
+        rightText.text = text;
+      }
     }
 
   }

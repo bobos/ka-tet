@@ -564,10 +564,6 @@ namespace UnitNS
       }
     }
 
-    public int GetUnitDefendCombatPoint() {
-      return (int)((IsCavalry() ? unitCombatPoint : (int)(unitCombatPoint * CombatController.DefendModifier)));
-    }
-
     public int unitPureCombatPoint {
       get {
         int total = vantage.TotalPoints(cp);
@@ -581,12 +577,6 @@ namespace UnitNS
         int total = vantage.TotalPoints(cp);
         total = (int)((total + total * GetCampingAttackBuff()) * 0.1f);
         return total < 0 ? 0 : total;
-      }
-    }
-
-    public int unitPureDefendCombatPoint {
-      get {
-        return IsCavalry() ? unitPureCombatPoint : (int)(unitPureCombatPoint * CombatController.DefendModifier);
       }
     }
 

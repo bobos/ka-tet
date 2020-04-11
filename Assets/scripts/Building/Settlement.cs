@@ -188,7 +188,7 @@ public abstract class Settlement: Building
     }
 
     foreach(Unit unit in garrison) {
-      int point = (int)(unit.GetUnitDefendCombatPoint() * (
+      int point = (int)(unit.unitCombatPoint * (
         unit.rf.general.Has(Cons.mechanician) ? 1.5f : 1f
       ));
       force += point;

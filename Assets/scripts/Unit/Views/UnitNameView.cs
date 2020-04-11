@@ -24,7 +24,7 @@ namespace UnitNS
         foreach(Tile tile in settlement.baseTile.neighbours) {
           Unit unit = tile.GetUnit();
           if (unit != null && unit.IsAI() == isAI) {
-            defendForce += unit.GetUnitDefendCombatPoint();
+            defendForce += unit.unitCombatPoint;
           }
         }
       }

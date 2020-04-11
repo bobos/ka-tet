@@ -41,8 +41,6 @@ namespace MonoNS
 
   public class CombatController : BaseController
   {
-    public const float DefendModifier = 1.5f;
-
     public override void PreGameInit(HexMap hexMap, BaseController me)
     {
       base.PreGameInit(hexMap, me);
@@ -192,7 +190,7 @@ namespace MonoNS
       unitPredict.unit = defender;
       unitPredict.percentOfEffectiveForce = GetEffectiveForcePercentage(defender, true);
       unitPredict.joinPossibility = 100;
-      unitPredict.operationPoint = targetSettlement != null ? targetSettlement.GetDefendForce() : defender.GetUnitDefendCombatPoint();
+      unitPredict.operationPoint = targetSettlement != null ? targetSettlement.GetDefendForce() : defender.unitCombatPoint;
       predict.defenders.Add(unitPredict);
       predict.defenderOptimPoints += unitPredict.operationPoint;
       if (targetSettlement == null) {
@@ -218,7 +216,7 @@ namespace MonoNS
         unitPredict.unit = unit;
         unitPredict.percentOfEffectiveForce = GetEffectiveForcePercentage(unit, false);
         unitPredict.joinPossibility = JoinPossibility(unit, false);
-        unitPredict.operationPoint = unit.GetUnitDefendCombatPoint();
+        unitPredict.operationPoint = unit.unitCombatPoint;
         predict.defenders.Add(unitPredict);
         predict.defenderOptimPoints += unitPredict.operationPoint;
       }
@@ -258,14 +256,12 @@ namespace MonoNS
       int smaller = predict.attackerOptimPoints > predict.defenderOptimPoints ? predict.defenderOptimPoints : predict.attackerOptimPoints;
       smaller = smaller < 1 ? 1 : smaller;
       float odds = bigger / smaller;
-      if (odds <= 1.1f) {
-        // 1 - 2x odds
+      if (odds <= 1.5f) {
         predict.suggestedResultType = ResultType.Close;
-      } else if (odds <= 1.6f) {
-        // 2x - 2.4x
+      } else if (odds <= 2.5f) {
+        // 1.5x - 2.5x
         predict.suggestedResultType = ResultType.Small;
-      } else if (odds <= 2.6f) {
-        // 2.4x - 3.9xx
+      } else if (odds <= 3.5f) {
         predict.suggestedResultType = ResultType.Great;
       } else {
         predict.suggestedResultType = ResultType.Crushing;
@@ -427,6 +423,7 @@ namespace MonoNS
     }
 
     public enum ResultType {
+      FeintDefeat,
       Close,
       Small,
       Great,
@@ -434,8 +431,11 @@ namespace MonoNS
     }
 
     int[] GetVicBuf(ResultType type) {
+      if (type == ResultType.FeintDefeat) {
+        return new int[]{0, 0};
+      }
       if (type == ResultType.Close) {
-        return new int[]{-1, -1};
+        return new int[]{0, 0};
       }
       if (type == ResultType.Small) {
         return new int[]{1, 0};
@@ -448,6 +448,9 @@ namespace MonoNS
 
     // initiatorMorale, supporterMorale, initiatorDiscontent
     int[] GetDftBuf(ResultType type) {
+      if (type == ResultType.FeintDefeat) {
+        return new int[]{0, 0};
+      }
       if (type == ResultType.Close) {
         return new int[]{-2, -1};
       }
@@ -583,16 +586,24 @@ namespace MonoNS
         // combat starts
         int attackerCasualty = 0;
         int defenderCasualty = 0;
-        ResultType resultLevel = predict.suggestedResultType;
         predict.attackerOptimPoints = predict.attackerOptimPoints <= 0 ? 1 : predict.attackerOptimPoints;
         predict.defenderOptimPoints = predict.defenderOptimPoints <= 0 ? 1 : predict.defenderOptimPoints;
-
         bool atkWin = predict.sugguestedResult.chance == 10;
-// 1.0 to 1.3 - 0.01(both)
-// 1.4 to 1.8 - def: x - 1.2, atk: (x -1) * (0.5 - 0.6)   
-// 1.9 to 2.2 - atk: (x - 1.2) * (0.25 - 0.4)
+        if (!atkWin && attacker.rf.general.Has(Cons.feintDefeat) && Cons.FiftyFifty()) {
+          // feint defeat triggered
+          predict.suggestedResultType = ResultType.FeintDefeat;
+          hexMap.turnController.ShowTitle(Cons.GetTextLib().get("title_feintDefeat"), Color.white);
+          while(hexMap.turnController.showingTitle) { yield return null; }
+        }
+
+        ResultType resultLevel = predict.suggestedResultType;
+        bool feint = resultLevel == ResultType.FeintDefeat;
+        if (resultLevel == ResultType.FeintDefeat) {
+          attackerCasualty = (int)(attackerTotal * 0.008f);
+          defenderCasualty = (int)(attackerCasualty * 0.8f);
+        }
         if (resultLevel == ResultType.Close) {
-          // 1 - 2x odds
+          // 1 - 1.5x odds
           float m = 0.04f;
           if (Cons.SlimChance()) {
             m = 0.06f;
@@ -624,7 +635,7 @@ namespace MonoNS
           }
 
           if (resultLevel == ResultType.Small) {
-            // 2x - 2.4x
+            // 2x - 3x
             int modifier = Util.Rand(5, 6);
             if (atkWin) {
               attackerCasualty = (int)(defenderCasualty * modifier * 0.1f);
@@ -634,7 +645,7 @@ namespace MonoNS
           }
 
           if (resultLevel == ResultType.Great) {
-            // 2.4x - 3.9x
+            // 3x - 4x
             int modifier = Util.Rand(4, 5);
             if (atkWin) {
               attackerCasualty = (int)(defenderCasualty * modifier* 0.1f);
@@ -699,10 +710,14 @@ namespace MonoNS
             }
             // morale, movement, killed, attack, def
             int[] stats = new int[]{0,0,up.dead,0,0};
-            hexMap.unitAniController.ShowEffect(unit, stats, view);
-            while (hexMap.unitAniController.ShowAnimating) { yield return null; }
+            hexMap.unitAniController.ShowEffect(unit, stats, view, true);
           }
+        }
+        hexMap.turnController.Sleep(1);
+        while(hexMap.turnController.sleeping) { yield return null; }
 
+        foreach(UnitPredict up in all) {
+          Unit unit = up.unit;
           if (unit.rf.soldiers <= Unit.DisbandUnitUnder) {
             // unit disbanded
             hexMap.unitAniController.DestroyUnit(unit, DestroyType.ByDisband);
@@ -719,10 +734,10 @@ namespace MonoNS
         int capturedHorse = (int)((atkWin ? defenderCavDead : attackerCavDead) * 0.2f);
         hexMap.CaptureHorse(atkWin ? attacker : defender, capturedHorse);
 
-        hexMap.eventDialogAlt.ShowOperationResult(resultLevel, atkWin, !attacker.IsAI(),
-          attackerInfTotal, attackerCavTotal, defenderInfTotal, defenderCavTotal,
-          attackerInfDead, attackerCavDead, defenderInfDead,  defenderCavDead, capturedHorse);
-        while(hexMap.eventDialogAlt.Animating) { yield return null; }
+        //hexMap.eventDialogAlt.ShowOperationResult(resultLevel, atkWin, !attacker.IsAI(),
+        //  attackerInfTotal, attackerCavTotal, defenderInfTotal, defenderCavTotal,
+        //  attackerInfDead, attackerCavDead, defenderInfDead,  defenderCavDead, capturedHorse);
+        //while(hexMap.eventDialogAlt.Animating) { yield return null; }
         CancelOperation();
 
         // Aftermath
@@ -754,12 +769,8 @@ namespace MonoNS
             if (unit.IsCamping()) {
               view = hexMap.settlementMgr.GetView(unit.tile.settlement);
             }
-
             hexMap.unitAniController.ShowEffect(unit, stats, view, true);
           }
-
-          hexMap.turnController.Sleep(1);
-          while(hexMap.turnController.sleeping) { yield return null; }
 
           morale = dftBuf[0];
           morale1 = dftBuf[1];
@@ -814,31 +825,32 @@ namespace MonoNS
             }
             hexMap.unitAniController.ShowEffect(unit, stats, view, true);
           }
-          hexMap.turnController.Sleep(1);
-          while(hexMap.turnController.sleeping) { yield return null; }
 
           morale = dftBuf[0];
           morale1 = dftBuf[1];
-          foreach (UnitPredict up in predict.attackers) {
-            Unit unit = up.unit;
-            if (unit.IsGone()) {
-              continue;
-            }
-            int[] stats = new int[]{0,0,0,0,0};
-            if (Util.eq<Unit>(unit, attacker)) {
-              unit.rf.morale += morale;
-              stats[0] = morale;
-            } else {
-              unit.rf.morale += morale1;
-              stats[0] = morale1;
-            }
+          if (!feint) {
+            foreach (UnitPredict up in predict.attackers) {
+              Unit unit = up.unit;
+              if (unit.IsGone()) {
+                continue;
+              }
+              int[] stats = new int[]{0,0,0,0,0};
+              if (Util.eq<Unit>(unit, attacker)) {
+                unit.rf.morale += morale;
+                stats[0] = morale;
+              } else {
+                unit.rf.morale += morale1;
+                stats[0] = morale1;
+              }
 
-            view = null;
-            if (unit.IsCamping()) {
-              view = hexMap.settlementMgr.GetView(unit.tile.settlement);
+              view = null;
+              if (unit.IsCamping()) {
+                view = hexMap.settlementMgr.GetView(unit.tile.settlement);
+              }
+              hexMap.unitAniController.ShowEffect(unit, stats, view, true);
             }
-            hexMap.unitAniController.ShowEffect(unit, stats, view, true);
           }
+
           hexMap.turnController.Sleep(1);
           while(hexMap.turnController.sleeping) { yield return null; }
         }
@@ -860,25 +872,15 @@ namespace MonoNS
 
         bool cunningLoser = loser.rf.general.Has(Cons.feintDefeat);
         foreach(UnitPredict up in atkWin ? predict.attackers : predict.defenders) {
-          if (!up.unit.IsGone() && up.unit.rf.general.Has(Cons.forwarder) && Cons.HighlyLikely()) {
-            chasers.Add(up.unit);
-          } else if (cunningLoser && Cons.FairChance()) {
+          if (!up.unit.IsGone() && up.unit.rf.general.Has(Cons.forwarder) && Cons.MostLikely()) {
             chasers.Add(up.unit);
           }
         }
 
-        HashSet<Unit> extra = new HashSet<Unit>();
-        foreach(Unit u in chasers) {
-          foreach(Tile t in u.tile.neighbours) {
-            Unit ut = t.GetUnit();
-            if (ut != null && ut.IsAI() == u.IsAI()
-              && !ut.rf.general.Has(Cons.playSafe) && Cons.FiftyFifty()) {
-              extra.Add(ut);
-            }
-          }
-        }
-        foreach(Unit u in extra) {
-          chasers.Add(u);
+        Unit un = atkWin ? attacker : defender;
+        if ((cunningLoser && Cons.EvenChance())
+          || (!un.rf.general.Has(Cons.playSafe) && Cons.SlimChance())) {
+          chasers.Add(un);
         }
 
         List<Unit> retreaters = new List<Unit>();
@@ -889,7 +891,7 @@ namespace MonoNS
         }
 
         // affected all allies
-        if (loser.IsCommander()) {
+        if (loser.IsCommander() && !feint) {
           int drop = -3;
           if (resultLevel == ResultType.Small) {
             drop = -5;
@@ -912,17 +914,17 @@ namespace MonoNS
         if (resultLevel != ResultType.Close) {
           foreach(Unit unit in supporters) {
             bool notMoving = unit.StickAsNailWhenDefeat();
-            if (notMoving) {
+            if (notMoving && !feint) {
               gonnaStick.Add(unit);
             } else {
               gonnaMove.Add(unit);
             }
           }
-          if (gonnaMove.Count > 2) {
+          if (gonnaMove.Count > 2 && !feint) {
             if (resultLevel == ResultType.Crushing) {
-              hexMap.turnController.ShowTitle(Cons.GetTextLib().get("title_formationCrushing"), Color.black);
+              hexMap.turnController.ShowTitle(Cons.GetTextLib().get("title_formationCrushing"), Color.red);
             } else {
-              hexMap.turnController.ShowTitle(Cons.GetTextLib().get("title_formationBreaking"), Color.black);
+              hexMap.turnController.ShowTitle(Cons.GetTextLib().get("title_formationBreaking"), Color.red);
             }
             while(hexMap.turnController.showingTitle) { yield return null; }
             hexMap.dialogue.ShowFormationBreaking(atkWin ? attacker : defender);
@@ -931,7 +933,11 @@ namespace MonoNS
             while(hexMap.cameraKeyboardController.fixingCamera) { yield return null; }
           }
 
-          hexMap.unitAniController.Scatter(gonnaMove, failedToMove, -10);
+          if (feint) {
+            hexMap.dialogue.ShowFeintDefeat(loser);
+            while(hexMap.dialogue.Animating) { yield return null; }
+          }
+          hexMap.unitAniController.Scatter(gonnaMove, failedToMove, feint ? 0 : -10);
           while(hexMap.unitAniController.ScatterAnimating) { yield return null; }
 
           foreach (Unit unit in gonnaMove) {
@@ -956,11 +962,13 @@ namespace MonoNS
             }
           }
 
-          // conservative generals retreat
-          foreach(Unit u in retreaters) {
-            if (u.SetRetreatPath()) {
-              hexMap.unitAniController.ForceRetreat(u);
-              while(hexMap.unitAniController.ForceRetreatAnimating) { yield return null; }
+          if (!feint) {
+            // conservative generals retreat
+            foreach(Unit u in retreaters) {
+              if (u.SetRetreatPath()) {
+                hexMap.unitAniController.ForceRetreat(u);
+                while(hexMap.unitAniController.ForceRetreatAnimating) { yield return null; }
+              }
             }
           }
         } else {
@@ -998,6 +1006,8 @@ namespace MonoNS
             }
           }
           if (path.Length > 0) {
+            hexMap.dialogue.ShowChaseDialogue(u);
+            while (hexMap.dialogue.Animating) { yield return null; }
             hexMap.unitAniController.MoveUnit(u, path[path.Length - 1]);
             while (hexMap.unitAniController.MoveAnimating) { yield return null; }
           }
