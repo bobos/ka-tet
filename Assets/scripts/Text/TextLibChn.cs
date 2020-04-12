@@ -110,14 +110,30 @@ namespace TextNS
       {"party_relationXtense", "一触即发"},
 
       // generals
-      {"g_liubei", "李存勖"},
+      {"g_liubei", "李克用"},
       {"g_guanyu", "李存审"},
       {"g_zhaoyun", "李嗣昭"},
       {"g_zhangfei", "元行钦"},
+      {"g_machao", "夏鲁奇"},
+      {"g_y1", "周德威"},
+      {"g_y2", "张承业"},
+      {"g_y3", "李嗣源"},
+      {"g_y4", "李存孝"},
+      {"g_y5", "李存勖"},
+
       {"g_caocao", "朱温"},
       {"g_xuchu", "王彦章"},
-      {"g_machao", "夏鲁奇"},
       {"g_abc", "牛存节"},
+      {"g_x1", "张全义"},
+      {"g_x2", "杨师厚"},
+      {"g_x3", "刘寻"},
+      {"g_x4", "王景仁"},
+      {"g_x5", "杨行密"},
+      {"g_x6", "刘守光"},
+      {"g_x7", "李茂贞"},
+      {"g_x8", "柴再用"},
+      {"g_x9", "朱瑾"},
+      {"g_x10", "刘知俊"},
 
       // event
       {"event_disbandDestroyUnit_title", "全军覆没"},

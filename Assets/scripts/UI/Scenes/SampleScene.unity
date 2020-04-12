@@ -10524,10 +10524,12 @@ MonoBehaviour:
   MoveAnimating: 0
   PostAnimating: 0
   AttackEmptyAnimating: 0
+  TakeAnimating: 0
   SurroundAnimating: 0
   RefreshAnimating: 0
   PoisionAnimating: 0
   BuryAnimating: 0
+  ScatterAnimating: 0
   ChargeAnimating: 0
   CrashAnimating: 0
   SiegeAnimating: 0
@@ -11673,8 +11675,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   generalPortait1: {fileID: 21300000, guid: a70d9b611d4a81942bacb2cc1fbf33c1, type: 3}
   generalPortait2: {fileID: 21300000, guid: d74b35bad6604df43aeb9633b59459a3, type: 3}
-  generalPortait3: {fileID: 21300000, guid: 0a2830c7fcb4f1c42adb978e98e64fdf, type: 3}
-  generalPortait4: {fileID: 21300000, guid: 444f3a793a1fe834db54f88c5852be08, type: 3}
+  defaultPortrait1: {fileID: 21300000, guid: 444f3a793a1fe834db54f88c5852be08, type: 3}
+  defaultPortrait2: {fileID: 21300000, guid: 0a2830c7fcb4f1c42adb978e98e64fdf, type: 3}
 --- !u!4 &2025462201
 Transform:
   m_ObjectHideFlags: 0
