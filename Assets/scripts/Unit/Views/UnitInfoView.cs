@@ -60,7 +60,7 @@ namespace UnitNS
       textMesh.text = title + unit.rf.province.Name() + "-"
         + unit.GetUnitName()
         + "[" + unit.rf.soldiers + "]\n"
-        + "攻: " + Shorten(unit.unitCombatPoint) + "/防: " + Shorten(totalDefendPoint);
+        + "攻: " + Shorten(unit.unitCombatPoint) + "\n防: " + Shorten(totalDefendPoint);
       textMesh.fontSize = 45;
       textMesh.color = color;
     }

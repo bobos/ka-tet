@@ -5,7 +5,6 @@
     Unit unit;
     const int MaxEffectiveNum = 10000;
     const int LeastEffectiveNum = 2000;
-    const int MaxEffectiveNum4Move = 8000;
     public Vantage(Unit unit) {
       this.unit = unit;
     }
@@ -16,7 +15,7 @@
 
     public float Buf() {
       if (unit.IsCamping() && unit.tile.settlement != null) {
-        return unit.tile.settlement.wall.defensePoint * 0.04f;
+        return unit.tile.settlement.wall.defensePoint * 0.03f;
       }
 
       if (unit.tile.terrian == MapTileNS.TerrianType.Hill) {
@@ -40,10 +39,6 @@
       } else {
         return unit.rf.soldiers * pointPerSoldier;
       }
-    }
-
-    public int MovementPoint(int point) {
-      return unit.rf.soldiers > MaxEffectiveNum4Move ? (int)(point * 0.8f) : point;
     }
 
     int GetEffectiveNum() {

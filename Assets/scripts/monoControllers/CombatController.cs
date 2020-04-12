@@ -241,7 +241,7 @@ namespace MonoNS
       }
 
       foreach(UnitPredict up in predict.defenders) {
-        if (Util.eq<Unit>(up.unit, defender)) {
+        if (Util.eq<Unit>(up.unit, defender) || up.unit.IsCamping()) {
           continue;
         }
         hexMap.ShowDefendArrow(up.unit, targetUnit, unitPredict);
@@ -256,12 +256,12 @@ namespace MonoNS
       int smaller = predict.attackerOptimPoints > predict.defenderOptimPoints ? predict.defenderOptimPoints : predict.attackerOptimPoints;
       smaller = smaller < 1 ? 1 : smaller;
       float odds = bigger / smaller;
-      if (odds <= 1.5f) {
+      if (odds <= 1.2f) {
         predict.suggestedResultType = ResultType.Close;
-      } else if (odds <= 2.5f) {
-        // 1.5x - 2.5x
+      } else if (odds <= 3f) {
+        // 1.2x - 3x
         predict.suggestedResultType = ResultType.Small;
-      } else if (odds <= 3.5f) {
+      } else if (odds <= 4.5f) {
         predict.suggestedResultType = ResultType.Great;
       } else {
         predict.suggestedResultType = ResultType.Crushing;
@@ -907,7 +907,6 @@ namespace MonoNS
         }
 
         HashSet<Unit> geese = new HashSet<Unit>();
-        // TODO: when defender is in city, capture the city on victory
         List<Unit> gonnaStick = new List<Unit>();
         List<Unit> gonnaMove = new List<Unit>();
         List<Unit> failedToMove = new List<Unit>();
@@ -970,6 +969,13 @@ namespace MonoNS
                 while(hexMap.unitAniController.ForceRetreatAnimating) { yield return null; }
               }
             }
+          }
+
+          if (atkWin && loser.IsCamping() &&
+            (resultLevel == ResultType.Crushing || resultLevel == ResultType.Great)) {
+            // settlement loss
+            hexMap.unitAniController.TakeSettlement(attacker, loser.tile.settlement);
+            while (hexMap.unitAniController.TakeAnimating) { yield return null; }
           }
         } else {
           bool notGonnaMove = loser.StickAsNailWhenDefeat();

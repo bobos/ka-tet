@@ -9,7 +9,7 @@ public class City : Settlement
     int wallLevel) :
     base(name, tile, warParty, 3,
     new StorageLevel(storageLevel),
-    new WallDefense(wallLevel < 2 ? 2 : wallLevel)
+    new WallDefense(wallLevel)
     )
   {
     this.civillian_male = male;

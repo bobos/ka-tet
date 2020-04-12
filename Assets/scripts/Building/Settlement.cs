@@ -87,7 +87,7 @@ public abstract class Settlement: Building
     return (!IsUnderSiege() && IsLinkedToRoot()) || lastingTurns > 0;
   }
 
-  protected override void TurnEndCB() {
+  public override void TurnEndCB() {
     if (IsUnderSiege() || !IsLinkedToRoot()) {
       lastingTurns--;
     } else {
@@ -191,6 +191,9 @@ public abstract class Settlement: Building
       int point = (int)(unit.unitCombatPoint * (
         unit.rf.general.Has(Cons.mechanician) ? 1.5f : 1f
       ));
+      if (IsUnderSiege() && unit.rf.general.Has(Cons.formidable)) {
+        point = point * 3;
+      }
       force += point;
     }
 
@@ -221,4 +224,45 @@ public abstract class Settlement: Building
     settlementMgr.GetRoot(owner.isAI).GetLinked(linked);
     return linked.Contains(this);
   }
+
+  public Tile FindBreakThroughPoint(Unit unit) {
+    Tile[] tiles = baseTile.GetNeighboursWithinRange<Tile>(5, (Tile t) => true);
+    List<Tile> deployables = new List<Tile>(tiles){};
+    // sort tiles from near to far
+    deployables.Sort(delegate (Tile a, Tile b)
+    {
+      return (int)(Tile.Distance(baseTile, a) - Tile.Distance(baseTile, b));
+    });
+
+    Tile target = null;
+    foreach (Tile t in hexMap.IsAttackSide(unit.IsAI()) ? hexMap.AttackerZone : hexMap.DefenderZone) {
+      target = t;
+      break;
+    }
+
+    Tile tile = null;
+    float score = 0f;
+    List<Tile> first8 = new List<Tile>();
+    int cnt = 0;
+    foreach(Tile t in deployables) {
+      if (cnt > 8) {
+        break;
+      }
+      if (t.Deployable(unit)) {
+        first8.Add(t);
+        cnt++;
+      }
+    }
+
+    foreach(Tile t in first8) {
+      float dist = Tile.Distance(t, target);
+      if (tile == null || dist < score) {
+        tile = t;
+        score = dist;
+      }
+    }
+
+    return tile;
+  }
+
 }

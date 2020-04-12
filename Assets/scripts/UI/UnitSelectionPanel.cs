@@ -153,6 +153,9 @@ namespace MonoNS
         if (deployableTiles.Count > 0) {
           DecampButton.SetActive(true);
         }
+        if (unit.CanAttack()) {
+          AttackButton.SetActive(true);
+        }
         return;
       }
 
@@ -361,12 +364,28 @@ namespace MonoNS
       }
 
       if (action == ActionController.actionName.SHOWMINE || action == ActionController.actionName.SHOWENEMY) {
+        hexMap.CleanSupplyLines();
         if (toggled) {
           toggled = false;
           hexMap.DehighlightArea();
           return;
         }
         toggled = true;
+        Settlement root;
+        if (action == ActionController.actionName.SHOWENEMY) {
+          root = hexMap.IsAttackSide(true) ? hexMap.settlementMgr.attackerRoot : hexMap.settlementMgr.defenderRoot;
+        } else {
+          root = hexMap.IsAttackSide(false) ? hexMap.settlementMgr.attackerRoot : hexMap.settlementMgr.defenderRoot;
+        }
+        List<Settlement> linked = new List<Settlement>();
+        root.GetLinked(linked);
+        foreach(Settlement s in linked) {
+          foreach(Tile tile in s.baseTile.linkedTilesForCamp) {
+            if (linked.Contains(tile.settlement)) {
+              hexMap.DrawSupplyLine(s.baseTile, tile);
+            }
+          }
+        }
 
         WarParty wp = action == ActionController.actionName.SHOWENEMY ? hexMap.GetAIParty() : hexMap.GetPlayerParty();
         WarPartyStat stat = wp.GetStat();

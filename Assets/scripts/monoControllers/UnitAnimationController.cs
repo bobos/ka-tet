@@ -69,7 +69,7 @@ namespace MonoNS
         }
       }
 
-      ShakeNearbyAllies(unit, unit.IsCommander() ? -20 : -8);
+      ShakeNearbyAllies(unit, unit.IsCommander() ? -20 : -5);
       while (ShakeAnimating) { yield return null; }
       hexMap.cameraKeyboardController.EnableCamera();
       DestroyAnimating = false;
@@ -210,6 +210,66 @@ namespace MonoNS
       while (eventDialog.Animating) { yield return null; }
       hexMap.cameraKeyboardController.EnableCamera();
       AttackEmptyAnimating = false;
+    }
+
+    public bool TakeAnimating = false;
+    public void TakeSettlement(Unit unit, Settlement settlement) {
+      TakeAnimating = true;
+      StartCoroutine(CoTakeSettlement(unit, settlement));
+    }
+
+    IEnumerator CoTakeSettlement(Unit unit, Settlement settlement) {
+      hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(settlement.baseTile).transform.position);
+      while (hexMap.cameraKeyboardController.fixingCamera) { yield return null; }
+      hexMap.cameraKeyboardController.DisableCamera();
+      popAniController.Show(hexMap.GetUnitView(unit), textLib.get("pop_occupied"), Color.green);
+      while (popAniController.Animating) { yield return null; }
+
+      List<Unit> tmp = new List<Unit>();
+      foreach (Unit g in settlement.garrison) {
+        tmp.Add(g);
+      }
+
+      foreach (Unit g in tmp) {
+        bool killed = false;
+        if ((g.rf.general.Has(Cons.easyTarget) || g.rf.general.Has(Cons.refuseToRetreat))
+          && Cons.MostLikely()) {
+          killed = true;
+        } else if ((g.rf.general.Has(Cons.opportunist) || g.rf.general.Has(Cons.playSafe)) && Cons.SlimChance()) {
+          killed = true;
+        } else {
+          killed = Cons.EvenChance();
+        }
+
+        Tile tile = settlement.FindBreakThroughPoint(g);
+        if (killed || tile == null) {
+          DestroyUnit(g, DestroyType.ByDisband, true);
+          while (DestroyAnimating) { yield return null; }
+        } else {
+          settlement.Decamp(g, tile);
+          if(g.SetRetreatPath()) {
+            ForceRetreat(g, true);
+            while (ForceRetreatAnimating) { yield return null; }
+          }
+        }
+      }
+
+      int[] afterMath = settlementMgr.OccupySettlement(unit, settlement);
+      if (settlement.type == Settlement.Type.city) {
+        eventDialog.Show(new MonoNS.Event(
+          unit.IsAI() ? MonoNS.EventDialog.EventName.EnemyCaptureCity : MonoNS.EventDialog.EventName.WeCaptureCity,
+        unit,
+        settlement,
+        afterMath[0], afterMath[1], afterMath[2]));
+      } else {
+        eventDialog.Show(new MonoNS.Event(
+          unit.IsAI() ? MonoNS.EventDialog.EventName.EnemyCaptureCamp : MonoNS.EventDialog.EventName.WeCaptureCamp,
+        unit,
+        settlement));
+      }
+      while (eventDialog.Animating) { yield return null; }
+      hexMap.cameraKeyboardController.EnableCamera();
+      TakeAnimating = false;
     }
 
     public bool SurroundAnimating = false;
@@ -693,33 +753,44 @@ namespace MonoNS
       hexMap.dialogue.ShowRetreat(unit);
       while(hexMap.dialogue.Animating) { yield return null; }
       unit.Retreat();
+      if (unit.IsCommander()) {
+        Unit newCommander = hexMap.GetWarParty(unit).AssignNewCommander();
+        if (newCommander.IsOnField()) {
+          popAniController.Show(hexMap.GetUnitView(newCommander), textLib.get("pop_newCommander"), Color.white);
+          while(popAniController.Animating) { yield return null; }
+        }
+      }
       hexMap.cameraKeyboardController.EnableCamera();
       RetreatAnimating = false;
     }
 
     public bool ForceRetreatAnimating = false;
-    public void ForceRetreat(Unit unit) {
+    public void ForceRetreat(Unit unit, bool breakThrough = false) {
       if (unit.retreated) {
         return;
       }
       ForceRetreatAnimating = true;
       unit.retreated = true;
       hexMap.cameraKeyboardController.DisableCamera();
-      StartCoroutine(CoForceRetreat(unit));
+      StartCoroutine(CoForceRetreat(unit, breakThrough));
     }
 
-    IEnumerator CoForceRetreat(Unit unit) {
+    IEnumerator CoForceRetreat(Unit unit, bool breakThrough) {
       Tile lastTile = unit.GetPath()[unit.GetPath().Length - 1];
       hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(unit.tile).transform.position);
       while(hexMap.cameraKeyboardController.fixingCamera) { yield return null; }
-      if (unit.rf.general.Has(Cons.refuseToRetreat) && Cons.MostLikely()) {
+      if (!breakThrough && unit.rf.general.Has(Cons.refuseToRetreat) && Cons.MostLikely()) {
         hexMap.dialogue.ShowRefuseToRetreat(unit);
         while(hexMap.dialogue.Animating) { yield return null; }
       } else {
-        unit.defeating = true;
+        if (breakThrough) {
+          unit.chaos = true;
+        } else {
+          unit.defeating = true;
+        }
         hexMap.dialogue.ShowRetreat(unit);
         while(hexMap.dialogue.Animating) { yield return null; }
-        unit.__movementRemaining = 150;
+        unit.__movementRemaining = breakThrough ? 600 : 150;
         while (unit.movementRemaining > 0 && unit.GetPath().Length > 0) {
           MoveUnit(unit);
           while(MoveAnimating) { yield return null; }
@@ -734,7 +805,7 @@ namespace MonoNS
           while(MoveAnimating) { yield return null; }
         }
         unit.movementRemaining = 0;
-        int moraleDrop = -5;
+        int moraleDrop = breakThrough ? -10 : -5;
         unit.rf.morale += moraleDrop;
         ShowEffect(unit, new int[]{moraleDrop,0,0,0,0});
         while(ShowAnimating) { yield return null; }

@@ -250,6 +250,7 @@ namespace TextNS
       {"pop_shaked", "阵脚松动!"},
       {"pop_holding", "稳住阵脚"},
       {"pop_newCommander", "新主帅"},
+      {"pop_occupied", "破城!"},
 
       // settlement
       {"settlement_storageLvl1", "初级粮仓"},
@@ -332,13 +333,13 @@ namespace TextNS
       {"ability_attender", "永不缺席"},
       {"ability_attender_description", "100%几率参加协同作战"},
       {"ability_refuseToRetreat", "绝不撤退"},
-      {"ability_refuseToRetreat_description", "80%几率拒绝撤退命令"},
+      {"ability_refuseToRetreat_description", "80%几率拒绝撤退命令,破城时容易战死"},
       {"ability_retreater", "草木皆兵"},
       {"ability_retreater_description", "被冲阵几率增加50%己方战败时一定几率擅自撤退"},
       {"ability_feintDefeat", "佯败"},
       {"ability_feintDefeat_description", "80%几率发动佯败, 撤退时增加敌军追击几率"},
       {"ability_opportunist", "见风使舵"},
-      {"ability_opportunist_description", "在本方明显劣势时60%几率不参与协同作战"},
+      {"ability_opportunist_description", "在本方明显劣势时60%几率不参与协同作战，不易战死"},
       {"ability_playSafe", "步步为营"},
       {"ability_playSafe_description", "敌方战败时本部兵马不会擅自追击将领不易战死"},
 

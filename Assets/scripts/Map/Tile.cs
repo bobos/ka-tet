@@ -279,7 +279,7 @@ namespace MapTileNS
         ret = (int)(ret * 1.2f);
       }
 
-      if (ret > 0 && mode == Mode.Normal) {
+      if (ret > 0 && mode == Mode.Normal && !hexMap.unitAniController.ForceRetreatAnimating) {
         int cnt = 0;
         foreach (Tile t in neighbours) {
           Unit u1 = t.GetUnit();

@@ -22,7 +22,7 @@ public abstract class Building: DataModel {
   public int buildWork = 0;
   protected MonoNS.HexMap hexMap;
   protected MonoNS.SettlementMgr settlementMgr;
-  protected virtual void TurnEndCB() {}
+  public virtual void TurnEndCB() {}
   public WarParty owner;
 
   public int buildTurns {
@@ -52,7 +52,6 @@ public abstract class Building: DataModel {
       onBuildingReady(this);
       ret = true;
     }
-    TurnEndCB();
     return ret;
   }
 }

@@ -26,7 +26,7 @@ namespace MonoNS
     Vector3 fixedPosition;
     public bool fixingCamera = false;
     public void FixCameraAt(Vector3 p) {
-      fixedPosition = new Vector3(p.x, 8, p.z-4f);
+      fixedPosition = new Vector3(p.x, 10, p.z-4f);
       fixingCamera = true;
     }
 

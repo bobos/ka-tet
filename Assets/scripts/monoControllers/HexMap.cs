@@ -296,6 +296,30 @@ namespace MonoNS
       return enemyScoutArea;
     }
 
+    List<GameObject> supplyLines = new List<GameObject>();
+    public void DrawSupplyLine(Tile from, Tile to) {
+      GameObject myLine = new GameObject();
+      supplyLines.Add(myLine);
+      myLine.transform.position = tile2GO[from].transform.position + (Vector3.up * 0.5f);
+      myLine.AddComponent<LineRenderer>();
+      LineRenderer lr = myLine.GetComponent<LineRenderer>();
+      lr.material = MatFlooded;
+      lr.startWidth = 0.1f;
+      lr.endWidth = 0.1f;
+      Vector3[] ps = new Vector3[2];
+      ps[0] = tile2GO[from].transform.position + (Vector3.up * 0.5f);
+      ps[1] = tile2GO[to].transform.position + (Vector3.up * 0.5f);
+      lr.positionCount = 2;
+      lr.SetPositions(ps);
+    }
+
+    public void CleanSupplyLines() {
+      foreach(GameObject line in supplyLines) {
+        GameObject.Destroy(line);
+      }
+      supplyLines = new List<GameObject>();
+    }
+
     public void CreateArrow(Tile[] path, Material mat, string label, Color kolor)
     {
       if (path.Length == 0) return;

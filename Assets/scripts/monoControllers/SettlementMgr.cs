@@ -66,6 +66,12 @@ namespace MonoNS
           }
         }
       }
+
+      foreach(Settlement s in allNodes) {
+        if (Util.eq<WarParty>(warParty, s.owner)) {
+          s.TurnEndCB();
+        }
+      }
       
       turnEndOngoing = false;
     }

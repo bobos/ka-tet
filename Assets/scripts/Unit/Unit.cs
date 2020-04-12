@@ -530,7 +530,7 @@ namespace UnitNS
     {
       return (int)(
         // ghost unit doesnt have vantage
-        (vantage != null ? vantage.MovementPoint(rf.mov) : rf.mov) *
+        rf.mov *
         (IsStarving() ? 0.8f : 1) *
         (plainSickness != null && plainSickness.affected ? (1 - plainSickness.moveDebuf) : 1) *
         (IsSick() ? 0.4f : 1));

@@ -1,7 +1,7 @@
 namespace UnitNS
 {
   abstract public class Rank {
-    public const int MoralePunishLine = 50;
+    public const int MoralePunishLine = 60;
     public static float GetMoralePunish(int morale) {
       const int dropStarts = 70;
       if (morale >= dropStarts) {
@@ -11,7 +11,7 @@ namespace UnitNS
         return 1f;
       }
 
-      return (dropStarts - morale) * 0.05f;
+      return (dropStarts - morale) * 0.1f;
     }
 
     abstract public string Name();

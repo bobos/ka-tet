@@ -4,7 +4,7 @@ using FieldNS;
 public class StrategyBase : Settlement
 {
   public StrategyBase(string name, Tile tile, WarParty warParty) :
-  base(name, tile, warParty, 3,
+  base(name, tile, warParty, 2,
     new StorageLevel(3),
     new WallDefense(1))
   {
