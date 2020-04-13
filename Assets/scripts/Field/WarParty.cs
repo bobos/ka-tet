@@ -17,7 +17,7 @@ namespace FieldNS
 
   public class WarParty
   {
-    public WarParty(bool attackside, Faction faction, int supply)
+    public WarParty(bool attackside, Faction faction, General commander, int supply)
     {
       this.isAI = faction.IsAI();
       this.attackside = attackside;
@@ -27,6 +27,7 @@ namespace FieldNS
         fieldParties.Add(new FieldParty(party));   
       }
       this.supply = supply;
+      commanderGeneral = commander;
     }
 
     public bool ConsumeSupply(int amount) {

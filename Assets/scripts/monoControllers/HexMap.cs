@@ -38,6 +38,10 @@ namespace MonoNS
     public ImgLibrary imgLibrary;
     public EventStasher eventStasher;
     public Province warProvince;
+    public Tile[] frontier = new Tile[]{};
+    public Tile[] middleField = new Tile[]{};
+    public Tile[] keyPos = new Tile[]{};
+    public Tile theBox;
 
     // ==============================================================
     // ================= Interfaces required from hex map plugin ====
@@ -229,10 +233,128 @@ namespace MonoNS
       }
     }
 
+    bool CanDeploy(Tile tile) {
+      return tile.Accessible() && tile.GetUnit() == null;
+    }
+
+    bool DeployAtSettlement(Tile tile, General general) {
+      if (tile.settlement == null) {
+        if (tile.GetUnit() != null) {
+          return false;
+        }
+        general.EnterCampaign(this, tile);
+        return true;
+      }
+
+      if (tile.settlement.HasRoom()) {
+       general.EnterCampaign(this, tile);
+       return true;
+      }
+
+      foreach (Tile t in tile.GetNeighboursWithinRange(2, (Tile _tile) => true)) {
+        if (CanDeploy(t)) {
+          general.EnterCampaign(this, t);
+          break;
+        } 
+      }
+
+      return general.IsOnField();
+    }
+
+    void RandomDeploy(General general) {
+      List<Tile> tiles = new List<Tile>(frontier);
+      foreach(Tile tile in middleField) {
+        tiles.Add(tile);
+      }
+      foreach(Tile tile in keyPos) {
+        tiles.Add(tile);
+      }
+      tiles.Add(theBox);
+      Tile[] all = tiles.ToArray();
+
+      if (DeployAtSettlement(all[Util.Rand(0, all.Length - 1)], general)) {
+        return;
+      }
+
+      foreach(Tile tile in all) {
+        if (DeployAtSettlement(tile, general)) {
+          break;
+        }
+      }
+
+      if (general.IsOnField()) {
+        return;
+      }
+
+      foreach(Tile tile in settlementMgr.GetControlledTiles(general.faction.IsAI())) {
+        if (tile.Accessible() && tile.GetUnit() == null) {
+          general.EnterCampaign(this, tile);
+          break;
+        }
+      }
+    }
+
+    public void InitDefendersOnMap(General[] defenders) {
+      // init defender first
+      General commander = defenders[0];
+      foreach(General g in defenders) {
+        if (g.traits.Contains(Cons.conservative)) {
+          if (DeployAtSettlement(theBox, g)) { continue; }
+          foreach(Tile t in middleField) {
+            if (DeployAtSettlement(t, g)) { break; }
+          }
+          if (!g.IsOnField()) { RandomDeploy(g); };
+        } else if (g.traits.Contains(Cons.loyal)) {
+          int len = frontier.Length - 1;
+          if (DeployAtSettlement(frontier[Util.Rand(0, len)], g)) {
+            continue;
+          }
+
+          foreach(Tile t in frontier) {
+            if (DeployAtSettlement(t, g)) { break; }
+          }
+
+          if (g.IsOnField()) { continue; }
+
+          foreach(Tile t in keyPos) {
+            if (DeployAtSettlement(t, g)) { break; }
+          }
+
+          if (!g.IsOnField()) { RandomDeploy(g); };
+        } else if (g.traits.Contains(Cons.cunning)) {
+          Tile[] ts = Cons.FairChance() ? keyPos : middleField;
+          int len = ts.Length - 1;
+          if (DeployAtSettlement(ts[Util.Rand(0, len)], g)) {
+            continue;
+          }
+
+          foreach(Tile t in ts) {
+            if (DeployAtSettlement(t, g)) { break; }
+          }
+
+          if (!g.IsOnField()) { RandomDeploy(g); };
+        } else if (g.traits.Contains(Cons.brave)) {
+          Tile[] ts = Cons.EvenChance() ? keyPos : frontier;
+          int len = ts.Length - 1;
+          if (DeployAtSettlement(ts[Util.Rand(0, len)], g)) {
+            continue;
+          }
+
+          foreach(Tile t in ts) {
+            if (DeployAtSettlement(t, g)) { break; }
+          }
+
+          if (!g.IsOnField()) { RandomDeploy(g); };
+        } else {
+          RandomDeploy(g);
+        }
+      }
+      GetWarParty(commander.faction).AssignCommander(commander);
+    }
+
     public void SetWarParties(WarParty p1, WarParty p2) {
       warParties[0] = p1.isAI ? p2 : p1;
       warParties[1] = p1.isAI ? p1 : p2;
-      deployDone = GetPlayerParty().attackside || turnNum != 1;
     }
 
     public WarParty GetPlayerParty() {

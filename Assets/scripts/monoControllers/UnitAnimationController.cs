@@ -222,8 +222,8 @@ namespace MonoNS
       hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(settlement.baseTile).transform.position);
       while (hexMap.cameraKeyboardController.fixingCamera) { yield return null; }
       hexMap.cameraKeyboardController.DisableCamera();
-      popAniController.Show(hexMap.GetUnitView(unit), textLib.get("pop_occupied"), Color.green);
-      while (popAniController.Animating) { yield return null; }
+      hexMap.turnController.ShowTitle(textLib.get("title_settlementTaken"), Color.red);
+      while (hexMap.turnController.showingTitle) { yield return null; }
 
       List<Unit> tmp = new List<Unit>();
       foreach (Unit g in settlement.garrison) {

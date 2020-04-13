@@ -95,8 +95,8 @@ namespace TextNS
       {"region_tuboRegion", "吐蕃人"},
 
       // faction
-      {"f_liao", "辽"},
-      {"f_song", "宋"},
+      {"f_liao", "梁"},
+      {"f_song", "晋"},
       {"f_xia", "夏"},
 
       // party
@@ -266,7 +266,6 @@ namespace TextNS
       {"pop_shaked", "阵脚松动!"},
       {"pop_holding", "稳住阵脚"},
       {"pop_newCommander", "新主帅"},
-      {"pop_occupied", "破城!"},
 
       // settlement
       {"settlement_storageLvl1", "初级粮仓"},
@@ -286,6 +285,7 @@ namespace TextNS
       {"title_noWayOut", "身陷重围"},
       {"title_deployment", "战前部署"},
       {"title_days", @"第{0}日 · {1}"},
+      {"title_settlementTaken", "城破!"},
 
       {"operation_success_chance", @"胜算{0}成"},
       {"misc_windAdvantage", "背风面"},

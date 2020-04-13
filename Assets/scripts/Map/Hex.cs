@@ -110,21 +110,6 @@ namespace MapTileNS
       return ToDescendentType<T>(_neighbours);
     }
 
-    public T[] GetTilesWithinRangeOf<T>(int radius) where T: Hex
-    {
-      List<Hex> hexes = new List<Hex>();
-      for (int dx = -radius; dx < radius - 1; dx++)
-      {
-        for (int dy = Mathf.Max(-radius + 1, -dx - radius); dy < Mathf.Min(radius, -dx + radius - 1); dy++)
-        {
-          Vector2 coord = this.GetCoord();
-          Hex tile = hexMap.GetHex((int)coord.x + dx, (int)coord.y + dy);
-          if (tile != null) hexes.Add(tile);
-        }
-      }
-      return ToDescendentType<T>(hexes.ToArray());
-    }
-
     T[] ToDescendentType<T> (Hex[] hexes) where T: Hex {
       List<T> ret = new List<T>();
       foreach(Hex h in hexes) {

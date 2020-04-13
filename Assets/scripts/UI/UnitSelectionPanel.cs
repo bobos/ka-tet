@@ -410,9 +410,9 @@ namespace MonoNS
 
         string info =
          "步兵: " + stat.numOfInfantryUnit + "都\n" +
-         "  战兵: " + stat.numOfInfantry + "/" + stat.numOfInfantryDead + "亡\n" +
+         "  战兵: " + UnitInfoView.Shorten(stat.numOfInfantry) + "/" + UnitInfoView.Shorten(stat.numOfInfantryDead) + "亡\n" +
          "骑兵: " + stat.numOfCavalryUnit + "都\n" +
-         "  战兵: " + stat.numOfCavalry + "/" + stat.numOfCavalryDead + "亡\n" +
+         "  战兵: " + UnitInfoView.Shorten(stat.numOfCavalry) + "/" + UnitInfoView.Shorten(stat.numOfCavalryDead) + "亡\n" +
          "总计: 战兵 " + UnitInfoView.Shorten(stat.numOfInfantry + stat.numOfCavalry) +
          "/" + UnitInfoView.Shorten(stat.numOfInfantryDead + stat.numOfCavalryDead) + "亡\n";
 

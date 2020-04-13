@@ -74,14 +74,74 @@ public class Starter : MonoBehaviour {
     TurnController turnController = GameObject.FindObjectOfType<TurnController>();
     controllers.Add(turnController);
 
+    // init generals
+    General liubei = new General("g_liubei", "g_liubei_d", Cons.heNan, new CommandSkill(3), new TroopSize(3)); 
+    General guanyu = new General("g_guanyu", "g_guanyu_d", Cons.heNan, new CommandSkill(1), new TroopSize(2)); 
+    General zhangfei = new General("g_zhangfei", "g_zhangfei_d", Cons.heDong, new CommandSkill(1), new TroopSize(2)); 
+    General zhaoyun = new General("g_zhaoyun", "g_zhaoyun_d", Cons.heDong, new CommandSkill(1), new TroopSize(2)); 
+    General machao = new General("g_machao", "g_machao_d", Cons.heBei, new CommandSkill(1), new TroopSize(2)); 
+    General y1 = new General("g_y1", "g_machao_d", Cons.heBei, new CommandSkill(1), new TroopSize(1)); 
+    General y2 = new General("g_y2", "g_machao_d", Cons.heBei, new CommandSkill(1), new TroopSize(1)); 
+    General y3 = new General("g_y3", "g_machao_d", Cons.heBei, new CommandSkill(1), new TroopSize(1)); 
+    liubei.JoinFaction(Cons.Song, Cons.NewParty);
+    guanyu.JoinFaction(Cons.Song, Cons.NewParty);
+    zhangfei.JoinFaction(Cons.Song, Cons.OldParty);
+    zhaoyun.JoinFaction(Cons.Song, Cons.OldParty);
+    machao.JoinFaction(Cons.Song, Cons.OldParty);
+    y1.JoinFaction(Cons.Song, Cons.OldParty);
+    y2.JoinFaction(Cons.Song, Cons.OldParty);
+    y3.JoinFaction(Cons.Song, Cons.OldParty);
+
+    liubei.CreateTroop(hexMap, 10000, Cons.heNan, Type.Infantry, Cons.veteran);
+    zhaoyun.CreateTroop(hexMap, 5000, Cons.heBei, Type.Infantry, Cons.veteran);
+    guanyu.CreateTroop(hexMap, 8000, Cons.heBei, Type.Infantry, Cons.rookie);
+    machao.CreateTroop(hexMap, 8000, Cons.heDong, Type.Infantry, Cons.veteran);
+    zhangfei.CreateTroop(hexMap, 2000, Cons.shanXi, Type.Cavalry, Cons.veteran);
+    y1.CreateTroop(hexMap, 4000, Cons.heDong, Type.Infantry, Cons.rookie);
+    y2.CreateTroop(hexMap, 4000, Cons.heDong, Type.Infantry, Cons.rookie);
+    y3.CreateTroop(hexMap, 4000, Cons.heDong, Type.Infantry, Cons.veteran);
+
+    General caocao = new General("g_caocao", "g_caocao_d", Cons.xiJing, new CommandSkill(3), new TroopSize(3)); 
+    General xuchu = new General("g_xuchu", "g_xuchu_d", Cons.xiJing, new CommandSkill(2), new TroopSize(3)); 
+    General abc = new General("g_abc", "g_abc", Cons.zhongJing, new CommandSkill(1), new TroopSize(2)); 
+    General x1 = new General("g_x1", "g_1", Cons.zhongJing, new CommandSkill(1), new TroopSize(3)); 
+    General x2 = new General("g_x2", "g_1", Cons.shangJing, new CommandSkill(1), new TroopSize(2)); 
+    General x3 = new General("g_x3", "g_1", Cons.shangJing, new CommandSkill(1), new TroopSize(3)); 
+    General x4 = new General("g_x4", "g_1", Cons.shangJing, new CommandSkill(1), new TroopSize(2)); 
+    General x5 = new General("g_x5", "g_1", Cons.shangJing, new CommandSkill(1), new TroopSize(2)); 
+    General x6 = new General("g_x6", "g_1", Cons.shangJing, new CommandSkill(1), new TroopSize(2));
+    General x7 = new General("g_x7", "g_1", Cons.shangJing, new CommandSkill(1), new TroopSize(2));
+    General x8 = new General("g_x8", "g_1", Cons.shangJing, new CommandSkill(1), new TroopSize(3));
+    caocao.JoinFaction(Cons.Liao, Cons.NorthCourt);
+    xuchu.JoinFaction(Cons.Liao, Cons.NorthCourt);
+    abc.JoinFaction(Cons.Liao, Cons.NorthCourt);
+    x1.JoinFaction(Cons.Liao, Cons.SouthCourt);
+    x2.JoinFaction(Cons.Liao, Cons.SouthCourt);
+    x3.JoinFaction(Cons.Liao, Cons.SouthCourt);
+    x4.JoinFaction(Cons.Liao, Cons.SouthCourt);
+
+    caocao.CreateTroop(hexMap, 10000, Cons.xiJing, Type.Infantry, Cons.veteran);
+    xuchu.CreateTroop(hexMap, 3000, Cons.zhongJing, Type.Cavalry, Cons.veteran);
+    abc.CreateTroop(hexMap, 8000, Cons.xiJing, Type.Infantry, Cons.veteran);
+    x1.CreateTroop(hexMap, 3000, Cons.shangJing, Type.Cavalry, Cons.rookie);
+    x2.CreateTroop(hexMap, 8000, Cons.xiJing, Type.Infantry, Cons.rookie);
+    x3.CreateTroop(hexMap, 10000, Cons.xiJing, Type.Infantry, Cons.rookie);
+    x4.CreateTroop(hexMap, 8000, Cons.zhongJing, Type.Infantry, Cons.rookie);
+    x5.CreateTroop(hexMap, 8000, Cons.zhongJing, Type.Infantry, Cons.veteran);
+    x6.CreateTroop(hexMap, 2000, Cons.zhongJing, Type.Cavalry, Cons.rookie);
+    x7.CreateTroop(hexMap, 8000, Cons.zhongJing, Type.Infantry, Cons.rookie);
+    x8.CreateTroop(hexMap, 10000, Cons.zhongJing, Type.Infantry, Cons.veteran);
+
     // for 100k man fight for 6 months
     const int supply = 100000 * 60;
     //initialization all controllers
     hexMap.PreGameInit();
     hexMap.SetWarParties(
-      new WarParty(false, Cons.Song, supply),
-      new WarParty(true, Cons.Liao, supply)
+      new WarParty(false, Cons.Song, liubei, supply),
+      new WarParty(true, Cons.Liao, caocao, supply)
     );
+    hexMap.deployDone = hexMap.GetWarParty(Cons.Song).commanderGeneral.commandSkill.commandSkill != 4;
+
     foreach(BaseController controller in controllers) {
       controller.PreGameInit(hexMap, controller);
     }
@@ -92,7 +152,7 @@ public class Starter : MonoBehaviour {
     }
 
     StartButton.SetActive(false);
-
+    
     // TODO build dam
     Tile dam = hexMap.GetTile(12, 7);
     dam.BuildDam();
@@ -101,50 +161,9 @@ public class Starter : MonoBehaviour {
     dam = hexMap.GetTile(30, 15);
     dam.BuildDam();
     
-    // init generals
-    General liubei = new General("g_liubei", "g_liubei_d", Cons.heNan, new CommandSkill(3), new TroopSize(3)); 
-    General guanyu = new General("g_guanyu", "g_guanyu_d", Cons.heNan, new CommandSkill(1), new TroopSize(1)); 
-    General zhangfei = new General("g_zhangfei", "g_zhangfei_d", Cons.heDong, new CommandSkill(1), new TroopSize(2)); 
-    General zhaoyun = new General("g_zhaoyun", "g_zhaoyun_d", Cons.heDong, new CommandSkill(1), new TroopSize(2)); 
-    General machao = new General("g_machao", "g_machao_d", Cons.heBei, new CommandSkill(1), new TroopSize(2)); 
-    General y1 = new General("g_y1", "g_machao_d", Cons.heBei, new CommandSkill(1), new TroopSize(1)); 
-    liubei.JoinFaction(Cons.Song, Cons.NewParty);
-    guanyu.JoinFaction(Cons.Song, Cons.NewParty);
-    zhangfei.JoinFaction(Cons.Song, Cons.OldParty);
-    zhaoyun.JoinFaction(Cons.Song, Cons.OldParty);
-    machao.JoinFaction(Cons.Song, Cons.OldParty);
-    y1.JoinFaction(Cons.Song, Cons.OldParty);
-
-    General caocao = new General("g_caocao", "g_caocao_d", Cons.xiJing, new CommandSkill(3), new TroopSize(3)); 
-    General xuchu = new General("g_xuchu", "g_xuchu_d", Cons.xiJing, new CommandSkill(2), new TroopSize(3)); 
-    General abc = new General("g_abc", "g_abc", Cons.zhongJing, new CommandSkill(1), new TroopSize(2)); 
-    General x1 = new General("g_x1", "g_1", Cons.zhongJing, new CommandSkill(1), new TroopSize(3)); 
-    General x2 = new General("g_x2", "g_1", Cons.shangJing, new CommandSkill(1), new TroopSize(2)); 
-    General x3 = new General("g_x3", "g_1", Cons.shangJing, new CommandSkill(1), new TroopSize(3)); 
-    General x4 = new General("g_x4", "g_1", Cons.shangJing, new CommandSkill(1), new TroopSize(2)); 
-    caocao.JoinFaction(Cons.Liao, Cons.NorthCourt);
-    xuchu.JoinFaction(Cons.Liao, Cons.NorthCourt);
-    abc.JoinFaction(Cons.Liao, Cons.NorthCourt);
-    x1.JoinFaction(Cons.Liao, Cons.SouthCourt);
-    x2.JoinFaction(Cons.Liao, Cons.SouthCourt);
-    x3.JoinFaction(Cons.Liao, Cons.SouthCourt);
-    x4.JoinFaction(Cons.Liao, Cons.SouthCourt);
-
-    // step 3, assign general to units
-    liubei.CreateTroop(hexMap, 15000, Cons.heNan, Type.Infantry, Cons.veteran);
-    zhaoyun.CreateTroop(hexMap, 15000, Cons.heBei, Type.Infantry, Cons.veteran);
-    guanyu.CreateTroop(hexMap, 4000, Cons.heBei, Type.Infantry, Cons.rookie);
-    machao.CreateTroop(hexMap, 8000, Cons.heDong, Type.Infantry, Cons.veteran);
-    y1.CreateTroop(hexMap, 4000, Cons.heDong, Type.Infantry, Cons.rookie);
-    zhangfei.CreateTroop(hexMap, 15000, Cons.shanXi, Type.Cavalry, Cons.rookie);
-
-    caocao.CreateTroop(hexMap, 20000, Cons.xiJing, Type.Infantry, Cons.veteran);
-    xuchu.CreateTroop(hexMap, 20000, Cons.zhongJing, Type.Cavalry, Cons.veteran);
-    abc.CreateTroop(hexMap, 20000, Cons.xiJing, Type.Infantry, Cons.veteran);
-    x1.CreateTroop(hexMap, 20000, Cons.shangJing, Type.Cavalry, Cons.rookie);
-    x2.CreateTroop(hexMap, 20000, Cons.xiJing, Type.Infantry, Cons.rookie);
-    x3.CreateTroop(hexMap, 20000, Cons.xiJing, Type.Infantry, Cons.rookie);
-    x4.CreateTroop(hexMap, 20000, Cons.zhongJing, Type.Infantry, Cons.rookie);
+    // first one is always the commander
+    List<General> defenders = new List<General>(){liubei, guanyu, zhangfei, zhaoyun, machao, y1, y2, y3};
+    List<General> attackers = new List<General>(){caocao, xuchu, abc, x1, x2, x3, x4, x5, x6, x7, x8};
 
     // create settlements
     // * tactical phase starts *
@@ -153,7 +172,7 @@ public class Starter : MonoBehaviour {
     Tile camp2 = hexMap.GetTile(17, 9);
     Tile camp3 = hexMap.GetTile(16, 33);
     Tile city = hexMap.GetTile(29, 13);
-    Tile mainCity = hexMap.GetTile(31, 33);
+    Tile mainCity = hexMap.GetTile(38, 30);
     // Set Route
     strategyBase.linkedTilesForCamp.Add(camp1);
     strategyBase.linkedTilesForCamp.Add(camp2);
@@ -172,22 +191,23 @@ public class Starter : MonoBehaviour {
 
     mainCity.linkedTilesForCamp.Add(city);
 
+    hexMap.frontier = new Tile[]{camp1, camp2};
+    hexMap.middleField = new Tile[]{camp3, city};
+    hexMap.theBox = mainCity;
+
     Settlement s = settlementMgr.BuildStrategyBase(strategyBase, hexMap.GetWarParty(Cons.Liao));
     if (s == null) {
       Util.Throw("Failed to build base at 1,1");
     }
     settlementMgr.attackerRoot = s;
 
-    if (settlementMgr.BuildCamp("虎牢关", camp1, hexMap.GetWarParty(Cons.Song), 1) == null) {
+    if (settlementMgr.BuildCamp("井陉", camp1, hexMap.GetWarParty(Cons.Song), 1) == null) {
       Util.Throw("Failed to build base at 10,17");
     }
     if (settlementMgr.BuildCamp("飞狐口", camp2, hexMap.GetWarParty(Cons.Song), 1) == null) {
       Util.Throw("Failed to build base at 10,17");
     }
-    if (settlementMgr.BuildCamp("大散关", camp3, hexMap.GetWarParty(Cons.Song), 1) == null) {
-      Util.Throw("Failed to build base at 10,17");
-    }
-    if (settlementMgr.BuildCity("金州", city, hexMap.GetWarParty(Cons.Song), 1,
+    if (settlementMgr.BuildCity("丹州", camp3, hexMap.GetWarParty(Cons.Song), 1,
       34000, // male
       23889, // female
       8888, // child
@@ -195,7 +215,15 @@ public class Starter : MonoBehaviour {
     ) == null) {
       Util.Throw("Failed to build base at 10,17");
     }
-    s = settlementMgr.BuildCity("河间府", hexMap.GetTile(31, 33),
+    if (settlementMgr.BuildCity("沁州", city, hexMap.GetWarParty(Cons.Song), 1,
+      34000, // male
+      23889, // female
+      8888, // child
+      3
+    ) == null) {
+      Util.Throw("Failed to build base at 10,17");
+    }
+    s = settlementMgr.BuildCity("晋州", mainCity, 
           hexMap.GetWarParty(Cons.Song),
           3, // wallLevel
           34000, // male
@@ -207,14 +235,7 @@ public class Starter : MonoBehaviour {
     settlementMgr.defenderRoot = s; 
     hexMap.AddTiles2Settlements();
 
-    // after settlement created, general enters campaign
-    liubei.EnterCampaign(hexMap, hexMap.GetTile(33, 31));
-    zhaoyun.EnterCampaign(hexMap, hexMap.GetTile(34, 31));
-    guanyu.EnterCampaign(hexMap, hexMap.GetTile(35, 31));
-    machao.EnterCampaign(hexMap, hexMap.GetTile(36, 31));
-    y1.EnterCampaign(hexMap, hexMap.GetTile(35, 31));
-    zhangfei.EnterCampaign(hexMap, hexMap.GetTile(37, 31));
-    hexMap.GetWarParty(liubei.faction).AssignCommander(liubei);
+    hexMap.InitDefendersOnMap(defenders.ToArray());
 
     // * AI *
     caocao.EnterCampaign(hexMap, hexMap.GetTile(0, 9));
@@ -224,7 +245,6 @@ public class Starter : MonoBehaviour {
     x2.EnterCampaign(hexMap, hexMap.GetTile(4, 9));
     x3.EnterCampaign(hexMap, hexMap.GetTile(5, 9));
     x4.EnterCampaign(hexMap, hexMap.GetTile(6, 9));
-    hexMap.GetWarParty(caocao.faction).AssignCommander(caocao);
     SettlementMgr.Ready4Refresh = true;
     FoW.Init(hexMap);
     Unit commander = hexMap.GetPlayerParty().commanderGeneral.commandUnit.onFieldUnit;

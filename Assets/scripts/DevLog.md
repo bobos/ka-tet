@@ -35,6 +35,13 @@ Game Tips:
 37. 部队在山地上被冲阵几率低
 38. 重骑兵无法被冲阵
 
+4星主帅战前部署
+1星主帅 乱跑
+2，3星主帅：
+保守：放弃边城，抱团省会
+忠义：死守边城
+狡猾：守中部
+
 骑兵冲阵包围或者围城中突围
 more discipline events
 帅:
@@ -65,7 +72,6 @@ map skeleton for AI(supply route, point, value tiles, dam, supply range etc.)
 fire escape through
 放火选地点
 每月一回合，10个战斗回合
-capture city on Great victory
 
 战场瘟疫爆发时，每只部队随机确定时候染病，染病几率由低到高在到低变化
 战略回合，ai借助战斗回合战果施压，换取停战条约
