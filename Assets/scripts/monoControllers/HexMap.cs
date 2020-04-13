@@ -237,6 +237,31 @@ namespace MonoNS
       return tile.Accessible() && tile.GetUnit() == null;
     }
 
+    bool DeployAt(Tile tile, General general) {
+      if (CanDeploy(tile)) {
+        general.EnterCampaign(this, tile);
+        return true;
+      }
+
+      foreach (Tile t in tile.GetNeighboursWithinRange(2, (Tile _tile) => true)) {
+        if (CanDeploy(t)) {
+          general.EnterCampaign(this, t);
+          break;
+        } 
+      }
+
+      return general.IsOnField();
+    }
+
+    void RandomDeployAttacker(General general, Tile baseTile) {
+      foreach(Tile tile in baseTile.settlement.myTiles) {
+        if (CanDeploy(tile)) {
+          general.EnterCampaign(this, tile);
+          break;
+        }
+      }
+    }
+
     bool DeployAtSettlement(Tile tile, General general) {
       if (tile.settlement == null) {
         if (tile.GetUnit() != null) {
@@ -287,7 +312,7 @@ namespace MonoNS
       }
 
       foreach(Tile tile in settlementMgr.GetControlledTiles(general.faction.IsAI())) {
-        if (tile.Accessible() && tile.GetUnit() == null) {
+        if (CanDeploy(tile)) {
           general.EnterCampaign(this, tile);
           break;
         }
@@ -350,6 +375,191 @@ namespace MonoNS
         }
       }
       GetWarParty(commander.faction).AssignCommander(commander);
+    }
+
+    public void InitAttackersOnMap(General[] attackers, Tile baseTile) {
+      General commander = attackers[0];
+      // 0: total random deployed at all frontier, strategybase and tiles between
+      // 1: 1 cavary in one of frontier area, main army settled at middle sections, most 2 cavalries
+      // 2: 2 or 3 groups, each consists one cavalry and 4 infantries, first one at frontier area, then middle sections
+      // 3: weakest two at strategybase, rest at one of frontier area
+
+      int aiType = 0;
+      if (commander.commandSkill.commandSkill == 1) {
+        aiType = 0;
+      } else {
+        aiType = Util.Rand(1, 3);
+      }
+
+      List<Tile> frontierArea = new List<Tile>();
+      float score = 10000f;
+      foreach(Tile tile in frontier) {
+        Tile candidate = null;
+        foreach (Tile t in tile.GetNeighboursWithinRange(6, (Tile _tile) => true)) {
+          if (CanDeploy(t)) {
+            float dist = Tile.Distance(t, baseTile);
+            if (dist < score) {
+              score = dist;
+              candidate = t;
+            }
+          } 
+        }
+        frontierArea.Add(candidate);
+      }
+
+      score = 0f;
+      Tile middleTile = null;
+      foreach(Tile t in baseTile.settlement.myTiles) {
+        if (CanDeploy(t) && !AttackerZone.Contains(t)) {
+          float dist = Tile.Distance(t, baseTile);
+          if (dist > score) {
+            score = dist;
+            middleTile = t;
+          }
+        }
+      }
+
+      List<Tile> all = new List<Tile>(frontierArea){};
+      all.Add(middleTile);
+      all.Add(baseTile);
+      Tile[] array = all.ToArray();
+
+      General weakest = commander;
+      int num = 1000000000;
+      foreach(General g in attackers) {
+        if (g.commandUnit.type == Type.Cavalry) {
+          continue;
+        }
+        int cp = (int)(g.commandUnit.soldiers * (1 + g.commandUnit.lvlBuf));
+        if (cp < num) {
+          num = cp;
+          weakest = g;
+        }
+      }
+      weakest.EnterCampaign(this, baseTile);
+      List<General> rest = new List<General>();
+      List<General> cavalries = new List<General>(); 
+      List<General> infantries = new List<General>(); 
+      foreach(General g in attackers) {
+        if (Util.eq<General>(g, weakest)) {
+          continue;
+        }
+        if (g.commandUnit.type == Type.Cavalry) {
+          cavalries.Add(g);
+        } else {
+          infantries.Add(g);
+        }
+        rest.Add(g);
+      }
+
+      if (aiType == 0) {
+        int len = array.Length - 1;
+        foreach(General general in rest) {
+          if(DeployAt(all[Util.Rand(0, len)], general)) { continue; }
+          RandomDeployAttacker(general, baseTile);
+        }
+        return;
+      }
+
+      if (aiType == 1) {
+        int cnt = 0;
+        foreach(Tile t in frontierArea) {
+          if (cnt++ == 2 || cavalries.Count == 0) {
+            break;
+          }
+          General g = cavalries.FindLast((General general) => true);
+          if(DeployAt(t, g)) { continue; }
+          RandomDeployAttacker(g, baseTile);
+          cavalries.Remove(g);
+        }
+
+        foreach(General g in cavalries) {
+          if(DeployAt(middleTile, g)) { continue; }
+          RandomDeployAttacker(g, baseTile);
+        }
+
+        foreach(General g in infantries) {
+          if(DeployAt(middleTile, g)) { continue; }
+          RandomDeployAttacker(g, baseTile);
+        }
+      }
+
+      if (aiType == 2) {
+        List<Tile> deployedTiles = new List<Tile>();
+        List<List<General>> groups = new List<List<General>>();
+        int cnt = 0;
+        List<General> group = new List<General>();
+        foreach(General grp in infantries) {
+          group.Add(grp);
+          cnt++;
+          if (cnt == 4) {
+            groups.Add(group);
+            group = new List<General>();
+            cnt = 0;
+          }
+        }
+
+        if (group.Count != 0) {
+          groups.Add(group);
+        }
+
+        foreach(List<General> grp in groups) {
+          if (cavalries.Count == 0) {
+            break;
+          }
+          General c = cavalries.FindLast((General general) => true);
+          grp.Add(c);
+          cavalries.Remove(c);
+        }
+
+        if (cavalries.Count > 0) {
+          foreach(List<General> grp in groups) {
+            if (cavalries.Count == 0) {
+              break;
+            }
+            General c = cavalries.FindLast((General general) => true);
+            grp.Add(c);
+            cavalries.Remove(c);
+          }
+        }
+
+        if (cavalries.Count > 0) {
+          foreach(General grp in cavalries) {
+            if(DeployAt(middleTile, grp)) { continue; }
+            RandomDeployAttacker(grp, baseTile);
+          }
+        }
+
+        // deploy middle tile
+        List<General> g = groups.FindLast((List<General> _g) => true);
+        foreach(General general in g) {
+          if(DeployAt(middleTile, general)) { continue; }
+          RandomDeployAttacker(general, baseTile);
+        }
+        groups.Remove(g);
+
+        foreach(Tile tile in frontierArea) {
+          if (groups.Count > 0) {
+            List<General> grp = groups.FindLast((List<General> _g) => true);
+            foreach(General general in grp) {
+              if(DeployAt(tile, general)) { continue; }
+              RandomDeployAttacker(general, baseTile);
+            }
+            groups.Remove(grp);
+          }
+        }
+
+        if (groups.Count > 0) {
+          foreach(List<General> grp in groups) {
+            foreach(General general in grp) {
+              if(DeployAt(middleTile, general)) { continue; }
+              RandomDeployAttacker(general, baseTile);
+            }
+          }
+        }
+      }
+
+      
     }
 
     public void SetWarParties(WarParty p1, WarParty p2) {

@@ -236,15 +236,7 @@ public class Starter : MonoBehaviour {
     hexMap.AddTiles2Settlements();
 
     hexMap.InitDefendersOnMap(defenders.ToArray());
-
-    // * AI *
-    caocao.EnterCampaign(hexMap, hexMap.GetTile(0, 9));
-    abc.EnterCampaign(hexMap, hexMap.GetTile(1, 9));
-    xuchu.EnterCampaign(hexMap, hexMap.GetTile(2, 9));
-    x1.EnterCampaign(hexMap, hexMap.GetTile(3, 9));
-    x2.EnterCampaign(hexMap, hexMap.GetTile(4, 9));
-    x3.EnterCampaign(hexMap, hexMap.GetTile(5, 9));
-    x4.EnterCampaign(hexMap, hexMap.GetTile(6, 9));
+    hexMap.InitAttackersOnMap(attackers.ToArray(), strategyBase);
     SettlementMgr.Ready4Refresh = true;
     FoW.Init(hexMap);
     Unit commander = hexMap.GetPlayerParty().commanderGeneral.commandUnit.onFieldUnit;
