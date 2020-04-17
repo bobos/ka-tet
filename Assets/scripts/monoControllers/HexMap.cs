@@ -377,6 +377,99 @@ namespace MonoNS
       GetWarParty(commander.faction).AssignCommander(commander);
     }
 
+    public class Army {
+      public General leader;
+      public List<General> lightCavalries = new List<General>();
+      public List<General> heavyCavalries = new List<General>();
+      public List<General> infantries = new List<General>();
+      public List<General> all = new List<General>();
+      public int point;
+    }
+
+    Army[] GetArmies(List<General> generals) {
+      int armyNum;
+      Army[] armies;
+      if (generals.Count < 7) {
+        armyNum = 1;
+        armies = new Army[]{new Army()};
+      } else if (generals.Count < 13) {
+        armyNum = 2;
+        armies = new Army[]{new Army(), new Army()};
+      } else {
+        armyNum = 3;
+        armies = new Army[]{new Army(), new Army(), new Army()};
+      }
+
+      // Shuffle
+      General[] all = generals.ToArray();
+      for (int i = 0; i < all.Length; i++)
+      {
+        int pos = Util.Rand(0, all.Length-1);
+        General tmp = all[pos];    
+        all[pos] = all[i];
+        all[i] = tmp; 
+      }
+
+      int index = 0;
+      foreach(Army army in armies) {
+        for (int i = 0; i < 5; i++)
+        {
+          if (index == all.Length) {
+            break;
+          }
+          General general = all[index++];
+          if (general.commandUnit.type == Type.Infantry) {
+            army.infantries.Add(general);
+          } else if (general.commandUnit.rank == Cons.veteran) {
+            army.heavyCavalries.Add(general);
+          } else {
+            army.lightCavalries.Add(general);
+          }
+          army.all.Add(general);
+        }
+        if (index == all.Length) {
+          break;
+        }
+      }
+
+      int armyIndex = 0;
+      for (int i = index; i < all.Length; i++) {
+        armyIndex = armyIndex == armyNum ? 0 : armyIndex;
+        General general = all[i];
+        if (general.commandUnit.type == Type.Infantry) {
+          armies[armyIndex].infantries.Add(general);
+        } else if (general.commandUnit.rank == Cons.veteran) {
+          armies[armyIndex].heavyCavalries.Add(general);
+        } else {
+          armies[armyIndex].lightCavalries.Add(general);
+        }
+        armies[armyIndex].all.Add(general);
+        armyIndex++;
+      }
+
+      // find leader
+      foreach(Army army in armies) {
+        General leader = null;
+        int score = 0;
+        foreach(General general in army.all) {
+          int point = (int)(general.commandUnit.soldiers * ( 1 + general.commandUnit.lvlBuf));
+          army.point += point;
+          if (Util.eq<General>(GetWarParty(general.faction).commanderGeneral, general)) {
+            army.leader = general;
+          }
+          if (point > score) {
+            score = point;
+            leader = general;
+          }
+        }
+        if (army.leader == null) {
+          army.leader = leader;
+        }
+      }
+
+      return armies;
+    }
+
     public void InitAttackersOnMap(General[] attackers, Tile baseTile) {
       General commander = attackers[0];
       // 0: total random deployed at all frontier, strategybase and tiles between
@@ -425,7 +518,7 @@ namespace MonoNS
       Tile[] array = all.ToArray();
 
       General weakest = commander;
-      int num = 1000000000;
+      int num = System.Int32.MaxValue;
       foreach(General g in attackers) {
         if (g.commandUnit.type == Type.Cavalry) {
           continue;
@@ -462,20 +555,23 @@ namespace MonoNS
       }
 
       if (aiType == 1) {
-        int cnt = 0;
-        foreach(Tile t in frontierArea) {
-          if (cnt++ == 2 || cavalries.Count == 0) {
+        Tile target = frontierArea.FindLast((Tile tile) => true);
+        int index = 0;
+        General[] cavalryArray = cavalries.ToArray();
+        for (int i = 0; i < 2; i++)
+        {
+          if (index == cavalryArray.Length) {
             break;
           }
-          General g = cavalries.FindLast((General general) => true);
-          if(DeployAt(t, g)) { continue; }
-          RandomDeployAttacker(g, baseTile);
-          cavalries.Remove(g);
+          General general = cavalryArray[index++];
+          if(DeployAt(target, general)) { continue; }
+          RandomDeployAttacker(general, baseTile);
         }
 
-        foreach(General g in cavalries) {
-          if(DeployAt(middleTile, g)) { continue; }
-          RandomDeployAttacker(g, baseTile);
+        for (int i = index; index < cavalryArray.Length; i++) {
+          General general = cavalryArray[i];
+          if(DeployAt(middleTile, general)) { continue; }
+          RandomDeployAttacker(general, baseTile);
         }
 
         foreach(General g in infantries) {
@@ -484,82 +580,62 @@ namespace MonoNS
         }
       }
 
+      Tile[] fronts = frontierArea.ToArray();
       if (aiType == 2) {
-        List<Tile> deployedTiles = new List<Tile>();
-        List<List<General>> groups = new List<List<General>>();
-        int cnt = 0;
-        List<General> group = new List<General>();
-        foreach(General grp in infantries) {
-          group.Add(grp);
-          cnt++;
-          if (cnt == 4) {
-            groups.Add(group);
-            group = new List<General>();
-            cnt = 0;
+        Army[] armies = GetArmies(rest);
+        Army reserve = null;
+        int point = System.Int32.MaxValue;
+        foreach(Army army in armies) {
+          if (army.point < point) {
+            reserve = army;
+            point = army.point;
           }
         }
 
-        if (group.Count != 0) {
-          groups.Add(group);
-        }
-
-        foreach(List<General> grp in groups) {
-          if (cavalries.Count == 0) {
-            break;
-          }
-          General c = cavalries.FindLast((General general) => true);
-          grp.Add(c);
-          cavalries.Remove(c);
-        }
-
-        if (cavalries.Count > 0) {
-          foreach(List<General> grp in groups) {
-            if (cavalries.Count == 0) {
-              break;
-            }
-            General c = cavalries.FindLast((General general) => true);
-            grp.Add(c);
-            cavalries.Remove(c);
-          }
-        }
-
-        if (cavalries.Count > 0) {
-          foreach(General grp in cavalries) {
-            if(DeployAt(middleTile, grp)) { continue; }
-            RandomDeployAttacker(grp, baseTile);
-          }
-        }
-
-        // deploy middle tile
-        List<General> g = groups.FindLast((List<General> _g) => true);
-        foreach(General general in g) {
+        // deploy reserve at middle tile
+        foreach(General general in reserve.all) {
           if(DeployAt(middleTile, general)) { continue; }
           RandomDeployAttacker(general, baseTile);
         }
-        groups.Remove(g);
 
-        foreach(Tile tile in frontierArea) {
-          if (groups.Count > 0) {
-            List<General> grp = groups.FindLast((List<General> _g) => true);
-            foreach(General general in grp) {
-              if(DeployAt(tile, general)) { continue; }
-              RandomDeployAttacker(general, baseTile);
-            }
-            groups.Remove(grp);
+        // deploy army at front
+        int index = 0;
+        foreach(Army army in armies) {
+          if (Util.eq<Army>(army, reserve)) {
+            continue;
           }
-        }
-
-        if (groups.Count > 0) {
-          foreach(List<General> grp in groups) {
-            foreach(General general in grp) {
-              if(DeployAt(middleTile, general)) { continue; }
-              RandomDeployAttacker(general, baseTile);
-            }
+          if (index == fronts.Length) {
+            index = 0;
+          }
+          Tile target = fronts[index++];
+          foreach(General general in army.all) {
+            if(DeployAt(target, general)) { continue; }
+            RandomDeployAttacker(general, baseTile);
           }
         }
       }
 
-      
+      if (aiType == 3) {
+        General weak = null;
+        num = System.Int32.MaxValue;
+        foreach(General g in rest) {
+          int cp = (int)(g.commandUnit.soldiers * (1 + g.commandUnit.lvlBuf));
+          if (cp < num) {
+            num = cp;
+            weak = g;
+          }
+        }
+        weak.EnterCampaign(this, baseTile);
+
+        foreach(General g in rest) {
+          if (Util.eq<General>(g, weak)) {
+            continue;
+          }
+          if(DeployAt(fronts[0], g)) { continue; }
+          if(DeployAt(middleTile, g)) { continue; }
+          RandomDeployAttacker(g, baseTile);
+        }
+      }
     }
 
     public void SetWarParties(WarParty p1, WarParty p2) {
