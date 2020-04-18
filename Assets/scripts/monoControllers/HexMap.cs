@@ -43,6 +43,8 @@ namespace MonoNS
     public Tile[] keyPos = new Tile[]{};
     public Tile theBox;
 
+    public Tile attackerReserveTile;
+
     // ==============================================================
     // ================= Interfaces required from hex map plugin ====
     // ==============================================================
@@ -50,8 +52,7 @@ namespace MonoNS
     {
       if (tiles == null)
       {
-        Debug.LogError("not initiated");
-        throw new UnityException("map not initiated yet");
+        Util.Throw("map not initiated yet");
       }
       if (x < 0 || y < 0 || x > numCols - 1 || y > numRows - 1) return null;
       return (Hex)(tiles[x, y]);
@@ -501,19 +502,8 @@ namespace MonoNS
       }
 
       score = 0f;
-      Tile middleTile = null;
-      foreach(Tile t in baseTile.settlement.myTiles) {
-        if (CanDeploy(t) && !AttackerZone.Contains(t)) {
-          float dist = Tile.Distance(t, baseTile);
-          if (dist > score) {
-            score = dist;
-            middleTile = t;
-          }
-        }
-      }
-
       List<Tile> all = new List<Tile>(frontierArea){};
-      all.Add(middleTile);
+      all.Add(attackerReserveTile);
       all.Add(baseTile);
       Tile[] array = all.ToArray();
 
@@ -570,12 +560,12 @@ namespace MonoNS
 
         for (int i = index; index < cavalryArray.Length; i++) {
           General general = cavalryArray[i];
-          if(DeployAt(middleTile, general)) { continue; }
+          if(DeployAt(attackerReserveTile, general)) { continue; }
           RandomDeployAttacker(general, baseTile);
         }
 
         foreach(General g in infantries) {
-          if(DeployAt(middleTile, g)) { continue; }
+          if(DeployAt(attackerReserveTile, g)) { continue; }
           RandomDeployAttacker(g, baseTile);
         }
       }
@@ -594,7 +584,7 @@ namespace MonoNS
 
         // deploy reserve at middle tile
         foreach(General general in reserve.all) {
-          if(DeployAt(middleTile, general)) { continue; }
+          if(DeployAt(attackerReserveTile, general)) { continue; }
           RandomDeployAttacker(general, baseTile);
         }
 
@@ -632,7 +622,7 @@ namespace MonoNS
             continue;
           }
           if(DeployAt(fronts[0], g)) { continue; }
-          if(DeployAt(middleTile, g)) { continue; }
+          if(DeployAt(attackerReserveTile, g)) { continue; }
           RandomDeployAttacker(g, baseTile);
         }
       }

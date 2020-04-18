@@ -31,7 +31,18 @@ namespace CourtNS {
     public delegate void OnGeneralLeaveCampaign(General general);
     public delegate void OnFieldEvent(FieldEvent fieldEvent, General general);
 
-    public Faction faction;
+    Faction _faction = null;
+    public Faction faction {
+      get {
+        if (_faction == null) {
+          Util.Throw("faction not set for " + Name());
+        }
+        return _faction;
+      }
+      set {
+        _faction = value;
+      }
+    }
     public Party party;
     public List<Trait> traits;
     public List<Ability> acquiredAbilities;

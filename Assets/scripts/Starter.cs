@@ -119,6 +119,10 @@ public class Starter : MonoBehaviour {
     x2.JoinFaction(Cons.Liao, Cons.SouthCourt);
     x3.JoinFaction(Cons.Liao, Cons.SouthCourt);
     x4.JoinFaction(Cons.Liao, Cons.SouthCourt);
+    x5.JoinFaction(Cons.Liao, Cons.SouthCourt);
+    x6.JoinFaction(Cons.Liao, Cons.NorthCourt);
+    x7.JoinFaction(Cons.Liao, Cons.NorthCourt);
+    x8.JoinFaction(Cons.Liao, Cons.NorthCourt);
 
     caocao.CreateTroop(hexMap, 10000, Cons.xiJing, Type.Infantry, Cons.veteran);
     xuchu.CreateTroop(hexMap, 3000, Cons.zhongJing, Type.Cavalry, Cons.veteran);
@@ -167,7 +171,7 @@ public class Starter : MonoBehaviour {
 
     // create settlements
     // * tactical phase starts *
-    Tile strategyBase = hexMap.GetTile(3, 5);
+    Tile strategyBase = hexMap.GetTile(1, 6);
     Tile camp1 = hexMap.GetTile(8, 26);
     Tile camp2 = hexMap.GetTile(17, 9);
     Tile camp3 = hexMap.GetTile(16, 33);
@@ -194,6 +198,7 @@ public class Starter : MonoBehaviour {
     hexMap.frontier = new Tile[]{camp1, camp2};
     hexMap.middleField = new Tile[]{camp3, city};
     hexMap.theBox = mainCity;
+    hexMap.attackerReserveTile = hexMap.GetTile(7, 11);
 
     Settlement s = settlementMgr.BuildStrategyBase(strategyBase, hexMap.GetWarParty(Cons.Liao));
     if (s == null) {

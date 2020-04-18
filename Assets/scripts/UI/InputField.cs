@@ -22,7 +22,7 @@ public class InputField : BaseController
   {
     int ret;
     if (!System.Int32.TryParse(input.text, out ret)) {
-      throw new System.Exception("invalid input, must be number");
+      Util.Throw("invalid input, must be number");
     }
     return ret; 
   }
