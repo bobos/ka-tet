@@ -55,7 +55,7 @@ namespace UnitNS
         + (unit.hexMap.wargameController.start ? "[推演]\n" : "")
         + unit.GeneralName()
         + (unit.IsAI() ? "" : (unit.IsCommander() ? "♛" : ""))
-        + "[" + unit.rf.general.party.Name() + "]"
+        + "[" + unit.rf.province.region.Name() + "]"
         + "\n";
       textMesh.text = title + unit.rf.province.Name() + "-"
         + unit.GetUnitName()

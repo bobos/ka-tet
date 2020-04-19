@@ -42,7 +42,7 @@
     }
 
     int GetEffectiveNum() {
-      return MaxEffectiveNum - (int)((MaxEffectiveNum - LeastEffectiveNum) * Rank.GetMoralePunish(unit.rf.morale));
+      return MaxEffectiveNum - (int)((MaxEffectiveNum - LeastEffectiveNum) * Rank.GetMoralePunish(unit.rf.morale, unit.rf.IsSpecial()));
     }
 
     public int GetEffective() {

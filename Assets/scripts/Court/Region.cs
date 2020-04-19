@@ -17,6 +17,8 @@ namespace CourtNS
     }
     public abstract int Will();
     public abstract int RetreatThreshold();
+    public abstract List<Region> GetConflictRegions();
+    public abstract float LevelBuf(Type unitType);
   }
 
   public class QidanRegion : Region
@@ -36,7 +38,7 @@ namespace CourtNS
     {
       if (unitType == Type.Infantry)
         return 10;
-      return 35;
+      return 40;
     }
 
     public override int Will()
@@ -47,6 +49,17 @@ namespace CourtNS
     public override int RetreatThreshold()
     {
       return 35;
+    }
+
+    public override List<Region> GetConflictRegions() {
+      return new List<Region>(){Cons.nvzhen, Cons.dangxiang};
+    }
+
+    public override float LevelBuf(Type unitType) {
+      if (unitType == Type.Cavalry) {
+        return 0.25f;
+      }
+      return 0.1f;
     }
 
   }
@@ -81,6 +94,14 @@ namespace CourtNS
       return 35;
     }
 
+    public override List<Region> GetConflictRegions() {
+      return new List<Region>();
+    }
+
+    public override float LevelBuf(Type _unitType) {
+      return 0.5f;
+    }
+
   }
 
   public class DangxiangRegion : Region
@@ -100,7 +121,7 @@ namespace CourtNS
     {
       if (unitType == Type.Infantry)
         return 10;
-      return 30;
+      return 35;
     }
 
     public override int Will()
@@ -111,6 +132,17 @@ namespace CourtNS
     public override int RetreatThreshold()
     {
       return 45;
+    }
+
+    public override List<Region> GetConflictRegions() {
+      return new List<Region>(){Cons.tubo, Cons.qidan};
+    }
+
+    public override float LevelBuf(Type unitType) {
+      if (unitType == Type.Cavalry) {
+        return 0.3f;
+      }
+      return 0.2f;
     }
 
   }
@@ -145,6 +177,56 @@ namespace CourtNS
       return 45;
     }
 
+    public override List<Region> GetConflictRegions() {
+      return new List<Region>(){Cons.dangxiang};
+    }
+
+    public override float LevelBuf(Type unitType) {
+      if (unitType == Type.Cavalry) {
+        return 0.3f;
+      }
+      return 0.8f;
+    }
+
+  }
+
+  public class NvZhenRegion : Region
+  {
+
+    public override string Name()
+    {
+      return textLib.get("region_nvZhenRegion");
+    }
+
+    public override string Description()
+    {
+      return textLib.get("region_nvZhenRegion_description");
+    }
+
+    public override int CombatPoint(Type unitType)
+    {
+      if (unitType == Type.Infantry)
+        return 10;
+      return 25;
+    }
+
+    public override int Will()
+    {
+      return 90;
+    }
+
+    public override int RetreatThreshold()
+    {
+      return 10;
+    }
+
+    public override List<Region> GetConflictRegions() {
+      return new List<Region>();
+    }
+
+    public override float LevelBuf(Type _unitType) {
+      return 1f;
+    }
   }
 
 }

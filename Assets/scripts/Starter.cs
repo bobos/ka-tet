@@ -96,10 +96,10 @@ public class Starter : MonoBehaviour {
     zhaoyun.CreateTroop(hexMap, 5000, Cons.heBei, Type.Infantry, Cons.veteran);
     guanyu.CreateTroop(hexMap, 8000, Cons.heBei, Type.Infantry, Cons.rookie);
     machao.CreateTroop(hexMap, 8000, Cons.heDong, Type.Infantry, Cons.veteran);
-    zhangfei.CreateTroop(hexMap, 2000, Cons.shanXi, Type.Cavalry, Cons.veteran);
+    zhangfei.CreateTroop(hexMap, 2000, Cons.heXi, Type.Cavalry, Cons.veteran);
     y1.CreateTroop(hexMap, 4000, Cons.heDong, Type.Infantry, Cons.rookie);
     y2.CreateTroop(hexMap, 4000, Cons.heDong, Type.Infantry, Cons.rookie);
-    y3.CreateTroop(hexMap, 4000, Cons.heDong, Type.Infantry, Cons.veteran);
+    y3.CreateTroop(hexMap, 4000, Cons.heHuang, Type.Infantry, Cons.veteran);
 
     General caocao = new General("g_caocao", "g_caocao_d", Cons.xiJing, new CommandSkill(3), new TroopSize(3)); 
     General xuchu = new General("g_xuchu", "g_xuchu_d", Cons.xiJing, new CommandSkill(2), new TroopSize(3)); 
@@ -125,9 +125,9 @@ public class Starter : MonoBehaviour {
     x8.JoinFaction(Cons.Liao, Cons.NorthCourt);
 
     caocao.CreateTroop(hexMap, 10000, Cons.xiJing, Type.Infantry, Cons.veteran);
-    xuchu.CreateTroop(hexMap, 3000, Cons.zhongJing, Type.Cavalry, Cons.veteran);
-    abc.CreateTroop(hexMap, 8000, Cons.xiJing, Type.Infantry, Cons.veteran);
-    x1.CreateTroop(hexMap, 3000, Cons.shangJing, Type.Cavalry, Cons.rookie);
+    xuchu.CreateTroop(hexMap, 3000, Cons.shangJing, Type.Cavalry, Cons.veteran);
+    abc.CreateTroop(hexMap, 8000, Cons.zhongJing, Type.Infantry, Cons.veteran);
+    x1.CreateTroop(hexMap, 3000, Cons.xiJing, Type.Cavalry, Cons.rookie);
     x2.CreateTroop(hexMap, 8000, Cons.xiJing, Type.Infantry, Cons.rookie);
     x3.CreateTroop(hexMap, 10000, Cons.xiJing, Type.Infantry, Cons.rookie);
     x4.CreateTroop(hexMap, 8000, Cons.zhongJing, Type.Infantry, Cons.rookie);
@@ -198,7 +198,7 @@ public class Starter : MonoBehaviour {
     hexMap.frontier = new Tile[]{camp1, camp2};
     hexMap.middleField = new Tile[]{camp3, city};
     hexMap.theBox = mainCity;
-    hexMap.attackerReserveTile = hexMap.GetTile(7, 11);
+    hexMap.attackerReserveTile = hexMap.GetTile(5, 9);
 
     Settlement s = settlementMgr.BuildStrategyBase(strategyBase, hexMap.GetWarParty(Cons.Liao));
     if (s == null) {

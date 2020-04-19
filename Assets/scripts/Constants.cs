@@ -136,16 +136,17 @@ public class Cons {
   public static Region qidan = new QidanRegion();
   public static Region dangxiang = new DangxiangRegion();
   public static Region tubo = new TuboRegion();
+  public static Region nvzhen = new NvZhenRegion();
 
-  public static Province heHuang = new HeHuang();
-  public static Province heXi = new HeXi();
-  public static Province heDong = new HeDong();
-  public static Province heBei = new HeBei();
-  public static Province heNan = new HeNan();
-  public static Province shanXi = new ShanXi();
-  public static Province xiJing = new XiJing();
-  public static Province zhongJing = new ZhongJing();
-  public static Province shangJing = new ShangJing();
+  public static Province heHuang = new HeHuang(tubo);
+  public static Province heXi = new HeXi(dangxiang);
+  public static Province heDong = new HeDong(han);
+  public static Province heBei = new HeBei(han);
+  public static Province heNan = new HeNan(han);
+  public static Province shanXi = new ShanXi(han);
+  public static Province xiJing = new XiJing(qidan);
+  public static Province zhongJing = new ZhongJing(han);
+  public static Province shangJing = new ShangJing(nvzhen);
 
   public static void Init() {
     NewParty.counterParty = OldParty;

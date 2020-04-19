@@ -288,6 +288,12 @@ namespace MonoNS
         ret = ret < 50 ? ret : 50;
       }
 
+      // if the target unit is the one hated
+      Unit target = attacker ? this.attacker : this.defender;
+      if (unit.rf.province.region.GetConflictRegions().Contains(target.rf.province.region)) {
+        ret = ret < 80 ? ret : 80;
+      }
+
       return ret;
     }
 
@@ -892,18 +898,17 @@ namespace MonoNS
 
         // affected all allies
         if (loser.IsCommander() && !feint) {
-          int drop = -3;
-          if (resultLevel == ResultType.Small) {
-            drop = -5;
-          }
+          int drop = 0;
           if (resultLevel == ResultType.Great) {
             drop = -8;
           }
           if (resultLevel == ResultType.Crushing) {
             drop = -10;
           }
-          hexMap.unitAniController.ShakeNearbyAllies(loser, drop);
-          while (hexMap.unitAniController.ShakeAnimating) { yield return null; }
+          if (drop != 0) {
+            hexMap.unitAniController.ShakeNearbyAllies(loser, drop);
+            while (hexMap.unitAniController.ShakeAnimating) { yield return null; }
+          }
         }
 
         HashSet<Unit> geese = new HashSet<Unit>();
@@ -956,7 +961,7 @@ namespace MonoNS
           }
 
           foreach(Unit unit in supporters) {
-            if (unit.rf.general.Has(Cons.noPanic) && Cons.FiftyFifty()) {
+            if (!unit.Rout()) {
               unit.defeating = unit.chaos = false;
             }
           }
@@ -980,8 +985,7 @@ namespace MonoNS
         } else {
           bool notGonnaMove = loser.StickAsNailWhenDefeat();
           if (Cons.FiftyFifty() && !notGonnaMove) {
-            loser.defeating = (loser.rf.general.Has(Cons.noPanic) && Cons.FiftyFifty())
-              ? false : true;
+            loser.defeating = loser.Rout();
           }
           if (!loser.IsCamping() && !notGonnaMove) {
             hexMap.unitAniController.Scatter(new List<Unit>(){loser}, failedToMove, -10);

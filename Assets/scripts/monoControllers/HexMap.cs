@@ -558,7 +558,7 @@ namespace MonoNS
           RandomDeployAttacker(general, baseTile);
         }
 
-        for (int i = index; index < cavalryArray.Length; i++) {
+        for (int i = index; i < cavalryArray.Length; i++) {
           General general = cavalryArray[i];
           if(DeployAt(attackerReserveTile, general)) { continue; }
           RandomDeployAttacker(general, baseTile);

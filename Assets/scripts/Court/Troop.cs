@@ -35,12 +35,21 @@ namespace CourtNS
       this.soldiers = soldiers;
       this.general = general;
       faction = general.faction;
-      name = province.AssignLegionName(type);
+      name = province.region.Name();
       combatPoint = province.region.CombatPoint(type);
       movementPoint = province.region.Mov(type);
       morale = province.region.Will();
       this.province = province;
       state = TroopState.Idle;
+    }
+
+    public bool IsSpecial() {
+      return Util.eq<Region>(province.region, Cons.nvzhen);
+    }
+
+    public bool IsChargeBuffed() {
+      // iron buddist, extra charge buf
+      return IsSpecial() && type == Type.Cavalry && Util.eq<Rank>(rank, Cons.veteran);
     }
 
     public bool IsRest() {
@@ -67,7 +76,7 @@ namespace CourtNS
 
     public float lvlBuf {
       get {
-        return rank.Buf(morale);
+        return rank.Buf(this.province.region.LevelBuf(this.type), morale, this.IsSpecial());
       }
     }
 

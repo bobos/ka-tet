@@ -219,7 +219,9 @@ namespace MonoNS
       if (name == EventName.UnitConflict) {
         title.text = textLib.get("event_unitConflict_title");
         description.text = System.String.Format(textLib.get("event_unitConflict"),
-          unit.rf.general.Name(), unit1.rf.general.Name(), argu2 + argu3, argu1);
+          unit.rf.general.Name(), unit.rf.province.region.Name(),
+          unit1.rf.province.region.Name(),
+          argu2 + argu3, argu1);
         image.sprite = drown;
       }
     }

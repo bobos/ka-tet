@@ -73,10 +73,31 @@ namespace TextNS
       {"u_standing", ""},
       {"u_infantryName", @"{0}步兵"},
       {"u_cavalryName", @"{0}骑兵"},
-      {"rank_rookie", "厢兵"},
-      {"rank_veteran", "禁军"},
-      {"rank_lightCav", "轻骑"},
-      {"rank_heavyCav", "重骑"},
+
+      {"rank_hanInfantryRookie", "厢军"},
+      {"rank_hanCavalryRookie", "游弋"},
+      {"rank_hanInfantryVeteran", "禁军"},
+      {"rank_hanCavalryVeteran", "大全装"},
+
+      {"rank_qidanInfantryRookie", "部族军"},
+      {"rank_qidanCavalryRookie", "打草谷"},
+      {"rank_qidanInfantryVeteran", "皮室军"},
+      {"rank_qidanCavalryVeteran", "斡鲁朵军"},
+
+      {"rank_dangxiangInfantryRookie", "正军"},
+      {"rank_dangxiangCavalryRookie", "擒生军"},
+      {"rank_dangxiangInfantryVeteran", "侍卫军"},
+      {"rank_dangxiangCavalryVeteran", "铁鹞子"},
+
+      {"rank_nvzhenInfantryRookie", "部族军"},
+      {"rank_nvzhenCavalryRookie", "部族马军"},
+      {"rank_nvzhenInfantryVeteran", "合札"},
+      {"rank_nvzhenCavalryVeteran", "铁浮图"},
+
+      {"rank_tuboInfantryRookie", "奴从"},
+      {"rank_tuboCavalryRookie", "索巴"},
+      {"rank_tuboInfantryVeteran", "武士步军"},
+      {"rank_tuboCavalryVeteran", "武士马军"},
 
       // region
       {"r_heHuang", "河湟"},
@@ -93,6 +114,7 @@ namespace TextNS
       {"region_hanRegion", "汉人"},
       {"region_dangxiangRegion", "党项人"},
       {"region_tuboRegion", "吐蕃人"},
+      {"region_nvZhenRegion", "女真人"},
 
       // faction
       {"f_liao", "梁"},
@@ -163,7 +185,7 @@ namespace TextNS
       {"event_underSiege_title", "长围合拢"},
       {"event_underSiege", @"围城军队连日所筑长围现已合拢，{0}已经被完全包围，任何物资人员已无法出入"},
       {"event_unitConflict_title", "士卒斗殴"},
-      {"event_unitConflict", @"由于朝中两派关系紧张, {0}所部与临近驻扎的{1}部发生冲突，有{2}人伤重不治，两部士兵士气{3}"},
+      {"event_unitConflict", @" {0}所部的{1}与临近驻扎的{2}发生冲突，有{3}人伤重不治，两部士兵士气下降{4}"},
       {"event_attackerSide_title", "进攻方"},
       {"event_defenderSide_title", "防御方"},
       {"event_ourSide_title", "我方"},

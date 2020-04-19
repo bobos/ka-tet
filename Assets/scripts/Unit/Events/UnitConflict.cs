@@ -1,4 +1,6 @@
-﻿using MapTileNS;
+﻿using System.Collections.Generic;
+using CourtNS;
+using MapTileNS;
 
 namespace UnitNS
 {
@@ -12,32 +14,22 @@ namespace UnitNS
 
   public class UnitConflict
   {
+    public bool conflicted = false;
     Unit unit;
-    public bool happened = false;
     public UnitConflict(Unit unit) {
       this.unit = unit;
     }
 
     public ConflictResult Occur() {
       ConflictResult result = new ConflictResult();
-      return result;
-      // TODO: for future
-      if (unit.IsAI() || happened) {
-        return result;
-      }
-
-      CourtNS.Party.Relation relation = unit.rf.general.party.GetRelation();
-      if (relation == CourtNS.Party.Relation.normal) {
-        return result;
-      }
-
+      List<Region> conflictRegions = unit.rf.province.region.GetConflictRegions();
       Unit target = null;
       foreach(Tile tile in unit.tile.neighbours) {
         Unit u = tile.GetUnit();
         if (u != null &&
         u.IsAI() == unit.IsAI() &&
-        !Util.eq<CourtNS.Party>(u.rf.general.party, unit.rf.general.party) &&
-        !u.unitConflict.happened) {
+        !u.unitConflict.conflicted &&
+        conflictRegions.Contains(unit.rf.province.region)) {
           target = u;
           break;
         }
@@ -47,24 +39,20 @@ namespace UnitNS
         return result;
       }
 
-      if ((relation == CourtNS.Party.Relation.tense && Cons.FairChance()) ||
-      relation == CourtNS.Party.Relation.xTense && Cons.EvenChance()) {
-        happened = true;
-        target.unitConflict.happened = true;
-        result.moralDrop = -Util.Rand(5, 10);
-        result.unit1 = unit;
-        result.unit2 = target;
+      conflicted = target.unitConflict.conflicted = true;
+      result.moralDrop = -Util.Rand(5, 10);
+      result.unit1 = unit;
+      result.unit2 = target;
 
-        result.unit1Dead = Util.Rand(0, 9);
-        unit.kia += result.unit1Dead;
-        unit.rf.soldiers -= result.unit1Dead;
+      result.unit1Dead = Util.Rand(3, 30);
+      unit.kia += result.unit1Dead;
+      unit.rf.soldiers -= result.unit1Dead;
 
-        result.unit2Dead = Util.Rand(0, 9);
-        target.kia += result.unit2Dead;
-        target.rf.soldiers -= result.unit2Dead;
-        unit.rf.morale += result.moralDrop;
-        target.rf.morale += result.moralDrop;
-      }
+      result.unit2Dead = Util.Rand(3, 30);
+      target.kia += result.unit2Dead;
+      target.rf.soldiers -= result.unit2Dead;
+      unit.rf.morale += result.moralDrop;
+      target.rf.morale += result.moralDrop;
 
       return result;
     }

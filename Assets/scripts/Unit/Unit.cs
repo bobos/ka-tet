@@ -170,15 +170,7 @@ namespace UnitNS
     }
 
     public string GetUnitName() {
-      if (IsHeavyCavalry()) {
-        return Cons.textLib.get("rank_heavyCav");
-      }
-
-      if (IsCavalry()) {
-        return Cons.textLib.get("rank_lightCav");
-      }
-
-      return rf.rank.Name();
+      return rf.rank.Name(rf.province.region, IsCavalry());
     }
 
     public string GeneralName()
@@ -191,7 +183,8 @@ namespace UnitNS
     }
 
     public int CanBeShaked(Unit charger) {
-      if (IsVulnerable() || !charger.IsHeavyCavalry() || !IsOnField() || tile.vantagePoint) {
+      if (IsVulnerable() || !charger.IsHeavyCavalry() || !IsOnField()
+        || tile.vantagePoint || rf.IsSpecial()) {
         return 0;
       }
       int chance = 0;
@@ -202,7 +195,7 @@ namespace UnitNS
           chance = 30;
         }
         if (up.windDisadvantage) {
-          chance = -20;
+          chance = -30;
         }
       }
       if (tile.terrian == TerrianType.Hill) {
@@ -400,7 +393,13 @@ namespace UnitNS
       return (InCommanderRange() &&
               MyCommander().Has(Cons.turningTide) &&
               Cons.FiftyFifty()) ||
-              (rf.general.Has(Cons.unshaken) && Cons.MostLikely());
+              (rf.general.Has(Cons.unshaken) && Cons.MostLikely()) ||
+              (rf.IsSpecial() && Cons.MostLikely());
+    }
+
+    public bool Rout() {
+      return (rf.general.Has(Cons.noPanic) && Cons.FiftyFifty()) && 
+        (!rf.IsSpecial() || Cons.FiftyFifty());
     }
 
     public bool RetreatOnDefeat() {
@@ -426,9 +425,7 @@ namespace UnitNS
     // Before new turn starts
     public int[] RefreshUnit()
     {
-      chaos = false;
-      defeating = false;
-      retreated = false;
+      chaos = defeating = retreated = unitConflict.conflicted = false;
       InitAllowedAtmpt();
 
       if (concealCoolDownTurn > 0) {

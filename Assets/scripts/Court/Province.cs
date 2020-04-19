@@ -32,7 +32,7 @@ namespace CourtNS
     private string name;
     private string description;
 
-    public HeHuang(): base(new TuboRegion())
+    public HeHuang(Region region): base(region)
     {
       name = textLib.get("r_heHuang");
       description = textLib.get("r_heHuang_d");
@@ -55,7 +55,7 @@ namespace CourtNS
     private string name;
     private string description;
 
-    public HeXi(): base(new DangxiangRegion())
+    public HeXi(Region region): base(region)
     {
       name = textLib.get("r_heXi");
       description = textLib.get("r_heXi_d");
@@ -78,7 +78,7 @@ namespace CourtNS
     private string name;
     private string description;
 
-    public HeDong(): base(new HanRegion())
+    public HeDong(Region region): base(region)
     {
       name = textLib.get("r_heDong");
       description = textLib.get("r_heDong_d");
@@ -101,7 +101,7 @@ namespace CourtNS
     private string name;
     private string description;
 
-    public HeBei(): base(new HanRegion())
+    public HeBei(Region region): base(region)
     {
       name = textLib.get("r_heBei");
       description = textLib.get("r_heBei_d");
@@ -124,7 +124,7 @@ namespace CourtNS
     private string name;
     private string description;
 
-    public HeNan(): base(new HanRegion())
+    public HeNan(Region region): base(region)
     {
       name = textLib.get("r_heNan");
       description = textLib.get("r_heNan_d");
@@ -147,7 +147,7 @@ namespace CourtNS
     private string name;
     private string description;
 
-    public ShanXi(): base(new HanRegion())
+    public ShanXi(Region region): base(region)
     {
       name = textLib.get("r_shanXi");
       description = textLib.get("r_shanXi_d");
@@ -170,7 +170,7 @@ namespace CourtNS
     private string name;
     private string description;
 
-    public XiJing(): base(new QidanRegion())
+    public XiJing(Region region): base(region)
     {
       name = textLib.get("r_xiJing");
       description = textLib.get("r_xiJing_d");
@@ -193,7 +193,7 @@ namespace CourtNS
     private string name;
     private string description;
 
-    public ZhongJing(): base(new HanRegion())
+    public ZhongJing(Region region): base(region)
     {
       name = textLib.get("r_zhongJing");
       description = textLib.get("r_zhongJing_d");
@@ -216,7 +216,7 @@ namespace CourtNS
     private string name;
     private string description;
 
-    public ShangJing(): base(new QidanRegion())
+    public ShangJing(Region region): base(region)
     {
       name = textLib.get("r_shangJing");
       description = textLib.get("r_shangJing_d");

@@ -79,10 +79,10 @@ namespace MonoNS
     public void ShakeNearbyAllies(Unit unit, int moraleDrop) {
       ShakeAnimating = true;
       StartCoroutine(CoShakeNearbyAllies(unit, moraleDrop));
-    } 
+    }
 
     IEnumerator CoShakeNearbyAllies(Unit unit, int moraleDrop) {
-      foreach(Tile t in unit.tile.GetNeighboursWithinRange<Tile>(10, (Tile tt) => true)) {
+      foreach(Tile t in unit.tile.GetNeighboursWithinRange<Tile>(6, (Tile tt) => true)) {
         Unit u = t.GetUnit();
         if (u != null && u.IsAI() == unit.IsAI() && !Util.eq<Unit>(unit, u)) {
           int[] stats = new int[]{moraleDrop,0,0,0,0};
@@ -601,6 +601,9 @@ namespace MonoNS
       if (!scared) {
         scared = from.rf.general.Has(Cons.hammer) ? Cons.FiftyFifty() : scared;
       }
+      if (!scared && from.rf.IsChargeBuffed()) {
+        scared = Cons.HighlyLikely();
+      }
       int killed = Util.Rand(0, 11);
       from.rf.soldiers -= killed;
       from.kia += killed;
@@ -783,7 +786,7 @@ namespace MonoNS
         hexMap.dialogue.ShowRefuseToRetreat(unit);
         while(hexMap.dialogue.Animating) { yield return null; }
       } else {
-        if (breakThrough) {
+        if (breakThrough && !unit.rf.IsSpecial()) {
           unit.chaos = true;
         } else {
           unit.defeating = true;
