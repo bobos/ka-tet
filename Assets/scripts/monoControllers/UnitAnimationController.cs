@@ -588,8 +588,11 @@ namespace MonoNS
     IEnumerator CoCharge(Unit from, Unit to) {
       from.movementRemaining -= chargePoint;
       from.UseAtmpt();
+      View view = from.IsCamping() ?
+        settlementMgr.GetView(from.tile.settlement) : hexMap.GetUnitView(from);
+
       bool defeatingUnit = to.IsVulnerable();
-      popAniController.Show(hexMap.GetUnitView(from),
+      popAniController.Show(view,
         defeatingUnit ? textLib.get("pop_chasing") : textLib.get("pop_charging"),
         Color.green);
       while (popAniController.Animating) { yield return null; }
@@ -631,24 +634,49 @@ namespace MonoNS
         }
 
         if (!to.IsGone()) {
-          List<Unit> affectedAllies = new List<Unit>();
-          affectedAllies.Add(to);
-          foreach(Tile t in to.tile.neighbours) {
-            Unit u = t.GetUnit();
-            if (u != null && u.IsAI() == to.IsAI() && !u.StickAsNailWhenDefeat() && Cons.FiftyFifty()) {
-              if (u.rf.general.Has(Cons.holdTheGround) && Cons.FiftyFifty()) {
-                affectedAllies.Add(u);
+          if (from.IsSurrounded()) {
+            // Break through
+            Tile escapeTile = null;
+            foreach(Tile t in to.tile.neighbours) {
+              if (t.Deployable(from)) {
+                escapeTile = t;
+                break;
               }
             }
-          }
 
-          Tile toTile = to.tile;
-          List<Unit> notMoved = new List<Unit>();
-          Scatter(affectedAllies, notMoved, -4);
-          while(ScatterAnimating) { yield return null; }
-          if (toTile.Deployable(from)) {
-            MoveUnit(from, toTile);
-            while (MoveAnimating) { yield return null; }
+            if (escapeTile == null) {
+              popAniController.Show(view,
+                textLib.get("pop_failedToBreakthrough"),
+                Color.white);
+              while (popAniController.Animating) { yield return null; }
+            } else {
+              MoveUnit(from, escapeTile);
+              while (MoveAnimating) { yield return null; }
+              popAniController.Show(view,
+                textLib.get("pop_breakthrough"),
+                Color.green);
+              while (popAniController.Animating) { yield return null; }
+            }
+          } else {
+            List<Unit> affectedAllies = new List<Unit>();
+            affectedAllies.Add(to);
+            foreach(Tile t in to.tile.neighbours) {
+              Unit u = t.GetUnit();
+              if (u != null && u.IsAI() == to.IsAI() && !u.StickAsNailWhenDefeat() && Cons.FiftyFifty()) {
+                if (u.rf.general.Has(Cons.holdTheGround) && Cons.FiftyFifty()) {
+                  affectedAllies.Add(u);
+                }
+              }
+            }
+
+            Tile toTile = to.tile;
+            List<Unit> notMoved = new List<Unit>();
+            Scatter(affectedAllies, notMoved, -4);
+            while(ScatterAnimating) { yield return null; }
+            if (toTile.Deployable(from)) {
+              MoveUnit(from, toTile);
+              while (MoveAnimating) { yield return null; }
+            }
           }
         }
       }

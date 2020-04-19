@@ -183,10 +183,19 @@ namespace MonoNS
       }
 
       if (!hexMap.wargameController.start && unit.CanCharge() && hexMap.deployDone) {
+        bool active = false;
         foreach(Unit enemy in mouseController.nearbyEnemey) {
           if (enemy.CanBeShaked(unit) > 0) {
-            ChargeButton.SetActive(true);
+            active = true;
             break;
+          }
+        }
+        if (active) {
+          ChargeButton.SetActive(true);
+          if (unit.IsSurrounded()) {
+            ChargeButton.GetComponentInChildren<Text>().text = "突围";
+          } else {
+            ChargeButton.GetComponentInChildren<Text>().text = "冲阵";
           }
         }
       }

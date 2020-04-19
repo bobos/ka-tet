@@ -312,6 +312,23 @@ namespace UnitNS
       return state == State.Conceal || state == State.Stand;
     }
 
+    public bool IsSurrounded() {
+      if (IsCamping()) {
+        if(tile.settlement.IsUnderSiege()) { return true; }
+        return false;
+      } 
+
+      bool isSurrounded = true;
+      foreach(Tile tile in tile.neighbours) {
+        if(tile.Passable(IsAI()) ||
+          (tile.settlement != null && tile.settlement.owner.isAI == IsAI())) {
+          isSurrounded = false;
+          break;
+        }
+      }
+      return isSurrounded;
+    }
+
     public bool IsVisible() {
       return _IsVisible(this.state);
     }

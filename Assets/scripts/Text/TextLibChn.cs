@@ -288,6 +288,8 @@ namespace TextNS
       {"pop_shaked", "阵脚松动!"},
       {"pop_holding", "稳住阵脚"},
       {"pop_newCommander", "新主帅"},
+      {"pop_failedToBreakthrough", "突围失败"},
+      {"pop_breakthrough", "突围成功"},
 
       // settlement
       {"settlement_storageLvl1", "初级粮仓"},

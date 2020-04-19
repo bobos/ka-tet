@@ -32,8 +32,6 @@ namespace MonoNS
     public Sprite routingSoldier;
     public Sprite scaredSoldier;
     public Sprite normalSoldier;
-    public Sprite AttackGeneral;
-    public Sprite DefenderGeneral;
 
     int phase = 0;
     public override void UpdateChild() {
@@ -88,7 +86,7 @@ namespace MonoNS
       right.SetActive(true);
       left.SetActive(true);
 
-      leftImg.sprite = defender.IsAI() ? AttackGeneral : DefenderGeneral;
+      leftImg.sprite = hexMap.imgLibrary.GetGeneralPortrait(defender.rf.general);
       leftText.text = System.String.Format(textLib.get("event_NoRetreatGeneralDialog"), defender.GeneralName());
       rightImg.sprite = normalSoldier;
       rightCacheDialog = System.String.Format(textLib.get("event_NoRetreatSoldierDialog"), defender.GeneralName());
@@ -102,7 +100,7 @@ namespace MonoNS
       right.SetActive(true);
       left.SetActive(true);
 
-      leftImg.sprite = unit.IsAI() ? AttackGeneral : DefenderGeneral;
+      leftImg.sprite = hexMap.imgLibrary.GetGeneralPortrait(unit.rf.general);
       leftCacheDialog = System.String.Format(textLib.get(allowed ? "event_RemoveAllowedGeneralDialog": "event_RemoveDisallowedGeneralDialog"),
         unit.GeneralName());
       leftText.text = "";
@@ -117,7 +115,7 @@ namespace MonoNS
       right.SetActive(true);
       left.SetActive(true);
 
-      leftImg.sprite = unit.IsAI() ? AttackGeneral : DefenderGeneral;
+      leftImg.sprite = hexMap.imgLibrary.GetGeneralPortrait(unit.rf.general);
       leftCacheDialog = System.String.Format(textLib.get(allowed ? "event_RemoveAllowedGeneralDialog": "event_RemoveDisallowedGeneralDialog"), unit.GeneralName());
       leftText.text = "";
       rightImg.sprite = normalSoldier;
@@ -133,12 +131,12 @@ namespace MonoNS
       if (hexMap.IsAttackSide(unit.IsAI())) {
         right.SetActive(false);
         left.SetActive(true);
-        leftImg.sprite = AttackGeneral;
+        leftImg.sprite = hexMap.imgLibrary.GetGeneralPortrait(unit.rf.general);
         leftText.text = text;
       } else {
         left.SetActive(false);
         right.SetActive(true);
-        rightImg.sprite = AttackGeneral;
+        rightImg.sprite = hexMap.imgLibrary.GetGeneralPortrait(unit.rf.general);
         rightText.text = text;
       }
     }
@@ -151,12 +149,12 @@ namespace MonoNS
       if (hexMap.IsAttackSide(unit.IsAI())) {
         right.SetActive(false);
         left.SetActive(true);
-        leftImg.sprite = AttackGeneral;
+        leftImg.sprite = hexMap.imgLibrary.GetGeneralPortrait(unit.rf.general);
         leftText.text = text;
       } else {
         left.SetActive(false);
         right.SetActive(true);
-        rightImg.sprite = DefenderGeneral;
+        rightImg.sprite = hexMap.imgLibrary.GetGeneralPortrait(unit.rf.general);
         rightText.text = text;
       }
     }
@@ -169,12 +167,12 @@ namespace MonoNS
       if (hexMap.IsAttackSide(unit.IsAI())) {
         right.SetActive(false);
         left.SetActive(true);
-        leftImg.sprite = AttackGeneral;
+        leftImg.sprite = hexMap.imgLibrary.GetGeneralPortrait(unit.rf.general);
         leftText.text = text;
       } else {
         left.SetActive(false);
         right.SetActive(true);
-        rightImg.sprite = DefenderGeneral;
+        rightImg.sprite = hexMap.imgLibrary.GetGeneralPortrait(unit.rf.general);
         rightText.text = text;
       }
     }
@@ -187,12 +185,12 @@ namespace MonoNS
       if (hexMap.IsAttackSide(unit.IsAI())) {
         right.SetActive(false);
         left.SetActive(true);
-        leftImg.sprite = AttackGeneral;
+        leftImg.sprite = hexMap.imgLibrary.GetGeneralPortrait(unit.rf.general);
         leftText.text = text;
       } else {
         left.SetActive(false);
         right.SetActive(true);
-        rightImg.sprite = DefenderGeneral;
+        rightImg.sprite = hexMap.imgLibrary.GetGeneralPortrait(unit.rf.general);
         rightText.text = text;
       }
     }
@@ -205,12 +203,12 @@ namespace MonoNS
       if (hexMap.IsAttackSide(unit.IsAI())) {
         right.SetActive(false);
         left.SetActive(true);
-        leftImg.sprite = AttackGeneral;
+        leftImg.sprite = hexMap.imgLibrary.GetGeneralPortrait(unit.rf.general);
         leftText.text = text;
       } else {
         left.SetActive(false);
         right.SetActive(true);
-        rightImg.sprite = DefenderGeneral;
+        rightImg.sprite = hexMap.imgLibrary.GetGeneralPortrait(unit.rf.general);
         rightText.text = text;
       }
     }
