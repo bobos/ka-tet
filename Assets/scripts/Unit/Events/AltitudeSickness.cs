@@ -14,9 +14,10 @@ namespace UnitNS
     public int Occur() {
       if (triggered ||
         Util.eq<Region>(unit.rf.province.region, Cons.tubo) || 
+        Util.eq<Region>(unit.rf.province.region, Cons.dangxiang) || 
         (!Util.eq<Province>(unit.hexMap.warProvince, Cons.heHuang)) ||
         unit.movementRemaining >= 50 ||
-        Cons.FairChance()) {
+        Cons.SlimChance()) {
         return 0;
       }
 
