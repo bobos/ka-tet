@@ -275,7 +275,7 @@ namespace TextNS
       {"pop_siegeBreak", "拆毁长围"},
       {"pop_buildFail", "无法建造"},
       {"pop_altitudeSickness", "高原反应"},
-      {"pop_plainSickness", "战马平原反应"},
+      {"pop_plainSickness", "平原反应"},
       {"pop_notJoinOperation", "按兵不动"},
       {"pop_joinOperation", "投入战斗"},
       {"pop_chaos", "一溃千里"},

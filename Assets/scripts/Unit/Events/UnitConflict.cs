@@ -22,6 +22,10 @@ namespace UnitNS
 
     public ConflictResult Occur() {
       ConflictResult result = new ConflictResult();
+      if (conflicted || unit.ApplyDiscipline()) {
+        return result;
+      }
+
       List<Region> conflictRegions = unit.rf.province.region.GetConflictRegions();
       Unit target = null;
       foreach(Tile tile in unit.tile.neighbours) {

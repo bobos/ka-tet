@@ -6,7 +6,6 @@ namespace UnitNS
   {
     Unit unit;
     public float debuf = 0;
-    public float moveDebuf = 0;
     public bool happened = false;
     public bool affected = false;
     public PlainSickness(Unit unit) {
@@ -14,22 +13,20 @@ namespace UnitNS
     }
 
     public int Occur() {
-      // TODO: for DLC
-      return 0;
       if (happened || 
+      !Util.eq<Region>(unit.rf.province.region, Cons.tubo) &&
       (!Util.eq<Province>(unit.hexMap.warProvince, Cons.heBei) &&
        !Util.eq<Province>(unit.hexMap.warProvince, Cons.heDong) &&
        !Util.eq<Province>(unit.hexMap.warProvince, Cons.heNan)
-       ) ||
-       unit.type != Type.Cavalry) {
+      )) {
         return 0;
       }
 
       happened = true;
-      if (Cons.FairChance()) {
+      if (Cons.SlimChance()) {
         affected = true;
-        debuf = moveDebuf = 0.3f;
-        return -5;
+        debuf = 0.2f;
+        return 1;
       }
 
       return 0;

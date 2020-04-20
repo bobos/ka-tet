@@ -12,8 +12,17 @@ namespace UnitNS
     }
 
     public int Occur() {
-      // TODO: for DLC, check remaining of movement point
-      return 0;
+      if (triggered ||
+        Util.eq<Region>(unit.rf.province.region, Cons.tubo) || 
+        (!Util.eq<Province>(unit.hexMap.warProvince, Cons.heHuang)) ||
+        unit.movementRemaining >= 50 ||
+        Cons.FairChance()) {
+        return 0;
+      }
+
+      triggered = true;
+      lastTurns = Util.Rand(1, 3);
+      return -5;
     }
 
     public int Apply() {
@@ -21,7 +30,7 @@ namespace UnitNS
         return 0;
       }
       lastTurns--;
-      int killed = Util.Rand(1, 3);
+      int killed = Util.Rand(1, 10);
       unit.kia += killed;
       unit.rf.soldiers -= killed;
       return killed;

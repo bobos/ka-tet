@@ -313,11 +313,6 @@ namespace UnitNS
     }
 
     public bool IsSurrounded() {
-      if (IsCamping()) {
-        if(tile.settlement.IsUnderSiege()) { return true; }
-        return false;
-      } 
-
       bool isSurrounded = true;
       foreach(Tile tile in tile.neighbours) {
         if(tile.Passable(IsAI()) ||
@@ -424,7 +419,7 @@ namespace UnitNS
     }
 
     public bool ApplyDiscipline() {
-      return rf.general.Has(Cons.discipline) && Cons.FiftyFifty();
+      return rf.general.Has(Cons.discipline) && Cons.MostLikely();
     }
 
     public General MyCommander() {
@@ -546,7 +541,6 @@ namespace UnitNS
         // ghost unit doesnt have vantage
         rf.mov *
         (IsStarving() ? 0.8f : 1) *
-        (plainSickness != null && plainSickness.affected ? (1 - plainSickness.moveDebuf) : 1) *
         (IsSick() ? 0.4f : 1));
     }
 

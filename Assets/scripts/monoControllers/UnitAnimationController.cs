@@ -403,8 +403,6 @@ namespace MonoNS
           if (unit.IsShowingAnimation()) {
             popAniController.Show(hexMap.GetUnitView(unit), textLib.get("pop_plainSickness"), Color.yellow);
             while (popAniController.Animating) { yield return null; }
-            ShowEffect(unit, new int[]{ret,0,0,0,0});
-            while (ShowAnimating) { yield return null; }
           }
         }
       }
