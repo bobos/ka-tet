@@ -68,7 +68,6 @@ namespace MonoNS
       EnemyCaptureCity,
       WeCaptureCamp,
       WeCaptureCity,
-      Poision,
       Epidemic,
       Disbanded,
       UnitConflict,
@@ -195,13 +194,6 @@ namespace MonoNS
         image.sprite = Gale;
       }
 
-      if (name == EventName.Poision) {
-        title.text = textLib.get("event_poision_title");
-        description.text = System.String.Format(textLib.get("event_poision"),
-          unit.GeneralName(), unit.Name());
-        image.sprite = Poisioned;
-      }
-      
       if (name == EventName.FarmDestroyedReported) {
         title.text = textLib.get("event_farmDestroyedReported_title");
         description.text = System.String.Format(textLib.get("event_farmDestroyedReported"),

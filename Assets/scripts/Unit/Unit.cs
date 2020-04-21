@@ -384,10 +384,15 @@ namespace UnitNS
     }
 
     public bool ImproviseOnSupply() {
+      if(Util.eq<Region>(rf.province.region, Cons.tubo)) {
+        return true;
+      }
+
       if (!MyCommander().Has(Cons.backStabber)) {
         return false;
       }
-      if (IsCommander()) {
+
+      if (IsCommander()){
         return true;
       }
 
@@ -415,7 +420,7 @@ namespace UnitNS
     }
 
     public bool RetreatOnDefeat() {
-      return rf.general.Has(Cons.retreater) && Cons.EvenChance();
+      return rf.general.Has(Cons.retreater) && Cons.EvenChance() && IsOnField();
     }
 
     public bool ApplyDiscipline() {

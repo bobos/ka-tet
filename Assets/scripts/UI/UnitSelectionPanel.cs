@@ -156,6 +156,15 @@ namespace MonoNS
         if (unit.CanAttack()) {
           AttackButton.SetActive(true);
         }
+
+        if (mouseController.nearFireTiles.Count > 0 && hexMap.deployDone && !hexMap.wargameController.start) {
+          FireButton.SetActive(true);
+        }
+
+        if (mouseController.nearWater && hexMap.deployDone && !hexMap.wargameController.start) {
+          DefendButton.SetActive(true);
+        }
+
         return;
       }
 
@@ -213,7 +222,7 @@ namespace MonoNS
         }
       }
 
-      if (mouseController.nearFire != null && hexMap.deployDone && !hexMap.wargameController.start) {
+      if (mouseController.nearFireTiles.Count > 0 && hexMap.deployDone && !hexMap.wargameController.start) {
         FireButton.SetActive(true);
       }
 
@@ -224,7 +233,7 @@ namespace MonoNS
       if (unit.type == Type.Infantry && !hexMap.wargameController.start) {
         if (hexMap.deployDone &&
           mouseController.nearEnemySettlement != null && !mouseController.nearEnemySettlement.IsEmpty()
-          && !hexMap.wargameController.start && mouseController.nearEnemySettlement.type == Settlement.Type.city) {
+          && !hexMap.wargameController.start) {
           SiegeButton.SetActive(true);
         }
       }

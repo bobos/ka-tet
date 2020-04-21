@@ -411,26 +411,20 @@ namespace MonoNS
     }
 
     public bool PoisionAnimating = false;
-    public void Poision(Unit unit, Tile tile) {
+    public void Poision(Tile tile) {
       PoisionAnimating = true;
       hexMap.cameraKeyboardController.DisableCamera();
-      StartCoroutine(CoPoision(unit, tile));
+      StartCoroutine(CoPoision(tile));
     }
 
-    IEnumerator CoPoision(Unit unit, Tile tile) {
-      if (unit.IsShowingAnimation()) {
-        popAniController.Show(hexMap.GetUnitView(unit), textLib.get("pop_poisionDone"), Color.green);
-        while (popAniController.Animating) { yield return null; }
-      }
-
-      foreach(Unit u in tile.Poision(unit)) {
+    IEnumerator CoPoision(Tile tile) {
+      foreach(Unit u in tile.Poision()) {
         if (u.IsAI()) {
           continue;
         }
-        eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.Poision, u, null));
-        while (eventDialog.Animating) { yield return null; }
+        popAniController.Show(hexMap.GetUnitView(u), textLib.get("pop_poisioned"), Color.white);
+        while (popAniController.Animating) { yield return null; }
       }
-
       hexMap.cameraKeyboardController.EnableCamera();
       PoisionAnimating = false;
     }

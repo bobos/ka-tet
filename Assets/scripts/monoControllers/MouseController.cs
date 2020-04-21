@@ -91,7 +91,7 @@ namespace MonoNS
     public Settlement nearEnemySettlement = null;
     public Settlement nearMySettlement = null;
     public Tile nearDam = null;
-    public Tile nearFire = null;
+    public List<Tile> nearFireTiles = null;
     public bool nearAlly = false;
     public bool nearEnemy = false;
     public bool nearWater = false;
@@ -102,18 +102,19 @@ namespace MonoNS
       nearEnemySettlement = null;
       nearMySettlement = null;
       nearDam = null;
-      nearFire = null;
       nearAlly = false;
       nearEnemy = false;
       nearWater = false;
       nearbyEnemey = new List<Unit>();
       nearbyAlly = new HashSet<Unit>();
+      nearFireTiles = new List<Tile>();
     }
 
     public void PrepareUnitSelection() {
       ResetUnitSelection();
       Settlement s = null;
-      Tile t = selectedUnit.tile;
+      Tile t = selectedUnit != null ? selectedUnit.tile : selectedSettlement.baseTile;
+      bool isAI = selectedUnit != null ? selectedUnit.IsAI() : selectedSettlement.owner.isAI;
 
       foreach(Tile tile in t.neighbours) {
         if (tile.settlement != null) {
@@ -121,7 +122,7 @@ namespace MonoNS
         }
 
         if (tile.burnable) {
-          nearFire = tile;
+          nearFireTiles.Add(tile);
         }
 
         if (tile.isDam) {
@@ -133,21 +134,21 @@ namespace MonoNS
         }
 
         Unit u = tile.GetUnit();
-        if (u != null && u.IsAI() == selectedUnit.IsAI()) {
+        if (u != null && u.IsAI() == isAI) {
           nearAlly = true;
           nearbyAlly.Add(u);
         }
 
-        if (u != null && u.IsAI() != selectedUnit.IsAI() && !u.IsConcealed()) {
+        if (u != null && u.IsAI() != isAI && !u.IsConcealed()) {
           nearEnemy = true;
           nearbyEnemey.Add(u);
         }
       }
 
-      if (s != null && selectedUnit.IsAI() == s.owner.isAI) {
+      if (s != null && isAI == s.owner.isAI) {
         nearMySettlement = s;
       }
-      if (s != null && selectedUnit.IsAI() != s.owner.isAI) {
+      if (s != null && isAI != s.owner.isAI) {
         nearEnemySettlement = s;
       }
     }
@@ -207,8 +208,10 @@ namespace MonoNS
 
       if (action == ActionController.actionName.FIRE)
       {
-        actionController.burn(nearFire);
-        return;
+        mouseMode = mode.fire;
+        Update_CurrentFunc = UpdateUnitSetFire;
+        msgBox.Show("选择放火地点");
+        hexMap.HighlightArea(nearFireTiles.ToArray(), HexMap.RangeType.camp);
       }
 
       if (action == ActionController.actionName.WARGAME)
@@ -278,7 +281,8 @@ namespace MonoNS
       move,
       attack,
       repos,
-      sabotage
+      sabotage,
+      fire
     }
 
     public override void UpdateChild()
@@ -320,6 +324,10 @@ namespace MonoNS
         foreach(Unit u in nearbyEnemey) {
           hexMap.SetUnitSkin(u);
         }
+      }
+
+      if (mouseMode == mode.fire) {
+        hexMap.DehighlightArea();
       }
 
       selectedPath = null;
@@ -464,6 +472,7 @@ namespace MonoNS
         if (s != null)
         {
           selectedSettlement = s;
+          PrepareUnitSelection();
           if (onSettlementSelect != null) onSettlementSelect(s);
         }
         else if (u != null)
@@ -609,13 +618,14 @@ namespace MonoNS
     void UpdateUnitPoision()
     {
       if (tileUnderMouse == null || tileUnderMouse.terrian != TerrianType.Water
-        || !selectedUnit.tile.neighbours.Contains(tileUnderMouse)) {
+        || (selectedUnit != null && !selectedUnit.tile.neighbours.Contains(tileUnderMouse))
+        || (selectedSettlement != null && !selectedSettlement.baseTile.neighbours.Contains(tileUnderMouse))) {
           return;
       }
       hexMap.HighlightArea(tileUnderMouse.poision.downStreams.ToArray(), HexMap.RangeType.PoisionRange);
       if (Input.GetMouseButtonUp(0))
       {
-        if (!actionController.poision(selectedUnit, tileUnderMouse)) {
+        if (!actionController.poision(null, tileUnderMouse)) {
           // TODO
           Debug.LogError("Failed to poision river, try again!");
         }
@@ -626,24 +636,13 @@ namespace MonoNS
 
     void UpdateUnitSetFire()
     {
-      if (Input.GetMouseButtonUp(0) && tileUnderMouse != null
-        && !Util.eq<Tile>(tileUnderMouse, selectedUnit.tile))
+      if (tileUnderMouse != null && Input.GetMouseButtonUp(0) && nearFireTiles.Contains(tileUnderMouse))
       {
-
-        Tile burnTile = null;
-        foreach (Tile h in selectedUnit.tile.neighbours)
-        {
-          if (Util.eq<Tile>(tileUnderMouse, h)
-            && h.IsBurnable())
-          {
-            burnTile = h;
-          }
+        if(!actionController.burn(tileUnderMouse)) {
+          // TODO
+          Debug.LogError("Failed to set fire!");
         }
-        if (burnTile != null)
-        {
-          actionController.burn(burnTile);
-          Escape();
-        }
+        Escape();
       }
     }
 

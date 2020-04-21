@@ -39,8 +39,11 @@ Game Tips:
 42. 女真铁浮图极大增加破阵几率
 43. 不同种族部队发生冲突，袖手旁观20%几率
 44. 党项人：不受高原反应影响
+45. 吐蕃人：长于后勤，做偏师
 
-吐蕃人：长于后勤，做偏师
+将领技能突围
+fire escape through
+
 兵团动态合并
 无*，鲁莽**, 勇猛***
 鲁莽：忠义
@@ -48,8 +51,6 @@ Game Tips:
 无：忠义**/保守*/狡猾***
 
 map skeleton for AI(supply route, point, value tiles, dam, supply range etc.)
-fire escape through
-放火选地点
 每月一回合，10个战斗回合
 
 战场瘟疫爆发时，每只部队随机确定时候染病，染病几率由低到高在到低变化

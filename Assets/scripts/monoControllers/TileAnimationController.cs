@@ -101,9 +101,6 @@ namespace MonoNS
     {
       hexMap.cameraKeyboardController.DisableCamera();
       tiles = tiles == null ? tile.SetFire() : tiles;
-      if (tiles.Count == 0) {
-        return false;
-      }
       BurnAnimating = true;
       StartCoroutine(CoBurn(tile, tiles));
       return true;
@@ -111,34 +108,39 @@ namespace MonoNS
 
     IEnumerator CoBurn(Tile t, HashSet<Tile> tiles)
     {
-      popAniController.Show(hexMap.GetTileView(t), textLib.get("pop_setFire"), Color.yellow);
-      while (popAniController.Animating) { yield return null; }
-      foreach(Tile tile in tiles) {
-        hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(tile).transform.position);
-        Unit unit = tile.GetUnit();
-        tile.Burn();
-        TileView view = hexMap.GetTileView(tile);
-        view.BurnAnimation();
-        while (view.Animating) { yield return null; }
-        if (tile.siegeWall != null) {
-          DestroySiegeWall(null, tile);
-          while (DestroySiegeAnimating) { yield return null; }
-        }
+      if (tiles.Count == 0) {
+        popAniController.Show(hexMap.GetTileView(t), textLib.get("pop_setFireFail"), Color.white);
+        while (popAniController.Animating) { yield return null; }
+      } else {
+        popAniController.Show(hexMap.GetTileView(t), textLib.get("pop_setFire"), Color.yellow);
+        while (popAniController.Animating) { yield return null; }
+        foreach(Tile tile in tiles) {
+          hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(tile).transform.position);
+          Unit unit = tile.GetUnit();
+          tile.Burn();
+          TileView view = hexMap.GetTileView(tile);
+          view.BurnAnimation();
+          while (view.Animating) { yield return null; }
+          if (tile.siegeWall != null) {
+            DestroySiegeWall(null, tile);
+            while (DestroySiegeAnimating) { yield return null; }
+          }
 
-        if (unit != null) {
-          Tile newTile = tile.Escape();
-          if (newTile == null) {
-            unitAniController.DestroyUnit(unit, DestroyType.ByWildFire);
-            while (unitAniController.DestroyAnimating) { yield return null; }
-          } else {
-            unitAniController.ShowEffect(unit, DisasterEffect.Apply(DisasterType.WildFire, unit));
-            while(unitAniController.ShowAnimating) { yield return null; }
-            unitAniController.MoveUnit(unit, newTile);
-            while (unitAniController.MoveAnimating) { yield return null; }
-            if (!Util.eq<Tile>(newTile, unit.tile)) {
-              // Failed to move, destroy unit
+          if (unit != null) {
+            Tile newTile = tile.Escape();
+            if (newTile == null) {
               unitAniController.DestroyUnit(unit, DestroyType.ByWildFire);
               while (unitAniController.DestroyAnimating) { yield return null; }
+            } else {
+              unitAniController.ShowEffect(unit, DisasterEffect.Apply(DisasterType.WildFire, unit));
+              while(unitAniController.ShowAnimating) { yield return null; }
+              unitAniController.MoveUnit(unit, newTile);
+              while (unitAniController.MoveAnimating) { yield return null; }
+              if (!Util.eq<Tile>(newTile, unit.tile)) {
+                // Failed to move, destroy unit
+                unitAniController.DestroyUnit(unit, DestroyType.ByWildFire);
+                while (unitAniController.DestroyAnimating) { yield return null; }
+              }
             }
           }
         }
