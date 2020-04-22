@@ -128,6 +128,8 @@ namespace MonoNS
 
           if (unit != null) {
             Tile newTile = tile.Escape();
+            newTile = newTile == null ? unit.FindBreakThroughPoint() : newTile;
+
             if (newTile == null) {
               unitAniController.DestroyUnit(unit, DestroyType.ByWildFire);
               while (unitAniController.DestroyAnimating) { yield return null; }
@@ -136,11 +138,6 @@ namespace MonoNS
               while(unitAniController.ShowAnimating) { yield return null; }
               unitAniController.MoveUnit(unit, newTile);
               while (unitAniController.MoveAnimating) { yield return null; }
-              if (!Util.eq<Tile>(newTile, unit.tile)) {
-                // Failed to move, destroy unit
-                unitAniController.DestroyUnit(unit, DestroyType.ByWildFire);
-                while (unitAniController.DestroyAnimating) { yield return null; }
-              }
             }
           }
         }

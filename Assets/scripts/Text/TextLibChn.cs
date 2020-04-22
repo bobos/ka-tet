@@ -355,7 +355,7 @@ namespace TextNS
       {"ability_diminisher", "破城之法"},
       {"ability_diminisher_description", "当统帅步兵围城时城防能力每回合衰减速度加倍"},
       {"ability_staminaManager", "洪荒之力"},
-      {"ability_staminaManager_description", "统帅骑兵部队时能发起两次进攻"},
+      {"ability_staminaManager_description", "部队能发起两次进攻"},
       {"ability_forwarder", "杀红眼"},
       {"ability_forwarder_description", "当敌军退败时80%几率擅自追击"},
       {"ability_holdTheGround", "纹丝不动"},
@@ -380,6 +380,8 @@ namespace TextNS
       {"ability_opportunist_description", "在本方明显劣势时60%几率不参与协同作战，不易战死"},
       {"ability_playSafe", "步步为营"},
       {"ability_playSafe_description", "敌方战败时本部兵马不会擅自追击将领不易战死"},
+      {"ability_punchThrough", "誓死一搏"},
+      {"ability_punchThrough_description", "部队突围成功率提升50%"},
 
       {"trait_reckless", "鲁莽"},
       {"trait_brave", "英勇"},

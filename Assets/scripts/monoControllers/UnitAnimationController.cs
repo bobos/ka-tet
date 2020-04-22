@@ -241,7 +241,7 @@ namespace MonoNS
           killed = Cons.EvenChance();
         }
 
-        Tile tile = settlement.FindBreakThroughPoint(g);
+        Tile tile = g.FindBreakThroughPoint();
         if (killed || tile == null) {
           DestroyUnit(g, DestroyType.ByDisband, true);
           while (DestroyAnimating) { yield return null; }
@@ -442,7 +442,7 @@ namespace MonoNS
     IEnumerator CoBury(Unit unit) {
       unit.movementRemaining -= Unit.ActionCost;
       if (!unit.ApplyDiscipline()) {
-        int moraleDrop = -5;
+        int moraleDrop = -3;
         unit.rf.morale += moraleDrop;
         ShowEffect(unit, new int[]{moraleDrop,0,0,0,0});
         while(ShowAnimating) { yield return null; }
@@ -566,9 +566,6 @@ namespace MonoNS
     public bool ChargeAnimating = false;
     public const int chargePoint = Unit.ActionCost;
     public void Charge(Unit from, Unit to) {
-      if (!from.IsCavalry()) {
-        return;
-      }
       if (!from.CanCharge() && !to.IsVulnerable()) {
         return;
       }
@@ -598,6 +595,9 @@ namespace MonoNS
       }
       if (!scared && from.rf.IsChargeBuffed()) {
         scared = Cons.HighlyLikely();
+      }
+      if (!scared && from.IsSurrounded() && from.rf.general.Has(Cons.punchThrough)) {
+        scared = Cons.FiftyFifty();
       }
       int killed = Util.Rand(0, 11);
       from.rf.soldiers -= killed;
@@ -805,6 +805,7 @@ namespace MonoNS
       if (!breakThrough && unit.rf.general.Has(Cons.refuseToRetreat) && Cons.MostLikely()) {
         hexMap.dialogue.ShowRefuseToRetreat(unit);
         while(hexMap.dialogue.Animating) { yield return null; }
+        unit.SetPath(new Tile[]{unit.tile});
       } else {
         if (breakThrough && !unit.rf.IsSpecial()) {
           unit.chaos = true;
@@ -813,7 +814,8 @@ namespace MonoNS
         }
         hexMap.dialogue.ShowRetreat(unit);
         while(hexMap.dialogue.Animating) { yield return null; }
-        unit.__movementRemaining = breakThrough ? 600 : 150;
+        //unit.__movementRemaining = breakThrough ? 600 : 300;
+        unit.__movementRemaining = 600;
         while (unit.movementRemaining > 0 && unit.GetPath().Length > 0) {
           MoveUnit(unit);
           while(MoveAnimating) { yield return null; }

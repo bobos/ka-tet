@@ -256,10 +256,10 @@ namespace MonoNS
       int smaller = predict.attackerOptimPoints > predict.defenderOptimPoints ? predict.defenderOptimPoints : predict.attackerOptimPoints;
       smaller = smaller < 1 ? 1 : smaller;
       float odds = bigger / smaller;
-      if (odds <= 1.2f) {
+      if (odds <= 1.5f) {
         predict.suggestedResultType = ResultType.Close;
       } else if (odds <= 3f) {
-        // 1.2x - 3x
+        // 1.5x - 3x
         predict.suggestedResultType = ResultType.Small;
       } else if (odds <= 4.5f) {
         predict.suggestedResultType = ResultType.Great;
@@ -610,9 +610,9 @@ namespace MonoNS
         }
         if (resultLevel == ResultType.Close) {
           // 1 - 1.5x odds
-          float m = 0.04f;
+          float m = 0.025f;
           if (Cons.SlimChance()) {
-            m = 0.06f;
+            m = 0.03f;
           }
           if (atkWin) {
             defenderCasualty = (int)(defenderTotal * m);
@@ -631,7 +631,7 @@ namespace MonoNS
             factor = 0.08f;
           }
           if (resultLevel == ResultType.Crushing) {
-            factor = 0.5f;
+            factor = 0.01f * Util.Rand(40, 50);
           }
 
           if (atkWin) {
@@ -941,8 +941,10 @@ namespace MonoNS
             hexMap.dialogue.ShowFeintDefeat(loser);
             while(hexMap.dialogue.Animating) { yield return null; }
           }
-          hexMap.unitAniController.Scatter(gonnaMove, failedToMove, feint ? 0 : -10);
-          while(hexMap.unitAniController.ScatterAnimating) { yield return null; }
+          if (gonnaMove.Count > 0) {
+            hexMap.unitAniController.Scatter(gonnaMove, failedToMove, feint ? 0 : -10);
+            while(hexMap.unitAniController.ScatterAnimating) { yield return null; }
+          }
 
           foreach (Unit unit in gonnaMove) {
             if (resultLevel == ResultType.Crushing) {

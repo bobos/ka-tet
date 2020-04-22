@@ -6,7 +6,7 @@ namespace UnitNS
   
     // Use this for initialization
     float timer = 0.0f;
-    float textSpeed = 3f;
+    float textSpeed = 2.8f;
     void Start () { 
     }
 
@@ -24,7 +24,7 @@ namespace UnitNS
       timer += Time.deltaTime;
       transform.Translate(new Vector3(0, textSpeed * Time.deltaTime, 0));
       // last 1 sec
-      if (timer > 0.7f) {
+      if (timer > 1.2f) {
         Animating = false;
       }
     }

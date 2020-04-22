@@ -9,7 +9,7 @@ namespace CourtNS {
     public static Ability LuckyDraw() {
       Ability[] candidates = new Ability[]{Cons.forecaster, Cons.discipline,
         Cons.pursuer, Cons.hammer, Cons.builder, Cons.breacher, Cons.noPanic,
-        Cons.mechanician, Cons.diminisher, Cons.staminaManager};
+        Cons.mechanician, Cons.diminisher, Cons.staminaManager, Cons.punchThrough};
       int total = candidates.Length;
       int luckNum = Util.Rand(0, total * 2);
       if (luckNum < total) {
@@ -393,6 +393,19 @@ namespace CourtNS {
 
     public override string Description() {
       return Cons.GetTextLib().get("ability_staminaManager_description");
+    }
+  }
+
+  public class PunchThrough: Ability {
+    public PunchThrough() {
+    }
+
+    public override string Name() {
+      return Cons.GetTextLib().get("ability_punchThrough");
+    }
+
+    public override string Description() {
+      return Cons.GetTextLib().get("ability_punchThrough_description");
     }
   }
 }

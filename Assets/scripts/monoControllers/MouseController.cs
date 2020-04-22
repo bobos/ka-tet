@@ -270,7 +270,7 @@ namespace MonoNS
       if (actionName == ActionController.actionName.MOVE
           && Util.eq<Unit>(unit, selectedUnit) && !unit.IsAI())
       {
-        Escape();
+        if (onUnitSelect != null) onUnitSelect(selectedUnit, false);
       }
     }
 
@@ -570,8 +570,9 @@ namespace MonoNS
     {
       if (Input.GetMouseButtonUp(0))
       {
-        // copy the path to movement queue
-        if (selectedPath != null && selectedPath.Length > 0)
+        if (tileUnderMouse != null && tileUnderMouse.GetUnit() != null) {
+          Escape();
+        } else if (selectedPath != null && selectedPath.Length > 0)
         {
           if (hexMap.wargameController.start) {
             hexMap.wargameController.Add(tileUnderMouse, selectedUnit, selectedPath);
@@ -585,7 +586,6 @@ namespace MonoNS
             }
           }
         }
-        Update_CurrentFunc = Escape;
         return;
       }
 

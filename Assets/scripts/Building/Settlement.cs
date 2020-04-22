@@ -224,45 +224,4 @@ public abstract class Settlement: Building
     settlementMgr.GetRoot(owner.isAI).GetLinked(linked);
     return linked.Contains(this);
   }
-
-  public Tile FindBreakThroughPoint(Unit unit) {
-    Tile[] tiles = baseTile.GetNeighboursWithinRange<Tile>(5, (Tile t) => true);
-    List<Tile> deployables = new List<Tile>(tiles){};
-    // sort tiles from near to far
-    deployables.Sort(delegate (Tile a, Tile b)
-    {
-      return (int)(Tile.Distance(baseTile, a) - Tile.Distance(baseTile, b));
-    });
-
-    Tile target = null;
-    foreach (Tile t in hexMap.IsAttackSide(unit.IsAI()) ? hexMap.AttackerZone : hexMap.DefenderZone) {
-      target = t;
-      break;
-    }
-
-    Tile tile = null;
-    float score = 0f;
-    List<Tile> first8 = new List<Tile>();
-    int cnt = 0;
-    foreach(Tile t in deployables) {
-      if (cnt > 8) {
-        break;
-      }
-      if (t.Deployable(unit)) {
-        first8.Add(t);
-        cnt++;
-      }
-    }
-
-    foreach(Tile t in first8) {
-      float dist = Tile.Distance(t, target);
-      if (tile == null || dist < score) {
-        tile = t;
-        score = dist;
-      }
-    }
-
-    return tile;
-  }
-
 }

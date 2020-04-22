@@ -225,7 +225,7 @@ namespace UnitNS
     public int allowedAtmpt = 1;
     void InitAllowedAtmpt() {
       allowedAtmpt = 1;
-      if (IsCavalry() && rf.general.Has(Cons.staminaManager)) {
+      if (rf.general.Has(Cons.staminaManager)) {
         allowedAtmpt = 2;
       }
     }
@@ -234,7 +234,7 @@ namespace UnitNS
     }
 
     public bool CanCharge() {
-      return IsHeavyCavalry() && CanAttack() && rf.soldiers >= 800; 
+      return (IsHeavyCavalry() && CanAttack() && rf.soldiers >= 800) || IsSurrounded(); 
     }
 
     public bool retreated = false;
@@ -764,6 +764,46 @@ namespace UnitNS
       }
       tile = h;
     }
+
+    public Tile FindBreakThroughPoint() {
+    Tile[] tiles = this.tile.GetNeighboursWithinRange<Tile>(5, (Tile t) => true);
+    List<Tile> deployables = new List<Tile>(tiles){};
+    // sort tiles from near to far
+    deployables.Sort(delegate (Tile a, Tile b)
+    {
+      return (int)(Tile.Distance(this.tile, a) - Tile.Distance(this.tile, b));
+    });
+
+    Tile target = null;
+    foreach (Tile t in hexMap.IsAttackSide(IsAI()) ? hexMap.AttackerZone : hexMap.DefenderZone) {
+      target = t;
+      break;
+    }
+
+    Tile tile = null;
+    float score = 0f;
+    List<Tile> first8 = new List<Tile>();
+    int cnt = 0;
+    foreach(Tile t in deployables) {
+      if (cnt > 8) {
+        break;
+      }
+      if (t.Deployable(this)) {
+        first8.Add(t);
+        cnt++;
+      }
+    }
+
+    foreach(Tile t in first8) {
+      float dist = Tile.Distance(t, target);
+      if (tile == null || dist < score) {
+        tile = t;
+        score = dist;
+      }
+    }
+
+    return tile;
+  }
 
     // ==============================================================
     // ================= path finding ===============================

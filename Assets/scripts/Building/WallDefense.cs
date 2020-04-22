@@ -13,7 +13,7 @@ public class WallDefense {
 
   public int MaxDefensePoint() {
     if (level == 1) {
-      return 100;
+      return 120;
     }
     
     if (level == 2) {

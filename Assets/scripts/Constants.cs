@@ -206,6 +206,7 @@ public class Cons {
   public static Ability mechanician = new Mechanician();
   public static Ability diminisher = new Diminisher();
   public static Ability staminaManager = new StaminaManager();
+  public static Ability punchThrough = new PunchThrough();
 
   // come with traits
   public static Ability forwarder = new Forwarder();
