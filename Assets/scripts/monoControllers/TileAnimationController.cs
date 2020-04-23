@@ -97,10 +97,13 @@ namespace MonoNS
     }
 
     public bool BurnAnimating = false;
-    public bool Burn(Tile tile, HashSet<Tile> tiles = null)
+    public bool Burn(Unit unit, Tile tile, HashSet<Tile> tiles = null)
     {
       hexMap.cameraKeyboardController.DisableCamera();
       tiles = tiles == null ? tile.SetFire() : tiles;
+      if (unit != null && unit.rf.general.Has(Cons.fireBug) && tiles.Count == 0) {
+        tiles.Add(tile);
+      }
       BurnAnimating = true;
       StartCoroutine(CoBurn(tile, tiles));
       return true;
@@ -179,7 +182,7 @@ namespace MonoNS
       if (tile.wildFire != null) {
         HashSet<Tile> tiles = tile.wildFire.OnWeatherChange(weather);
         if (tiles.Count > 0) {
-          Burn(tile, tiles);
+          Burn(null, tile, tiles);
           while (BurnAnimating) { yield return null; }
         }
       }

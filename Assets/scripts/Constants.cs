@@ -207,6 +207,9 @@ public class Cons {
   public static Ability diminisher = new Diminisher();
   public static Ability staminaManager = new StaminaManager();
   public static Ability punchThrough = new PunchThrough();
+  public static Ability generous = new Generous();
+  public static Ability runner = new Runner();
+  public static Ability fireBug = new FireBug();
 
   // come with traits
   public static Ability forwarder = new Forwarder();

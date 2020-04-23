@@ -298,9 +298,9 @@ namespace MonoNS
       return DoAction(unit, null, tile, actionName.SABOTAGE);
     }
 
-    public bool burn(Tile tile)
+    public bool burn(Unit unit, Tile tile)
     {
-      return DoAction(null, null, tile, actionName.FIRE);
+      return DoAction(unit, null, tile, actionName.FIRE);
     }
 
     public bool poision(Unit unit, Tile tile) {
@@ -349,7 +349,7 @@ namespace MonoNS
       }
       if (name == actionName.FIRE)
       {
-        StartCoroutine(Burn(tile));
+        StartCoroutine(Burn(unit, tile));
       }
       if (name == actionName.ATTACKEmpty) 
       {
@@ -431,9 +431,9 @@ namespace MonoNS
       ActionOngoing = false;
     }
 
-    IEnumerator Burn(Tile tile)
+    IEnumerator Burn(Unit unit, Tile tile)
     {
-      tileAniController.Burn(tile);
+      tileAniController.Burn(unit, tile);
       while (tileAniController.BurnAnimating)
       {
         yield return null;

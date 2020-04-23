@@ -10,16 +10,16 @@ public class StorageLevel {
 
   public int LastingTurnsUnderSiege() {
     if (level == 1) {
-      return 2;
+      return 4;
     }
     
     if (level == 2) {
-      return 6;
+      return 8;
     }
 
     if (level == 3) {
       // small city and strategy base
-      return 10;
+      return 12;
     }
 
     // large city

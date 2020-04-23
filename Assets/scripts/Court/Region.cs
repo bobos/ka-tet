@@ -43,7 +43,7 @@ namespace CourtNS
 
     public override int Will()
     {
-      return 80;
+      return 90;
     }
 
     public override int RetreatThreshold()
@@ -86,7 +86,7 @@ namespace CourtNS
 
     public override int Will()
     {
-      return 80;
+      return 90;
     }
 
     public override int RetreatThreshold()
@@ -169,7 +169,7 @@ namespace CourtNS
 
     public override int Will()
     {
-      return 80;
+      return 85;
     }
 
     public override int RetreatThreshold()
@@ -212,7 +212,7 @@ namespace CourtNS
 
     public override int Will()
     {
-      return 90;
+      return 100;
     }
 
     public override int RetreatThreshold()

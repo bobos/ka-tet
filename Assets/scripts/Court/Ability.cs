@@ -9,9 +9,10 @@ namespace CourtNS {
     public static Ability LuckyDraw() {
       Ability[] candidates = new Ability[]{Cons.forecaster, Cons.discipline,
         Cons.pursuer, Cons.hammer, Cons.builder, Cons.breacher, Cons.noPanic,
-        Cons.mechanician, Cons.diminisher, Cons.staminaManager, Cons.punchThrough};
+        Cons.mechanician, Cons.diminisher, Cons.staminaManager, Cons.punchThrough,
+        Cons.generous, Cons.runner, Cons.fireBug};
       int total = candidates.Length;
-      int luckNum = Util.Rand(0, total * 2);
+      int luckNum = Util.Rand(0, total + 5);
       if (luckNum < total) {
         return candidates[luckNum];
       }
@@ -408,4 +409,44 @@ namespace CourtNS {
       return Cons.GetTextLib().get("ability_punchThrough_description");
     }
   }
+
+  public class Generous: Ability {
+    public Generous() {
+    }
+
+    public override string Name() {
+      return Cons.GetTextLib().get("ability_generous");
+    }
+
+    public override string Description() {
+      return Cons.GetTextLib().get("ability_generous_description");
+    }
+  }
+
+  public class Runner: Ability {
+    public Runner() {
+    }
+
+    public override string Name() {
+      return Cons.GetTextLib().get("ability_runner");
+    }
+
+    public override string Description() {
+      return Cons.GetTextLib().get("ability_runner_description");
+    }
+  }
+
+  public class FireBug: Ability {
+    public FireBug() {
+    }
+
+    public override string Name() {
+      return Cons.GetTextLib().get("ability_fireBug");
+    }
+
+    public override string Description() {
+      return Cons.GetTextLib().get("ability_fireBug_description");
+    }
+  }
+
 }

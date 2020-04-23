@@ -116,9 +116,9 @@ namespace MonoNS
       }
 
       if (predict.windAdvantage) {
-        predict.percentOfEffectiveForce += 30;
+        predict.percentOfEffectiveForce += 100;
       } else if (predict.windDisadvantage) {
-        predict.percentOfEffectiveForce -= 20;
+        predict.percentOfEffectiveForce -= 50;
       }
     }
 
@@ -294,6 +294,10 @@ namespace MonoNS
         ret = ret < 80 ? ret : 80;
       }
 
+      if (attacker && !inRange) {
+        ret = ret < 80 ? ret : 80;
+      }
+
       return ret;
     }
 
@@ -385,11 +389,11 @@ namespace MonoNS
           int toll = 0;
           if (unit.rf.rank.Level() == 1) {
             if (!unit.IsCavalry()) {
-              toll = dieMore ? 40 : 20;
+              toll = dieMore ? 30 : 15;
               total -= toll;
               Helper(up, toll);
             } else {
-              toll = dieMore ? 16 : 8;
+              toll = dieMore ? 10 : 5;
               total -= toll;
               Helper(up, toll);
             }
@@ -398,20 +402,7 @@ namespace MonoNS
           // veteran
           if (unit.rf.rank.Level() == 2) {
             if (!unit.IsCavalry()) {
-              toll = dieMore ? 20 : 10;
-              total -= toll;
-              Helper(up, toll);
-            } else {
-              toll = dieMore ? 10 : 5;
-              total -= toll;
-              Helper(up, toll);
-            }
-          }
-
-          // elite
-          if (unit.rf.rank.Level() == 3) {
-            if (!unit.IsCavalry()) {
-              toll = dieMore ? 10 : 5;
+              toll = dieMore ? 16 : 8;
               total -= toll;
               Helper(up, toll);
             } else {
@@ -621,9 +612,9 @@ namespace MonoNS
           }
 
           if (atkWin) {
-            attackerCasualty = (int)(defenderCasualty * 0.8f);
+            attackerCasualty = (int)(defenderCasualty * 0.45f);
           } else {
-            defenderCasualty = (int)(attackerCasualty * 0.8f);
+            defenderCasualty = (int)(attackerCasualty * 0.45f);
           }
         } else {
           float factor = 0.05f;
@@ -631,7 +622,7 @@ namespace MonoNS
             factor = 0.08f;
           }
           if (resultLevel == ResultType.Crushing) {
-            factor = 0.01f * Util.Rand(40, 50);
+            factor = 0.01f * Util.Rand(35, 45);
           }
 
           if (atkWin) {
@@ -642,7 +633,7 @@ namespace MonoNS
 
           if (resultLevel == ResultType.Small) {
             // 2x - 3x
-            int modifier = Util.Rand(5, 6);
+            int modifier = Util.Rand(3, 4);
             if (atkWin) {
               attackerCasualty = (int)(defenderCasualty * modifier * 0.1f);
             } else {
@@ -652,7 +643,7 @@ namespace MonoNS
 
           if (resultLevel == ResultType.Great) {
             // 3x - 4x
-            int modifier = Util.Rand(4, 5);
+            int modifier = Util.Rand(2, 3);
             if (atkWin) {
               attackerCasualty = (int)(defenderCasualty * modifier* 0.1f);
             } else {

@@ -37,7 +37,7 @@ namespace CourtNS
       faction = general.faction;
       name = province.region.Name();
       combatPoint = province.region.CombatPoint(type);
-      movementPoint = province.region.Mov(type);
+      movementPoint = 100;
       morale = province.region.Will();
       this.province = province;
       state = TroopState.Idle;
@@ -110,6 +110,10 @@ namespace CourtNS
         return false;
       }
       state = TroopState.OnField;
+      if (general.Has(Cons.generous)) {
+        morale += 10;
+      }
+      movementPoint = general.Has(Cons.runner) ? 150 : 100;
       if(type == Type.Cavalry) {
         onFieldUnit = Cavalry.Create(false, this, deploymentTile);
       } else {

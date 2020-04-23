@@ -382,6 +382,12 @@ namespace TextNS
       {"ability_playSafe_description", "敌方战败时本部兵马不会擅自追击将领不易战死"},
       {"ability_punchThrough", "誓死一搏"},
       {"ability_punchThrough_description", "部队突围成功率提升50%"},
+      {"ability_generous", "犒赏将士"},
+      {"ability_generous_description", "进入战场部队士气+20"},
+      {"ability_runner", "神行太保"},
+      {"ability_runner_description", "部队移动力提升50%"},
+      {"ability_fireBug", "祝融之名"},
+      {"ability_fireBug_description", "放火成功率100%"},
 
       {"trait_reckless", "鲁莽"},
       {"trait_brave", "英勇"},

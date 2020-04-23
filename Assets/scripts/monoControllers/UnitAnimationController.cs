@@ -576,7 +576,7 @@ namespace MonoNS
 
     IEnumerator CoCharge(Unit from, Unit to) {
       from.movementRemaining -= chargePoint;
-      from.UseAtmpt();
+      from.charged = true;
       View view = from.IsCamping() ?
         settlementMgr.GetView(from.tile.settlement) : hexMap.GetUnitView(from);
 
@@ -814,8 +814,7 @@ namespace MonoNS
         }
         hexMap.dialogue.ShowRetreat(unit);
         while(hexMap.dialogue.Animating) { yield return null; }
-        //unit.__movementRemaining = breakThrough ? 600 : 300;
-        unit.__movementRemaining = 600;
+        unit.movementRemaining = 200;
         while (unit.movementRemaining > 0 && unit.GetPath().Length > 0) {
           MoveUnit(unit);
           while(MoveAnimating) { yield return null; }

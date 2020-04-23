@@ -638,7 +638,7 @@ namespace MonoNS
     {
       if (tileUnderMouse != null && Input.GetMouseButtonUp(0) && nearFireTiles.Contains(tileUnderMouse))
       {
-        if(!actionController.burn(tileUnderMouse)) {
+        if(!actionController.burn(selectedUnit, tileUnderMouse)) {
           // TODO
           Debug.LogError("Failed to set fire!");
         }

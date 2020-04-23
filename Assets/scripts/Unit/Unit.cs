@@ -150,7 +150,7 @@ namespace UnitNS
         return __movementRemaining;
       }
       set {
-        __movementRemaining = value < 0 ? 0 : (value > 100 ? 100 : value);
+        __movementRemaining = value < 0 ? 0 : value;
       }
     }
     public Tile tile;
@@ -159,7 +159,7 @@ namespace UnitNS
     public State state = State.Stand;
     public bool defeating = false;
 
-    public int __movementRemaining;
+    int __movementRemaining;
     Queue<Tile> path;
     // ==============================================================
     // ================= Unit Stat ==================================
@@ -234,9 +234,11 @@ namespace UnitNS
     }
 
     public bool CanCharge() {
-      return (IsHeavyCavalry() && CanAttack() && rf.soldiers >= 800) || IsSurrounded(); 
+      return (IsHeavyCavalry() && !charged && rf.soldiers >= 800)
+        || (!charged && IsSurrounded()); 
     }
 
+    public bool charged = false;
     public bool retreated = false;
     public bool CanAttack() {
       return allowedAtmpt > 0;
@@ -442,7 +444,7 @@ namespace UnitNS
     // Before new turn starts
     public int[] RefreshUnit()
     {
-      chaos = defeating = retreated = unitConflict.conflicted = false;
+      chaos = defeating = retreated = charged = unitConflict.conflicted = false;
       InitAllowedAtmpt();
 
       if (concealCoolDownTurn > 0) {
