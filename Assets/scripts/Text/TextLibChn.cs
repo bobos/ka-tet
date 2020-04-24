@@ -356,7 +356,7 @@ namespace TextNS
       {"ability_diminisher_description", "当统帅步兵围城时城防能力每回合衰减速度加倍"},
       {"ability_staminaManager", "洪荒之力"},
       {"ability_staminaManager_description", "部队能发起两次进攻"},
-      {"ability_forwarder", "杀红眼"},
+      {"ability_forwarder", "穷追猛打"},
       {"ability_forwarder_description", "当敌军退败时80%几率擅自追击"},
       {"ability_holdTheGround", "纹丝不动"},
       {"ability_holdTheGround_description", "面对敌军冲阵时减少冲阵成功率50%"},

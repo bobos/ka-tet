@@ -171,11 +171,11 @@ namespace MapTileNS
       }
     }
 
-    public Unit[] Poision() {
+    public Unit[] Poision(Unit poisioner) {
       if (poision == null) {
         return new Unit[0];
       }
-      return poision.SetPoision();
+      return poision.SetPoision(poisioner);
     }
 
     // ==============================================================

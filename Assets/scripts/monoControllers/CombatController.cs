@@ -675,7 +675,6 @@ namespace MonoNS
         int defenderCavDead = 0;
 
         foreach(UnitPredict up in predict.attackers) {
-          up.unit.movementRemaining -= Unit.ActionCost;
           if (up.unit.IsCavalry()) {
             attackerCavDead += up.dead;
           } else {
@@ -685,7 +684,6 @@ namespace MonoNS
         }
 
         foreach(UnitPredict up in predict.defenders) {
-          up.unit.movementRemaining -= Unit.DefenceCost;
           if (up.unit.IsCavalry()) {
             defenderCavDead += up.dead;
           } else {
@@ -880,16 +878,12 @@ namespace MonoNS
           chasers.Add(un);
         }
 
-        List<Unit> retreaters = new List<Unit>();
-        foreach(Unit u in hexMap.GetWarParty(loser).GetUnits()) {
-          if (u.RetreatOnDefeat() && !supporters.Contains(u)) {
-            retreaters.Add(u);
-          }
-        }
-
         // affected all allies
         if (loser.IsCommander() && !feint) {
           int drop = 0;
+          if (resultLevel == ResultType.Small) {
+            drop = -3;
+          }
           if (resultLevel == ResultType.Great) {
             drop = -8;
           }
@@ -900,6 +894,9 @@ namespace MonoNS
             hexMap.unitAniController.ShakeNearbyAllies(loser, drop);
             while (hexMap.unitAniController.ShakeAnimating) { yield return null; }
           }
+        } else if (!feint && resultLevel != ResultType.Close) {
+          hexMap.unitAniController.ShakeNearbyAllies(loser, 0);
+          while (hexMap.unitAniController.ShakeAnimating) { yield return null; }
         }
 
         HashSet<Unit> geese = new HashSet<Unit>();
@@ -956,16 +953,6 @@ namespace MonoNS
           foreach(Unit unit in supporters) {
             if (!unit.Rout()) {
               unit.defeating = unit.chaos = false;
-            }
-          }
-
-          if (!feint) {
-            // conservative generals retreat
-            foreach(Unit u in retreaters) {
-              if (u.SetRetreatPath()) {
-                hexMap.unitAniController.ForceRetreat(u);
-                while(hexMap.unitAniController.ForceRetreatAnimating) { yield return null; }
-              }
             }
           }
 

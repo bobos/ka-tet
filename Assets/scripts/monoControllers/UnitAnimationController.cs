@@ -411,14 +411,14 @@ namespace MonoNS
     }
 
     public bool PoisionAnimating = false;
-    public void Poision(Tile tile) {
+    public void Poision(Unit unit, Tile tile) {
       PoisionAnimating = true;
       hexMap.cameraKeyboardController.DisableCamera();
-      StartCoroutine(CoPoision(tile));
+      StartCoroutine(CoPoision(unit, tile));
     }
 
-    IEnumerator CoPoision(Tile tile) {
-      foreach(Unit u in tile.Poision()) {
+    IEnumerator CoPoision(Unit unit, Tile tile) {
+      foreach(Unit u in tile.Poision(unit)) {
         if (u.IsAI()) {
           continue;
         }
@@ -440,7 +440,6 @@ namespace MonoNS
     }
 
     IEnumerator CoBury(Unit unit) {
-      unit.movementRemaining -= Unit.ActionCost;
       if (!unit.ApplyDiscipline()) {
         int moraleDrop = -3;
         unit.rf.morale += moraleDrop;
@@ -564,7 +563,6 @@ namespace MonoNS
     }
 
     public bool ChargeAnimating = false;
-    public const int chargePoint = Unit.ActionCost;
     public void Charge(Unit from, Unit to) {
       if (!from.CanCharge() && !to.IsVulnerable()) {
         return;
@@ -575,7 +573,6 @@ namespace MonoNS
     }
 
     IEnumerator CoCharge(Unit from, Unit to) {
-      from.movementRemaining -= chargePoint;
       from.charged = true;
       View view = from.IsCamping() ?
         settlementMgr.GetView(from.tile.settlement) : hexMap.GetUnitView(from);

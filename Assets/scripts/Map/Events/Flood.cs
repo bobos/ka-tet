@@ -34,14 +34,9 @@ namespace MapTileNS
       }
     }
 
-    public bool Floodable() {
-      return !flooded && (Cons.IsSpring(tile.weatherGenerator.season) || Cons.IsSummer(tile.weatherGenerator.season))
-          && (Cons.IsRain(tile.weatherGenerator.currentWeather) || Cons.IsHeavyRain(tile.weatherGenerator.currentWeather));
-    }
-
     public HashSet<Tile> Start() {
       HashSet<Tile> affectedTiles = new HashSet<Tile>();
-      if (Floodable()) 
+      if (!flooded) 
       {
         tile.isDam = false;
         GetTile2Flood(affectedTiles);

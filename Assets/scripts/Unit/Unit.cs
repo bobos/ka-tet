@@ -13,8 +13,6 @@ namespace UnitNS
     public abstract bool IsCavalry();
     protected abstract Unit Clone();
 
-    public const int ActionCost = 15; // For actions like: attack, bury
-    public const int DefenceCost = 10;
     public const int MovementcostOnHill = 25;
     public const int MovementcostOnHillRoad = 15;
     public const int MovementcostOnPlain = 15;
@@ -183,7 +181,7 @@ namespace UnitNS
     }
 
     public int CanBeShaked(Unit charger) {
-      if (IsVulnerable() || !charger.IsHeavyCavalry() || !IsOnField()
+      if (!IsOnField()
         || tile.vantagePoint || rf.IsSpecial()) {
         return 0;
       }
@@ -201,10 +199,18 @@ namespace UnitNS
       if (tile.terrian == TerrianType.Hill) {
         chance += -30;
       }
-      if (Util.eq<Rank>(rf.rank, Cons.rookie)) {
-        chance += 70;
+      if (charger.IsHeavyCavalry()) {
+        if (Util.eq<Rank>(rf.rank, Cons.rookie)) {
+          chance += 70;
+        } else {
+          chance += 40;
+        }
       } else {
-        chance += 40;
+        if (Util.eq<Rank>(rf.rank, Cons.rookie)) {
+          chance += 30;
+        } else {
+          chance += 10;
+        }
       }
 
       if (rf.general.Has(Cons.retreater)) {
@@ -235,7 +241,7 @@ namespace UnitNS
 
     public bool CanCharge() {
       return (IsHeavyCavalry() && !charged && rf.soldiers >= 800)
-        || (!charged && IsSurrounded()); 
+        || (!charged && IsSurrounded() && rf.soldiers >= 800);
     }
 
     public bool charged = false;
@@ -316,11 +322,23 @@ namespace UnitNS
 
     public bool IsSurrounded() {
       bool isSurrounded = true;
-      foreach(Tile tile in tile.neighbours) {
-        if(tile.Passable(IsAI()) ||
-          (tile.settlement != null && tile.settlement.owner.isAI == IsAI())) {
-          isSurrounded = false;
-          break;
+      if (IsCamping()) {
+        foreach(Tile tile in tile.neighbours) {
+          if(tile.Passable(IsAI()) ||
+            (tile.settlement != null && tile.settlement.owner.isAI == IsAI())) {
+            isSurrounded = false;
+            break;
+          }
+        }
+      } else {
+        Dictionary<HashSet<Unit>, HashSet<Tile>> spaces = hexMap.GetWarParty(this).GetFreeSpaces();
+        foreach(KeyValuePair<HashSet<Unit>, HashSet<Tile>> kvp in spaces) {
+          if (kvp.Value.Count == 0) {
+            if (kvp.Key.Contains(this)) {
+              isSurrounded = true;
+              break;
+            }
+          }
         }
       }
       return isSurrounded;

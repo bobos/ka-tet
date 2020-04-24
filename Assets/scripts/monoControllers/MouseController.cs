@@ -625,7 +625,8 @@ namespace MonoNS
       hexMap.HighlightArea(tileUnderMouse.poision.downStreams.ToArray(), HexMap.RangeType.PoisionRange);
       if (Input.GetMouseButtonUp(0))
       {
-        if (!actionController.poision(null, tileUnderMouse)) {
+        Unit u = selectedUnit == null ? hexMap.settlementViewPanel.selectedUnit : selectedUnit;
+        if (!actionController.poision(u, tileUnderMouse)) {
           // TODO
           Debug.LogError("Failed to poision river, try again!");
         }

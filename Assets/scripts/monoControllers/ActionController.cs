@@ -357,7 +357,7 @@ namespace MonoNS
       }
       if (name == actionName.POISION) 
       {
-        StartCoroutine(DoPoision(tile));
+        StartCoroutine(DoPoision(unit, tile));
       }
       if (name == actionName.SIEGE) 
       {
@@ -451,9 +451,9 @@ namespace MonoNS
       ActionOngoing = false;
     }
 
-    IEnumerator DoPoision(Tile tile)
+    IEnumerator DoPoision(Unit unit, Tile tile)
     {
-      unitAniController.Poision(tile);
+      unitAniController.Poision(unit, tile);
       while (unitAniController.PoisionAnimating)
       {
         yield return null;
