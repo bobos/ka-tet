@@ -673,10 +673,6 @@ namespace MonoNS
       if (!scared) {
         popAniController.Show(hexMap.GetUnitView(to), textLib.get("pop_holding"), Color.green);
         while (popAniController.Animating) { yield return null; }
-        int morale = 5;
-        to.rf.morale += morale;
-        // morale, movement, wounded, killed, laborKilled, disserter, attack, def, discontent
-        ShowEffect(to, new int[]{morale,0,0,0,0}, null, true);
         int morale1 = -2;
         from.rf.morale += morale1;
         ShowEffect(from, new int[]{morale1,0,0,0,0}, null, true);
