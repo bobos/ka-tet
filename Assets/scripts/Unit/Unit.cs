@@ -181,8 +181,7 @@ namespace UnitNS
     }
 
     public int CanBeShaked(Unit charger) {
-      if (!IsOnField()
-        || tile.vantagePoint || rf.IsSpecial()) {
+      if (!IsOnField() || tile.vantagePoint || rf.IsSpecial()) {
         return 0;
       }
       int chance = 0;
@@ -240,8 +239,11 @@ namespace UnitNS
     }
 
     public bool CanCharge() {
-      return (IsHeavyCavalry() && !charged && rf.soldiers >= 800)
-        || (!charged && IsSurrounded() && rf.soldiers >= 800);
+      return IsHeavyCavalry() && !charged && rf.soldiers >= 800;
+    }
+
+    public bool CanBreakThrough() {
+      return IsSurrounded() && rf.soldiers >= 800 && CanAttack();
     }
 
     public bool charged = false;
@@ -321,8 +323,9 @@ namespace UnitNS
     }
 
     public bool IsSurrounded() {
-      bool isSurrounded = true;
+      bool isSurrounded = false;
       if (IsCamping()) {
+        isSurrounded = true;
         foreach(Tile tile in tile.neighbours) {
           if(tile.Passable(IsAI()) ||
             (tile.settlement != null && tile.settlement.owner.isAI == IsAI())) {
@@ -331,13 +334,11 @@ namespace UnitNS
           }
         }
       } else {
-        Dictionary<HashSet<Unit>, HashSet<Tile>> spaces = hexMap.GetWarParty(this).GetFreeSpaces();
-        foreach(KeyValuePair<HashSet<Unit>, HashSet<Tile>> kvp in spaces) {
-          if (kvp.Value.Count == 0) {
-            if (kvp.Key.Contains(this)) {
-              isSurrounded = true;
-              break;
-            }
+        foreach(KeyValuePair<HashSet<Unit>, HashSet<Tile>> kvp in 
+          hexMap.GetWarParty(this).GetFreeSpaces()) {
+          if (kvp.Value.Count == 0 && kvp.Key.Contains(this)) {
+            isSurrounded = true;
+            break;
           }
         }
       }

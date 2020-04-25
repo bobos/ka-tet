@@ -84,6 +84,14 @@ namespace MonoNS
       }
     }
 
+    public void OnBreakthroughClick()
+    {
+      if (onBtnClick != null)
+      {
+        onBtnClick(actionName.Breakthrough);
+      }
+    }
+
     public void OnReposition() {
       if (onBtnClick != null)
       {
@@ -260,6 +268,7 @@ namespace MonoNS
       SIEGE,
       BURY,
       CHARGE,
+      Breakthrough,
       ENCAMP,
       RETREAT,
       ForceRetreat,
@@ -323,6 +332,10 @@ namespace MonoNS
       return DoAction(from, to, null, actionName.CHARGE);
     }
 
+    public bool breakThrough(Unit from, Unit to) {
+      return DoAction(from, to, null, actionName.Breakthrough);
+    }
+
     public bool retreat(Unit unit) {
       return DoAction(unit, null, null, actionName.RETREAT);
     }
@@ -374,6 +387,10 @@ namespace MonoNS
       if (name == actionName.CHARGE) 
       {
         StartCoroutine(DoCharge(unit, unit1));
+      }
+      if (name == actionName.Breakthrough) 
+      {
+        StartCoroutine(DoBreakThrough(unit, unit1));
       }
       if (name == actionName.RETREAT) 
       {
@@ -484,6 +501,15 @@ namespace MonoNS
     IEnumerator DoCharge(Unit from, Unit to) {
       unitAniController.Charge(from, to);
       while (unitAniController.ChargeAnimating)
+      {
+        yield return null;
+      }
+      ActionOngoing = false;
+    }
+
+    IEnumerator DoBreakThrough(Unit from, Unit to) {
+      unitAniController.BreakThrough(from, to);
+      while (unitAniController.BreakthroughAnimating)
       {
         yield return null;
       }

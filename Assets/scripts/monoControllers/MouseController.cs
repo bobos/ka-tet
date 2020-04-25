@@ -247,6 +247,18 @@ namespace MonoNS
         }
       }
 
+      if (action == ActionController.actionName.Breakthrough)
+      {
+        mouseMode = mode.attack;
+        Update_CurrentFunc = UpdateUnitBreakThrough;
+        msgBox.Show("选择突破目标!");
+        foreach(Unit u in nearbyEnemey) {
+          if (u.CanBeShaked(selectedUnit) > 0) {
+            hexMap.TargetUnit(u);
+          }
+        }
+      }
+
       if (action == ActionController.actionName.REPOS)
       {
         mouseMode = mode.repos;
@@ -561,6 +573,22 @@ namespace MonoNS
         if (targetUnit != null && targetUnit.CanBeShaked(selectedUnit) > 0) {
           msgBox.Show("");
           actionController.charge(selectedUnit, targetUnit);
+          Escape();
+        }
+      }
+    }
+
+    void UpdateUnitBreakThrough()
+    {
+      if (tileUnderMouse == null) {
+        return;
+      }
+      if (Input.GetMouseButtonUp(0))
+      {
+        ClickOnTile();
+        if (targetUnit != null && targetUnit.CanBeShaked(selectedUnit) > 0) {
+          msgBox.Show("");
+          actionController.breakThrough(selectedUnit, targetUnit);
           Escape();
         }
       }

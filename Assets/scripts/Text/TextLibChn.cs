@@ -288,6 +288,7 @@ namespace TextNS
       {"pop_newCommander", "新主帅"},
       {"pop_failedToBreakthrough", "突围失败"},
       {"pop_breakthrough", "突围成功"},
+      {"pop_toBreakThrough", "突围"},
 
       // settlement
       {"settlement_storageLvl1", "初级粮仓"},
@@ -341,7 +342,7 @@ namespace TextNS
       {"ability_discipline", "治军有方"},
       {"ability_discipline_description", "一定几率减少部队各种不满发生"},
       {"ability_pursuer", "乘胜追击"},
-      {"ability_pursuer_description", "增加对敌方溃败单位追击杀伤率和士气削减"},
+      {"ability_pursuer_description", "统帅骑兵增加对敌方溃败单位追击杀伤率和士气削减"},
       {"ability_hammer", "气吞万里"},
       {"ability_hammer_description", "统帅骑兵部队时冲阵成功率加50%"},
       {"ability_builder", "鲁班再世"},

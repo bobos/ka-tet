@@ -80,9 +80,10 @@ public class Starter : MonoBehaviour {
     General zhangfei = new General("g_zhangfei", "g_zhangfei_d", Cons.heDong, new CommandSkill(1), new TroopSize(2)); 
     General zhaoyun = new General("g_zhaoyun", "g_zhaoyun_d", Cons.heDong, new CommandSkill(1), new TroopSize(2)); 
     General machao = new General("g_machao", "g_machao_d", Cons.heBei, new CommandSkill(1), new TroopSize(2)); 
-    General y1 = new General("g_y1", "g_machao_d", Cons.heBei, new CommandSkill(1), new TroopSize(1)); 
-    General y2 = new General("g_y2", "g_machao_d", Cons.heBei, new CommandSkill(1), new TroopSize(1)); 
-    General y3 = new General("g_y3", "g_machao_d", Cons.heBei, new CommandSkill(1), new TroopSize(1)); 
+    General y1 = new General("g_y1", "g_machao_d", Cons.heBei, new CommandSkill(1), new TroopSize(1));
+    General y2 = new General("g_y2", "g_machao_d", Cons.heBei, new CommandSkill(1), new TroopSize(1));
+    General y3 = new General("g_y3", "g_machao_d", Cons.heBei, new CommandSkill(1), new TroopSize(1));
+    General y4 = new General("g_y4", "g_machao_d", Cons.shanXi, new CommandSkill(1), new TroopSize(2));
     liubei.JoinFaction(Cons.Song, Cons.NewParty);
     guanyu.JoinFaction(Cons.Song, Cons.NewParty);
     zhangfei.JoinFaction(Cons.Song, Cons.OldParty);
@@ -91,6 +92,7 @@ public class Starter : MonoBehaviour {
     y1.JoinFaction(Cons.Song, Cons.OldParty);
     y2.JoinFaction(Cons.Song, Cons.OldParty);
     y3.JoinFaction(Cons.Song, Cons.OldParty);
+    y4.JoinFaction(Cons.Song, Cons.OldParty);
 
     liubei.CreateTroop(hexMap, 10000, Cons.heNan, Type.Infantry, Cons.veteran);
     zhaoyun.CreateTroop(hexMap, 5000, Cons.heBei, Type.Infantry, Cons.veteran);
@@ -100,6 +102,7 @@ public class Starter : MonoBehaviour {
     y1.CreateTroop(hexMap, 4000, Cons.heDong, Type.Infantry, Cons.rookie);
     y2.CreateTroop(hexMap, 4000, Cons.heDong, Type.Infantry, Cons.rookie);
     y3.CreateTroop(hexMap, 4000, Cons.heHuang, Type.Infantry, Cons.veteran);
+    y4.CreateTroop(hexMap, 2000, Cons.shanXi, Type.Cavalry, Cons.rookie);
 
     General caocao = new General("g_caocao", "g_caocao_d", Cons.xiJing, new CommandSkill(3), new TroopSize(3)); 
     General xuchu = new General("g_xuchu", "g_xuchu_d", Cons.xiJing, new CommandSkill(2), new TroopSize(3)); 
@@ -166,7 +169,7 @@ public class Starter : MonoBehaviour {
     dam.BuildDam();
     
     // first one is always the commander
-    List<General> defenders = new List<General>(){liubei, guanyu, zhangfei, zhaoyun, machao, y1, y2, y3};
+    List<General> defenders = new List<General>(){liubei, guanyu, zhangfei, zhaoyun, machao, y1, y2, y3, y4};
     List<General> attackers = new List<General>(){caocao, xuchu, abc, x1, x2, x3, x4, x5, x6, x7, x8};
 
     // create settlements

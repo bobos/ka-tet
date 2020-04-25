@@ -441,7 +441,7 @@ namespace MonoNS
 
     IEnumerator CoBury(Unit unit) {
       if (!unit.ApplyDiscipline()) {
-        int moraleDrop = -3;
+        int moraleDrop = -5;
         unit.rf.morale += moraleDrop;
         ShowEffect(unit, new int[]{moraleDrop,0,0,0,0});
         while(ShowAnimating) { yield return null; }
@@ -564,7 +564,7 @@ namespace MonoNS
 
     public bool ChargeAnimating = false;
     public void Charge(Unit from, Unit to) {
-      if (!from.CanCharge() && !to.IsVulnerable()) {
+      if (!from.CanCharge()) {
         return;
       }
       ChargeAnimating = true;
@@ -593,10 +593,7 @@ namespace MonoNS
       if (!scared && from.rf.IsChargeBuffed()) {
         scared = Cons.HighlyLikely();
       }
-      if (!scared && from.IsSurrounded() && from.rf.general.Has(Cons.punchThrough)) {
-        scared = Cons.FiftyFifty();
-      }
-      int killed = Util.Rand(0, 11);
+      int killed = Util.Rand(2, 15);
       from.rf.soldiers -= killed;
       from.kia += killed;
       // morale, movement, killed, attack, def
@@ -623,32 +620,9 @@ namespace MonoNS
         }
 
         if (!to.IsGone()) {
-          if (from.IsSurrounded()) {
-            // Break through
-            Tile escapeTile = null;
-            foreach(Tile t in to.tile.neighbours) {
-              if (t.Deployable(from)) {
-                escapeTile = t;
-                break;
-              }
-            }
-
-            if (escapeTile == null) {
-              popAniController.Show(view,
-                textLib.get("pop_failedToBreakthrough"),
-                Color.white);
-              while (popAniController.Animating) { yield return null; }
-            } else {
-              MoveUnit(from, escapeTile);
-              while (MoveAnimating) { yield return null; }
-              popAniController.Show(view,
-                textLib.get("pop_breakthrough"),
-                Color.green);
-              while (popAniController.Animating) { yield return null; }
-            }
-          } else {
-            List<Unit> affectedAllies = new List<Unit>();
-            affectedAllies.Add(to);
+          List<Unit> affectedAllies = new List<Unit>();
+          affectedAllies.Add(to);
+          if (from.rf.general.Has(Cons.breaker)) {
             foreach(Tile t in to.tile.neighbours) {
               Unit u = t.GetUnit();
               if (u != null && u.IsAI() == to.IsAI() && !u.StickAsNailWhenDefeat() && Cons.FiftyFifty()) {
@@ -657,30 +631,95 @@ namespace MonoNS
                 }
               }
             }
+          }
 
-            Tile toTile = to.tile;
-            List<Unit> notMoved = new List<Unit>();
-            Scatter(affectedAllies, notMoved, -4);
-            while(ScatterAnimating) { yield return null; }
-            if (toTile.Deployable(from)) {
-              MoveUnit(from, toTile);
-              while (MoveAnimating) { yield return null; }
-            }
+          Tile toTile = to.tile;
+          List<Unit> notMoved = new List<Unit>();
+          Scatter(affectedAllies, notMoved, -4);
+          while(ScatterAnimating) { yield return null; }
+          if (toTile.Deployable(from)) {
+            MoveUnit(from, toTile);
+            while (MoveAnimating) { yield return null; }
           }
         }
-      }
-
-      if (!scared) {
+      } else {
         popAniController.Show(hexMap.GetUnitView(to), textLib.get("pop_holding"), Color.green);
         while (popAniController.Animating) { yield return null; }
         int morale1 = -2;
         from.rf.morale += morale1;
         ShowEffect(from, new int[]{morale1,0,0,0,0}, null, true);
-        hexMap.turnController.Sleep(1);
-        while(hexMap.turnController.sleeping) { yield return null; }
+        while(ShowAnimating) { yield return null; }
       }
       hexMap.cameraKeyboardController.EnableCamera();
       ChargeAnimating = false;
+    }
+
+    public bool BreakthroughAnimating = false;
+    public void BreakThrough(Unit from, Unit to) {
+      if (!from.CanBreakThrough()) {
+        return;
+      }
+      BreakthroughAnimating = true;
+      hexMap.cameraKeyboardController.DisableCamera();
+      StartCoroutine(CoBreakThrough(from, to));
+    }
+
+    IEnumerator CoBreakThrough(Unit from, Unit to) {
+      from.UseAtmpt();
+      View view = from.IsCamping() ?
+        settlementMgr.GetView(from.tile.settlement) : hexMap.GetUnitView(from);
+
+      bool defeatingUnit = to.IsVulnerable();
+      popAniController.Show(view, textLib.get("pop_toBreakThrough"), Color.green);
+      while (popAniController.Animating) { yield return null; }
+      bool scared = to.CanBeShaked(from) >= Util.Rand(1, 100);
+      if (!defeatingUnit && scared && to.rf.general.Has(Cons.holdTheGround) && Cons.FiftyFifty()) {
+        scared = false;
+      }
+      scared = defeatingUnit ? true : scared;
+      if (!scared && from.rf.general.Has(Cons.punchThrough)) {
+        scared = Cons.FiftyFifty();
+      }
+      int killed = Util.Rand(30, 100);
+      from.rf.soldiers -= killed;
+      from.kia += killed;
+      // morale, movement, killed, attack, def
+      ShowEffect(from, new int[]{0,0,killed,0,0});
+      while (ShowAnimating) { yield return null; }
+      if (scared) {
+        Tile escapeTile = null;
+        foreach(Tile t in to.tile.neighbours) {
+          if (t.Deployable(from)) {
+            escapeTile = t;
+            break;
+          }
+        }
+
+        if (escapeTile == null) {
+          popAniController.Show(view,
+            textLib.get("pop_failedToBreakthrough"),
+            Color.white);
+          while (popAniController.Animating) { yield return null; }
+        } else {
+          MoveUnit(from, escapeTile);
+          while (MoveAnimating) { yield return null; }
+          popAniController.Show(view,
+            textLib.get("pop_breakthrough"),
+            Color.green);
+          while (popAniController.Animating) { yield return null; }
+        }
+      } else {
+        popAniController.Show(view,
+          textLib.get("pop_failedToBreakthrough"),
+          Color.white);
+        while (popAniController.Animating) { yield return null; }
+        int morale1 = -5;
+        from.rf.morale += morale1;
+        ShowEffect(from, new int[]{morale1,0,0,0,0}, null, true);
+        while(ShowAnimating) { yield return null; }
+      }
+      hexMap.cameraKeyboardController.EnableCamera();
+      BreakthroughAnimating = false;
     }
 
     public bool CrashAnimating = false;
@@ -740,12 +779,6 @@ namespace MonoNS
           while (popAniController.Animating) { yield return null; }
         }
       } else {
-        if (!unit.ApplyDiscipline()) {
-          int moraleDrop = -3;
-          unit.rf.morale += moraleDrop;
-          ShowEffect(unit, new int[]{moraleDrop,0,0,0,0});
-          while(ShowAnimating) { yield return null; }
-        }
         if (unit.IsShowingAnimation()) {
           popAniController.Show(hexMap.GetUnitView(unit),
           textLib.get("pop_sieging"), Color.green);
@@ -798,7 +831,6 @@ namespace MonoNS
       if (!breakThrough && unit.rf.general.Has(Cons.refuseToRetreat) && Cons.MostLikely()) {
         hexMap.dialogue.ShowRefuseToRetreat(unit);
         while(hexMap.dialogue.Animating) { yield return null; }
-        unit.SetPath(new Tile[]{unit.tile});
       } else {
         if (breakThrough && !unit.rf.IsSpecial()) {
           unit.chaos = true;
@@ -826,8 +858,8 @@ namespace MonoNS
         unit.rf.morale += moraleDrop;
         ShowEffect(unit, new int[]{moraleDrop,0,0,0,0});
         while(ShowAnimating) { yield return null; }
-        unit.SetPath(new Tile[]{unit.tile});
       }
+      unit.SetPath(new Tile[]{unit.tile});
       hexMap.cameraKeyboardController.EnableCamera();
       ForceRetreatAnimating = false;
     }

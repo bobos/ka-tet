@@ -42,8 +42,10 @@ Game Tips:
 45. 吐蕃人：长于后勤，做偏师
 46. 主动发起进攻和进攻目标方死的多
 
+ambush 3格视野外不可见
+charge or breakthrough from settlemnt, failed to move unit due to no view, unitAnimation 641
 破阵 -> 以少打多 -> 击败 -> 追击 -> 歼灭 -> 影响周边军队
-isSurrounded bug
+疑兵之计
 善用地形风力: 
 兵团动态合并
 无*，鲁莽**, 勇猛***

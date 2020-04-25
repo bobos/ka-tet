@@ -25,7 +25,8 @@ namespace MonoNS
       GameObject[] btns = {MoveButton, AttackButton, DefendButton,
                            SabotageButton, FireButton, SiegeButton, EncampButton,
                            RetreatButton, DecampButton, ReposButton,
-                           BuryButton, ChargeButton, TroopButton, GeneralButton
+                           BuryButton, ChargeButton, TroopButton, GeneralButton,
+                           BreakThroughButton
                            };
       buttons = btns;
       mouseController.onUnitSelect += OnUnitSelect;
@@ -57,6 +58,7 @@ namespace MonoNS
     public GameObject ReposButton;
     public GameObject BuryButton;
     public GameObject ChargeButton;
+    public GameObject BreakThroughButton;
     public GameObject TroopButton;
     public GameObject GeneralButton;
     GameObject[] buttons;
@@ -167,11 +169,10 @@ namespace MonoNS
 
         if (!hexMap.wargameController.start && unit.CanCharge() && hexMap.deployDone) {
           ChargeButton.SetActive(true);
-          if (unit.IsSurrounded()) {
-            ChargeButton.GetComponentInChildren<Text>().text = "突围";
-          } else {
-            ChargeButton.GetComponentInChildren<Text>().text = "冲阵";
-          }
+        }
+
+        if (!hexMap.wargameController.start && unit.CanBreakThrough() && hexMap.deployDone) {
+          BreakThroughButton.SetActive(true);
         }
 
         return;
@@ -202,11 +203,10 @@ namespace MonoNS
 
       if (!hexMap.wargameController.start && unit.CanCharge() && hexMap.deployDone) {
         ChargeButton.SetActive(true);
-        if (unit.IsSurrounded()) {
-          ChargeButton.GetComponentInChildren<Text>().text = "突围";
-        } else {
-          ChargeButton.GetComponentInChildren<Text>().text = "冲阵";
-        }
+      }
+
+      if (!hexMap.wargameController.start && unit.CanBreakThrough() && hexMap.deployDone) {
+        BreakThroughButton.SetActive(true);
       }
 
       if (mouseController.nearMySettlement != null && mouseController.nearMySettlement.HasRoom()
