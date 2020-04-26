@@ -121,7 +121,7 @@ namespace CourtNS
     {
       if (unitType == Type.Infantry)
         return 10;
-      return 35;
+      return 30;
     }
 
     public override int Will()
@@ -139,10 +139,7 @@ namespace CourtNS
     }
 
     public override float LevelBuf(Type unitType) {
-      if (unitType == Type.Cavalry) {
-        return 0.3f;
-      }
-      return 0.2f;
+      return 0.5f;
     }
 
   }
@@ -182,10 +179,7 @@ namespace CourtNS
     }
 
     public override float LevelBuf(Type unitType) {
-      if (unitType == Type.Cavalry) {
-        return 0.3f;
-      }
-      return 0.8f;
+      return 0.3f;
     }
 
   }

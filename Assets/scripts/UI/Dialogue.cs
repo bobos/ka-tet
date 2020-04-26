@@ -1,4 +1,5 @@
-﻿using TextNS;
+﻿using CourtNS;
+using TextNS;
 using UnitNS;
 using UnityEngine;
 using UnityEngine.UI;
@@ -211,6 +212,50 @@ namespace MonoNS
         rightImg.sprite = hexMap.imgLibrary.GetGeneralPortrait(unit.rf.general);
         rightText.text = text;
       }
+    }
+
+    public void ShowSiegeComplain(Region region) {
+      phase = 2;
+      Animating = true;
+      self.SetActive(true);
+      string text = System.String.Format(textLib.get("event_SiegeComplain"), region.Name());
+      right.SetActive(false);
+      left.SetActive(true);
+      leftImg.sprite = routingSoldier;
+      leftText.text = text;
+    }
+
+    public void ShowInCampComplain(Region region) {
+      phase = 2;
+      Animating = true;
+      self.SetActive(true);
+      string text = System.String.Format(textLib.get("event_InCampComplain"), region.Name());
+      right.SetActive(false);
+      left.SetActive(true);
+      leftImg.sprite = routingSoldier;
+      leftText.text = text;
+    }
+
+    public void ShowOnFieldComplain(Region region) {
+      phase = 2;
+      Animating = true;
+      self.SetActive(true);
+      string text = System.String.Format(textLib.get("event_OnFieldComplain"), region.Name());
+      right.SetActive(false);
+      left.SetActive(true);
+      leftImg.sprite = routingSoldier;
+      leftText.text = text;
+    }
+
+    public void ShowRetreatStress(Unit unit) {
+      phase = 2;
+      Animating = true;
+      self.SetActive(true);
+      string text = System.String.Format(textLib.get("event_RetreatStress"), unit.GeneralName());
+      right.SetActive(false);
+      left.SetActive(true);
+      leftImg.sprite = routingSoldier;
+      leftText.text = text;
     }
 
   }

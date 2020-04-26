@@ -47,6 +47,9 @@ namespace UnitNS
     public PlainSickness plainSickness;
     public WarWeary warWeary;
     public Vantage vantage;
+    public InCampComplain inCampComplain;
+    public OnFieldComplain onFieldComplain;
+    public RetreatStress retreatStress;
     WeatherGenerator weatherGenerator;
     TurnController turnController;
     public bool chaos = false;
@@ -83,6 +86,9 @@ namespace UnitNS
       plainSickness = new PlainSickness(this);
       warWeary = new WarWeary(this);
       vantage = new Vantage(this);
+      inCampComplain = new InCampComplain(this);
+      onFieldComplain = new OnFieldComplain(this);
+      retreatStress = new RetreatStress(this);
       InitAllowedAtmpt();
     }
 
@@ -445,7 +451,7 @@ namespace UnitNS
     }
 
     public bool ApplyDiscipline() {
-      return rf.general.Has(Cons.discipline) && Cons.MostLikely();
+      return rf.IsSpecial() || rf.general.Has(Cons.discipline) && Cons.HighlyLikely();
     }
 
     public General MyCommander() {
@@ -625,7 +631,11 @@ namespace UnitNS
 
     public float GetBuff()
     {
-      return GetCampingAttackBuff() + vantage.Buf();
+      return GetCampingAttackBuff() + vantage.Buf() + HeavyCavalryBuf();
+    }
+
+    public float HeavyCavalryBuf() {
+      return IsHeavyCavalry() ? 0.5f : 0f;
     }
 
     public float GetWarwearyBuf()

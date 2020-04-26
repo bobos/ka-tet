@@ -174,6 +174,15 @@ namespace MonoNS
         unit.rf.morale = unit.rf.morale > unit.GetRetreatThreshold() ? unit.rf.morale: unit.GetRetreatThreshold();
       }
 
+      int moraleDrop = unit.retreatStress.Occur();
+      if (moraleDrop != 0) {
+        unit.rf.morale += moraleDrop;
+        hexMap.dialogue.ShowRetreatStress(unit);
+        while(hexMap.dialogue.Animating) { yield return null; }
+        ShowEffect(unit, new int[]{moraleDrop, 0, 0, 0, 0});
+        while(ShowAnimating) { yield return null; }
+      }
+
       if (unit.rf.morale == 0 || unit.rf.soldiers <= Unit.DisbandUnitUnder)
       {
         hexMap.unitAniController.DestroyUnit(unit, DestroyType.ByDisband);
@@ -406,6 +415,24 @@ namespace MonoNS
           }
         }
       }
+
+      int moraleDrop = unit.inCampComplain.Occur();
+      if (moraleDrop != 0) {
+        unit.rf.morale += moraleDrop;
+        hexMap.dialogue.ShowInCampComplain(unit.rf.province.region);
+        while(hexMap.dialogue.Animating) { yield return null; }
+        ShowEffect(unit, new int[]{moraleDrop, 0, 0, 0, 0}, settlementMgr.GetView(unit.tile.settlement));
+        while(ShowAnimating) { yield return null; }
+      }
+
+      moraleDrop = unit.onFieldComplain.Occur();
+      if (moraleDrop != 0) {
+        unit.rf.morale += moraleDrop;
+        hexMap.dialogue.ShowOnFieldComplain(unit.rf.province.region);
+        while(hexMap.dialogue.Animating) { yield return null; }
+        ShowEffect(unit, new int[]{moraleDrop, 0, 0, 0, 0}, settlementMgr.GetView(unit.tile.settlement));
+        while(ShowAnimating) { yield return null; }
+      }
       hexMap.cameraKeyboardController.EnableCamera();
       RefreshAnimating = false;
     }
@@ -597,7 +624,7 @@ namespace MonoNS
       from.rf.soldiers -= killed;
       from.kia += killed;
       // morale, movement, killed, attack, def
-      ShowEffect(from, new int[]{0,0,killed,0,0});
+      ShowEffect(from, new int[]{0,0,killed,0,0}, view);
       while (ShowAnimating) { yield return null; }
       if (scared) {
         if (defeatingUnit) {
@@ -609,7 +636,7 @@ namespace MonoNS
           to.rf.soldiers -= dead;
           to.kia += dead;
           to.rf.morale += morale;
-          ShowEffect(to, new int[]{morale,0,dead,0,0});
+          ShowEffect(to, new int[]{morale,0,dead,0,0}, view);
           while (ShowAnimating) { yield return null; }
           if (to.rf.soldiers <= Unit.DisbandUnitUnder) {
             // unit disbanded
@@ -638,16 +665,20 @@ namespace MonoNS
           Scatter(affectedAllies, notMoved, -4);
           while(ScatterAnimating) { yield return null; }
           if (toTile.Deployable(from)) {
-            MoveUnit(from, toTile);
-            while (MoveAnimating) { yield return null; }
+            if (from.IsCamping()) {
+              from.tile.settlement.Decamp(from, toTile);
+            } else {
+              MoveUnit(from, toTile);
+              while (MoveAnimating) { yield return null; }
+            }
           }
         }
       } else {
-        popAniController.Show(hexMap.GetUnitView(to), textLib.get("pop_holding"), Color.green);
+        popAniController.Show(view, textLib.get("pop_holding"), Color.green);
         while (popAniController.Animating) { yield return null; }
         int morale1 = -2;
         from.rf.morale += morale1;
-        ShowEffect(from, new int[]{morale1,0,0,0,0}, null, true);
+        ShowEffect(from, new int[]{morale1,0,0,0,0}, view, true);
         while(ShowAnimating) { yield return null; }
       }
       hexMap.cameraKeyboardController.EnableCamera();
@@ -684,7 +715,7 @@ namespace MonoNS
       from.rf.soldiers -= killed;
       from.kia += killed;
       // morale, movement, killed, attack, def
-      ShowEffect(from, new int[]{0,0,killed,0,0});
+      ShowEffect(from, new int[]{0,0,killed,0,0}, view);
       while (ShowAnimating) { yield return null; }
       if (scared) {
         Tile escapeTile = null;
@@ -701,8 +732,12 @@ namespace MonoNS
             Color.white);
           while (popAniController.Animating) { yield return null; }
         } else {
-          MoveUnit(from, escapeTile);
-          while (MoveAnimating) { yield return null; }
+          if (from.IsCamping()) {
+            from.tile.settlement.Decamp(from, escapeTile);
+          } else {
+            MoveUnit(from, escapeTile);
+            while (MoveAnimating) { yield return null; }
+          }
           popAniController.Show(view,
             textLib.get("pop_breakthrough"),
             Color.green);
@@ -715,7 +750,7 @@ namespace MonoNS
         while (popAniController.Animating) { yield return null; }
         int morale1 = -5;
         from.rf.morale += morale1;
-        ShowEffect(from, new int[]{morale1,0,0,0,0}, null, true);
+        ShowEffect(from, new int[]{morale1,0,0,0,0}, view, true);
         while(ShowAnimating) { yield return null; }
       }
       hexMap.cameraKeyboardController.EnableCamera();
@@ -779,6 +814,16 @@ namespace MonoNS
           while (popAniController.Animating) { yield return null; }
         }
       } else {
+        Region region = unit.rf.province.region;
+        if ((Cons.IsQidan(region) || Cons.IsDangxiang(region)) && 
+          !unit.ApplyDiscipline() && Cons.FiftyFifty()) {
+          hexMap.dialogue.ShowSiegeComplain(region);
+          while(hexMap.dialogue.Animating) { yield return null; }
+          int moraleDrop = -5;
+          unit.rf.morale += moraleDrop;
+          ShowEffect(unit, new int[]{moraleDrop,0,0,0,0});
+          while(ShowAnimating) { yield return null; }
+        }
         if (unit.IsShowingAnimation()) {
           popAniController.Show(hexMap.GetUnitView(unit),
           textLib.get("pop_sieging"), Color.green);

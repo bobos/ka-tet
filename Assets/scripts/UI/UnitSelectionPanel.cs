@@ -286,6 +286,7 @@ namespace MonoNS
       + "%\n加成:\n"
       + "等级加成:" + unit.rf.lvlBuf * 100
       + "%\n地形加成:" + unit.vantage.Buf() * 100
+      + "%\n重骑加成:" + unit.HeavyCavalryBuf() * 100
       + "%\n将领加成:" + unit.GetGeneralBuf() * 100
       + "%\n总计加成:" + (unit.GetBuff() *100) + "%\n\n"
       + "有效作战人数:" + unit.vantage.GetEffective();
@@ -407,24 +408,10 @@ namespace MonoNS
 
         WarParty wp = action == ActionController.actionName.SHOWENEMY ? hexMap.GetAIParty() : hexMap.GetPlayerParty();
         WarPartyStat stat = wp.GetStat();
-        int attackerCP = 0;
-        int defenderCP = 0;
         WarParty wp1 = hexMap.GetAIParty();
-        foreach(Unit u in wp1.GetUnits()) {
-          if (wp1.attackside) {
-            attackerCP += u.unitPureCombatPoint;
-          } else {
-            defenderCP += u.unitPureCombatPoint;
-          }
-        }
-        wp1 = hexMap.GetPlayerParty();
-        foreach(Unit u in wp1.GetUnits()) {
-          if (wp1.attackside) {
-            attackerCP += u.unitPureCombatPoint;
-          } else {
-            defenderCP += u.unitPureCombatPoint;
-          }
-        }
+        WarParty wp2 = hexMap.GetPlayerParty();
+        int attackerCP = wp1.attackside ? wp1.GetTotalPoint() : wp2.GetTotalPoint();
+        int defenderCP = wp2.attackside ? wp1.GetTotalPoint() : wp2.GetTotalPoint();
 
         string info =
          "步兵: " + stat.numOfInfantryUnit + "都\n" +

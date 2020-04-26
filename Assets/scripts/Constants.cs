@@ -101,6 +101,26 @@ public class Cons {
     return Util.eq<Current>(current, gale);
   }
 
+  public static bool IsQidan(Region region) {
+    return Util.eq<Region>(Cons.qidan, region);
+  }
+
+  public static bool IsDangxiang(Region region) {
+    return Util.eq<Region>(Cons.dangxiang, region);
+  }
+
+  public static bool IsTubo(Region region) {
+    return Util.eq<Region>(Cons.tubo, region);
+  }
+
+  public static bool IsNvzhen(Region region) {
+    return Util.eq<Region>(Cons.nvzhen, region);
+  }
+
+  public static bool IsHan(Region region) {
+    return Util.eq<Region>(Cons.han, region);
+  }
+
   public enum Direction {
     dueNorth,
     dueSouth,

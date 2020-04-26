@@ -205,6 +205,14 @@ namespace FieldNS
       return found;
     } 
 
+    public int GetTotalPoint() {
+      int point = 0;
+      foreach(Unit u in GetUnits()) {
+        point += u.unitPureCombatPoint;
+      }
+      return point;
+    }
+
   }
 
 }

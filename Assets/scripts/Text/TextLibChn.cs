@@ -110,15 +110,15 @@ namespace TextNS
       {"r_zhongJing", "中京"},
       {"r_shangJing", "上京"},
 
-      {"region_qidanRegion", "契丹人"},
-      {"region_hanRegion", "汉人"},
-      {"region_dangxiangRegion", "党项人"},
-      {"region_tuboRegion", "吐蕃人"},
-      {"region_nvZhenRegion", "女真人"},
+      {"region_qidanRegion", "契丹族"},
+      {"region_hanRegion", "汉族"},
+      {"region_dangxiangRegion", "党项族"},
+      {"region_tuboRegion", "吐蕃族"},
+      {"region_nvZhenRegion", "女真族"},
 
       // faction
-      {"f_liao", "梁"},
-      {"f_song", "晋"},
+      {"f_liao", "辽"},
+      {"f_song", "宋"},
       {"f_xia", "夏"},
 
       // party
@@ -242,6 +242,10 @@ namespace TextNS
       {"event_RefuseToRetreat", @"{0}: 食君之禄忠君之事，岂能遁逃!"},
       {"event_ChaseDialogue", @"{0}: 贼兵休走!"},
       {"event_FeintDefeat", @"{0}: 听我号令，全军后撤!"},
+      {"event_SiegeComplain", @"{0}士兵: 我{0}勇士半日即刻拿下此城，何须筑此长围示弱于敌耶!"},
+      {"event_InCampComplain", @"{0}士兵: 我{0}铁骑岂能龟缩于高墙之后任由贼人践踏我土地，掠杀我同胞，当以堂堂之阵临贼!"},
+      {"event_OnFieldComplain", @"{0}士兵: 今贼势凶险，当凭城守坚以避贼锋，岂有野地浪战之理!"},
+      {"event_RetreatStress", @"{0}士兵: 今我部兵士战死者半，将军为何还不撤兵，意欲置我辈于死地耶!"},
 
       // pop out msg
       {"pop_builded", "建造完成!"},
