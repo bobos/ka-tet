@@ -339,20 +339,7 @@ namespace MonoNS
           title.text += " {" + ability.Name() + "}: " + ability.Description() + "\n";
         }
       }
-      title.text += "性格:";
-      if (unit.rf.general.traits.Count == 0) {
-        title.text += "无\n";
-      } else {
-        string traits = "";
-        string abilities = "性格技能: \n";
-        foreach(Trait trait in unit.rf.general.traits) {
-          traits += " " + trait.Name();
-          foreach(Ability ability in trait.Abilities()) {
-            abilities += " {" + ability.Name() + "}: " + ability.Description() + "\n";
-          }
-        }
-        title.text += traits + "\n" + abilities;
-      }
+      title.text += "\n**性格**: " + unit.rf.general.trait.Name() + "\n  " + unit.rf.general.trait.Description();
     }
 
     public void OnUnitDeselect(Unit unit)

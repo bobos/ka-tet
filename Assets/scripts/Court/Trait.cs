@@ -5,40 +5,16 @@ namespace CourtNS {
 
   public abstract class Trait {
     public abstract string Name();
-    public abstract List<Ability> Abilities();
-    public static List<Trait> RandomTraits() {
-      List<Trait> traits = new List<Trait>();
-      Trait trait = null;
-      if (Cons.FairChance()) {
-        trait = Cons.reckless;
-      } else if (Cons.TinyChance()) {
-        trait = Cons.brave;
-      }
-      
-      if (trait != null) {
-        traits.Add(trait);
-        if (trait == Cons.brave) {
-          if (Cons.FairChance()) {
-            traits.Add(Cons.loyal);
-          } else if (Cons.SlimChance()) {
-            traits.Add(Cons.cunning);
-          }
-        } else {
-          if (Cons.SlimChance()) {
-            traits.Add(Cons.loyal);
-          }
-        }
-      } else {
-        if (Cons.FairChance()) {
-          traits.Add(Cons.conservative);
-        } else if (Cons.FairChance()) {
-          traits.Add(Cons.loyal);
-        } else if (Cons.SlimChance()) {
-          traits.Add(Cons.cunning);
-        }
-      }
-
-      return traits;
+    public abstract string Description();
+    public static Trait Random() {
+      Trait[] traits = new Trait[]{
+        Cons.reckless,
+        Cons.brave, Cons.brave,
+        Cons.loyal, Cons.loyal, Cons.loyal,
+        Cons.conservative, Cons.conservative, Cons.conservative, Cons.conservative,
+        Cons.cunning, Cons.cunning, Cons.cunning,
+        Cons.ego};
+      return traits[Util.Rand(0, traits.Length-1)];
     }
   }
 
@@ -47,8 +23,8 @@ namespace CourtNS {
       return Cons.GetTextLib().get("trait_reckless");
     }
 
-    public override List<Ability> Abilities() {
-      return new List<Ability>(){Cons.forwarder, Cons.holdTheGround};
+    public override string Description() {
+      return Cons.GetTextLib().get("trait_reckless_description");
     }
   }
 
@@ -57,9 +33,8 @@ namespace CourtNS {
       return Cons.GetTextLib().get("trait_brave");
     }
 
-    public override List<Ability> Abilities() {
-      return new List<Ability>(){Cons.breaker, Cons.unshaken, Cons.forwarder,
-        Cons.holdTheGround, Cons.easyTarget, Cons.formidable};
+    public override string Description() {
+      return Cons.GetTextLib().get("trait_brave_description");
     }
   }
 
@@ -68,8 +43,8 @@ namespace CourtNS {
       return Cons.GetTextLib().get("trait_loyal");
     }
 
-    public override List<Ability> Abilities() {
-      return new List<Ability>(){Cons.attender, Cons.refuseToRetreat, Cons.unshaken};
+    public override string Description() {
+      return Cons.GetTextLib().get("trait_loyal_description");
     }
   }
 
@@ -78,8 +53,8 @@ namespace CourtNS {
       return Cons.GetTextLib().get("trait_conservative");
     }
 
-    public override List<Ability> Abilities() {
-      return new List<Ability>(){Cons.retreater, Cons.playSafe};
+    public override string Description() {
+      return Cons.GetTextLib().get("trait_conservative_description");
     }
   }
 
@@ -88,8 +63,18 @@ namespace CourtNS {
       return Cons.GetTextLib().get("trait_cunning");
     }
 
-    public override List<Ability> Abilities() {
-      return new List<Ability>(){Cons.feintDefeat, Cons.opportunist, Cons.playSafe};
+    public override string Description() {
+      return Cons.GetTextLib().get("trait_cunning_description");
+    }
+  }
+
+  public class Ego: Trait {
+    public override string Name() {
+      return Cons.GetTextLib().get("trait_ego");
+    }
+
+    public override string Description() {
+      return Cons.GetTextLib().get("trait_ego_description");
     }
   }
 

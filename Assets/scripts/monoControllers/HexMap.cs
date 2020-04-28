@@ -324,13 +324,13 @@ namespace MonoNS
       // init defender first
       General commander = defenders[0];
       foreach(General g in defenders) {
-        if (g.traits.Contains(Cons.conservative)) {
+        if (g.Is(Cons.conservative)) {
           if (DeployAtSettlement(theBox, g)) { continue; }
           foreach(Tile t in middleField) {
             if (DeployAtSettlement(t, g)) { break; }
           }
           if (!g.IsOnField()) { RandomDeploy(g); };
-        } else if (g.traits.Contains(Cons.loyal)) {
+        } else if (g.Is(Cons.loyal)) {
           int len = frontier.Length - 1;
           if (DeployAtSettlement(frontier[Util.Rand(0, len)], g)) {
             continue;
@@ -347,7 +347,7 @@ namespace MonoNS
           }
 
           if (!g.IsOnField()) { RandomDeploy(g); };
-        } else if (g.traits.Contains(Cons.cunning)) {
+        } else if (g.Is(Cons.cunning)) {
           Tile[] ts = Cons.FairChance() ? keyPos : middleField;
           int len = ts.Length - 1;
           if (DeployAtSettlement(ts[Util.Rand(0, len)], g)) {
@@ -359,7 +359,7 @@ namespace MonoNS
           }
 
           if (!g.IsOnField()) { RandomDeploy(g); };
-        } else if (g.traits.Contains(Cons.brave)) {
+        } else if (g.Is(Cons.brave)) {
           Tile[] ts = Cons.EvenChance() ? keyPos : frontier;
           int len = ts.Length - 1;
           if (DeployAtSettlement(ts[Util.Rand(0, len)], g)) {

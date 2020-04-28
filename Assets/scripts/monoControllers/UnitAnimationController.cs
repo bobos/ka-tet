@@ -241,10 +241,10 @@ namespace MonoNS
 
       foreach (Unit g in tmp) {
         bool killed = false;
-        if ((g.rf.general.Has(Cons.easyTarget) || g.rf.general.Has(Cons.refuseToRetreat))
+        if ((g.rf.general.Is(Cons.brave) || g.rf.general.Is(Cons.loyal))
           && Cons.MostLikely()) {
           killed = true;
-        } else if ((g.rf.general.Has(Cons.opportunist) || g.rf.general.Has(Cons.playSafe)) && Cons.SlimChance()) {
+        } else if (g.rf.general.Is(Cons.cunning) && Cons.SlimChance()) {
           killed = true;
         } else {
           killed = Cons.EvenChance();
@@ -873,7 +873,7 @@ namespace MonoNS
       Tile lastTile = unit.GetPath()[unit.GetPath().Length - 1];
       hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(unit.tile).transform.position);
       while(hexMap.cameraKeyboardController.fixingCamera) { yield return null; }
-      if (!breakThrough && unit.rf.general.Has(Cons.refuseToRetreat) && Cons.MostLikely()) {
+      if (!breakThrough && unit.rf.general.Is(Cons.loyal) && Cons.MostLikely()) {
         hexMap.dialogue.ShowRefuseToRetreat(unit);
         while(hexMap.dialogue.Animating) { yield return null; }
       } else {

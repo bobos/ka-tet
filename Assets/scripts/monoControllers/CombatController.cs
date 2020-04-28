@@ -313,7 +313,7 @@ namespace MonoNS
       }
 
       // when odds is greater than close
-      if (unit.rf.general.Has(Cons.opportunist)) {
+      if (unit.rf.general.Is(Cons.cunning)) {
         return 50;
       }
 
@@ -739,7 +739,7 @@ namespace MonoNS
         int[] vicBuf = GetVicBuf(resultLevel);
         int[] dftBuf = GetDftBuf(resultLevel);
         if (atkWin) {
-          if (!defender.IsGone() && defender.rf.general.Has(Cons.easyTarget) && Cons.SlimChance()) {
+          if (!defender.IsGone() && defender.rf.general.Is(Cons.brave) && Cons.SlimChance()) {
             hexMap.unitAniController.DestroyUnit(defender, DestroyType.ByDisband, true);
             while (hexMap.unitAniController.DestroyAnimating) { yield return null; }
           }
@@ -792,7 +792,7 @@ namespace MonoNS
           hexMap.turnController.Sleep(1);
           while(hexMap.turnController.sleeping) { yield return null; }
         } else {
-          if (!attacker.IsGone() && attacker.rf.general.Has(Cons.easyTarget) && Cons.SlimChance()) {
+          if (!attacker.IsGone() && attacker.rf.general.Is(Cons.brave) && Cons.SlimChance()) {
             hexMap.unitAniController.DestroyUnit(attacker, DestroyType.ByDisband, true);
             while (hexMap.unitAniController.DestroyAnimating) { yield return null; }
           }
@@ -867,7 +867,7 @@ namespace MonoNS
 
         bool cunningLoser = loser.rf.general.Has(Cons.feintDefeat);
         foreach(UnitPredict up in atkWin ? predict.attackers : predict.defenders) {
-          if (!up.unit.IsGone() && up.unit.rf.general.Has(Cons.forwarder) && Cons.MostLikely()) {
+          if (!up.unit.IsGone() && up.unit.rf.general.Is(Cons.reckless) && Cons.MostLikely()) {
             chasers.Add(up.unit);
           }
         }

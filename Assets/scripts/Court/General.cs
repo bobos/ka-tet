@@ -44,7 +44,7 @@ namespace CourtNS {
       }
     }
     public Party party;
-    public List<Trait> traits;
+    public Trait trait;
     public List<Ability> acquiredAbilities;
     public int age;
     public Province province;
@@ -58,7 +58,6 @@ namespace CourtNS {
     public HashSet<Ability> onFieldAbilities;
 
     HexMap hexMap;
-    WarParty warParty;
     string name;
     string biography;
     TextLib txtLib = Cons.GetTextLib();
@@ -69,7 +68,7 @@ namespace CourtNS {
       this.name = name;
       this.biography = biography;
       this.province = province;
-      this.traits = traits == null ? Trait.RandomTraits() : traits;
+      this.trait = Trait.Random();
       acquiredAbilities = acquired == null ? Ability.RandomAcquiredAbilities() : acquired;
       this.commandSkill = commandSkill;
       this.size = size;
@@ -77,6 +76,10 @@ namespace CourtNS {
 
     public bool Has(Ability ability) {
       return onFieldAbilities.Contains(ability);
+    }
+
+    public bool Is(Trait trait) {
+      return Util.eq<Trait>(this.trait, trait);
     }
 
     // General Stats
@@ -158,11 +161,6 @@ namespace CourtNS {
           onFieldAbilities.Add(ability);
         }
       }
-      foreach(Trait trait in traits) {
-        foreach(Ability ability in trait.Abilities()) {
-          onFieldAbilities.Add(ability);
-        }
-      }
       foreach(Ability ability in acquiredAbilities) {
         onFieldAbilities.Add(ability);
       }
@@ -180,10 +178,8 @@ namespace CourtNS {
       commandUnit.general = null;
       commandUnit = null;
       LeaveCampaign();
-      if ((Has(Cons.easyTarget) && Cons.FiftyFifty()) ||
-          (Has(Cons.playSafe) && Cons.TinyChance()) ||
-          Cons.FairChance() || generalDead
-          ) {
+      if ((Is(Cons.brave) && Cons.FiftyFifty()) ||
+          Cons.FairChance() || generalDead) {
         // Killed in battle
         Die();
       }

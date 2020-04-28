@@ -230,19 +230,12 @@ public class Cons {
   public static Ability generous = new Generous();
   public static Ability runner = new Runner();
   public static Ability fireBug = new FireBug();
-
-  // come with traits
-  public static Ability forwarder = new Forwarder();
   public static Ability holdTheGround = new HoldTheGround();
   public static Ability breaker = new Breaker();
   public static Ability unshaken = new Unshaken();
-  public static Ability easyTarget = new EasyTarget();
   public static Ability formidable = new CounterAttack();
   public static Ability attender = new Attender();
-  public static Ability refuseToRetreat = new RefuseToRetreat();
-  public static Ability retreater = new Retreater();
   public static Ability feintDefeat = new FeintDefeat();
-  public static Ability opportunist = new Opportunist();
   public static Ability playSafe = new PlaySafe();
 
   // trait
@@ -251,5 +244,6 @@ public class Cons {
   public static Trait loyal = new Loyal();
   public static Trait conservative = new Conservative();
   public static Trait cunning = new Cunning();
+  public static Trait ego = new Ego();
 
 }

@@ -200,6 +200,7 @@ public class Starter : MonoBehaviour {
 
     hexMap.frontier = new Tile[]{camp1, camp2};
     hexMap.middleField = new Tile[]{camp3, city};
+    hexMap.keyPos = new Tile[]{hexMap.GetTile(13, 30)};
     hexMap.theBox = mainCity;
     hexMap.attackerReserveTile = hexMap.GetTile(5, 9);
 

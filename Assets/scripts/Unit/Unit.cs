@@ -218,7 +218,7 @@ namespace UnitNS
         }
       }
 
-      if (rf.general.Has(Cons.retreater)) {
+      if (rf.general.Is(Cons.conservative)) {
         chance += 50;
       }
 
@@ -447,7 +447,7 @@ namespace UnitNS
     }
 
     public bool RetreatOnDefeat() {
-      return rf.general.Has(Cons.retreater) && Cons.EvenChance() && IsOnField();
+      return rf.general.Is(Cons.conservative) && Cons.EvenChance() && IsOnField();
     }
 
     public bool ApplyDiscipline() {
@@ -635,7 +635,7 @@ namespace UnitNS
     }
 
     public float HeavyCavalryBuf() {
-      return IsHeavyCavalry() ? 0.5f : 0f;
+      return IsHeavyCavalry() ? 0.2f : 0f;
     }
 
     public float GetWarwearyBuf()
