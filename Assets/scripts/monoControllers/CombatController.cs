@@ -338,8 +338,7 @@ namespace MonoNS
     void Helper(UnitPredict up, int dead) {
       Unit unit = up.unit;
       up.dead += dead;
-      unit.kia += dead;
-      unit.rf.soldiers -= dead;
+      unit.Killed(dead);
     }
 
     int AllocateCasualty(int total, List<UnitPredict> units) {
@@ -363,12 +362,10 @@ namespace MonoNS
             if (unit.rf.soldiers < total) {
               total -= unit.rf.soldiers;
               up.dead += unit.rf.soldiers;
-              unit.kia += unit.rf.soldiers;
-              unit.rf.soldiers = 0;
+              unit.Killed(unit.rf.soldiers);
             } else {
               up.dead += total;
-              unit.kia += total;
-              unit.rf.soldiers -= total;
+              unit.Killed(total);
               total = 0;
               break;
             }
@@ -379,8 +376,7 @@ namespace MonoNS
           if (unit.rf.soldiers < 20) {
             total -= unit.rf.soldiers;
             up.dead += unit.rf.soldiers;
-            unit.kia += unit.rf.soldiers;
-            unit.rf.soldiers = 0;
+            unit.Killed(unit.rf.soldiers);
             dryUnits++;
             continue;
           }

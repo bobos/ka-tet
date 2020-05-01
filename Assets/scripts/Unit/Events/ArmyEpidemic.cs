@@ -43,8 +43,7 @@ namespace UnitNS
         effects[0] = morale;
         unit.rf.morale += morale;
         int kiaNum = (int)(unit.rf.soldiers * KillRate);
-        unit.kia += kiaNum;
-        unit.rf.soldiers -= kiaNum;
+        unit.Killed(kiaNum);
         effects[2] = kiaNum;
       }
 

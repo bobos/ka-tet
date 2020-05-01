@@ -255,6 +255,12 @@ namespace MonoNS
       }
     }
 
+    public void OnSurpriseAttackClick() {
+      if (onBtnClick != null) {
+        onBtnClick(actionName.SurpriseAttack);
+      }
+    }
+
     public enum actionName
     {
       MOVE,
@@ -288,7 +294,8 @@ namespace MonoNS
       MIDBTN2,
       TroopInfo,
       TraitInfo,
-      AbilityInfo
+      AbilityInfo,
+      SurpriseAttack
     }
 
     // Make sure this is sequential
@@ -342,6 +349,10 @@ namespace MonoNS
 
     public bool ForceRetreat(Unit unit) {
       return DoAction(unit, null, null, actionName.ForceRetreat);
+    }
+
+    public bool SurpriseAttack(Unit from, Unit to) {
+      return DoAction(from, to, null, actionName.SurpriseAttack);
     }
 
     public bool DoAction(Unit unit, Unit unit1, Tile tile, actionName name)
@@ -399,6 +410,10 @@ namespace MonoNS
       if (name == actionName.ForceRetreat) 
       {
         StartCoroutine(DoForceRetreat(unit));
+      }
+      if (name == actionName.SurpriseAttack) 
+      {
+        StartCoroutine(DoSurpriseAttack(unit, unit1));
       }
       return true;
     }
@@ -528,6 +543,15 @@ namespace MonoNS
     IEnumerator DoForceRetreat(Unit unit) {
       unitAniController.ForceRetreat(unit);
       while (unitAniController.RetreatAnimating)
+      {
+        yield return null;
+      }
+      ActionOngoing = false;
+    }
+
+    IEnumerator DoSurpriseAttack(Unit unit, Unit unit1) {
+      unitAniController.SurpriseAttack(unit, unit1);
+      while (unitAniController.SurpriseAnimating)
       {
         yield return null;
       }

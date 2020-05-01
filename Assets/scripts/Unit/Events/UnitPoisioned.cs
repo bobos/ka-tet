@@ -45,8 +45,7 @@
         effects[0] = morale;
 
         int kiaNum = Util.Rand(1, 15);
-        unit.kia += kiaNum;
-        unit.rf.soldiers -= kiaNum;
+        unit.Killed(kiaNum);
         effects[2] = kiaNum;
       }
       return effects;

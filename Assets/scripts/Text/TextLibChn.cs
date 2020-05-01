@@ -293,6 +293,8 @@ namespace TextNS
       {"pop_failedToBreakthrough", "突围失败"},
       {"pop_breakthrough", "突围成功"},
       {"pop_toBreakThrough", "突围"},
+      {"pop_surpriseAttack", "奇袭!"},
+      {"pop_surpriseAttackFailed", "早有防备!"},
 
       // settlement
       {"settlement_storageLvl1", "初级粮仓"},
@@ -368,7 +370,7 @@ namespace TextNS
       {"ability_unshaken", "寸步不让"},
       {"ability_unshaken_description", "部队战败时75%几率不会退败"},
       {"ability_formidable", "骁勇善战"},
-      {"ability_formidable_description", "所部战力+25%,当所部被完全包围时战斗力提升3倍"},
+      {"ability_formidable_description", "所部战力+25%,当所部被完全包围时战斗力提升3倍, 被奇袭成功率低"},
       {"ability_attender", "永不缺席"},
       {"ability_attender_description", "100%几率参加协同作战"},
       {"ability_feintDefeat", "佯败"},
@@ -383,6 +385,10 @@ namespace TextNS
       {"ability_runner_description", "部队移动力提升50%"},
       {"ability_fireBug", "祝融之名"},
       {"ability_fireBug_description", "放火成功率100%"},
+      {"ability_outlooker", "千里眼"},
+      {"ability_outlooker_description", "发现视力范围内潜伏敌军"},
+      {"ability_ambusher", "飞将军"},
+      {"ability_ambusher_description", "可发动奇袭范围增加为4格"},
 
       {"trait_reckless", "鲁莽"},
       {"trait_reckless_description", "敌军退败容易主动追击"},
@@ -391,11 +397,13 @@ namespace TextNS
       {"trait_loyal", "忠义"},
       {"trait_loyal_description", "容易拒绝撤退指令"},
       {"trait_conservative", "保守"},
-      {"trait_conservative_description", "己方战败时容易主动撤退,不易受突袭影响"},
-      {"trait_cunning", "精明"},
+      {"trait_conservative_description", "己方战败时容易主动撤退, 不易被奇袭"},
+      {"trait_cunning", "利己"},
       {"trait_cunning_description", "己方处于劣势时容易按兵不动,不易战死"},
       {"trait_ego", "自负"},
       {"trait_ego_description", "容易受敌方激将"},
+      {"trait_calm", "中庸"},
+      {"trait_calm_description", "中庸之道"},
       };
     }
   }

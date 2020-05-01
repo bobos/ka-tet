@@ -237,6 +237,8 @@ public class Cons {
   public static Ability attender = new Attender();
   public static Ability feintDefeat = new FeintDefeat();
   public static Ability playSafe = new PlaySafe();
+  public static Ability outlooker = new Outlooker();
+  public static Ability ambusher = new Ambusher();
 
   // trait
   public static Trait reckless = new Reckless();
@@ -245,5 +247,6 @@ public class Cons {
   public static Trait conservative = new Conservative();
   public static Trait cunning = new Cunning();
   public static Trait ego = new Ego();
+  public static Trait calm = new Calm();
 
 }

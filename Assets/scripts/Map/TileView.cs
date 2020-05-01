@@ -45,8 +45,8 @@ public class TileView : View
     } else if (tile.terrian != TerrianType.Mountain) {
       txt = txt + (tile.burnable ? "Fire" : "");
     }
-    if (tile.field == FieldType.Village) {
-      txt = txt + " Vlg";
+    if (tile.field == FieldType.Forest) {
+      txt = txt + " Fst";
     }
     Color fontColor;
     if (tile.field == FieldType.Burning || tile.field == FieldType.Schorched) {
@@ -86,7 +86,7 @@ public class TileView : View
     {
       mat = hexMap.MatMountain;
     }
-    else if (tile.field == FieldType.Village)
+    else if (tile.field == FieldType.Forest)
     {
       mat = hexMap.MatGrassland;
     }

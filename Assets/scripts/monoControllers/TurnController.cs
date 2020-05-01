@@ -294,6 +294,7 @@ namespace MonoNS
           u.surroundCnt = 0;
         }
       }
+      otherP.UpdateAlert();
 
       // AI Stuff
       /*

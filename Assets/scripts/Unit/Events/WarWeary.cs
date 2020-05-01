@@ -25,9 +25,7 @@
       int[] effects = new int[5]{0,0,0,0,0};
       int miaNum = GetWarWearyDissertNum();
       effects[2] = miaNum;
-      unit.kia += miaNum;
-      unit.rf.soldiers -= miaNum;
-
+      unit.Killed(miaNum);
       return effects;
     }
 

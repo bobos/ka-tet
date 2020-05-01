@@ -150,6 +150,7 @@ namespace MonoNS
         popAniController.Show(view, textLib.get("pop_discovered"), Color.yellow);
         while(popAniController.Animating) { yield return null; }
       }
+      hexMap.GetWarParty(unit, true).UpdateAlert();
       // stash event
       // hexMap.eventStasher.Add(unit.rf.general, MonoNS.EventDialog.EventName.FarmDestroyed);
 
@@ -621,8 +622,7 @@ namespace MonoNS
         scared = Cons.HighlyLikely();
       }
       int killed = Util.Rand(2, 15);
-      from.rf.soldiers -= killed;
-      from.kia += killed;
+      from.Killed(killed);
       // morale, movement, killed, attack, def
       ShowEffect(from, new int[]{0,0,killed,0,0}, view);
       while (ShowAnimating) { yield return null; }
@@ -633,8 +633,7 @@ namespace MonoNS
           dead = from.rf.general.Has(Cons.pursuer) ? (int)(dead * 1.5f) : dead;
           dead = dead > to.rf.soldiers ? to.rf.soldiers : dead;
           int morale = from.rf.general.Has(Cons.pursuer) ? -8 : -5;
-          to.rf.soldiers -= dead;
-          to.kia += dead;
+          to.Killed(dead);
           to.rf.morale += morale;
           ShowEffect(to, new int[]{morale,0,dead,0,0}, view);
           while (ShowAnimating) { yield return null; }
@@ -711,9 +710,8 @@ namespace MonoNS
       if (!scared && from.rf.general.Has(Cons.punchThrough)) {
         scared = Cons.FiftyFifty();
       }
-      int killed = Util.Rand(30, 100);
-      from.rf.soldiers -= killed;
-      from.kia += killed;
+      int killed = Util.Rand(20, 50);
+      from.Killed(killed);
       // morale, movement, killed, attack, def
       ShowEffect(from, new int[]{0,0,killed,0,0}, view);
       while (ShowAnimating) { yield return null; }
@@ -771,8 +769,7 @@ namespace MonoNS
       // morale, movement, killed, attack, def
       ShowEffect(unit, new int[]{morale,0,killed,0,0});
       while (ShowAnimating) { yield return null; }
-      unit.rf.soldiers -= killed;
-      unit.kia += killed;
+      unit.Killed(killed);
       unit.rf.morale += morale;
       if (unit.rf.soldiers <= Unit.DisbandUnitUnder) {
         // unit disbanded
@@ -907,6 +904,42 @@ namespace MonoNS
       unit.SetPath(new Tile[]{unit.tile});
       hexMap.cameraKeyboardController.EnableCamera();
       ForceRetreatAnimating = false;
+    }
+
+    public bool SurpriseAnimating = false;
+    public void SurpriseAttack(Unit from, Unit to) {
+      SurpriseAnimating = true;
+      hexMap.cameraKeyboardController.DisableCamera();
+      StartCoroutine(CoSurpriseAttack(from, to));
+    }
+
+    IEnumerator CoSurpriseAttack(Unit from, Unit to) {
+      bool surprised = to.CanBeSurprised() >= Util.Rand(1, 100);
+      from.SetPath(from.FindAttackPath(to));
+      while (from.GetPath().Length > 0) {
+        MoveUnit(from);
+        while(MoveAnimating) { yield return null; }
+      }
+      while(MoveAnimating) { yield return null; }
+      popAniController.Show(hexMap.GetUnitView(from), textLib.get("pop_surpriseAttack"), Color.green);
+      from.UseAtmpt();
+      while(popAniController.Animating) { yield return null; }
+      if (!surprised) {
+        popAniController.Show(hexMap.GetUnitView(to), textLib.get("pop_surpriseAttackFailed"), Color.white);
+        while(popAniController.Animating) { yield return null; }
+        int killed = from.IsCavalry() ? Util.Rand(20, 50) : Util.Rand(40, 100);
+        int moraleDrop = -3; 
+        from.rf.morale += moraleDrop;
+        from.Killed(killed);
+        ShowEffect(from, new int[]{moraleDrop,0,killed,0,0});
+        while (ShowAnimating) { yield return null; }
+      } else {
+        // TODO:xxx 
+xxx
+      }
+      
+      hexMap.cameraKeyboardController.EnableCamera();
+      SurpriseAnimating = false;
     }
 
     public bool ShowAnimating = false;

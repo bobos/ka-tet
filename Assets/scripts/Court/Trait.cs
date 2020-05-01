@@ -10,9 +10,10 @@ namespace CourtNS {
       Trait[] traits = new Trait[]{
         Cons.reckless,
         Cons.brave, Cons.brave,
-        Cons.loyal, Cons.loyal, Cons.loyal,
-        Cons.conservative, Cons.conservative, Cons.conservative, Cons.conservative,
-        Cons.cunning, Cons.cunning, Cons.cunning,
+        Cons.loyal, Cons.loyal,
+        Cons.conservative, Cons.conservative,
+        Cons.cunning, Cons.cunning,
+        Cons.calm, Cons.calm, Cons.calm,
         Cons.ego};
       return traits[Util.Rand(0, traits.Length-1)];
     }
@@ -75,6 +76,16 @@ namespace CourtNS {
 
     public override string Description() {
       return Cons.GetTextLib().get("trait_ego_description");
+    }
+  }
+
+  public class Calm: Trait {
+    public override string Name() {
+      return Cons.GetTextLib().get("trait_calm");
+    }
+
+    public override string Description() {
+      return Cons.GetTextLib().get("trait_calm_description");
     }
   }
 

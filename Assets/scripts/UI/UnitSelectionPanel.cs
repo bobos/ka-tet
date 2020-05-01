@@ -26,7 +26,7 @@ namespace MonoNS
                            SabotageButton, FireButton, SiegeButton, EncampButton,
                            RetreatButton, DecampButton, ReposButton,
                            BuryButton, ChargeButton, TroopButton, GeneralButton,
-                           BreakThroughButton
+                           BreakThroughButton, SurpriseAttackButton
                            };
       buttons = btns;
       mouseController.onUnitSelect += OnUnitSelect;
@@ -61,6 +61,7 @@ namespace MonoNS
     public GameObject BreakThroughButton;
     public GameObject TroopButton;
     public GameObject GeneralButton;
+    public GameObject SurpriseAttackButton;
     GameObject[] buttons;
 
     public Text title;
@@ -191,6 +192,7 @@ namespace MonoNS
       
       if (!hexMap.combatController.start && hexMap.deployDone && unit.CanAttack()) {
         AttackButton.SetActive(true);
+        SurpriseAttackButton.SetActive(mouseController.surpriseTargets.Length > 0);
       }
 
       if (mouseController.nearAlly && hexMap.deployDone && !hexMap.wargameController.IsWargameUnit(unit)) {
@@ -310,7 +312,7 @@ namespace MonoNS
       stateStr += unit.IsWarWeary() ? "士气低落 " : "";
       stateStr += unit.IsStarving() ? "饥饿 " : "";
       stateStr += unit.GetStateName();
-      title.text += "\n" + stateStr;
+      title.text += "\n" + (unit.alerted ? "[有所防备]" : "") + stateStr;
       title.text += unit.GetHeatSickTurns() > 0 ? "\n痢疾: 将持续" + unit.GetHeatSickTurns() + "回合 " : "";
       title.text += unit.GetAltitudeSickTurns() > 0 ? "\n高原反应: 将持续" + unit.GetAltitudeSickTurns() + "回合" : "";
       title.text += unit.plainSickness.affected  ? "\n平原反应" : "";

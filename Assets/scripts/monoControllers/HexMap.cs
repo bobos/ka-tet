@@ -650,8 +650,10 @@ namespace MonoNS
       return wp.attackside;
     }
 
-    public WarParty GetWarParty(Unit unit) {
-      return unit.IsAI() ? GetAIParty() : GetPlayerParty();
+    public WarParty GetWarParty(Unit unit, bool counterParty = false) {
+      return counterParty ?
+      (unit.IsAI() ? GetPlayerParty() : GetAIParty()) :
+      (unit.IsAI() ? GetAIParty() : GetPlayerParty());
     }
 
     public WarParty GetWarParty(Faction faction) {
@@ -960,7 +962,7 @@ namespace MonoNS
           tile.vantagePoint = true;
         } else {
           prefab = HighGroundPrefab;
-          fieldType = Cons.MostLikely() ? FieldType.Wild : (Cons.TinyChance() ? FieldType.Village : FieldType.Wild);
+          fieldType = Cons.MostLikely() ? FieldType.Wild : (Cons.EvenChance() ? FieldType.Forest : FieldType.Wild);
           tile.SetTerrianType(TerrianType.Hill);
           if(fieldType == FieldType.Wild && Cons.SlimChance()) {
             tile.burnable = true;
@@ -971,7 +973,7 @@ namespace MonoNS
       {
         prefab = HexPrefab;
         tile.SetTerrianType(TerrianType.Plain);
-        fieldType = Cons.FairChance() ? FieldType.Wild : (Cons.TinyChance() ? FieldType.Village : FieldType.Wild);
+        fieldType = Cons.FairChance() ? FieldType.Wild : (Cons.FairChance() ? FieldType.Forest : FieldType.Wild);
       }
       else
       {

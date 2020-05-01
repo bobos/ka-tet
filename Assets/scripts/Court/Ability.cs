@@ -10,7 +10,9 @@ namespace CourtNS {
       Ability[] candidates = new Ability[]{Cons.forecaster, Cons.discipline,
         Cons.pursuer, Cons.hammer, Cons.builder, Cons.breacher, Cons.noPanic,
         Cons.mechanician, Cons.diminisher, Cons.staminaManager, Cons.punchThrough,
-        Cons.generous, Cons.runner, Cons.fireBug};
+        Cons.generous, Cons.runner, Cons.fireBug, Cons.holdTheGround, Cons.breaker,
+        Cons.unshaken, Cons.formidable, Cons.attender, Cons.feintDefeat, Cons.playSafe,
+        Cons.outlooker, Cons.ambusher};
       int total = candidates.Length;
       int luckNum = Util.Rand(0, total + 5);
       if (luckNum < total) {
@@ -446,6 +448,32 @@ namespace CourtNS {
 
     public override string Description() {
       return Cons.GetTextLib().get("ability_fireBug_description");
+    }
+  }
+
+  public class Outlooker: Ability {
+    public Outlooker() {
+    }
+
+    public override string Name() {
+      return Cons.GetTextLib().get("ability_outlooker");
+    }
+
+    public override string Description() {
+      return Cons.GetTextLib().get("ability_outlooker_description");
+    }
+  }
+
+  public class Ambusher: Ability {
+    public Ambusher() {
+    }
+
+    public override string Name() {
+      return Cons.GetTextLib().get("ability_ambusher");
+    }
+
+    public override string Description() {
+      return Cons.GetTextLib().get("ability_ambusher_description");
     }
   }
 

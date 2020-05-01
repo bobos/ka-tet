@@ -95,7 +95,7 @@ namespace MapTileNS
     {
       string prefix = "";
       if (field == FieldType.Wild) prefix = "Wild";
-      if (field == FieldType.Village) prefix = "Village";
+      if (field == FieldType.Forest) prefix = "Forest";
       if (field == FieldType.Settlement) prefix = "Settelment On";
       if (field == FieldType.Schorched) prefix = "Schorched";
       if (field == FieldType.Burning) prefix = "Burning";
@@ -343,7 +343,7 @@ namespace MapTileNS
     public int Work2BuildSettlement()
     {
       if ((terrian == TerrianType.Plain || terrian == TerrianType.Hill) &&
-        (field == FieldType.Wild || field == FieldType.Village || field == FieldType.Flooded
+        (field == FieldType.Wild || field == FieldType.Forest || field == FieldType.Flooded
          || field == FieldType.Schorched) && siegeWall == null)
       {
         return Work2BuildCamp;

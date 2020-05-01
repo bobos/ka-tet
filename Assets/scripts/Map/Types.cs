@@ -13,7 +13,7 @@ namespace MapTileNS
 
   public enum FieldType {
     Wild,
-    Village,
+    Forest,
     Settlement,
     Schorched,
     Flooded,

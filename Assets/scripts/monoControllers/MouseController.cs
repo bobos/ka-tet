@@ -96,6 +96,7 @@ namespace MonoNS
     public bool nearEnemy = false;
     public bool nearWater = false;
     public List<Unit> nearbyEnemey = null;
+    public Unit[] surpriseTargets = null;
     public HashSet<Unit> nearbyAlly = null;
 
     void ResetUnitSelection() {
@@ -108,6 +109,7 @@ namespace MonoNS
       nearbyEnemey = new List<Unit>();
       nearbyAlly = new HashSet<Unit>();
       nearFireTiles = new List<Tile>();
+      surpriseTargets = new Unit[]{};
     }
 
     public void PrepareUnitSelection() {
@@ -150,6 +152,10 @@ namespace MonoNS
       }
       if (s != null && isAI != s.owner.isAI) {
         nearEnemySettlement = s;
+      }
+
+      if (selectedUnit != null) {
+        surpriseTargets = selectedUnit.GetSurpriseTargets();
       }
     }
 
@@ -235,6 +241,21 @@ namespace MonoNS
         }
       }
 
+      if (action == ActionController.actionName.SurpriseAttack)
+      {
+        if (surpriseTargets.Length == 0) {
+          msgBox.Show("无可奇袭目标!");
+          Escape();
+        } else {
+          mouseMode = mode.surpriseAttack;
+          Update_CurrentFunc = UpdateUnitSurpriseAttack;
+          msgBox.Show("选择目标!");
+          foreach(Unit u in surpriseTargets) {
+            hexMap.TargetUnit(u);
+          }
+        }
+      }
+
       if (action == ActionController.actionName.CHARGE)
       {
         mouseMode = mode.attack;
@@ -292,6 +313,7 @@ namespace MonoNS
       camera,
       move,
       attack,
+      surpriseAttack,
       repos,
       sabotage,
       fire
@@ -334,6 +356,12 @@ namespace MonoNS
 
       if (mouseMode == mode.attack) {
         foreach(Unit u in nearbyEnemey) {
+          hexMap.SetUnitSkin(u);
+        }
+      }
+
+      if (mouseMode == mode.surpriseAttack) {
+        foreach(Unit u in surpriseTargets) {
           hexMap.SetUnitSkin(u);
         }
       }
@@ -472,6 +500,13 @@ namespace MonoNS
         }
       }
 
+      if (mouseMode == mode.surpriseAttack) {
+        if(u != null && u.IsAI() != selectedUnit.IsAI() && surpriseTargets.Contains(u)) {
+          targetUnit = u;
+          return;
+        }
+      }
+
       if (mouseMode == mode.repos && nearbyAlly.Contains(u)) {
         targetUnit = u;
         return;
@@ -528,6 +563,29 @@ namespace MonoNS
           msgBox.Show("");
           hexMap.combatController.StartOperation(selectedUnit, targetUnit, targetSettlement);
           hexMap.actionController.commenceOperation();
+        }
+      } else if (!Util.eq<Tile>(tileUnderMouse, selectedUnit.tile))
+      {
+        Unit u = tileUnderMouse.GetUnit();
+        if (u != null)
+        {
+          hover.Show(u.Name());
+        }
+      }
+    }
+
+    void UpdateUnitSurpriseAttack()
+    {
+      if (tileUnderMouse == null) {
+        return;
+      }
+      if (Input.GetMouseButtonUp(0))
+      {
+        ClickOnTile();
+        if (targetUnit != null) {
+          msgBox.Show("");
+          hexMap.actionController.SurpriseAttack(selectedUnit, targetUnit);
+          Escape();
         }
       } else if (!Util.eq<Tile>(tileUnderMouse, selectedUnit.tile))
       {

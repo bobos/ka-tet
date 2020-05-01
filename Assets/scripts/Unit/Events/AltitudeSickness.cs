@@ -32,8 +32,7 @@ namespace UnitNS
       }
       lastTurns--;
       int killed = Util.Rand(1, 10);
-      unit.kia += killed;
-      unit.rf.soldiers -= killed;
+      unit.Killed(killed);
       return killed;
     }
 

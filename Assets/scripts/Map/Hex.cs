@@ -184,8 +184,14 @@ namespace MapTileNS
       HashSet<Hex> core = new HashSet<Hex>();
       hexes.Add(this);
       core.Add(this);
-      FindNeighbours(hexes, core, range, filter);
-      return ToDescendentType<T>(hexes.ToArray());
+      FindNeighbours(hexes, core, range);
+      HashSet<T> ret = new HashSet<T>();
+      foreach(T hex in hexes) {
+        if (filter(hex)) {
+          ret.Add(hex);
+        }
+      }
+      return ret.ToArray();
     }
    
     float Height()
@@ -208,7 +214,7 @@ namespace MapTileNS
       return Width();
     }
 
-    void FindNeighbours<T>(HashSet<Hex> hexes, HashSet<Hex> innerRing, int range, NeighboursFilter<T> filter) where T: Hex
+    void FindNeighbours(HashSet<Hex> hexes, HashSet<Hex> innerRing, int range)
     {
       if (range-- == 0) return;
       HashSet<Hex> outerRing = new HashSet<Hex>();
@@ -224,7 +230,7 @@ namespace MapTileNS
           }
         }
       }
-      FindNeighbours<T>(hexes, outerRing, range, filter);
+      FindNeighbours(hexes, outerRing, range);
     }
   }
 

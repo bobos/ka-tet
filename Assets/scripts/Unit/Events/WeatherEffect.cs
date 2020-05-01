@@ -21,8 +21,7 @@
           int morale = -1;
           unit.rf.morale += morale;
           int kiaNum = Util.Rand(0, 10);
-          unit.kia += kiaNum;
-          unit.rf.soldiers -= kiaNum;
+          unit.Killed(kiaNum);
           effects[0] = morale;
           effects[2] = kiaNum;
         }
@@ -35,8 +34,7 @@
           int morale = -4;
           unit.rf.morale += morale;
           int kiaNum = Util.Rand(4, 20);
-          unit.kia += kiaNum;
-          unit.rf.soldiers -= kiaNum;
+          unit.Killed(kiaNum);
           effects[0] = morale;
           effects[2] = kiaNum;
         }

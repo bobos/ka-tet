@@ -49,12 +49,10 @@ namespace UnitNS
       result.unit2 = target;
 
       result.unit1Dead = Util.Rand(3, 30);
-      unit.kia += result.unit1Dead;
-      unit.rf.soldiers -= result.unit1Dead;
+      unit.Killed(result.unit1Dead);
 
       result.unit2Dead = Util.Rand(3, 30);
-      target.kia += result.unit2Dead;
-      target.rf.soldiers -= result.unit2Dead;
+      target.Killed(result.unit2Dead);
       unit.rf.morale += result.moralDrop;
       target.rf.morale += result.moralDrop;
 

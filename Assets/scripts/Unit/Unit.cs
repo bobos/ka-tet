@@ -5,6 +5,7 @@ using MonoNS;
 using UnityEngine;
 using CourtNS;
 using FieldNS;
+using System.Linq;
 
 namespace UnitNS
 {
@@ -22,7 +23,7 @@ namespace UnitNS
     public const int L0Visibility = 1;
     public const int L1Visibility = 2;
     public const int L2Visibility = 3;
-    public const int VantageVisibility = 8;
+    public const int VantageVisibility = 5;
     public const int L1DiscoverRange = 1; // under 2000
     public const int L2DiscoverRange = 2; // > 4000
     public const int ConcealCoolDownIn = 3;
@@ -225,6 +226,14 @@ namespace UnitNS
       return chance < 0 ? 0 : (chance > 100 ? 100 : chance);
     }
 
+    public int CanBeSurprised() {
+      if (!IsOnField() || tile.vantagePoint || rf.IsSpecial() || alerted) {
+        return 0;
+      }
+      return rf.general.Is(Cons.brave) || rf.general.Is(Cons.conservative)
+      || rf.general.Has(Cons.formidable) ? 20 : 80;
+    }
+
     public bool IsHeavyCavalry() {
       return IsCavalry() && rf.rank == Cons.veteran;
     }
@@ -252,6 +261,7 @@ namespace UnitNS
       return IsSurrounded() && rf.soldiers >= 800 && CanAttack();
     }
 
+    public bool alerted = false;
     public bool charged = false;
     public bool retreated = false;
     public bool CanAttack() {
@@ -380,19 +390,66 @@ namespace UnitNS
       return true;
     }
 
+    public Unit[] GetSurpriseTargets() {
+      Tile[] tiles = GetSurpriseAttackTiles();
+      if (tiles.Length == 0) { return new Unit[]{}; }
+
+      List<Unit> targets = new List<Unit>();
+      foreach(Tile t in tiles) {
+        Unit unit = t.GetUnit();
+        if (unit != null && unit.IsAI() != IsAI() && !unit.alerted) {
+          targets.Add(unit);
+        }
+      }
+      return targets.ToArray();
+    }
+
+    public Tile[] GetSurpriseAttackTiles() {
+      HashSet<Tile> enemyVisibleRange = new HashSet<Tile>();
+      hexMap.GetWarParty(this, true).GetVisibleArea(enemyVisibleRange);
+      if (enemyVisibleRange.Contains(tile)) {
+        // discovered by enemy
+        return new Tile[]{};
+      }
+      List<Tile> tiles = new List<Tile>();
+      Tile[] accessible = GetAccessibleTiles();
+      return tile.GetNeighboursWithinRange(rf.general.Has(Cons.ambusher) ? 4 : 2,
+        (Tile t) => accessible.Contains(t));
+    }
+
+    public bool EnemyInSight() {
+      bool yes = false;
+      Tile[] myRange = GetVisibleArea();
+      foreach(Unit u in hexMap.GetWarParty(this, true).GetUnits()) {
+        if (myRange.Contains(u.tile)) {
+          yes = true;
+          break;
+        }
+      }
+      return yes;
+    }
+
     public Tile[] GetScoutArea() {
       return tile.GetNeighboursWithinRange<Tile>(rf.soldiers > 5000 ? L2DiscoverRange : L1DiscoverRange,
                                                  (Tile _tile) => true);
     }
 
     public Tile[] GetVisibleArea() {
-      int v = L1Visibility;
+      int v;
       if (Cons.IsMist(weatherGenerator.currentWeather)) {
         v = L0Visibility;
-      } else if (IsCommander()) {
-        v = vantage.IsAtVantagePoint() ? VantageVisibility : rf.general.commandSkill.GetCommandRange();
+      } else {
+        v = vantage.IsAtVantagePoint() ? VantageVisibility : L1Visibility;
+        v = (IsCommander() && rf.general.commandSkill.GetCommandRange() > v) ?
+          rf.general.commandSkill.GetCommandRange() : v;
       }
-      return tile.GetNeighboursWithinRange<Tile>(v, (Tile _tile) => true);
+      Tile[] detectRange = tile.GetNeighboursWithinRange<Tile>(L0Visibility, (Tile _t) => true); 
+      return tile.GetNeighboursWithinRange<Tile>(v, (Tile tile) => {
+        if (tile.field == FieldType.Forest && !detectRange.Contains(tile) && !rf.general.Has(Cons.outlooker)) {
+          return false;
+        }
+        return true;
+      });
     }
 
     public bool InCommanderRange() {
@@ -469,7 +526,7 @@ namespace UnitNS
     // Before new turn starts
     public int[] RefreshUnit()
     {
-      chaos = defeating = retreated = charged = unitConflict.conflicted = false;
+      alerted = chaos = defeating = retreated = charged = unitConflict.conflicted = false;
       InitAllowedAtmpt();
 
       if (concealCoolDownTurn > 0) {
@@ -516,6 +573,11 @@ namespace UnitNS
       return true;
     }
 
+    public void Killed(int killed) {
+      rf.soldiers -= killed;
+      kia += killed;
+    }
+
     public void Retreat() {
       // TODO: move the queuing unit in
       if (rf.general != null) {
@@ -529,8 +591,7 @@ namespace UnitNS
     {
       // TODO: move the queuing unit in
       int killed = rf.soldiers;
-      kia += killed;
-      rf.soldiers = 0;
+      Killed(killed);
       SetState(State.Disbanded);
       tile.RemoveUnit(this);
       if (tile.settlement != null && tile.settlement.owner.isAI == this.IsAI()) {
@@ -557,8 +618,7 @@ namespace UnitNS
       movementRemaining = movementRemaining - moveReduce; 
       reduced[1] = -moveReduce;
       int kiaNum = (int)(rf.soldiers * killRatio);
-      kia += kiaNum;
-      rf.soldiers -= kiaNum;
+      Killed(kiaNum);
       reduced[2] = kiaNum;
       return reduced;
     }
@@ -863,6 +923,17 @@ namespace UnitNS
         }
       }
       return area.ToArray();
+    }
+
+    public Tile[] FindAttackPath(Unit target)
+    {
+      List<Tile> tiles = new List<Tile>();
+      foreach(Tile t in PFTile2Tile(PathFinder.FindPath(tile, target.tile, this))) {
+        if (!Util.eq<Tile>(t, target.tile)) {
+          tiles.Add(t);
+        }
+      }
+      return tiles.ToArray();
     }
 
     // only for Ghost unit to pathfind settlement path

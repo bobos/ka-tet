@@ -43,8 +43,11 @@ Game Tips:
 43. 不同种族部队发生冲突，袖手旁观20%几率
 46. 主动发起进攻和进攻目标方死的多
 47. 减员超过1/2 75%几率抗议不撤退，士气-10
+48. 部队必须隐藏再密林中才能发动奇袭, 3格攻击范围
 
-突袭
+敌军性格和技能通过交战或者情报获知
+技能：谍报
+
 主帅服从命令技能修正范围内性格缺陷
 
 破阵 -> 以少打多 -> 击败 -> 追击 -> 歼灭 -> 影响周边军队
@@ -69,4 +72,5 @@ HashSet<Tile> road = new HashSet<Tile>(baseTile.roads[tile]);
 Find gameobject by name:
  GameObject.Find("LeftPart").gameObject;
 
+use "System.Linq" to let Array has Contains method
 delete meta and .DS_Store file to avoid project syntax error in IDE
