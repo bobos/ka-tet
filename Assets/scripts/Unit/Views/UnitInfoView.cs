@@ -52,7 +52,6 @@ namespace UnitNS
         + "\n"
         + (unit.InCommanderRange() ? "[*]" : "")
         + (unit.alerted ? "◉" : "")
-        + (unit.IsCavalry() ? "♞" : "♜")
         + (unit.hexMap.wargameController.start ? "[推演]\n" : "")
         + unit.GeneralName()
         + (unit.IsAI() ? "" : (unit.IsCommander() ? "♛" : ""))

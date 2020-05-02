@@ -368,7 +368,7 @@ namespace MonoNS
         DeploymentDoneButton.SetActive(false);
         hexMap.wargameController.WargameBtn.SetActive(true);
         NextTurnButton.SetActive(true);
-        FoW.Get().Fog();
+        FoW.Get().Fog(hexMap.allTiles);
       }
 
       if (action == ActionController.actionName.SHOWMINE || action == ActionController.actionName.SHOWENEMY) {

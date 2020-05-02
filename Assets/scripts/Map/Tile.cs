@@ -48,7 +48,7 @@ namespace MapTileNS
       if (terrian == TerrianType.Water) {
         poision = new Poision(this);
       }
-      if (field == FieldType.Wild) {
+      if (field == FieldType.Wild || field == FieldType.Forest) {
         if ((Util.eq<Province>(hexMap.warProvince, Cons.heBei)
              || Util.eq<Province>(hexMap.warProvince, Cons.heDong)) && Cons.FiftyFifty()) {
           epidemic = new Epidemic(this);
@@ -245,6 +245,7 @@ namespace MapTileNS
       }
     }
 
+    public bool ignoreUnit = false;
     public override int GetCost(Unit unit, Mode mode)
     {
       //if (settlement != null && settlement.owner.isAI == unit.IsAI()
@@ -257,7 +258,7 @@ namespace MapTileNS
       int mov = movementCost;
       if (u != null)
       {
-        if (u.IsAI() != unit.IsAI()) {
+        if (u.IsAI() != unit.IsAI() && !ignoreUnit) {
           return Unit.MovementCostOnUnaccesible;
         }
       }

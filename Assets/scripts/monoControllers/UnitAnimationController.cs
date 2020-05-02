@@ -93,7 +93,7 @@ namespace MonoNS
           if (!u.StickAsNailWhenDefeat()
             && (u.RetreatOnDefeat() || Cons.FiftyFifty())
             && u.SetRetreatPath()) {
-            ForceRetreat(u);
+            ForceRetreat(u, 60);
             while(ForceRetreatAnimating) { yield return null; }
           }
         }
@@ -150,15 +150,16 @@ namespace MonoNS
         popAniController.Show(view, textLib.get("pop_discovered"), Color.yellow);
         while(popAniController.Animating) { yield return null; }
       }
-      hexMap.GetWarParty(unit, true).UpdateAlert();
-      unit.UpdateAlert();
+      if (!unit.IsAI()) {
+        hexMap.GetAIParty().UpdateAlert();
+      }
 
       // stash event
       // hexMap.eventStasher.Add(unit.rf.general, MonoNS.EventDialog.EventName.FarmDestroyed);
 
       hexMap.cameraKeyboardController.EnableCamera();
-      // after each step, recalculate fog
-      FoW.Get().Fog();
+      //TODO: optimize, after each step, recalculate fog
+      FoW.Get().Fog(hexMap.allTiles);
       hexMap.mouseController.RefreshUnitPanel(unit);
       MoveAnimating = false;
     }
@@ -260,7 +261,7 @@ namespace MonoNS
         } else {
           settlement.Decamp(g, tile);
           if(g.SetRetreatPath()) {
-            ForceRetreat(g, true);
+            ForceRetreat(g, 200, true);
             while (ForceRetreatAnimating) { yield return null; }
           }
         }
@@ -858,17 +859,17 @@ namespace MonoNS
     }
 
     public bool ForceRetreatAnimating = false;
-    public void ForceRetreat(Unit unit, bool breakThrough = false) {
+    public void ForceRetreat(Unit unit, int movement, bool breakThrough = false) {
       if (unit.retreated) {
         return;
       }
       ForceRetreatAnimating = true;
       unit.retreated = true;
       hexMap.cameraKeyboardController.DisableCamera();
-      StartCoroutine(CoForceRetreat(unit, breakThrough));
+      StartCoroutine(CoForceRetreat(unit, movement, breakThrough));
     }
 
-    IEnumerator CoForceRetreat(Unit unit, bool breakThrough) {
+    IEnumerator CoForceRetreat(Unit unit, int movement, bool breakThrough) {
       Tile lastTile = unit.GetPath()[unit.GetPath().Length - 1];
       hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(unit.tile).transform.position);
       while(hexMap.cameraKeyboardController.fixingCamera) { yield return null; }
@@ -883,7 +884,7 @@ namespace MonoNS
         }
         hexMap.dialogue.ShowRetreat(unit);
         while(hexMap.dialogue.Animating) { yield return null; }
-        unit.movementRemaining = 200;
+        unit.movementRemaining = movement;
         while (unit.movementRemaining > 0 && unit.GetPath().Length > 0) {
           MoveUnit(unit);
           while(MoveAnimating) { yield return null; }
@@ -926,6 +927,7 @@ namespace MonoNS
       popAniController.Show(hexMap.GetUnitView(from), textLib.get("pop_surpriseAttack"), Color.green);
       while(popAniController.Animating) { yield return null; }
       if (!surprised) {
+        from.UseAtmpt();
         popAniController.Show(hexMap.GetUnitView(to), textLib.get("pop_surpriseAttackFailed"), Color.white);
         while(popAniController.Animating) { yield return null; }
         int killed = from.IsCavalry() ? Util.Rand(20, 50) : Util.Rand(40, 100);

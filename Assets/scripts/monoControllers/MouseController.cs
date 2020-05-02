@@ -97,6 +97,7 @@ namespace MonoNS
     public bool nearWater = false;
     public List<Unit> nearbyEnemey = null;
     public Unit[] surpriseTargets = null;
+    public Tile[] accessibleTiles = null;
     public HashSet<Unit> nearbyAlly = null;
 
     void ResetUnitSelection() {
@@ -110,6 +111,7 @@ namespace MonoNS
       nearbyAlly = new HashSet<Unit>();
       nearFireTiles = new List<Tile>();
       surpriseTargets = new Unit[]{};
+      accessibleTiles = new Tile[]{};
     }
 
     public void PrepareUnitSelection() {
@@ -156,6 +158,7 @@ namespace MonoNS
 
       if (selectedUnit != null) {
         surpriseTargets = selectedUnit.GetSurpriseTargets();
+        accessibleTiles = selectedUnit.GetAccessibleTiles();
       }
     }
 
@@ -665,6 +668,7 @@ namespace MonoNS
             Escape();
           } else {
             selectedUnit.SetPath(selectedPath);
+            accessibleTiles = selectedUnit.GetAccessibleTiles();
             if (!actionController.move(selectedUnit))
             {
               // TODO
@@ -678,7 +682,7 @@ namespace MonoNS
       if (tileUnderMouse != null && !Util.eq<Tile>(tileUnderMouse, selectedUnit.tile))
       {
         if (!tileUnderMouse.DeployableForPathFind(selectedUnit) ||
-         !selectedUnit.GetAccessibleTiles().Contains(tileUnderMouse))
+         !accessibleTiles.Contains(tileUnderMouse))
         {
           selectedPath = new Tile[0];
         }

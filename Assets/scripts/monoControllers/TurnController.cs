@@ -210,7 +210,7 @@ namespace MonoNS
 
       // TODO
       p.ResetDiscoveredTiles();
-      FoW.Get().Fog();
+      FoW.Get().Fog(hexMap.allTiles);
       foreach(Unit u in playerParty.GetUnits()) {
         if (!u.IsCamping()) {
           u.SetState(u.state);
@@ -294,7 +294,9 @@ namespace MonoNS
           u.surroundCnt = 0;
         }
       }
-      otherP.UpdateAlert();
+      if (otherP.isAI) {
+        otherP.UpdateAlert();
+      }
 
       // AI Stuff
       /*

@@ -541,7 +541,7 @@ namespace MonoNS
     }
 
     IEnumerator DoForceRetreat(Unit unit) {
-      unitAniController.ForceRetreat(unit);
+      unitAniController.ForceRetreat(unit, 200);
       while (unitAniController.RetreatAnimating)
       {
         yield return null;

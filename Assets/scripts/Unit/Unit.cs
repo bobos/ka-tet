@@ -53,6 +53,7 @@ namespace UnitNS
     public RetreatStress retreatStress;
     WeatherGenerator weatherGenerator;
     TurnController turnController;
+    public int defeatStreak = 0;
     public bool chaos = false;
     public int surroundCnt = 0;
     public Unit(bool clone, Troop troop, Tile tile, State state,
@@ -231,7 +232,7 @@ namespace UnitNS
         return 0;
       }
       return rf.general.Is(Cons.brave) || rf.general.Is(Cons.conservative)
-      || rf.general.Has(Cons.formidable) ? 20 : 80;
+      || rf.general.Has(Cons.formidable) ? 20 : 95;
     }
 
     public bool IsHeavyCavalry() {
@@ -411,8 +412,9 @@ namespace UnitNS
         // discovered by enemy
         return new Tile[]{};
       }
+      Tile[] tiles = GetVisibleArea();
       return tile.GetNeighboursWithinRange(rf.general.Has(Cons.ambusher) ? 4 : 2,
-        (Tile t) => FindAttackPath(t).Length > 0);
+        (Tile t) => FindAttackPath(t).Length > 0 && tiles.Contains(t));
     }
 
     public bool EnemyInSight() {
@@ -489,7 +491,7 @@ namespace UnitNS
     }
 
     public bool StickAsNailWhenDefeat() {
-      return (InCommanderRange() &&
+      return IsCommander() || (InCommanderRange() &&
               MyCommander().Has(Cons.turningTide) &&
               Cons.FiftyFifty()) ||
               (rf.general.Has(Cons.unshaken) && Cons.MostLikely()) ||
@@ -513,6 +515,18 @@ namespace UnitNS
       return hexMap.GetWarParty(this).commanderGeneral;
     }
 
+    public int Defeat(int moraleDrop) {
+      int drop = moraleDrop + (defeatStreak++ * -5);
+      rf.morale += drop;
+      return drop;
+    }
+
+    public int Victory(int moraleIncr) {
+      defeatStreak = 0;
+      rf.morale += moraleIncr;
+      return moraleIncr;
+    }
+
     protected virtual bool Concealable() {
       return false;
     }
@@ -525,6 +539,7 @@ namespace UnitNS
     public int[] RefreshUnit()
     {
       alerted = chaos = defeating = retreated = charged = unitConflict.conflicted = false;
+      defeatStreak = 0;
       InitAllowedAtmpt();
 
       if (concealCoolDownTurn > 0) {
@@ -926,15 +941,21 @@ namespace UnitNS
     public Tile[] FindAttackPath(Tile target)
     {
       List<Tile> tiles = new List<Tile>();
+      target.ignoreUnit = true;
       foreach(Tile t in PFTile2Tile(PathFinder.FindPath(tile, target, this))) {
         if (!Util.eq<Tile>(t, target)) {
           tiles.Add(t);
         }
       }
+      target.ignoreUnit = false;
       return tiles.ToArray();
     }
 
     public void UpdateAlert() {
+      if (!IsAI()) {
+        // only applicable to AI
+        return;
+      }
       if (EnemyInSight()) {
         alerted = true;
         // remind nearby allies

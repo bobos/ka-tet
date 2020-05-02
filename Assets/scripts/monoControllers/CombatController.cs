@@ -428,37 +428,37 @@ namespace MonoNS
       Crushing
     }
 
-    int[] GetVicBuf(ResultType type) {
+    int GetVicBuf(ResultType type) {
       if (type == ResultType.FeintDefeat) {
-        return new int[]{0, 0};
+        return 0;
       }
       if (type == ResultType.Close) {
-        return new int[]{0, 0};
+        return 0;
       }
       if (type == ResultType.Small) {
-        return new int[]{1, 0};
+        return 0;
       }
       if (type == ResultType.Great) {
-        return new int[]{2, 1};
+        return 1;
       }
-      return new int[]{3, 2};
+      return 2;
     }
 
     // initiatorMorale, supporterMorale, initiatorDiscontent
-    int[] GetDftBuf(ResultType type) {
+    int GetDftBuf(ResultType type) {
       if (type == ResultType.FeintDefeat) {
-        return new int[]{0, 0};
+        return 0;
       }
       if (type == ResultType.Close) {
-        return new int[]{-2, -1};
+        return -3;
       }
       if (type == ResultType.Small) {
-        return new int[]{-5, -3};
+        return -6;
       }
       if (type == ResultType.Great) {
-        return new int[]{-6, -4};
+        return -10;
       }
-      return new int[]{-10, -8};
+      return -15;
     }
 
     public bool commenceOpAnimating = false;
@@ -737,15 +737,14 @@ namespace MonoNS
         CancelOperation();
 
         // Aftermath
-        int[] vicBuf = GetVicBuf(resultLevel);
-        int[] dftBuf = GetDftBuf(resultLevel);
+        int vicBuf = GetVicBuf(resultLevel);
+        int dftBuf = GetDftBuf(resultLevel);
         if (atkWin) {
           if (!defender.IsGone() && defender.rf.general.Is(Cons.brave) && Cons.SlimChance()) {
             hexMap.unitAniController.DestroyUnit(defender, DestroyType.ByDisband, true);
             while (hexMap.unitAniController.DestroyAnimating) { yield return null; }
           }
-          int morale = vicBuf[0];
-          int morale1 = vicBuf[1];
+          int morale = vicBuf;
           View view = null;
           foreach (UnitPredict up in predict.attackers) {
             Unit unit = up.unit;
@@ -753,13 +752,7 @@ namespace MonoNS
               continue;
             }
             int[] stats = new int[]{0,0,0,0,0};
-            if (Util.eq<Unit>(unit, attacker)) {
-              unit.rf.morale += morale;
-              stats[0] = morale;
-            } else {
-              unit.rf.morale += morale1;
-              stats[0] = morale1;
-            }
+            stats[0] = unit.Victory(morale);
 
             view = null;
             if (unit.IsCamping()) {
@@ -768,21 +761,14 @@ namespace MonoNS
             hexMap.unitAniController.ShowEffect(unit, stats, view, true);
           }
 
-          morale = dftBuf[0];
-          morale1 = dftBuf[1];
+          morale = dftBuf;
           foreach (UnitPredict up in predict.defenders) {
             Unit unit = up.unit;
             if (unit.IsGone()) {
               continue;
             }
             int[] stats = new int[]{0,0,0,0,0};
-            if (Util.eq<Unit>(unit, defender)) {
-              unit.rf.morale += morale;
-              stats[0] = morale;
-            } else {
-              unit.rf.morale += morale1;
-              stats[0] = morale1;
-            }
+            stats[0] = unit.Defeat(morale);
 
             view = null;
             if (unit.IsCamping()) {
@@ -798,8 +784,7 @@ namespace MonoNS
             while (hexMap.unitAniController.DestroyAnimating) { yield return null; }
           }
           // defender win
-          int morale = vicBuf[0];
-          int morale1 = vicBuf[1];
+          int morale = vicBuf;
           View view = null;
           foreach (UnitPredict up in predict.defenders) {
             Unit unit = up.unit;
@@ -807,13 +792,7 @@ namespace MonoNS
               continue;
             }
             int[] stats = new int[]{0,0,0,0,0};
-            if (Util.eq<Unit>(unit, defender)) {
-              unit.rf.morale += morale;
-              stats[0] = morale;
-            } else {
-              unit.rf.morale += morale1;
-              stats[0] = morale1;
-            }
+            stats[0] = unit.Victory(morale);
 
             view = null;
             if (unit.IsCamping()) {
@@ -822,8 +801,7 @@ namespace MonoNS
             hexMap.unitAniController.ShowEffect(unit, stats, view, true);
           }
 
-          morale = dftBuf[0];
-          morale1 = dftBuf[1];
+          morale = dftBuf;
           if (!feint) {
             foreach (UnitPredict up in predict.attackers) {
               Unit unit = up.unit;
@@ -831,13 +809,7 @@ namespace MonoNS
                 continue;
               }
               int[] stats = new int[]{0,0,0,0,0};
-              if (Util.eq<Unit>(unit, attacker)) {
-                unit.rf.morale += morale;
-                stats[0] = morale;
-              } else {
-                unit.rf.morale += morale1;
-                stats[0] = morale1;
-              }
+              stats[0] = unit.Defeat(morale);
 
               view = null;
               if (unit.IsCamping()) {

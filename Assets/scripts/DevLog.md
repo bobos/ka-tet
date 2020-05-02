@@ -43,7 +43,13 @@ Game Tips:
 43. 不同种族部队发生冲突，袖手旁观20%几率
 46. 主动发起进攻和进攻目标方死的多
 47. 减员超过1/2 75%几率抗议不撤退，士气-10
+48. 同一回合内连续战败 士气累计-5, -10, -15, -20
 
+refactor update alert
+佯败单独按钮
+hidden unit doesn't join the operation start phase
+空城计，激将，阵骂
+AI ambush doesn't need to check players alert status, only check if ambusher is in player's visible field before attack
 敌军性格和技能通过交战或者情报获知
 技能：谍报
 

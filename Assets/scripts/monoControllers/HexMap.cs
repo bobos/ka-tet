@@ -91,7 +91,7 @@ namespace MonoNS
     public Material TransMat;
     public Material WarningMat;
     public Material SupplyRouteMat;
-    [System.NonSerialized] public float HeightMountain = 0.33f, HeightHill = 0.28f, HeightFlat = 0f;
+    [System.NonSerialized] public float HeightMountain = 0.33f, HeightHill = 0.2f, HeightFlat = 0f;
     public GameObject InfantryPrefab;
     public GameObject CavalryPrefab;
     public GameObject HexPrefab;
@@ -110,6 +110,19 @@ namespace MonoNS
     public List<GameObject> lineLabels = new List<GameObject>();
 
     public Tile[,] tiles;
+    Tile[] _allTiles;
+    public Tile[] allTiles {
+      get {
+        if (_allTiles == null) {
+          List<Tile> all = new List<Tile>();
+          foreach(Tile tile in tiles) {
+            all.Add(tile);
+          }
+          _allTiles = all.ToArray();
+        }
+        return _allTiles;
+      }
+    }
 
     //bool updateReady = false;
     Tile[] highlightedArea;
@@ -962,7 +975,7 @@ namespace MonoNS
           tile.vantagePoint = true;
         } else {
           prefab = HighGroundPrefab;
-          fieldType = Cons.MostLikely() ? FieldType.Wild : (Cons.EvenChance() ? FieldType.Forest : FieldType.Wild);
+          fieldType = Cons.MostLikely() ? FieldType.Wild : (Cons.MostLikely() ? FieldType.Forest : FieldType.Wild);
           tile.SetTerrianType(TerrianType.Hill);
           if(fieldType == FieldType.Wild && Cons.SlimChance()) {
             tile.burnable = true;
@@ -973,7 +986,7 @@ namespace MonoNS
       {
         prefab = HexPrefab;
         tile.SetTerrianType(TerrianType.Plain);
-        fieldType = Cons.FairChance() ? FieldType.Wild : (Cons.FairChance() ? FieldType.Forest : FieldType.Wild);
+        fieldType = Cons.FairChance() ? FieldType.Wild : (Cons.SlimChance() ? FieldType.Forest : FieldType.Wild);
       }
       else
       {
@@ -1062,35 +1075,20 @@ namespace MonoNS
       return false;
     }
 
-    public void OverlayDisable(Tile tile, HashSet<Tile> enemyZone = null) {
-      HashSet<Tile> zone = enemyZone;
-      if (zone == null) {
-        zone = FoW.Get().GetVisibleArea(true);
-      }
+    public void OverlayDisable(Tile tile, bool markAsEnemyZone) {
       Unit unit = tile.GetUnit();
-      if (unit != null && !unit.IsConcealed()) {
+      if (unit != null) {
         ActivateUnitView(unit);
       }
-      if (FoW.Get() == null ||
-        FoW.Get().GetVisibleArea().Contains(tile)) {
-        Overlay(tile, TransMat);
-        TileView view = GetTileView(tile);
-        view.RefreshVisual();
-        if (zone.Contains(tile)) {
-          view.RefreshVisual(true);
-        }
-      } else {
-        OverlayFoW(tile);
-      }
+      Overlay(tile, TransMat);
+      TileView view = GetTileView(tile);
+      view.RefreshVisual(markAsEnemyZone);
     }
 
     public void DehighlightArea()
     {
       if (highlightedArea == null) return;
-      foreach (Tile tile in highlightedArea)
-      {
-        OverlayDisable(tile);
-      }
+      FoW.Get().Fog(highlightedArea);
       highlightedArea = null;
     }
 

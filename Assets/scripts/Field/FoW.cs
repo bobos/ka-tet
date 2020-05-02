@@ -11,7 +11,7 @@ namespace FieldNS
     FoW(HexMap hexMap) {
       this.hexMap = hexMap;
       // init fow for player at game start
-      Fog();
+      Fog(hexMap.allTiles);
     }
 
     public HashSet<Tile> GetVisibleArea(bool enemy = false) {
@@ -33,12 +33,13 @@ namespace FieldNS
       return tiles;
     }
 
-    public void Fog() {
+    public void Fog(Tile[] all) {
       HashSet<Tile> tiles = GetVisibleArea();
-      foreach (Tile tile in hexMap.tiles)
+      HashSet<Tile> enemyTiles = hexMap.turnController.playerTurn ? GetVisibleArea(true) : new HashSet<Tile>();
+      foreach (Tile tile in all)
       {
         if (tiles.Contains(tile)) {
-          hexMap.OverlayDisable(tile, GetVisibleArea(true));
+          hexMap.OverlayDisable(tile, enemyTiles.Contains(tile));
         } else {
           hexMap.OverlayFoW(tile);
         }
