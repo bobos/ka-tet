@@ -60,10 +60,6 @@ namespace MonoNS
     List<Unit> supportAttackers; 
     List<Unit> supportDefenders;
 
-    int GetEffectiveForcePercentage(Unit unit, bool asMainDefender) {
-      return 100;
-    }
-
     public void SetGaleVantage(Unit unit, Unit target, UnitPredict predict) {
       if (Cons.IsGale(hexMap.windGenerator.current)) {
         if (hexMap.windGenerator.direction == Cons.Direction.dueNorth) {
@@ -116,10 +112,12 @@ namespace MonoNS
       }
 
       if (predict.windAdvantage) {
-        predict.percentOfEffectiveForce += 100;
+        predict.percentOfEffectiveForce += 50;
       } else if (predict.windDisadvantage) {
         predict.percentOfEffectiveForce -= 50;
       }
+
+      predict.percentOfEffectiveForce = predict.percentOfEffectiveForce < 0 ? 1 : predict.percentOfEffectiveForce;
     }
 
     int AttackerPoint(Unit unit, Settlement targetSettlement) {
@@ -131,7 +129,8 @@ namespace MonoNS
     }
 
     OperationPredict predict;
-    public OperationPredict StartOperation(Unit attacker, Unit targetUnit, Settlement targetSettlement) {
+    public OperationPredict StartOperation(Unit attacker, Unit targetUnit,
+      Settlement targetSettlement, bool surprised = false) {
       if (!attacker.CanAttack()) {
         // no enough stamina, can not start operation
         return null;
@@ -148,28 +147,31 @@ namespace MonoNS
       supportAttackers = new List<Unit>();
       supportDefenders = new List<Unit>();
 
-      foreach (Tile tile in targetUnit.tile.neighbours) {
-        Unit u = tile.GetUnit();
-        if (u == null) {
-          continue;
-        }
+      if (!surprised) {
+        foreach (Tile tile in targetUnit.tile.neighbours) {
+          Unit u = tile.GetUnit();
+          if (u == null) {
+            continue;
+          }
 
-        if (u.IsAI() == attacker.IsAI() && !Util.eq<Unit>(u, attacker) && u.CanAttack()) {
-          supportAttackers.Add(u);
-        }
+          if (u.IsAI() == attacker.IsAI() && !Util.eq<Unit>(u, attacker) && u.CanAttack()) {
+            supportAttackers.Add(u);
+          }
 
-        if (u.IsAI() != attacker.IsAI() && !Util.eq<Unit>(u, attacker)) {
-          supportDefenders.Add(u);
+          if (u.IsAI() != attacker.IsAI() && !Util.eq<Unit>(u, attacker)) {
+            supportDefenders.Add(u);
+          }
         }
       }
 
       UnitPredict unitPredict = new UnitPredict();
       unitPredict.unit = attacker;
-      unitPredict.percentOfEffectiveForce = GetEffectiveForcePercentage(attacker, false);
+      unitPredict.percentOfEffectiveForce = 100;
       unitPredict.joinPossibility = 100;
       SetGaleVantage(attacker, defender, unitPredict);
       unitPredict.operationPoint = attacker.IsCamping() ?
         attacker.unitCampingAttackCombatPoint : AttackerPoint(attacker, targetSettlement);
+      unitPredict.operationPoint = (int)(unitPredict.percentOfEffectiveForce * 0.01f * unitPredict.operationPoint);
       predict.attackers.Add(unitPredict);
       predict.attackerOptimPoints += unitPredict.operationPoint;
       hexMap.ShowAttackArrow(attacker, targetUnit, unitPredict);
@@ -177,10 +179,11 @@ namespace MonoNS
       foreach(Unit unit in supportAttackers) {
         unitPredict = new UnitPredict();
         unitPredict.unit = unit;
-        unitPredict.percentOfEffectiveForce = GetEffectiveForcePercentage(unit, false);
+        unitPredict.percentOfEffectiveForce = 100;
         SetGaleVantage(unit, defender, unitPredict);
         unitPredict.joinPossibility = JoinPossibility(unit, true);
         unitPredict.operationPoint = AttackerPoint(unit, targetSettlement);
+        unitPredict.operationPoint = (int)(unitPredict.percentOfEffectiveForce * 0.01f * unitPredict.operationPoint);
         predict.attackers.Add(unitPredict);
         predict.attackerOptimPoints += unitPredict.operationPoint;
       }
@@ -188,9 +191,10 @@ namespace MonoNS
       // defenders
       unitPredict = new UnitPredict();
       unitPredict.unit = defender;
-      unitPredict.percentOfEffectiveForce = GetEffectiveForcePercentage(defender, true);
+      unitPredict.percentOfEffectiveForce = surprised ? 20 : 100;
       unitPredict.joinPossibility = 100;
       unitPredict.operationPoint = targetSettlement != null ? targetSettlement.GetDefendForce() : defender.unitCombatPoint;
+      unitPredict.operationPoint = (int)(unitPredict.percentOfEffectiveForce * 0.01f * unitPredict.operationPoint);
       predict.defenders.Add(unitPredict);
       predict.defenderOptimPoints += unitPredict.operationPoint;
       if (targetSettlement == null) {
@@ -204,7 +208,7 @@ namespace MonoNS
 
           unitPredict = new UnitPredict();
           unitPredict.unit = unit;
-          unitPredict.percentOfEffectiveForce = GetEffectiveForcePercentage(unit, true);
+          unitPredict.percentOfEffectiveForce = 100;
           unitPredict.joinPossibility = 100;
           unitPredict.operationPoint = 0;
           predict.defenders.Add(unitPredict);
@@ -214,9 +218,10 @@ namespace MonoNS
       foreach(Unit unit in supportDefenders) {
         unitPredict = new UnitPredict();
         unitPredict.unit = unit;
-        unitPredict.percentOfEffectiveForce = GetEffectiveForcePercentage(unit, false);
+        unitPredict.percentOfEffectiveForce = 100;
         unitPredict.joinPossibility = JoinPossibility(unit, false);
         unitPredict.operationPoint = unit.unitCombatPoint;
+        unitPredict.operationPoint = (int)(unitPredict.percentOfEffectiveForce * 0.01f * unitPredict.operationPoint);
         predict.defenders.Add(unitPredict);
         predict.defenderOptimPoints += unitPredict.operationPoint;
       }
@@ -861,7 +866,6 @@ namespace MonoNS
           }
         }
 
-        bool cunningLoser = loser.rf.general.Has(Cons.feintDefeat);
         foreach(UnitPredict up in atkWin ? predict.attackers : predict.defenders) {
           if (!up.unit.IsGone() && up.unit.rf.general.Is(Cons.reckless) && Cons.MostLikely()) {
             chasers.Add(up.unit);
@@ -869,9 +873,14 @@ namespace MonoNS
         }
 
         Unit un = atkWin ? attacker : defender;
-        if ((cunningLoser && Cons.EvenChance())
-          || (!un.rf.general.Has(Cons.playSafe) && Cons.SlimChance())) {
-          chasers.Add(un);
+        if (feint) {
+          if (un.rf.general.Has(Cons.playSafe)) {
+            if (Cons.SlimChance()) {
+              chasers.Add(un);
+            }
+          } else if (Cons.MostLikely()) {
+            chasers.Add(un);
+          }
         }
 
         // affected all allies

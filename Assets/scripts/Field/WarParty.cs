@@ -215,16 +215,7 @@ namespace FieldNS
 
     public void UpdateAlert() {
       foreach(Unit unit in GetUnits()) {
-        if (unit.EnemyInSight()) {
-          unit.alerted = true;
-          // remind nearby allies
-          foreach(Tile t in unit.tile.neighbours) {
-            Unit ally = t.GetUnit();
-            if (ally.IsAI() == unit.IsAI()) {
-              ally.alerted = true;
-            }
-          }
-        }
+        unit.UpdateAlert();
       }
     }
 

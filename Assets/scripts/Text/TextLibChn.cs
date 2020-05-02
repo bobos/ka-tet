@@ -374,7 +374,7 @@ namespace TextNS
       {"ability_attender", "永不缺席"},
       {"ability_attender_description", "100%几率参加协同作战"},
       {"ability_feintDefeat", "佯败"},
-      {"ability_feintDefeat_description", "80%几率发动佯败, 撤退时增加敌军追击几率"},
+      {"ability_feintDefeat_description", "80%几率发动佯败"},
       {"ability_playSafe", "步步为营"},
       {"ability_playSafe_description", "敌方战败时本部兵马不会擅自追击"},
       {"ability_punchThrough", "誓死一搏"},
@@ -387,7 +387,7 @@ namespace TextNS
       {"ability_fireBug_description", "放火成功率100%"},
       {"ability_outlooker", "千里眼"},
       {"ability_outlooker_description", "发现视力范围内潜伏敌军"},
-      {"ability_ambusher", "飞将军"},
+      {"ability_ambusher", "神出鬼没"},
       {"ability_ambusher_description", "可发动奇袭范围增加为4格"},
 
       {"trait_reckless", "鲁莽"},
@@ -402,8 +402,8 @@ namespace TextNS
       {"trait_cunning_description", "己方处于劣势时容易按兵不动,不易战死"},
       {"trait_ego", "自负"},
       {"trait_ego_description", "容易受敌方激将"},
-      {"trait_calm", "中庸"},
-      {"trait_calm_description", "中庸之道"},
+      {"trait_calm", "恪守"},
+      {"trait_calm_description", "恪守军令"},
       };
     }
   }

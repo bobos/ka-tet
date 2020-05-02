@@ -397,7 +397,7 @@ namespace UnitNS
       List<Unit> targets = new List<Unit>();
       foreach(Tile t in tiles) {
         Unit unit = t.GetUnit();
-        if (unit != null && unit.IsAI() != IsAI() && !unit.alerted) {
+        if (unit != null && unit.IsAI() != IsAI() && !unit.alerted && unit.IsOnField()) {
           targets.Add(unit);
         }
       }
@@ -411,17 +411,15 @@ namespace UnitNS
         // discovered by enemy
         return new Tile[]{};
       }
-      List<Tile> tiles = new List<Tile>();
-      Tile[] accessible = GetAccessibleTiles();
       return tile.GetNeighboursWithinRange(rf.general.Has(Cons.ambusher) ? 4 : 2,
-        (Tile t) => accessible.Contains(t));
+        (Tile t) => FindAttackPath(t).Length > 0);
     }
 
     public bool EnemyInSight() {
       bool yes = false;
       Tile[] myRange = GetVisibleArea();
       foreach(Unit u in hexMap.GetWarParty(this, true).GetUnits()) {
-        if (myRange.Contains(u.tile)) {
+        if (u.IsOnField() && myRange.Contains(u.tile)) {
           yes = true;
           break;
         }
@@ -925,15 +923,28 @@ namespace UnitNS
       return area.ToArray();
     }
 
-    public Tile[] FindAttackPath(Unit target)
+    public Tile[] FindAttackPath(Tile target)
     {
       List<Tile> tiles = new List<Tile>();
-      foreach(Tile t in PFTile2Tile(PathFinder.FindPath(tile, target.tile, this))) {
-        if (!Util.eq<Tile>(t, target.tile)) {
+      foreach(Tile t in PFTile2Tile(PathFinder.FindPath(tile, target, this))) {
+        if (!Util.eq<Tile>(t, target)) {
           tiles.Add(t);
         }
       }
       return tiles.ToArray();
+    }
+
+    public void UpdateAlert() {
+      if (EnemyInSight()) {
+        alerted = true;
+        // remind nearby allies
+        foreach(Tile t in tile.neighbours) {
+          Unit ally = t.GetUnit();
+          if (ally != null && ally.IsAI() == IsAI()) {
+            ally.alerted = true;
+          }
+        }
+      }
     }
 
     // only for Ghost unit to pathfind settlement path

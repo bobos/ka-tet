@@ -151,6 +151,8 @@ namespace MonoNS
         while(popAniController.Animating) { yield return null; }
       }
       hexMap.GetWarParty(unit, true).UpdateAlert();
+      unit.UpdateAlert();
+
       // stash event
       // hexMap.eventStasher.Add(unit.rf.general, MonoNS.EventDialog.EventName.FarmDestroyed);
 
@@ -915,14 +917,13 @@ namespace MonoNS
 
     IEnumerator CoSurpriseAttack(Unit from, Unit to) {
       bool surprised = to.CanBeSurprised() >= Util.Rand(1, 100);
-      from.SetPath(from.FindAttackPath(to));
+      from.SetPath(from.FindAttackPath(to.tile));
       while (from.GetPath().Length > 0) {
         MoveUnit(from);
         while(MoveAnimating) { yield return null; }
       }
       while(MoveAnimating) { yield return null; }
       popAniController.Show(hexMap.GetUnitView(from), textLib.get("pop_surpriseAttack"), Color.green);
-      from.UseAtmpt();
       while(popAniController.Animating) { yield return null; }
       if (!surprised) {
         popAniController.Show(hexMap.GetUnitView(to), textLib.get("pop_surpriseAttackFailed"), Color.white);
@@ -934,8 +935,9 @@ namespace MonoNS
         ShowEffect(from, new int[]{moraleDrop,0,killed,0,0});
         while (ShowAnimating) { yield return null; }
       } else {
-        // TODO:xxx 
-xxx
+        hexMap.combatController.StartOperation(from, to, null, true);
+        hexMap.combatController.CommenceOperation();
+        while (hexMap.combatController.commenceOpAnimating) { yield return null; }
       }
       
       hexMap.cameraKeyboardController.EnableCamera();
