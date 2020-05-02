@@ -246,7 +246,7 @@ namespace UnitNS
     public int allowedAtmpt = 1;
     void InitAllowedAtmpt() {
       allowedAtmpt = 1;
-      if (rf.general.Has(Cons.staminaManager)) {
+      if (IsCavalry() || rf.general.Has(Cons.staminaManager)) {
         allowedAtmpt = 2;
       }
     }
@@ -721,7 +721,7 @@ namespace UnitNS
     }
 
     public float GetChaosBuf() {
-      return chaos ? -0.99f : (defeating ? -0.3f : 0f);
+      return chaos ? -0.99f : (defeating ? -0.4f : (defeatStreak > 0 ? -0.2f : 0f));
     }
 
     // ==============================================================

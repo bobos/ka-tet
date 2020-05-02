@@ -45,8 +45,6 @@ Game Tips:
 47. 减员超过1/2 75%几率抗议不撤退，士气-10
 48. 同一回合内连续战败 士气累计-5, -10, -15, -20
 
-骑兵2次打击
-非defeat chaos，战败部队当前回合战力-20%
 ai和玩家战术，偏师一个方向吸引敌军主力，另一路伏兵从后方伏击后队敌军
 佯败单独按钮
 hidden unit doesn't join the operation start phase
