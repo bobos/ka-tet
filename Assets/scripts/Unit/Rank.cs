@@ -3,25 +3,9 @@ using CourtNS;
 namespace UnitNS
 {
   abstract public class Rank {
-    public static int MoralePunishLine(bool isSpecial) {
-      return isSpecial ? 20 : 60;
-    }
-
-    public static float GetMoralePunish(int morale, bool isSpecial) {
-      int dropStarts = isSpecial ? 30 : 70;
-      if (morale >= dropStarts) {
-        return 0f;
-      }
-      if (morale < MoralePunishLine(isSpecial)) {
-        return 1f;
-      }
-
-      return (dropStarts - morale) * 0.1f;
-    }
-
     abstract public string Name(Region region, bool IsCavalry);
     abstract public string Description();
-    abstract public float Buf(float buf, int morale, bool isSpecial);
+    abstract public float Buf(Troop troop);
     abstract public int RecoverPerTurn();
     abstract public int Level();
   }
@@ -55,7 +39,7 @@ namespace UnitNS
       return Cons.GetTextLib().get("rank_rookie_description");
     }
 
-    public override float Buf(float _buf, int _morale, bool _isSpecial) {
+    public override float Buf(Troop _troop) {
       return 0;
     }
 
@@ -92,8 +76,9 @@ namespace UnitNS
       return Cons.GetTextLib().get("rank_veteran_description");
     }
 
-    public override float Buf(float buf, int morale, bool isSpecial) {
-      return buf * (1 - Rank.GetMoralePunish(morale, isSpecial));
+    public override float Buf(Troop troop) {
+      return troop.province.region.LevelBuf(troop.type) *
+        (1 - troop.morale < troop.province.region.MoralePunishLine() ? 1f : 0f);
     }
 
     public override int RecoverPerTurn() {

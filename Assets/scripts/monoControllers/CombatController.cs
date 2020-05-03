@@ -33,10 +33,14 @@ namespace MonoNS
   public class OperationPredict {
     public List<UnitPredict> attackers = new List<UnitPredict>();
     public List<UnitPredict> defenders = new List<UnitPredict>();
+    public List<UnitPredict> hiddenDefenders = new List<UnitPredict>();
     public int attackerOptimPoints = 1;
     public int defenderOptimPoints = 1;
+    public int hiddenDefenderOptimPoints = 1;
     public OperationGeneralResult sugguestedResult;
+    public OperationGeneralResult trueSugguestedResult;
     public CombatController.ResultType suggestedResultType;
+    public CombatController.ResultType trueSuggestedResultType;
     public bool feintDefeat = false;
   }
 
@@ -60,6 +64,7 @@ namespace MonoNS
     Unit defender;
     List<Unit> supportAttackers; 
     List<Unit> supportDefenders;
+    List<Unit> hiddenDefenders;
 
     public void SetGaleVantage(Unit unit, Unit target, UnitPredict predict) {
       WindAdvantage advantage = unit.tile.GetGaleAdvantage(target.tile);
@@ -92,7 +97,7 @@ namespace MonoNS
       OperationPredict predict = new OperationPredict();
       predict.feintDefeat = feintDefeat;
       if (targetSettlement != null) {
-        targetUnit = this.defender = targetSettlement.garrison[0];
+        targetUnit = this.defender = targetSettlement.garrison[Util.Rand(0, targetSettlement.garrison.Count-1)];
       }
 
       start = true;
@@ -101,7 +106,9 @@ namespace MonoNS
       this.defender = targetUnit;
       supportAttackers = new List<Unit>();
       supportDefenders = new List<Unit>();
+      hiddenDefenders = new List<Unit>();
 
+      HashSet<Tile> attackerVision = hexMap.GetWarParty(attacker).GetVisibleArea();
       if (!surprised) {
         foreach (Tile tile in targetUnit.tile.neighbours) {
           Unit u = tile.GetUnit();
@@ -114,7 +121,11 @@ namespace MonoNS
           }
 
           if (u.IsAI() != attacker.IsAI() && !Util.eq<Unit>(u, attacker)) {
-            supportDefenders.Add(u);
+            if (!attackerVision.Contains(u.tile)) {
+              hiddenDefenders.Add(u);
+            } else {
+              supportDefenders.Add(u);
+            }
           }
         }
       }
@@ -181,14 +192,30 @@ namespace MonoNS
         predict.defenderOptimPoints += unitPredict.operationPoint;
       }
 
+      foreach(Unit unit in hiddenDefenders) {
+        unitPredict = new UnitPredict();
+        unitPredict.unit = unit;
+        unitPredict.percentOfEffectiveForce = 100;
+        unitPredict.joinPossibility = JoinPossibility(unit, false);
+        unitPredict.operationPoint = unit.unitCombatPoint;
+        unitPredict.operationPoint = (int)(unitPredict.percentOfEffectiveForce * 0.01f * unitPredict.operationPoint);
+        predict.hiddenDefenders.Add(unitPredict);
+        predict.hiddenDefenderOptimPoints += unitPredict.operationPoint;
+      }
+
       CalculateWinChance(predict);
-      bool atkWin = predict.sugguestedResult.chance == 10;
-      List<UnitPredict> ups = atkWin ? predict.defenders : predict.attackers;
+      CalculateTrueWinChance(predict);
+      bool atkWin = predict.trueSugguestedResult.chance == 10;
+      List<UnitPredict> allDefenders = new List<UnitPredict>(predict.defenders);
+      foreach(UnitPredict up in predict.hiddenDefenders) {
+        allDefenders.Add(up);
+      }
+      List<UnitPredict> ups = atkWin ? allDefenders : predict.attackers;
       foreach (UnitPredict up in ups) {
         if (Util.eq<Unit>(up.unit, defender) || Util.eq<Unit>(up.unit, attacker)) {
           continue;
         }
-        int pos = JoinPossibilityBaseOnOdds(up.unit, predict.suggestedResultType);
+        int pos = JoinPossibilityBaseOnOdds(up.unit, predict.trueSuggestedResultType);
         up.joinPossibility = pos < up.joinPossibility ? pos : up.joinPossibility;
       }
 
@@ -229,6 +256,29 @@ namespace MonoNS
         predict.sugguestedResult = new OperationGeneralResult(10);
       } else {
         predict.sugguestedResult = new OperationGeneralResult(0);
+      }
+    }
+
+    void CalculateTrueWinChance(OperationPredict predict) {
+      int defenderPoints = predict.hiddenDefenderOptimPoints + predict.defenderOptimPoints;
+      int bigger = predict.attackerOptimPoints > defenderPoints ? predict.attackerOptimPoints : defenderPoints;
+      int smaller = predict.attackerOptimPoints > defenderPoints ? defenderPoints : predict.attackerOptimPoints;
+      smaller = smaller < 1 ? 1 : smaller;
+      float odds = bigger / smaller;
+      if (odds <= 1.5f) {
+        predict.trueSuggestedResultType = ResultType.Close;
+      } else if (odds <= 3f) {
+        // 1.5x - 3x
+        predict.trueSuggestedResultType = ResultType.Small;
+      } else if (odds <= 4.5f) {
+        predict.trueSuggestedResultType = ResultType.Great;
+      } else {
+        predict.trueSuggestedResultType = ResultType.Crushing;
+      }
+      if (predict.attackerOptimPoints > predict.defenderOptimPoints) {
+        predict.trueSugguestedResult = new OperationGeneralResult(10);
+      } else {
+        predict.trueSugguestedResult = new OperationGeneralResult(0);
       }
     }
 
@@ -441,6 +491,9 @@ namespace MonoNS
         int defenderInfTotal = 0;
         int defenderCavTotal = 0;
 
+        foreach(UnitPredict up in predict.hiddenDefenders) {
+          predict.defenders.Add(up);
+        }
         List<UnitPredict> newAttackers = new List<UnitPredict>();
         List<UnitPredict> newDefenders = new List<UnitPredict>();
         List<Unit> giveupAttackers = new List<Unit>();
@@ -797,8 +850,8 @@ namespace MonoNS
         }
 
         Unit un = atkWin ? attacker : defender;
-        if (feint) {
-          if (un.rf.general.Has(Cons.playSafe) || un.rf.general.Has(Cons.feintDefeat)) {
+        if (feint && !un.FollowOrder()) {
+          if (un.rf.general.Has(Cons.playSafe) || un.rf.general.Has(Cons.tactic)) {
             if (Cons.SlimChance()) {
               chasers.Add(un);
             }
@@ -908,6 +961,19 @@ namespace MonoNS
         // goose chase
         HashSet<Unit> occupied = new HashSet<Unit>();
         foreach(Unit u in chasers) {
+          if (u.IsCamping()) {
+            Tile targetTile = null;
+            foreach(Tile t in u.tile.neighbours) {
+              if (t.Deployable(u)) {
+                targetTile = t;
+                break;
+              }
+            }
+            if (targetTile == null) {
+              continue;
+            }
+            u.tile.settlement.Decamp(u, targetTile);
+          }
           Tile[] path = new Tile[]{};
           foreach(Unit goose in geese) {
             foreach(Tile t in goose.tile.neighbours) {

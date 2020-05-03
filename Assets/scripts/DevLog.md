@@ -28,13 +28,12 @@ Game Tips:
 37. 部队在山地上被冲阵几率低
 38. 重骑兵无法被冲阵
 39. 女真人不能被冲阵
-40. 女真人溃败几率50%，士气降到30才削减战斗力
+40. 女真人溃败几率50%
 41. 女真人大概率不撤退
 42. 女真铁浮图极大增加破阵几率
-42. 女真步兵老兵战斗力极强
 43. 女真人所有纪律事件免疫
 44. 汉：步兵守方, 敌我战力比大于2倍时50%野战抱怨
-45. 契丹:步兵围城50%抱怨, 骑兵守城75%抱怨
+45. 契丹:步兵围城50%抱怨, 骑兵防御时守城75%抱怨
 46. 契丹人易于多种族产生冲突(党项，女真)
 46. 汉人和女真人不与任何种族产生冲突
 46. 党项：步兵围城50%抱怨
@@ -46,24 +45,16 @@ Game Tips:
 48. 同一回合内连续战败 士气累计-5, -10, -15, -20
 49. 部队战败状态战力-20%
 
-主帅服从命令技能修正范围内性格缺陷
-谍报 佯败 空城 挑衅为将领技能按钮
 ai和玩家战术，偏师一个方向吸引敌军主力，另一路伏兵从后方伏击后队敌军
-hidden unit doesn't join the operation start phase
 AI ambush doesn't need to check players alert status, only check if ambusher is in player's visible field before attack
-敌军性格和技能通过交战或者情报获知
-技能：谍报
-
 
 破阵 -> 以少打多 -> 击败 -> 追击 -> 歼灭 -> 影响周边军队
-
 兵团动态合并
 map skeleton for AI(supply route, point, value tiles, dam, supply range etc.)
 每月一回合，10个战斗回合
 
 战场瘟疫爆发时，每只部队随机确定时候染病，染病几率由低到高在到低变化
 战略回合，ai借助战斗回合战果施压，换取停战条约
-all event not showing for AI
 
 in Attached script to direct access gameobject:
  public void Destroy()

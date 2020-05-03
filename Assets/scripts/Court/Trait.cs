@@ -13,8 +13,7 @@ namespace CourtNS {
         Cons.loyal, Cons.loyal,
         Cons.conservative, Cons.conservative,
         Cons.cunning, Cons.cunning,
-        Cons.calm, Cons.calm, Cons.calm,
-        Cons.ego};
+        Cons.calm, Cons.calm, Cons.calm};
       return traits[Util.Rand(0, traits.Length-1)];
     }
   }
@@ -66,16 +65,6 @@ namespace CourtNS {
 
     public override string Description() {
       return Cons.GetTextLib().get("trait_cunning_description");
-    }
-  }
-
-  public class Ego: Trait {
-    public override string Name() {
-      return Cons.GetTextLib().get("trait_ego");
-    }
-
-    public override string Description() {
-      return Cons.GetTextLib().get("trait_ego_description");
     }
   }
 

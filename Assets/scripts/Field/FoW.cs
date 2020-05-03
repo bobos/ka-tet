@@ -14,28 +14,22 @@ namespace FieldNS
       Fog(hexMap.allTiles);
     }
 
-    public HashSet<Tile> GetVisibleArea(bool enemy = false) {
+    public HashSet<Tile> GetVisibleArea() {
       HashSet<Tile> tiles = new HashSet<Tile>();
       // TODO: AI test
-      WarParty party;
-      if (enemy) {
-        if (!hexMap.deployDone) {
-          return tiles;
-        }
-        party = hexMap.turnController.playerTurn ? hexMap.GetAIParty() : hexMap.GetPlayerParty();
-      } else {
-        if (!hexMap.deployDone) {
-          return new HashSet<Tile>(hexMap.InitPlayerDeploymentZone());
-        }
-        party = hexMap.turnController.playerTurn ? hexMap.GetPlayerParty() : hexMap.GetAIParty();
+      if (!hexMap.deployDone) {
+        return new HashSet<Tile>(hexMap.InitPlayerDeploymentZone());
       }
-      party.GetVisibleArea(tiles);
-      return tiles;
+      WarParty party = hexMap.turnController.playerTurn ? hexMap.GetPlayerParty() : hexMap.GetAIParty();
+      return party.GetVisibleArea();
     }
 
     public void Fog(Tile[] all) {
       HashSet<Tile> tiles = GetVisibleArea();
-      HashSet<Tile> enemyTiles = hexMap.turnController.playerTurn ? GetVisibleArea(true) : new HashSet<Tile>();
+      HashSet<Tile> enemyTiles = new HashSet<Tile>();
+      if(hexMap.turnController.playerTurn) {
+        enemyTiles = hexMap.GetAIParty().GetAiIndicationArea(tiles);
+      }
       foreach (Tile tile in all)
       {
         if (tiles.Contains(tile)) {

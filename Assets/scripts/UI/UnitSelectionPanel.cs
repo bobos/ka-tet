@@ -27,7 +27,6 @@ namespace MonoNS
                            RetreatButton, DecampButton, ReposButton,
                            BuryButton, ChargeButton, TroopButton, GeneralButton,
                            BreakThroughButton, SurpriseAttackButton, FeintDefeatButton,
-                           BaitButton, ToutButton, SpyButton
                            };
       buttons = btns;
       mouseController.onUnitSelect += OnUnitSelect;
@@ -64,9 +63,6 @@ namespace MonoNS
     public GameObject GeneralButton;
     public GameObject SurpriseAttackButton;
     public GameObject FeintDefeatButton;
-    public GameObject BaitButton;
-    public GameObject ToutButton;
-    public GameObject SpyButton;
     GameObject[] buttons;
 
     public Text title;
@@ -197,7 +193,7 @@ namespace MonoNS
       
       if (!hexMap.combatController.start && hexMap.deployDone && unit.CanAttack()) {
         AttackButton.SetActive(true);
-        FeintDefeatButton.SetActive(unit.rf.general.Has(Cons.feintDefeat));
+        FeintDefeatButton.SetActive(unit.rf.general.Has(Cons.tactic));
         SurpriseAttackButton.SetActive(mouseController.surpriseTargets.Length > 0);
       }
 
@@ -296,8 +292,7 @@ namespace MonoNS
       + "%\n地形加成:" + unit.vantage.Buf() * 100
       + "%\n重骑加成:" + unit.HeavyCavalryBuf() * 100
       + "%\n将领加成:" + unit.GetGeneralBuf() * 100
-      + "%\n总计加成:" + (unit.GetBuff() *100) + "%\n\n"
-      + "有效作战人数:" + unit.vantage.GetEffective();
+      + "%\n总计加成:" + (unit.GetBuff() *100) + "%\n\n";
       hexMap.hoverInfo.Show(details);
 
       title.text = unit.GeneralName();

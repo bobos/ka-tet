@@ -76,7 +76,7 @@ namespace CourtNS
 
     public float lvlBuf {
       get {
-        return rank.Buf(this.province.region.LevelBuf(this.type), morale, this.IsSpecial());
+        return rank.Buf(this);
       }
     }
 

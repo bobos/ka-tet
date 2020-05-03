@@ -215,7 +215,7 @@ namespace UnitNS
     }
 
     public int CanBeSurprised() {
-      if (!IsOnField() || tile.vantagePoint || rf.IsSpecial() || alerted) {
+      if (!IsOnField() || tile.vantagePoint || alerted) {
         return 0;
       }
       return rf.general.Is(Cons.brave) || rf.general.Is(Cons.conservative)
@@ -385,9 +385,7 @@ namespace UnitNS
     }
 
     public Tile[] GetSurpriseAttackTiles() {
-      HashSet<Tile> enemyVisibleRange = new HashSet<Tile>();
-      hexMap.GetWarParty(this, true).GetVisibleArea(enemyVisibleRange);
-      if (enemyVisibleRange.Contains(tile)) {
+      if (hexMap.GetWarParty(this, true).GetVisibleArea().Contains(tile)) {
         // discovered by enemy
         return new Tile[]{};
       }
@@ -406,11 +404,6 @@ namespace UnitNS
         }
       }
       return yes;
-    }
-
-    public Tile[] GetScoutArea() {
-      return tile.GetNeighboursWithinRange<Tile>(rf.soldiers > 5000 ? L2DiscoverRange : L1DiscoverRange,
-                                                 (Tile _tile) => true);
     }
 
     public Tile[] GetVisibleArea() {
@@ -444,6 +437,10 @@ namespace UnitNS
         }
       }
       return inRange;
+    }
+
+    public bool FollowOrder() {
+      return InCommanderRange() && MyCommander().commandUnit.general.Has(Cons.obey);
     }
 
     public bool ImproviseOnSupply() {

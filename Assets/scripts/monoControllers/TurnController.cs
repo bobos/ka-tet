@@ -193,14 +193,14 @@ namespace MonoNS
           WarParty atkParty = playerParty.attackside ? playerParty : aiParty;
           WarParty defParty = playerParty.attackside ? aiParty : playerParty;
           foreach (Unit unit in atkParty.GetUnits()) {
-            if (unit.rf.morale >= Rank.MoralePunishLine(unit.rf.IsSpecial())) {
+            if (unit.rf.morale >= unit.rf.province.region.MoralePunishLine()) {
               unit.rf.morale -= 2;
             }
           }
 
           if ((turnNum % 2) != 0) {
             foreach(Unit unit in defParty.GetUnits()) {
-              if (unit.rf.morale >= Rank.MoralePunishLine(unit.rf.IsSpecial())) {
+              if (unit.rf.morale >= unit.rf.province.region.MoralePunishLine()) {
                 unit.rf.morale -= 2;
               }
             }

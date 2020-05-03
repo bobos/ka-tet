@@ -267,24 +267,6 @@ namespace MonoNS
       }
     }
 
-    public void OnBaitClick() {
-      if (onBtnClick != null) {
-        onBtnClick(actionName.Bait);
-      }
-    }
-
-    public void OnToutClick() {
-      if (onBtnClick != null) {
-        onBtnClick(actionName.Tout);
-      }
-    }
-
-    public void OnSpyClick() {
-      if (onBtnClick != null) {
-        onBtnClick(actionName.Spy);
-      }
-    }
-
     public enum actionName
     {
       MOVE,
@@ -321,9 +303,6 @@ namespace MonoNS
       AbilityInfo,
       SurpriseAttack,
       FeintDefeat,
-      Bait,
-      Tout,
-      Spy
     }
 
     // Make sure this is sequential

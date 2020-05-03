@@ -670,7 +670,7 @@ namespace MonoNS
           }
         }
       } else {
-        popAniController.Show(view, textLib.get("pop_holding"), Color.green);
+        popAniController.Show(hexMap.GetUnitView(to), textLib.get("pop_holding"), Color.green);
         while (popAniController.Animating) { yield return null; }
         int morale1 = -2;
         from.rf.morale += morale1;

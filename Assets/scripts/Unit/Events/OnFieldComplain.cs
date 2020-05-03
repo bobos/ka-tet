@@ -23,7 +23,7 @@ namespace UnitNS
     }
 
     int MoraleDrop() {
-      return -8;
+      return -5;
     } 
 
     public void Destroy() {}

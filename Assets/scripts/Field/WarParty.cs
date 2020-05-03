@@ -173,7 +173,8 @@ namespace FieldNS
     }
 
     HashSet<Tile> discoveredTiles = new HashSet<Tile>();
-    public void GetVisibleArea(HashSet<Tile> tiles) {
+    public HashSet<Tile> GetVisibleArea() {
+      HashSet<Tile> tiles = new HashSet<Tile>();
       foreach (Unit u in GetUnits())
       {
         foreach(Tile tile in u.GetVisibleArea()) {
@@ -184,6 +185,22 @@ namespace FieldNS
       foreach (Tile tile in discoveredTiles) {
         tiles.Add(tile);
       }
+      return tiles;
+    }
+
+    public HashSet<Tile> GetAiIndicationArea(HashSet<Tile> playerVision) {
+      HashSet<Tile> tiles = new HashSet<Tile>();
+      foreach (Unit u in GetUnits())
+      {
+        if (u.tile.field == FieldType.Forest && u.IsOnField() && !playerVision.Contains(u.tile)) {
+          continue;
+        }
+        foreach(Tile tile in u.GetVisibleArea()) {
+          tiles.Add(tile);
+        }
+      }
+
+      return tiles;
     }
 
     public void DiscoverTile(Tile tile) {

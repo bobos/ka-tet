@@ -11,7 +11,7 @@ namespace CourtNS {
         Cons.pursuer, Cons.hammer, Cons.builder, Cons.breacher, Cons.noPanic,
         Cons.mechanician, Cons.diminisher, Cons.staminaManager, Cons.punchThrough,
         Cons.generous, Cons.runner, Cons.fireBug, Cons.holdTheGround, Cons.breaker,
-        Cons.unshaken, Cons.formidable, Cons.attender, Cons.feintDefeat, Cons.playSafe,
+        Cons.unshaken, Cons.formidable, Cons.attender, Cons.tactic, Cons.playSafe,
         Cons.outlooker, Cons.ambusher};
       int total = candidates.Length;
       int luckNum = Util.Rand(0, total + 5);
@@ -321,16 +321,16 @@ namespace CourtNS {
     }
   }
 
-  public class FeintDefeat: Ability {
-    public FeintDefeat() {
+  public class Tactic: Ability {
+    public Tactic() {
     }
 
     public override string Name() {
-      return Cons.GetTextLib().get("ability_feintDefeat");
+      return Cons.GetTextLib().get("ability_tactic");
     }
 
     public override string Description() {
-      return Cons.GetTextLib().get("ability_feintDefeat_description");
+      return Cons.GetTextLib().get("ability_tactic_description");
     }
   }
 

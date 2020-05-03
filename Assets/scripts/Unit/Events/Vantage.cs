@@ -3,8 +3,6 @@
   public class Vantage
   {
     Unit unit;
-    const int MaxEffectiveNum = 10000;
-    const int LeastEffectiveNum = 2000;
     public Vantage(Unit unit) {
       this.unit = unit;
     }
@@ -33,21 +31,7 @@
     }
 
     public int TotalPoints(int pointPerSoldier) {
-      int effective = GetEffectiveNum();
-      if (unit.rf.soldiers > effective) {
-        return effective * pointPerSoldier;
-      } else {
-        return unit.rf.soldiers * pointPerSoldier;
-      }
-    }
-
-    int GetEffectiveNum() {
-      return MaxEffectiveNum - (int)((MaxEffectiveNum - LeastEffectiveNum) * Rank.GetMoralePunish(unit.rf.morale, unit.rf.IsSpecial()));
-    }
-
-    public int GetEffective() {
-      int eff = GetEffectiveNum();
-      return unit.rf.soldiers > eff ?  eff : unit.rf.soldiers;
+      return unit.rf.soldiers * pointPerSoldier;
     }
 
   }

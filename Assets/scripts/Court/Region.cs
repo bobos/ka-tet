@@ -17,6 +17,7 @@ namespace CourtNS
     }
     public abstract int Will();
     public abstract int RetreatThreshold();
+    public abstract int MoralePunishLine();
     public abstract List<Region> GetConflictRegions();
     public abstract float LevelBuf(Type unitType);
   }
@@ -44,6 +45,11 @@ namespace CourtNS
     public override int Will()
     {
       return 90;
+    }
+
+    public override int MoralePunishLine()
+    {
+      return 55;
     }
 
     public override int RetreatThreshold()
@@ -89,6 +95,11 @@ namespace CourtNS
       return 90;
     }
 
+    public override int MoralePunishLine()
+    {
+      return 55;
+    }
+
     public override int RetreatThreshold()
     {
       return 35;
@@ -129,9 +140,14 @@ namespace CourtNS
       return 80;
     }
 
+    public override int MoralePunishLine()
+    {
+      return 55;
+    }
+
     public override int RetreatThreshold()
     {
-      return 45;
+      return 40;
     }
 
     public override List<Region> GetConflictRegions() {
@@ -169,9 +185,14 @@ namespace CourtNS
       return 85;
     }
 
+    public override int MoralePunishLine()
+    {
+      return 50;
+    }
+
     public override int RetreatThreshold()
     {
-      return 45;
+      return 40;
     }
 
     public override List<Region> GetConflictRegions() {
@@ -209,9 +230,14 @@ namespace CourtNS
       return 100;
     }
 
+    public override int MoralePunishLine()
+    {
+      return 30;
+    }
+
     public override int RetreatThreshold()
     {
-      return 10;
+      return 20;
     }
 
     public override List<Region> GetConflictRegions() {
