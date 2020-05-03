@@ -9,7 +9,6 @@
   public enum State
   {
     Stand,
-    Conceal,
     Camping,
     Disbanded,
     Retreated

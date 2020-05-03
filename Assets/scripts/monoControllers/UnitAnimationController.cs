@@ -82,7 +82,7 @@ namespace MonoNS
     }
 
     IEnumerator CoShakeNearbyAllies(Unit unit, int moraleDrop) {
-      foreach(Tile t in unit.tile.GetNeighboursWithinRange<Tile>(6, (Tile tt) => true)) {
+      foreach(Tile t in unit.tile.GetNeighboursWithinRange<Tile>(4, (Tile tt) => true)) {
         Unit u = t.GetUnit();
         if (u != null && u.IsAI() == unit.IsAI() && !Util.eq<Unit>(unit, u)) {
           int[] stats = new int[]{moraleDrop,0,0,0,0};
@@ -91,7 +91,7 @@ namespace MonoNS
             hexMap.unitAniController.ShowEffect(u, stats, null, true);
           }
           if (!u.StickAsNailWhenDefeat()
-            && (u.RetreatOnDefeat() || Cons.FiftyFifty())
+            && u.RetreatOnDefeat()
             && u.SetRetreatPath()) {
             ForceRetreat(u, 60);
             while(ForceRetreatAnimating) { yield return null; }
@@ -106,9 +106,7 @@ namespace MonoNS
     public bool MoveUnit(Unit unit, Tile tile = null, bool dontFixCamera = false) {
       MoveAnimating = true;
       Tile old = unit.tile;
-      bool hiddenB4 = unit.IsConcealed();
       bool continuing = unit.DoMove(tile);
-      bool discovered = hiddenB4 && !unit.IsConcealed();
       int moraleDrop = 0;
       if (Util.eq<Tile>(old, unit.tile)) {
         MoveAnimating = false;
@@ -122,11 +120,11 @@ namespace MonoNS
         hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(unit.tile).transform.position);
       }
       hexMap.cameraKeyboardController.DisableCamera();
-      StartCoroutine(CoMoveUnit(unit, moraleDrop, discovered));
+      StartCoroutine(CoMoveUnit(unit, moraleDrop));
       return continuing;
     }
 
-    IEnumerator CoMoveUnit(Unit unit, int moraleDrop, bool discovered) {
+    IEnumerator CoMoveUnit(Unit unit, int moraleDrop) {
       UnitView view = hexMap.GetUnitView(unit);
       view.Move(unit.tile);
       while (view.Animating) { yield return null; }
@@ -145,10 +143,6 @@ namespace MonoNS
         unit.rf.morale += moraleDrop;
         ShowEffect(unit, new int[]{moraleDrop,0,0,0,0});
         while(ShowAnimating) { yield return null; }
-      }
-      if (!unit.IsAI() && discovered) {
-        popAniController.Show(view, textLib.get("pop_discovered"), Color.yellow);
-        while(popAniController.Animating) { yield return null; }
       }
       if (!unit.IsAI()) {
         hexMap.GetAIParty().UpdateAlert();
@@ -434,7 +428,7 @@ namespace MonoNS
         unit.rf.morale += moraleDrop;
         hexMap.dialogue.ShowOnFieldComplain(unit.rf.province.region);
         while(hexMap.dialogue.Animating) { yield return null; }
-        ShowEffect(unit, new int[]{moraleDrop, 0, 0, 0, 0}, settlementMgr.GetView(unit.tile.settlement));
+        ShowEffect(unit, new int[]{moraleDrop, 0, 0, 0, 0});
         while(ShowAnimating) { yield return null; }
       }
       hexMap.cameraKeyboardController.EnableCamera();

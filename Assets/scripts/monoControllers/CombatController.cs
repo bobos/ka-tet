@@ -37,6 +37,7 @@ namespace MonoNS
     public int defenderOptimPoints = 1;
     public OperationGeneralResult sugguestedResult;
     public CombatController.ResultType suggestedResultType;
+    public bool feintDefeat = false;
   }
 
   public class CombatController : BaseController
@@ -61,59 +62,12 @@ namespace MonoNS
     List<Unit> supportDefenders;
 
     public void SetGaleVantage(Unit unit, Unit target, UnitPredict predict) {
-      if (Cons.IsGale(hexMap.windGenerator.current)) {
-        if (hexMap.windGenerator.direction == Cons.Direction.dueNorth) {
-          if(Util.eq<Tile>(target.tile.SouthTile<Tile>(), unit.tile)) {
-            predict.windDisadvantage = true;
-          } else if(Util.eq<Tile>(target.tile.NorthTile<Tile>(), unit.tile)) {
-            predict.windAdvantage = true;
-          }
-        }
-
-        if (hexMap.windGenerator.direction == Cons.Direction.northEast) {
-          if(Util.eq<Tile>(target.tile.SouthWestTile<Tile>(), unit.tile)) {
-            predict.windDisadvantage = true;
-          } else if(Util.eq<Tile>(target.tile.NorthEastTile<Tile>(), unit.tile)) {
-            predict.windAdvantage = true;
-          }
-        }
-
-        if (hexMap.windGenerator.direction == Cons.Direction.northWest) {
-          if(Util.eq<Tile>(target.tile.SouthEastTile<Tile>(), unit.tile)) {
-            predict.windDisadvantage = true;
-          } else if(Util.eq<Tile>(target.tile.NorthWestTile<Tile>(), unit.tile)) {
-            predict.windAdvantage = true;
-          }
-        }
-
-        if (hexMap.windGenerator.direction == Cons.Direction.dueSouth) {
-          if(Util.eq<Tile>(target.tile.NorthTile<Tile>(), unit.tile)) {
-            predict.windDisadvantage = true;
-          } else if(Util.eq<Tile>(target.tile.SouthTile<Tile>(), unit.tile)) {
-            predict.windAdvantage = true;
-          }
-        }
-
-        if (hexMap.windGenerator.direction == Cons.Direction.southEast) {
-          if(Util.eq<Tile>(target.tile.NorthWestTile<Tile>(), unit.tile)) {
-            predict.windDisadvantage = true;
-          } else if(Util.eq<Tile>(target.tile.SouthEastTile<Tile>(), unit.tile)) {
-            predict.windAdvantage = true;
-          }
-        }
-
-        if (hexMap.windGenerator.direction == Cons.Direction.southWest) {
-          if(Util.eq<Tile>(target.tile.NorthEastTile<Tile>(), unit.tile)) {
-            predict.windDisadvantage = true;
-          } else if(Util.eq<Tile>(target.tile.SouthWestTile<Tile>(), unit.tile)) {
-            predict.windAdvantage = true;
-          }
-        }
-      }
-
-      if (predict.windAdvantage) {
+      WindAdvantage advantage = unit.tile.GetGaleAdvantage(target.tile);
+      if (advantage == WindAdvantage.Advantage) {
+        predict.windAdvantage = true;
         predict.percentOfEffectiveForce += 50;
-      } else if (predict.windDisadvantage) {
+      } else if (advantage == WindAdvantage.Disadvantage) {
+        predict.windDisadvantage = true;
         predict.percentOfEffectiveForce -= 50;
       }
 
@@ -130,12 +84,13 @@ namespace MonoNS
 
     OperationPredict predict;
     public OperationPredict StartOperation(Unit attacker, Unit targetUnit,
-      Settlement targetSettlement, bool surprised = false) {
+      Settlement targetSettlement, bool surprised = false, bool feintDefeat = false) {
       if (!attacker.CanAttack()) {
-        // no enough stamina, can not start operation
+        // no enough attempt, can not start operation
         return null;
       }
       OperationPredict predict = new OperationPredict();
+      predict.feintDefeat = feintDefeat;
       if (targetSettlement != null) {
         targetUnit = this.defender = targetSettlement.garrison[0];
       }
@@ -154,7 +109,7 @@ namespace MonoNS
             continue;
           }
 
-          if (u.IsAI() == attacker.IsAI() && !Util.eq<Unit>(u, attacker) && u.CanAttack()) {
+          if (u.IsAI() == attacker.IsAI() && !Util.eq<Unit>(u, attacker) && u.CanAttack() && !feintDefeat) {
             supportAttackers.Add(u);
           }
 
@@ -228,7 +183,6 @@ namespace MonoNS
 
       CalculateWinChance(predict);
       bool atkWin = predict.sugguestedResult.chance == 10;
-      Unit initiator = atkWin ? defender : attacker; 
       List<UnitPredict> ups = atkWin ? predict.defenders : predict.attackers;
       foreach (UnitPredict up in ups) {
         if (Util.eq<Unit>(up.unit, defender) || Util.eq<Unit>(up.unit, attacker)) {
@@ -300,7 +254,7 @@ namespace MonoNS
       }
 
       if (attacker && !inRange) {
-        ret = ret < 80 ? ret : 80;
+        ret = ret < 90 ? ret : 90;
       }
 
       return ret;
@@ -586,9 +540,8 @@ namespace MonoNS
         int defenderCasualty = 0;
         predict.attackerOptimPoints = predict.attackerOptimPoints <= 0 ? 1 : predict.attackerOptimPoints;
         predict.defenderOptimPoints = predict.defenderOptimPoints <= 0 ? 1 : predict.defenderOptimPoints;
-        bool atkWin = predict.sugguestedResult.chance == 10;
-        if (!atkWin && attacker.rf.general.Has(Cons.feintDefeat) && Cons.FiftyFifty()) {
-          // feint defeat triggered
+        bool atkWin = predict.sugguestedResult.chance == 10 && !predict.feintDefeat;
+        if (predict.feintDefeat) {
           predict.suggestedResultType = ResultType.FeintDefeat;
           hexMap.turnController.ShowTitle(Cons.GetTextLib().get("title_feintDefeat"), Color.white);
           while(hexMap.turnController.showingTitle) { yield return null; }
@@ -598,9 +551,8 @@ namespace MonoNS
         bool feint = resultLevel == ResultType.FeintDefeat;
         if (resultLevel == ResultType.FeintDefeat) {
           attackerCasualty = (int)(attackerTotal * 0.008f);
-          defenderCasualty = (int)(attackerCasualty * 0.8f);
-        }
-        if (resultLevel == ResultType.Close) {
+          defenderCasualty = (int)(attackerCasualty * 0.4f);
+        } else if (resultLevel == ResultType.Close) {
           // 1 - 1.5x odds
           float m = 0.025f;
           if (Cons.SlimChance()) {
@@ -722,9 +674,9 @@ namespace MonoNS
         }
 
         if (defender.IsCamping()) {
-            int[] stats = new int[]{0,0,settlementDead,0,0};
-            hexMap.unitAniController.ShowEffect(null, stats, hexMap.settlementMgr.GetView(defender.tile.settlement));
-            while (hexMap.unitAniController.ShowAnimating) { yield return null; }
+          int[] stats = new int[]{0,0,settlementDead,0,0};
+          hexMap.unitAniController.ShowEffect(null, stats, hexMap.settlementMgr.GetView(defender.tile.settlement));
+          while (hexMap.unitAniController.ShowAnimating) { yield return null; }
         }
 
         int capturedHorse = (int)((atkWin ? defenderCavDead : attackerCavDead) * 0.2f);
@@ -846,7 +798,7 @@ namespace MonoNS
 
         Unit un = atkWin ? attacker : defender;
         if (feint) {
-          if (un.rf.general.Has(Cons.playSafe)) {
+          if (un.rf.general.Has(Cons.playSafe) || un.rf.general.Has(Cons.feintDefeat)) {
             if (Cons.SlimChance()) {
               chasers.Add(un);
             }

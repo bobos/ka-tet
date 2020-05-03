@@ -116,9 +116,6 @@ namespace UnitNS
     State[] visibleStates = {State.Stand};
     public void SetState(State state) {
       UnitActionBroker broker = UnitActionBroker.GetBroker();
-      if (state == State.Stand && Concealable() && concealCoolDownTurn == 0) {
-        state = State.Conceal;
-      }
       this.state = state;
       if (state == State.Retreated) {
         broker.BrokeChange(this, ActionType.UnitDestroyed, tile);
@@ -139,18 +136,9 @@ namespace UnitNS
         }
       }
 
-      if (state == State.Conceal) {
-        if (myTurn) {
-          broker.BrokeChange(this, ActionType.UnitVisible, tile);
-          return;
-        }
-        broker.BrokeChange(this, ActionType.UnitHidden, tile);
-        return;
-      }
       broker.BrokeChange(this, ActionType.UnitVisible, tile);
     }
 
-    public int concealCoolDownTurn = 0;
     public int movementRemaining {
       get {
         return __movementRemaining;
@@ -194,12 +182,11 @@ namespace UnitNS
       }
       int chance = 0;
       if (Cons.IsGale(hexMap.windGenerator.current)) {
-        UnitPredict up = new UnitPredict();
-        hexMap.combatController.SetGaleVantage(charger, this, up);
-        if (up.windAdvantage) {
+        WindAdvantage advantage = charger.tile.GetGaleAdvantage(tile);
+        if (advantage == WindAdvantage.Advantage) {
           chance = 30;
         }
-        if (up.windDisadvantage) {
+        if (advantage == WindAdvantage.Disadvantage) {
           chance = -30;
         }
       }
@@ -271,10 +258,6 @@ namespace UnitNS
 
     public string GetStateName()
     {
-      if (state == State.Conceal)
-      {
-        return txtLib.get("u_concealing");
-      }
       if (state == State.Camping)
       {
         return txtLib.get("u_camping");
@@ -331,12 +314,8 @@ namespace UnitNS
       return warWeary.IsWarWeary();
     }
 
-    public bool IsConcealed() {
-      return state == State.Conceal;
-    }
-
     public bool IsOnField() {
-      return state == State.Conceal || state == State.Stand;
+      return state == State.Stand;
     }
 
     public bool IsSurrounded() {
@@ -493,9 +472,9 @@ namespace UnitNS
     public bool StickAsNailWhenDefeat() {
       return IsCommander() || (InCommanderRange() &&
               MyCommander().Has(Cons.turningTide) &&
-              Cons.FiftyFifty()) ||
-              (rf.general.Has(Cons.unshaken) && Cons.MostLikely()) ||
-              (rf.IsSpecial() && Cons.MostLikely());
+              Cons.HighlyLikely()) ||
+              (rf.general.Has(Cons.unshaken) && Cons.HighlyLikely()) ||
+              (rf.IsSpecial() && Cons.HighlyLikely());
     }
 
     public bool Rout() {
@@ -504,7 +483,14 @@ namespace UnitNS
     }
 
     public bool RetreatOnDefeat() {
-      return rf.general.Is(Cons.conservative) && Cons.EvenChance() && IsOnField();
+      if (IsCamping()) {
+        return false;
+      }
+      if (rf.general.Is(Cons.conservative)) {
+        return Cons.EvenChance();
+      } else {
+        return Cons.SlimChance();
+      }
     }
 
     public bool ApplyDiscipline() {
@@ -541,15 +527,6 @@ namespace UnitNS
       alerted = chaos = defeating = retreated = charged = unitConflict.conflicted = false;
       defeatStreak = 0;
       InitAllowedAtmpt();
-
-      if (concealCoolDownTurn > 0) {
-        concealCoolDownTurn--;
-      } else {
-        if (Concealable() && state == State.Stand) {
-          if (!hexMap.GetRangeForDiscoveryWarning(this.IsAI()).Contains(tile)) SetState(State.Conceal);
-        }
-      }
-
       turnDone = false;
       movementRemaining = GetFullMovement();
       int[] ret = weatherEffect.Apply();
@@ -789,11 +766,6 @@ namespace UnitNS
     {
       SetTile(tile);
       path = null;
-      SetState(State.Stand);
-    }
-
-    public void DiscoveredByEnemy() {
-      concealCoolDownTurn = ConcealCoolDownIn;
       SetState(State.Stand);
     }
 

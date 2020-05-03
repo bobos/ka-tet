@@ -40,7 +40,7 @@
       if (IsValid())
       {
         lastTurns--;
-        int morale = -8;
+        int morale = -6;
         unit.rf.morale += morale;
         effects[0] = morale;
 

@@ -91,7 +91,7 @@ namespace MonoNS
     public Material TransMat;
     public Material WarningMat;
     public Material SupplyRouteMat;
-    [System.NonSerialized] public float HeightMountain = 0.33f, HeightHill = 0.2f, HeightFlat = 0f;
+    [System.NonSerialized] public float HeightMountain = 0.33f, HeightHill = 0.23f, HeightFlat = 0f;
     public GameObject InfantryPrefab;
     public GameObject CavalryPrefab;
     public GameObject HexPrefab;
@@ -681,34 +681,6 @@ namespace MonoNS
       GetWarParty(unit).CaptureHorse(num);
     }
 
-    public HashSet<Tile> GetRangeForDiscoveryWarning(bool isAI) {
-      return GetEnemyRange(isAI, 0);
-    }
-
-    public HashSet<Tile> GetRangeForDiscoveryCheck(bool isAI) {
-      return GetEnemyRange(isAI, 1);
-    }
-
-    public HashSet<Tile> GetRangeForGuardCheck(bool isAI) {
-      return GetEnemyRange(isAI, 2);
-    }
-
-    HashSet<Tile> GetEnemyRange(bool isAI, int type) {
-      // type: 0 for discovery warning, 1 for discovery check, 2 for guarded tile check
-      HashSet<Tile> enemyScoutArea = new HashSet<Tile>();
-      WarParty party = isAI ? GetPlayerParty() : GetAIParty();
-      foreach (Unit u in party.GetUnits())
-      {
-        foreach(Tile t in (type == 0 || type == 1) ? u.GetScoutArea() : u.tile.neighbours) {
-          if (type == 0 && u.IsConcealed()) {
-            continue;
-          }
-          enemyScoutArea.Add(t);
-        }
-      }
-      return enemyScoutArea;
-    }
-
     List<GameObject> supplyLines = new List<GameObject>();
     public void DrawSupplyLine(Tile from, Tile to) {
       GameObject myLine = new GameObject();
@@ -1016,9 +988,8 @@ namespace MonoNS
       {
         return;
       }
-      if(unit.IsVisible() || unit.IsConcealed()) {
+      if(unit.IsVisible()) {
         CreateUnitViewAt(unit, unit.tile);
-        if (unit.IsConcealed() && unit.IsAI()) DeactivateUnitView(unit);
       }
     }
 
@@ -1051,7 +1022,7 @@ namespace MonoNS
 
     public void OverlayFoW(Tile tile) {
       Unit unit = tile.GetUnit();
-      if (unit != null && !unit.IsConcealed()) {
+      if (unit != null) {
         DeactivateUnitView(unit);
       }
       Overlay(tile, OverLayMat);
@@ -1095,9 +1066,6 @@ namespace MonoNS
     public void HighlightArea(Tile[] tiles, RangeType type, Unit unit = null)
     {
       DehighlightArea();
-      HashSet<Tile> spotWarningRange = unit != null && unit.IsConcealed()
-        ? GetRangeForDiscoveryWarning(unit.IsAI()) : null;
-      HashSet<Tile> guardWarningRange = unit != null ? GetRangeForGuardCheck(unit.IsAI()) : null;
       Tile[] visible = unit != null ? unit.GetVisibleArea() : null;
       foreach (Tile tile in tiles)
       {
@@ -1105,21 +1073,6 @@ namespace MonoNS
         if (type == RangeType.attack) mat = AttackRange;
         if (type == RangeType.movement) {
           mat = MovementRange;
-          if (unit != null && unit.IsConcealed() && spotWarningRange.Contains(tile)) {
-            mat = WarningMat;
-          }
-          if (guardWarningRange.Contains(tile)) {
-            bool found = false;
-            foreach (Tile t in visible) {
-              if (Util.eq<Tile>(tile, t)) {
-                found = true;
-                break;
-              }
-            }
-            if (found) {
-              mat = CampRange;
-            }
-          }
         }
         if (type == RangeType.camp) mat = CampRange;
         if (type == RangeType.supplyRange) mat = SupplyRange;

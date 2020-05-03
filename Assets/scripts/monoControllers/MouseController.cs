@@ -143,7 +143,7 @@ namespace MonoNS
           nearbyAlly.Add(u);
         }
 
-        if (u != null && u.IsAI() != isAI && !u.IsConcealed()) {
+        if (u != null && u.IsAI() != isAI) {
           nearEnemy = true;
           nearbyEnemey.Add(u);
         }
@@ -238,6 +238,16 @@ namespace MonoNS
       {
         mouseMode = mode.attack;
         Update_CurrentFunc = UpdateUnitAttack;
+        msgBox.Show("选择目标!");
+        foreach(Unit u in nearbyEnemey) {
+          hexMap.TargetUnit(u);
+        }
+      }
+
+      if (action == ActionController.actionName.FeintDefeat)
+      {
+        mouseMode = mode.attack;
+        Update_CurrentFunc = UpdateUnitFeintDefeat;
         msgBox.Show("选择目标!");
         foreach(Unit u in nearbyEnemey) {
           hexMap.TargetUnit(u);
@@ -565,6 +575,29 @@ namespace MonoNS
         } else if (targetUnit != null || targetSettlement != null) {
           msgBox.Show("");
           hexMap.combatController.StartOperation(selectedUnit, targetUnit, targetSettlement);
+          hexMap.actionController.commenceOperation();
+        }
+      } else if (!Util.eq<Tile>(tileUnderMouse, selectedUnit.tile))
+      {
+        Unit u = tileUnderMouse.GetUnit();
+        if (u != null)
+        {
+          hover.Show(u.Name());
+        }
+      }
+    }
+
+    void UpdateUnitFeintDefeat()
+    {
+      if (tileUnderMouse == null) {
+        return;
+      }
+      if (Input.GetMouseButtonUp(0))
+      {
+        ClickOnTile();
+        if (targetUnit != null || targetSettlement != null) {
+          msgBox.Show("");
+          hexMap.combatController.StartOperation(selectedUnit, targetUnit, targetSettlement, false, true);
           hexMap.actionController.commenceOperation();
         }
       } else if (!Util.eq<Tile>(tileUnderMouse, selectedUnit.tile))

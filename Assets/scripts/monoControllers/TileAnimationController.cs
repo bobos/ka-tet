@@ -100,10 +100,20 @@ namespace MonoNS
     public bool Burn(Unit unit, Tile tile, HashSet<Tile> tiles = null)
     {
       hexMap.cameraKeyboardController.DisableCamera();
-      tiles = tiles == null ? tile.SetFire() : tiles;
-      if (unit != null && unit.rf.general.Has(Cons.fireBug) && tiles.Count == 0) {
-        tiles.Add(tile);
+      Weather weather = hexMap.weatherGenerator.currentWeather;
+      bool set = false;
+      if(unit != null && !Cons.IsHeavyRain(weather) && ! Cons.IsRain(weather) && !Cons.IsBlizard(weather)) {
+        if (unit.tile.GetGaleAdvantage(tile) == WindAdvantage.Advantage) {
+          set = true;
+        }
+        if (unit.rf.general.Has(Cons.fireBug)) {
+          set = true;
+        }
+        if (unit.tile.GetGaleAdvantage(tile) == WindAdvantage.Disadvantage) {
+          set = false;
+        }
       }
+      tiles = tiles == null ? tile.SetFire(set) : tiles;
       BurnAnimating = true;
       StartCoroutine(CoBurn(tile, tiles));
       return true;

@@ -67,7 +67,6 @@ namespace TextNS
       {"d_southWest", "西南 ↘"},
 
   //   unit
-      {"u_concealing", "隐蔽中"},
       {"u_camping", "驻扎中"},
       {"u_disbanded", "被歼灭"},
       {"u_standing", ""},
@@ -240,7 +239,7 @@ namespace TextNS
       {"event_FormationBreaking_xia", @"{0}: 大宋何曾耸，大辽亦无奇。 满川龙虎辈，犹自说兵机!"},
       {"event_Retreat", @"{0}: 胜败乃兵家常事，他日再战!"},
       {"event_RefuseToRetreat", @"{0}: 食君之禄忠君之事，岂能遁逃!"},
-      {"event_ChaseDialogue", @"{0}: 贼兵休走!"},
+      {"event_ChaseDialogue", @"{0}: 贼将休走!"},
       {"event_FeintDefeat", @"{0}: 听我号令，全军后撤!"},
       {"event_SiegeComplain", @"{0}士兵: 我{0}勇士半日即刻拿下此城，何须筑此长围示弱于敌耶!"},
       {"event_InCampComplain", @"{0}士兵: 我{0}铁骑岂能龟缩于高墙之后任由贼人践踏我土地，掠杀我同胞，当以堂堂之阵临贼!"},

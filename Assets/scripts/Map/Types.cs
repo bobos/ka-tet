@@ -25,4 +25,9 @@ namespace MapTileNS
     Flood,
     WildFire
   }
+  public enum WindAdvantage {
+    NoAdvantage,
+    Advantage,
+    Disadvantage
+  }
 }

@@ -39,7 +39,7 @@ namespace UnitNS
       if (IsValid())
       {
         lastTurns--;
-        int morale = -10;
+        int morale = -6;
         effects[0] = morale;
         unit.rf.morale += morale;
         int kiaNum = (int)(unit.rf.soldiers * KillRate);

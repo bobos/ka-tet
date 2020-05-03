@@ -133,10 +133,10 @@ namespace MapTileNS
     // ==============================================================
     // ================= Disasters ==================================
     // ==============================================================
-    public HashSet<Tile> SetFire()
+    public HashSet<Tile> SetFire(bool started = false)
     {
       if (wildFire != null) {
-        return wildFire.Start();
+        return wildFire.Start(started);
       }
       return new HashSet<Tile>();
     }
@@ -216,8 +216,6 @@ namespace MapTileNS
           if (!forDeploy) {
             deployable = true;
           }
-        } else if(IsThereConcealedEnemy(isAI)) {
-          deployable = true;
         }
       }
       return deployable;
@@ -272,7 +270,7 @@ namespace MapTileNS
           Cavalry.MovementCostModifierOnPlainOrRoad : Cavalry.MovementCostModifierOnHill));
         if (unit.IsHeavyCavalry()) {
           // movement punishment on elite cavalry
-          ret = (int)(ret * 1.8f);
+          ret = (int)(ret * 1.2f);
         }
       }
 
@@ -301,19 +299,65 @@ namespace MapTileNS
 
     public bool Deployable(Unit unit)
     {
-      if (IsThereConcealedEnemy(unit.IsAI())) {
-        GetUnit().DiscoveredByEnemy();
-      }
       return Passable(unit.IsAI(), true);
     }
 
     public bool DeployableForPathFind(Unit unit) {
-      return (GetUnit() == null || IsThereConcealedEnemy(unit.IsAI())) && movementCost != Unit.MovementCostOnUnaccesible;
+      return GetUnit() == null && movementCost != Unit.MovementCostOnUnaccesible;
     }
 
-    public bool IsThereConcealedEnemy(bool isAI) {
-      Unit u = GetUnit();
-      return u != null && u.IsAI() != isAI && u.IsConcealed();
+    public WindAdvantage GetGaleAdvantage(Tile target) {
+      WindAdvantage advantage = WindAdvantage.NoAdvantage;
+      if (Cons.IsGale(hexMap.windGenerator.current)) {
+        if (hexMap.windGenerator.direction == Cons.Direction.dueNorth) {
+          if(Util.eq<Tile>(target.SouthTile<Tile>(), this)) {
+            advantage = WindAdvantage.Disadvantage;
+          } else if(Util.eq<Tile>(target.NorthTile<Tile>(), this)) {
+            advantage = WindAdvantage.Advantage;
+          }
+        }
+
+        if (hexMap.windGenerator.direction == Cons.Direction.northEast) {
+          if(Util.eq<Tile>(target.SouthWestTile<Tile>(), this)) {
+            advantage = WindAdvantage.Disadvantage;
+          } else if(Util.eq<Tile>(target.NorthEastTile<Tile>(), this)) {
+            advantage = WindAdvantage.Advantage;
+          }
+        }
+
+        if (hexMap.windGenerator.direction == Cons.Direction.northWest) {
+          if(Util.eq<Tile>(target.SouthEastTile<Tile>(), this)) {
+            advantage = WindAdvantage.Disadvantage;
+          } else if(Util.eq<Tile>(target.NorthWestTile<Tile>(), this)) {
+            advantage = WindAdvantage.Advantage;
+          }
+        }
+
+        if (hexMap.windGenerator.direction == Cons.Direction.dueSouth) {
+          if(Util.eq<Tile>(target.NorthTile<Tile>(), this)) {
+            advantage = WindAdvantage.Disadvantage;
+          } else if(Util.eq<Tile>(target.SouthTile<Tile>(), this)) {
+            advantage = WindAdvantage.Advantage;
+          }
+        }
+
+        if (hexMap.windGenerator.direction == Cons.Direction.southEast) {
+          if(Util.eq<Tile>(target.NorthWestTile<Tile>(), this)) {
+            advantage = WindAdvantage.Disadvantage;
+          } else if(Util.eq<Tile>(target.SouthEastTile<Tile>(), this)) {
+            advantage = WindAdvantage.Advantage;
+          }
+        }
+
+        if (hexMap.windGenerator.direction == Cons.Direction.southWest) {
+          if(Util.eq<Tile>(target.NorthEastTile<Tile>(), this)) {
+            advantage = WindAdvantage.Disadvantage;
+          } else if(Util.eq<Tile>(target.SouthWestTile<Tile>(), this)) {
+            advantage = WindAdvantage.Advantage;
+          }
+        }
+      }
+      return advantage;
     }
 
     // ==============================================================

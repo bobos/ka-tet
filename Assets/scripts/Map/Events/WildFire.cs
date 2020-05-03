@@ -35,9 +35,9 @@ namespace MapTileNS
       }
     }
 
-    public HashSet<Tile> Start() {
+    public HashSet<Tile> Start(bool started = false) {
       HashSet<Tile> affectedTiles = new HashSet<Tile>();
-      if (Burnable()) 
+      if (started || Burnable()) 
       {
         tile.burnable = false;
         affectedTiles.Add(tile);
