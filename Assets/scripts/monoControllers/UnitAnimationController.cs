@@ -466,7 +466,7 @@ namespace MonoNS
 
     IEnumerator CoBury(Unit unit) {
       if (!unit.ApplyDiscipline()) {
-        int moraleDrop = -5;
+        int moraleDrop = -3;
         unit.rf.morale += moraleDrop;
         ShowEffect(unit, new int[]{moraleDrop,0,0,0,0});
         while(ShowAnimating) { yield return null; }

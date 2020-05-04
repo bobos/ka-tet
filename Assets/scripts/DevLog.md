@@ -45,6 +45,8 @@ Game Tips:
 48. 同一回合内连续战败 士气累计-5, -10, -15, -20
 49. 部队战败状态战力-20%
 
+测试佯败引诱守军
+冲突换成对话框
 ai和玩家战术，偏师一个方向吸引敌军主力，另一路伏兵从后方伏击后队敌军
 AI ambush doesn't need to check players alert status, only check if ambusher is in player's visible field before attack
 

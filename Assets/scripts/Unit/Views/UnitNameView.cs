@@ -29,7 +29,7 @@ namespace UnitNS
         }
       }
 
-      name += FoW.Get().IsFogged(settlement.baseTile) ? "??" : "\n♟" + UnitInfoView.Shorten(defendForce); 
+      name += FoW.Get().IsFogged(settlement.baseTile) ? "??" : "\n" + UnitInfoView.Shorten(defendForce); 
       TextMesh textMesh = this.transform.GetComponent<TextMesh>();
       textMesh.text = name;
       textMesh.color = color;
