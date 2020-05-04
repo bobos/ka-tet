@@ -602,16 +602,12 @@ namespace MonoNS
       View view = from.IsCamping() ?
         settlementMgr.GetView(from.tile.settlement) : hexMap.GetUnitView(from);
 
-      bool defeatingUnit = to.IsVulnerable();
-      popAniController.Show(view,
-        defeatingUnit ? textLib.get("pop_chasing") : textLib.get("pop_charging"),
-        Color.green);
+      popAniController.Show(view, textLib.get("pop_charging"), Color.green);
       while (popAniController.Animating) { yield return null; }
       bool scared = to.CanBeShaked(from) >= Util.Rand(1, 100);
-      if (!defeatingUnit && scared && to.rf.general.Has(Cons.holdTheGround) && Cons.FiftyFifty()) {
+      if (scared && to.rf.general.Has(Cons.holdTheGround) && Cons.FiftyFifty()) {
         scared = false;
       }
-      scared = defeatingUnit ? true : scared;
       if (!scared) {
         scared = from.rf.general.Has(Cons.hammer) ? Cons.FiftyFifty() : scared;
       }
@@ -624,24 +620,6 @@ namespace MonoNS
       ShowEffect(from, new int[]{0,0,killed,0,0}, view);
       while (ShowAnimating) { yield return null; }
       if (scared) {
-        if (defeatingUnit) {
-          int dead = to.chaos ? (from.rf.soldiers / (from.IsHeavyCavalry() ? 2 : 3))
-            : (from.rf.soldiers / (from.IsHeavyCavalry() ? 4 : 6));
-          dead = from.rf.general.Has(Cons.pursuer) ? (int)(dead * 1.5f) : dead;
-          dead = dead > to.rf.soldiers ? to.rf.soldiers : dead;
-          int morale = from.rf.general.Has(Cons.pursuer) ? -8 : -5;
-          to.Killed(dead);
-          to.rf.morale += morale;
-          ShowEffect(to, new int[]{morale,0,dead,0,0}, view);
-          while (ShowAnimating) { yield return null; }
-          if (to.rf.soldiers <= Unit.DisbandUnitUnder) {
-            // unit disbanded
-            hexMap.unitAniController.DestroyUnit(to, DestroyType.ByDisband);
-            while (hexMap.unitAniController.DestroyAnimating) { yield return null; }
-          }
-          to.tile.deadZone.Occur(dead);
-        }
-
         if (!to.IsGone()) {
           List<Unit> affectedAllies = new List<Unit>();
           affectedAllies.Add(to);
@@ -679,6 +657,71 @@ namespace MonoNS
       }
       hexMap.cameraKeyboardController.EnableCamera();
       ChargeAnimating = false;
+    }
+
+    public bool PursueAnimating = false;
+    public void Pursue(Unit from, Unit to) {
+      if (!to.IsVulnerable()) {
+        return;
+      }
+      PursueAnimating = true;
+      hexMap.cameraKeyboardController.DisableCamera();
+      StartCoroutine(CoPursue(from, to));
+    }
+
+    IEnumerator CoPursue(Unit from, Unit to) {
+      from.UseAtmpt();
+      View view = from.IsCamping() ?
+        settlementMgr.GetView(from.tile.settlement) : hexMap.GetUnitView(from);
+
+      popAniController.Show(view, textLib.get("pop_chasing"), Color.green);
+      while (popAniController.Animating) { yield return null; }
+      int dead = to.chaos ?
+        (from.rf.soldiers / (from.IsHeavyCavalry() ? 3 : (from.IsCavalry() ? 5 : 10)))
+      : (from.rf.soldiers / (from.IsHeavyCavalry() ? 5 : (from.IsCavalry() ? 8 : 12)));
+      dead = from.rf.general.Has(Cons.pursuer) ? (int)(dead * 1.5f) : dead;
+      dead = dead > to.rf.soldiers ? to.rf.soldiers : dead;
+      int morale = from.rf.general.Has(Cons.pursuer) ? -8 : -5;
+      to.Killed(dead);
+      to.rf.morale += morale;
+      ShowEffect(to, new int[]{morale,0,dead,0,0}, view);
+      while (ShowAnimating) { yield return null; }
+      if (to.rf.soldiers <= Unit.DisbandUnitUnder) {
+        // unit disbanded
+        hexMap.unitAniController.DestroyUnit(to, DestroyType.ByDisband);
+        while (hexMap.unitAniController.DestroyAnimating) { yield return null; }
+      }
+      to.tile.deadZone.Occur(dead);
+
+      if (!to.IsGone()) {
+        List<Unit> affectedAllies = new List<Unit>();
+        affectedAllies.Add(to);
+        if (from.rf.general.Has(Cons.breaker)) {
+          foreach(Tile t in to.tile.neighbours) {
+            Unit u = t.GetUnit();
+            if (u != null && u.IsAI() == to.IsAI() && !u.StickAsNailWhenDefeat() && Cons.FiftyFifty()) {
+              if (u.rf.general.Has(Cons.holdTheGround) && Cons.FiftyFifty()) {
+                affectedAllies.Add(u);
+              }
+            }
+          }
+        }
+
+        Tile toTile = to.tile;
+        List<Unit> notMoved = new List<Unit>();
+        Scatter(affectedAllies, notMoved, -4);
+        while(ScatterAnimating) { yield return null; }
+        if (toTile.Deployable(from)) {
+          if (from.IsCamping()) {
+            from.tile.settlement.Decamp(from, toTile);
+          } else {
+            MoveUnit(from, toTile);
+            while (MoveAnimating) { yield return null; }
+          }
+        }
+      }
+      hexMap.cameraKeyboardController.EnableCamera();
+      PursueAnimating = false;
     }
 
     public bool BreakthroughAnimating = false;
