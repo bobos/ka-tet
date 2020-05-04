@@ -359,8 +359,8 @@ namespace MonoNS
 
       if (unit.tile.deadZone.Apply(unit)) {
         // epimedic caused by decomposing corpse
-        eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.Epidemic, unit, null));
-        while (eventDialog.Animating) { yield return null; }
+        popAniController.Show(hexMap.GetUnitView(unit), textLib.get("pop_epidemic"), Color.white);
+        while (popAniController.Animating) { yield return null; }
         unit.epidemic.Occur();
       }
 
@@ -396,11 +396,18 @@ namespace MonoNS
 
       ConflictResult conflict = unit.unitConflict.Occur();
       if (conflict.moralDrop != 0) {
-        // unit conflict happens
-        eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.UnitConflict, unit,
-          null, conflict.moralDrop, conflict.unit1Dead, conflict.unit2Dead,
-          0, 0, null, null, conflict.unit2));
-        while (eventDialog.Animating) { yield return null; }
+        hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetUnitView(unit).transform.position);
+        while (hexMap.cameraKeyboardController.fixingCamera) { yield return null; }
+        hexMap.dialogue.ShowUnitConflict(unit, conflict.unit2);
+        while (hexMap.dialogue.Animating) { yield return null; }
+        ShowEffect(unit, new int[]{conflict.moralDrop, 0, 0, 0, 0}, null, true); 
+        ShowEffect(conflict.unit2, new int[]{conflict.moralDrop, 0, 0, 0, 0}, null, true); 
+        hexMap.turnController.Sleep(1);
+        while(hexMap.turnController.sleeping) { yield return null; }
+        ShowEffect(unit, new int[]{0, 0, conflict.unit1Dead, 0, 0}, null, true); 
+        ShowEffect(conflict.unit2, new int[]{0, 0, conflict.unit2Dead, 0, 0}, null, true); 
+        hexMap.turnController.Sleep(1);
+        while(hexMap.turnController.sleeping) { yield return null; }
       }
 
       if (Cons.FiftyFifty()) {
@@ -465,7 +472,7 @@ namespace MonoNS
     }
 
     IEnumerator CoBury(Unit unit) {
-      if (!unit.ApplyDiscipline()) {
+      if (!unit.ApplyDiscipline(Cons.FiftyFifty())) {
         int moraleDrop = -3;
         unit.rf.morale += moraleDrop;
         ShowEffect(unit, new int[]{moraleDrop,0,0,0,0});
@@ -589,7 +596,7 @@ namespace MonoNS
 
     public bool ChargeAnimating = false;
     public void Charge(Unit from, Unit to) {
-      if (!from.CanCharge()) {
+      if (!from.CanCharge() || to.IsVulnerable()) {
         return;
       }
       ChargeAnimating = true;
@@ -854,7 +861,7 @@ namespace MonoNS
       } else {
         Region region = unit.rf.province.region;
         if ((Cons.IsQidan(region) || Cons.IsDangxiang(region)) && 
-          !unit.ApplyDiscipline() && Cons.FiftyFifty()) {
+          !unit.ApplyDiscipline(Cons.FiftyFifty())) {
           hexMap.dialogue.ShowSiegeComplain(region);
           while(hexMap.dialogue.Animating) { yield return null; }
           int moraleDrop = -5;

@@ -176,8 +176,9 @@ namespace MonoNS
           Util.eq<Province>(unit.rf.province, Cons.heBei) ||
           Util.eq<Province>(unit.rf.province, Cons.heDong)
         )) {
-          eventDialog.Show(new MonoNS.Event(MonoNS.EventDialog.EventName.Epidemic, unit, null));
-          while (eventDialog.Animating) { yield return null; }
+          popAniController.Show(hexMap.GetUnitView(unit), textLib.get("pop_epidemic"), Color.white);
+          while (popAniController.Animating) { yield return null; }
+          unit.epidemic.Occur();
         }
       }
 

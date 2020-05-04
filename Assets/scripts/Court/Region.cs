@@ -58,7 +58,7 @@ namespace CourtNS
     }
 
     public override List<Region> GetConflictRegions() {
-      return new List<Region>(){Cons.nvzhen, Cons.dangxiang};
+      return new List<Region>(){Cons.nvzhen, Cons.han};
     }
 
     public override float LevelBuf(Type unitType) {

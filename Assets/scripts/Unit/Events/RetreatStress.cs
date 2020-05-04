@@ -9,10 +9,11 @@
     }
 
     public int Occur() {
-      if (!fired && unit.kia >= unit.rf.soldiers && !unit.IsCamping() && !unit.ApplyDiscipline()) {
+      if (!fired && unit.kia >= unit.rf.soldiers && !unit.IsCamping() && !unit.ApplyDiscipline(Cons.EvenChance())) {
         fired = true;
-        return Cons.MostLikely() ? MoraleDrop() : 0;
+        return MoraleDrop();
       }
+      fired = true;
       return 0;
     }
 

@@ -14,7 +14,7 @@ namespace CourtNS {
         Cons.unshaken, Cons.formidable, Cons.attender, Cons.tactic, Cons.playSafe,
         Cons.outlooker, Cons.ambusher};
       int total = candidates.Length;
-      int luckNum = Util.Rand(0, total + 5);
+      int luckNum = Util.Rand(0, total + 15);
       if (luckNum < total) {
         return candidates[luckNum];
       }

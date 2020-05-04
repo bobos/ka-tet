@@ -303,6 +303,7 @@ namespace MonoNS
       AbilityInfo,
       SurpriseAttack,
       FeintDefeat,
+      Pursue,
     }
 
     // Make sure this is sequential
@@ -362,6 +363,10 @@ namespace MonoNS
       return DoAction(from, to, null, actionName.SurpriseAttack);
     }
 
+    public bool Pursue(Unit from, Unit to) {
+      return DoAction(from, to, null, actionName.Pursue);
+    }
+
     public bool DoAction(Unit unit, Unit unit1, Tile tile, actionName name)
     {
       if (ActionOngoing) return false;
@@ -418,9 +423,13 @@ namespace MonoNS
       {
         StartCoroutine(DoForceRetreat(unit));
       }
-      if (name == actionName.SurpriseAttack) 
+      if (name == actionName.SurpriseAttack)
       {
         StartCoroutine(DoSurpriseAttack(unit, unit1));
+      }
+      if (name == actionName.Pursue)
+      {
+        StartCoroutine(DoPursue(unit, unit1));
       }
       return true;
     }
@@ -559,6 +568,15 @@ namespace MonoNS
     IEnumerator DoSurpriseAttack(Unit unit, Unit unit1) {
       unitAniController.SurpriseAttack(unit, unit1);
       while (unitAniController.SurpriseAnimating)
+      {
+        yield return null;
+      }
+      ActionOngoing = false;
+    }
+
+    IEnumerator DoPursue(Unit unit, Unit unit1) {
+      unitAniController.Pursue(unit, unit1);
+      while (unitAniController.PursueAnimating)
       {
         yield return null;
       }

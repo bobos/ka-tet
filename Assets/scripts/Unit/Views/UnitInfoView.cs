@@ -49,23 +49,24 @@ namespace UnitNS
       TextMesh textMesh = this.transform.GetComponent<TextMesh>();
       Color color = unit.hexMap.GetWarParty(unit).attackside ? Color.yellow : Color.white;
       string title = (unit.defeating ? "∇∇" : (unit.chaos ? "∇∇∇": (unit.defeatStreak > 0 ? "∇": "")))
-        + "\n"
         + (unit.InCommanderRange() ? "㊬" : "")
         + (unit.alerted ? "◎" : "")
         + (unit.rf.general.Has(Cons.ambusher) ? "☸": "")
         + (unit.rf.general.Has(Cons.tactic) ? "☯" : "")
         + (unit.rf.general.Has(Cons.fireBug) ? "♨" : "")
         + (unit.rf.general.Has(Cons.runner) ? "♘" : "")
-        + (unit.rf.general.Has(Cons.staminaManager) && !unit.IsCavalry() ? "♋" : "")
+        + (unit.rf.general.Has(Cons.staminaManager) ? "♋" : "")
         + (unit.rf.general.Has(Cons.outlooker) ? "⦿" : "")
         + (unit.rf.general.Has(Cons.formidable) ? "✪" : "")
         + (unit.rf.general.Has(Cons.breaker) && unit.IsCavalry() ? "✴" : "")
         + (unit.rf.general.Has(Cons.diminisher) || unit.rf.general.Has(Cons.builder)
-          || unit.rf.general.Has(Cons.breacher) ? "♟" : "")
+          || unit.rf.general.Has(Cons.breacher) ? "▣" : "")
         + (unit.rf.general.Has(Cons.mechanician) ? "♜" : "")
         + (unit.rf.general.Has(Cons.pursuer) ? "➲" : "")
+        + (unit.rf.general.Has(Cons.punchThrough) ? "↹" : "")
         + (unit.hexMap.wargameController.start ? "[演]\n" : "\n")
         + unit.GeneralName()
+        + "(" + unit.rf.general.trait.Name() + ")"
         + (unit.IsAI() ? "" : (unit.IsCommander() ? "♛" : ""))
         + "[" + unit.rf.province.region.Name() + "]"
         + "\n";

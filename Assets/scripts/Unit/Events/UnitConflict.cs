@@ -22,7 +22,7 @@ namespace UnitNS
 
     public ConflictResult Occur() {
       ConflictResult result = new ConflictResult();
-      if (conflicted || unit.ApplyDiscipline()) {
+      if (conflicted || unit.ApplyDiscipline(Cons.MostLikely())) {
         return result;
       }
 
@@ -33,7 +33,7 @@ namespace UnitNS
         if (u != null &&
         u.IsAI() == unit.IsAI() &&
         !u.unitConflict.conflicted &&
-        conflictRegions.Contains(unit.rf.province.region)) {
+        conflictRegions.Contains(u.rf.province.region)) {
           target = u;
           break;
         }

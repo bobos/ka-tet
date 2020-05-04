@@ -733,7 +733,13 @@ namespace MonoNS
         }
 
         int capturedHorse = (int)((atkWin ? defenderCavDead : attackerCavDead) * 0.2f);
-        hexMap.CaptureHorse(atkWin ? attacker : defender, capturedHorse);
+        Unit winner = atkWin ? attacker : defender;
+        hexMap.CaptureHorse(winner, capturedHorse);
+        if (capturedHorse > 0) {
+          View view = winner.IsCamping() ? hexMap.settlementMgr.GetView(winner.tile.settlement) : hexMap.GetUnitView(winner);
+          hexMap.popAniController.Show(view, System.String.Format(Cons.textLib.get("pop_capturedHorse"), capturedHorse), Color.green);
+          while (hexMap.popAniController.Animating) { yield return null; }
+        }
 
         //hexMap.eventDialogAlt.ShowOperationResult(resultLevel, atkWin, !attacker.IsAI(),
         //  attackerInfTotal, attackerCavTotal, defenderInfTotal, defenderCavTotal,

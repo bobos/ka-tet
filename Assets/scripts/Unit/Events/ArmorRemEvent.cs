@@ -15,8 +15,8 @@
       }
 
       if ((unit.rf.rank == Cons.rookie || first != null)
-          && !unit.ApplyDiscipline()
-          && !unit.IsAI() && !fired && unit.IsOnField() && Cons.HighlyLikely()) {
+          && !unit.ApplyDiscipline(Cons.FiftyFifty())
+          && !unit.IsAI() && !fired && unit.IsOnField()) {
         fired = true;
         if (unit.rf.general.Has(Cons.discipline)) {
           return MoraleDrop();

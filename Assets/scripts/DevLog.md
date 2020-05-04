@@ -45,11 +45,8 @@ Game Tips:
 48. 同一回合内连续战败 士气累计-5, -10, -15, -20
 49. 部队战败状态战力-20%
 
-测试佯败引诱守军
-冲突换成对话框
-ai和玩家战术，偏师一个方向吸引敌军主力，另一路伏兵从后方伏击后队敌军
-AI ambush doesn't need to check players alert status, only check if ambusher is in player's visible field before attack
-
+显示进攻剩余数量
+图标单独显示
 破阵 -> 以少打多 -> 击败 -> 追击 -> 歼灭 -> 影响周边军队
 兵团动态合并
 map skeleton for AI(supply route, point, value tiles, dam, supply range etc.)
@@ -57,6 +54,9 @@ map skeleton for AI(supply route, point, value tiles, dam, supply range etc.)
 
 战场瘟疫爆发时，每只部队随机确定时候染病，染病几率由低到高在到低变化
 战略回合，ai借助战斗回合战果施压，换取停战条约
+ai和玩家战术，偏师一个方向吸引敌军主力，另一路伏兵从后方伏击后队敌军
+AI ambush doesn't need to check players alert status, only check if ambusher is in player's visible field before attack
+use as much configuration as possible for Mod development, and think about flexibility
 
 in Attached script to direct access gameobject:
  public void Destroy()

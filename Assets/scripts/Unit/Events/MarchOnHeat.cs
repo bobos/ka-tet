@@ -11,7 +11,7 @@
       if (!Cons.IsHeat(unit.hexMap.weatherGenerator.currentWeather) || unit.IsCamping()) {
         return 0;
       }
-      if (Cons.FairChance() && !unit.ApplyDiscipline()) {
+      if (!unit.ApplyDiscipline(Cons.FiftyFifty())) {
         return -3;
       }
       return 0;

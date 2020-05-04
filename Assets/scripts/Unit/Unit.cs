@@ -177,7 +177,7 @@ namespace UnitNS
     }
 
     public int CanBeShaked(Unit charger) {
-      if (!IsOnField() || tile.vantagePoint || rf.IsSpecial()) {
+      if (!IsOnField() || tile.vantagePoint || rf.IsSpecial() || IsVulnerable()) {
         return 0;
       }
       int chance = 0;
@@ -232,11 +232,12 @@ namespace UnitNS
 
     public int allowedAtmpt = 1;
     void InitAllowedAtmpt() {
-      allowedAtmpt = 1;
-      if (IsCavalry() || rf.general.Has(Cons.staminaManager)) {
-        allowedAtmpt = 2;
+      allowedAtmpt = IsCavalry() ? 2 : 1;
+      if (rf.general.Has(Cons.staminaManager)) {
+        allowedAtmpt++;
       }
     }
+
     public void UseAtmpt() {
       allowedAtmpt--;
     }
@@ -490,8 +491,8 @@ namespace UnitNS
       }
     }
 
-    public bool ApplyDiscipline() {
-      return rf.IsSpecial() || rf.general.Has(Cons.discipline) && Cons.HighlyLikely();
+    public bool ApplyDiscipline(bool applied) {
+      return rf.IsSpecial() || (rf.general.Has(Cons.discipline) && Cons.HighlyLikely()) || applied;
     }
 
     public General MyCommander() {

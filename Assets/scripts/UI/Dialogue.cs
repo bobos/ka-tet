@@ -258,6 +258,22 @@ namespace MonoNS
       leftText.text = text;
     }
 
+    public void ShowUnitConflict(Unit unit, Unit unit1) {
+      phase = 1;
+      Animating = true;
+      self.SetActive(true);
+      right.SetActive(true);
+      left.SetActive(true);
+
+      rightText.text = System.String.Format(textLib.get("event_UnitConflictTout"),
+        unit.rf.province.region.Name(), unit1.rf.province.region.Name());
+      rightImg.sprite = normalSoldier;
+      leftImg.sprite = routingSoldier;
+      leftText.text = "";
+      leftCacheDialog = System.String.Format(textLib.get("event_UnitConflictRsp"),
+        unit1.rf.province.region.Name());
+    }
+
   }
 
 

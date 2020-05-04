@@ -22,10 +22,10 @@ MonoBehaviour:
     y: 30
     width: 1920
     height: 947
-  m_MinSize: {x: 608, y: 471}
-  m_MaxSize: {x: 18003, y: 14021}
+  m_MinSize: {x: 608, y: 492}
+  m_MaxSize: {x: 18003, y: 14042}
   vertical: 0
-  controlID: 19621
+  controlID: 24370
 --- !u!114 &2
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -180,9 +180,9 @@ MonoBehaviour:
   m_PlayAudio: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 1343.9325, y: 422.35248, z: -3515.6357}
+    m_Target: {x: 1270.6703, y: 379.41385, z: -3556.4614}
     speed: 2
-    m_Value: {x: 1343.9325, y: 422.35248, z: -3515.6357}
+    m_Value: {x: 1270.6703, y: 379.41385, z: -3556.4614}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -232,9 +232,9 @@ MonoBehaviour:
     speed: 2
     m_Value: {x: 0, y: 0, z: 0, w: 1}
   m_Size:
-    m_Target: 507.733
+    m_Target: 595.6249
     speed: 2
-    m_Value: 507.733
+    m_Value: 595.6249
   m_Ortho:
     m_Target: 1
     speed: 2
@@ -280,10 +280,10 @@ MonoBehaviour:
     y: 0
     width: 292
     height: 947
-  m_MinSize: {x: 232, y: 471}
-  m_MaxSize: {x: 10002, y: 14021}
+  m_MinSize: {x: 232, y: 492}
+  m_MaxSize: {x: 10002, y: 14042}
   vertical: 1
-  controlID: 19556
+  controlID: 24371
 --- !u!114 &6
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -303,8 +303,8 @@ MonoBehaviour:
     y: 0
     width: 292
     height: 554
-  m_MinSize: {x: 200, y: 200}
-  m_MaxSize: {x: 4000, y: 4000}
+  m_MinSize: {x: 202, y: 221}
+  m_MaxSize: {x: 4002, y: 4021}
   m_ActualView: {fileID: 7}
   m_Panes:
   - {fileID: 7}
@@ -341,7 +341,7 @@ MonoBehaviour:
       scrollPos: {x: 0, y: 96}
       m_SelectedIDs: 
       m_LastClickedID: 0
-      m_ExpandedIDs: f69dd5ffa0a2d5ff4aa5d5ff28a7d5ffb015f8ff08fbffffc03a0000ce3a0000ec3a0000463c00001c3d0000
+      m_ExpandedIDs: f69dd5ffa0a2d5ff4aa5d5ff28a7d5ffb015f8ff08fbffffc03a0000ce3a0000ec3a0000463c0000603c0000bc3c00001c3d0000
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -468,7 +468,7 @@ MonoBehaviour:
       m_ResourceFile: 
   m_AssetTreeState:
     scrollPos: {x: 0, y: 2309}
-    m_SelectedIDs: f8390000
+    m_SelectedIDs: 
     m_LastClickedID: 0
     m_ExpandedIDs: ffffffff00000000183e000056440000584400005a4400005c4400005e44000060440000624400006444000066440000684400006a4400006c4400006e44000070440000724400007444000076440000784400007a4400007c4400007e4400008044000082440000844400008644000088440000f4440000
     m_RenameOverlay:
@@ -495,8 +495,8 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
   m_ListAreaState:
-    m_SelectedInstanceIDs: f8390000
-    m_LastClickedInstanceID: 14840
+    m_SelectedInstanceIDs: 
+    m_LastClickedInstanceID: 0
     m_HadKeyboardFocusLastEvent: 0
     m_ExpandedInstanceIDs: c6230000
     m_RenameOverlay:
@@ -584,7 +584,7 @@ MonoBehaviour:
     m_CachedPref: 160
     m_ControlHash: -371814159
     m_PrefName: Preview_InspectorPreview
-  m_LastInspectedObjectInstanceID: 14840
+  m_LastInspectedObjectInstanceID: -1
   m_LastVerticalScrollValue: 0
   m_AssetGUID: 
   m_InstanceID: 0

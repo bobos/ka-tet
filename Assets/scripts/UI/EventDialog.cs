@@ -68,9 +68,7 @@ namespace MonoNS
       EnemyCaptureCity,
       WeCaptureCamp,
       WeCaptureCity,
-      Epidemic,
       Disbanded,
-      UnitConflict,
       GeneralKilledInBattle,
       FarmDestroyedReported,
       UnderSiege,
@@ -187,13 +185,6 @@ namespace MonoNS
         image.sprite = drown;
       }
 
-      if (name == EventName.Epidemic) {
-        title.text = textLib.get("event_epidemic_title");
-        description.text = System.String.Format(textLib.get("event_epidemic"),
-          unit.GeneralName(), unit.Name());
-        image.sprite = Gale;
-      }
-
       if (name == EventName.FarmDestroyedReported) {
         title.text = textLib.get("event_farmDestroyedReported_title");
         description.text = System.String.Format(textLib.get("event_farmDestroyedReported"),
@@ -208,14 +199,6 @@ namespace MonoNS
         image.sprite = UnderSiege;
       }
 
-      if (name == EventName.UnitConflict) {
-        title.text = textLib.get("event_unitConflict_title");
-        description.text = System.String.Format(textLib.get("event_unitConflict"),
-          unit.rf.general.Name(), unit.rf.province.region.Name(),
-          unit1.rf.province.region.Name(),
-          argu2 + argu3, argu1);
-        image.sprite = drown;
-      }
     }
 
     void ToggleConfirm() {
