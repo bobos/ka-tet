@@ -681,7 +681,8 @@ namespace MonoNS
       : (from.rf.soldiers / (from.IsHeavyCavalry() ? 5 : (from.IsCavalry() ? 8 : 12)));
       dead = from.rf.general.Has(Cons.pursuer) ? (int)(dead * 1.5f) : dead;
       dead = dead > to.rf.soldiers ? to.rf.soldiers : dead;
-      int morale = from.rf.general.Has(Cons.pursuer) ? -8 : -5;
+      int morale = from.IsHeavyCavalry() ? -6 : (from.IsCavalry() ? -5 : -3); 
+      morale = morale * (from.rf.general.Has(Cons.pursuer) ? 2 : 1);
       to.Killed(dead);
       to.rf.morale += morale;
       ShowEffect(to, new int[]{morale,0,dead,0,0}, view);
