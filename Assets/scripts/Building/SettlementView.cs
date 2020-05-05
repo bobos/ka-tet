@@ -25,7 +25,7 @@ public class SettlementView : View
   }
 
   public static Vector3 NamePosition(Vector3 p) {
-    return new Vector3(p.x - 1f, p.y - 1f, p.z + 0.5f);
+    return new Vector3(p.x - 0.5f, p.y + 0.6f, p.z);
   }
 
   public void SetNameGO(GameObject nameGO) {

@@ -47,36 +47,20 @@ namespace UnitNS
       }
 
       TextMesh textMesh = this.transform.GetComponent<TextMesh>();
-      Color color = unit.hexMap.GetWarParty(unit).attackside ? Color.yellow : Color.white;
-      string title = (unit.defeating ? "∇∇" : (unit.chaos ? "∇∇∇": (unit.defeatStreak > 0 ? "∇": "")))
-        + (unit.InCommanderRange() ? "㊬" : "")
-        + (unit.alerted ? "◎" : "")
-        + (unit.rf.general.Has(Cons.ambusher) ? "☸": "")
-        + (unit.rf.general.Has(Cons.tactic) ? "☯" : "")
-        + (unit.rf.general.Has(Cons.fireBug) ? "♨" : "")
-        + (unit.rf.general.Has(Cons.runner) ? "↹" : "")
-        + (unit.rf.general.Has(Cons.staminaManager) ? "♋" : "")
-        + (unit.rf.general.Has(Cons.outlooker) ? "⦿" : "")
-        + (unit.rf.general.Has(Cons.formidable) ? "✴" : "")
-        //+ (unit.rf.general.Has(Cons.formidable) ? "✪" : "")
-        + (unit.rf.general.Has(Cons.hammer) ? "➲" : "")
-        + (unit.rf.general.Has(Cons.breaker) && unit.IsCavalry() ? "♘" : "")
-        + (unit.rf.general.Has(Cons.diminisher) ? "▣" : "")
-        + (unit.rf.general.Has(Cons.mechanician) ? "♜" : "")
-        + (unit.rf.general.Has(Cons.holdTheGround) ? "☍" : "")
-        + (unit.rf.general.Has(Cons.forecaster) ? "➹" : "")
-        + (unit.ImproviseOnSupply() ? "❥" : "")
-        + (unit.hexMap.wargameController.start ? "[演]\n" : "\n")
+      Color color = Color.white;
+      textMesh.text =
+        (unit.hexMap.wargameController.start ? "[演]" : "")
         + unit.GeneralName()
         + "(" + unit.rf.general.trait.Name() + ")"
         + (unit.IsAI() ? "" : (unit.IsCommander() ? "♛" : ""))
         + "[" + unit.rf.province.region.Name() + "]"
-        + "\n";
-      textMesh.text = title + unit.rf.province.Name() + "-"
+        + "("+unit.allowedAtmpt+")"
+        + "\n"
+        + unit.rf.province.Name() + "-"
         + unit.GetUnitName()
         + "[" + Shorten(unit.rf.soldiers) + "]\n"
         + "攻: " + Shorten(unit.unitCombatPoint) + "\n防: " + Shorten(totalDefendPoint);
-      textMesh.fontSize = 55;
+      textMesh.fontSize = 45;
       textMesh.color = color;
     }
 

@@ -575,7 +575,7 @@ namespace MonoNS
           }
         }
 
-        if (targetUnit != null && targetUnit.IsVulnerable() && selectedUnit.IsCavalry()) {
+        if (targetUnit != null && targetUnit.IsVulnerable()) {
           actionController.Pursue(selectedUnit, targetUnit);
           Escape();
         } else if (targetUnit != null || targetSettlement != null) {

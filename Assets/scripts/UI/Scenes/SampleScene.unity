@@ -4910,6 +4910,8 @@ MonoBehaviour:
     type: 3}
   UnitInfoPrefab: {fileID: 1678439610897408, guid: 3db0ca0ef863445099c17a9d94015fb7,
     type: 3}
+  UnitIconPrefab: {fileID: 6760628680878558167, guid: a8f098007f9dff143a912348f68eeaee,
+    type: 3}
   PopTextPrefab: {fileID: 1494587712262224, guid: 5c837f8051153411188e4957638b549a,
     type: 3}
   SiegeWallPrefab: {fileID: 4476222928804734191, guid: d9a912d06428d3c4d962def28f4eb4d0,
@@ -11300,6 +11302,7 @@ MonoBehaviour:
   CrashAnimating: 0
   SiegeAnimating: 0
   RetreatAnimating: 0
+  ForecastAnimating: 0
   ForceRetreatAnimating: 0
   SurpriseAnimating: 0
   ShowAnimating: 0

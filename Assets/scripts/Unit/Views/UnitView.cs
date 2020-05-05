@@ -13,6 +13,7 @@ namespace UnitNS
     HexMap hexMap;
     public Unit unit;
     public GameObject unitInfoGO;
+    public GameObject unitIconGO;
     ActionController actionController;
     MouseController mouseController;
 
@@ -32,20 +33,25 @@ namespace UnitNS
     }
 
     public static Vector3 UnitInfoPosition(Vector3 unitPosition) {
-      return new Vector3(unitPosition.x - 0.5f, unitPosition.y - 0.6f, unitPosition.z);
+      return new Vector3(unitPosition.x - 0.5f, unitPosition.y + 0.6f, unitPosition.z);
     }
 
     public static Vector3 NamePosition(Vector3 unitPosition) {
-      return new Vector3(unitPosition.x - 0.5f, unitPosition.y, unitPosition.z);
+      return new Vector3(unitPosition.x - 0.5f, unitPosition.y + 0.6f, unitPosition.z + 0.35f);
     }
 
     void UpdateUnitInfo() {
       unitInfoGO.transform.position = UnitInfoPosition(transform.position);
       unitInfoGO.GetComponent<UnitInfoView>().SetName(unit);
+      unitIconGO.transform.position = NamePosition(transform.position);
+      unitIconGO.GetComponent<UnitIconView>().SetName(unit);
     }
 
     public void ToggleText(bool on) {
       foreach(MeshRenderer mr in unitInfoGO.GetComponentsInChildren<MeshRenderer>()) {
+        mr.enabled = on;
+      }
+      foreach(MeshRenderer mr in unitIconGO.GetComponentsInChildren<MeshRenderer>()) {
         mr.enabled = on;
       }
     }
@@ -75,6 +81,7 @@ namespace UnitNS
       mouseController.onModeQuit -= OnModeQuit;
       mouseController.onUnitDeselect -= OnUnitDeselect;
       Destroy(unitInfoGO);
+      Destroy(unitIconGO);
     }
 
     public void DestroyAnimation(DestroyType type)

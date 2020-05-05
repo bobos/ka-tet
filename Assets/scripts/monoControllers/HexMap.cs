@@ -103,6 +103,7 @@ namespace MonoNS
     public GameObject CampPrefab;
     public GameObject NameTextPrefab;
     public GameObject UnitInfoPrefab;
+    public GameObject UnitIconPrefab;
     public GameObject PopTextPrefab;
     public GameObject SiegeWallPrefab;
     public WarParty[] warParties = new WarParty[2];
@@ -1131,7 +1132,6 @@ namespace MonoNS
       GameObject tileGO = tile2GO[tile];
       //NOTE: spawn as child gameobject of hex
       Vector3 position = tile.GetSurfacePosition();
-      Vector3 namePosition = UnitView.NamePosition(position);
       Vector3 unitInfoPosition = UnitView.UnitInfoPosition(position);
       GameObject unitGO = (GameObject)Instantiate(prefab,
           position,
@@ -1141,7 +1141,11 @@ namespace MonoNS
       GameObject unitInfoGO = (GameObject)Instantiate(UnitInfoPrefab,
           unitInfoPosition,
           Quaternion.identity, tileGO.transform);
+      GameObject unitIconGO = (GameObject)Instantiate(UnitIconPrefab,
+          unitInfoPosition,
+          Quaternion.identity, tileGO.transform);
       view.unitInfoGO = unitInfoGO;
+      view.unitIconGO = unitIconGO;
       view.OnCreate(unit);
       unit2GO[unit] = unitGO;
       SetUnitSkin(unit);

@@ -51,10 +51,8 @@ public class TileView : View
     Color fontColor;
     if (tile.field == FieldType.Burning || tile.field == FieldType.Schorched) {
       fontColor = Color.white;
-    } else if (tile.field == FieldType.Flooded) {
-      fontColor = Color.black;
     } else {
-      fontColor = Color.white;
+      fontColor = Color.black;
     }
     tileGO.GetComponentInChildren<TextMesh>().color = fontColor;
     tileGO.GetComponentInChildren<TextMesh>().text = txt;
