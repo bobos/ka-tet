@@ -178,7 +178,7 @@ namespace UnitNS
     }
 
     public int CanBeShaked(Unit charger) {
-      if (!IsOnField() || tile.vantagePoint || rf.IsSpecial() || IsVulnerable()) {
+      if (!IsOnField() || tile.vantagePoint || IsHeavyCavalry() || IsVulnerable()) {
         return 0;
       }
       int chance = 0;
