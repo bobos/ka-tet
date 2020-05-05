@@ -80,7 +80,7 @@ namespace MonoNS
     }
 
     int AttackerPoint(Unit unit, Settlement targetSettlement) {
-      if (targetSettlement != null && unit.rf.general.Has(Cons.breacher)) {
+      if (targetSettlement != null && unit.rf.general.Has(Cons.diminisher)) {
         return (int)(unit.unitCombatPoint * 1.5f);
       }
 
@@ -285,26 +285,15 @@ namespace MonoNS
     int JoinPossibility(Unit unit, bool attacker) {
       int ret = 100;
       bool inRange = unit.InCommanderRange();
-      if (!attacker && Cons.IsMist(hexMap.weatherGenerator.currentWeather)) {
-        if (inRange && unit.MyCommander().Has(Cons.masterOfMist)) {
-          ret = 100;
-        } else {
-          ret = 60;
-        }
-      }
-
-      if (attacker && unit.MyCommander().Has(Cons.outOfOrder)) {
-        ret = ret < 50 ? ret : 50;
-      }
-
       // if the target unit is the one hated
       Unit target = attacker ? this.attacker : this.defender;
-      if (unit.rf.province.region.GetConflictRegions().Contains(target.rf.province.region)) {
-        ret = ret < 80 ? ret : 80;
+      if (unit.rf.province.region.GetConflictRegions().Contains(target.rf.province.region)
+        && !unit.FollowOrder()) {
+        ret = ret < 75 ? ret : 75;
       }
 
       if (attacker && !inRange) {
-        ret = ret < 90 ? ret : 90;
+        ret = ret < 85 ? ret : 85;
       }
 
       return ret;
@@ -312,8 +301,7 @@ namespace MonoNS
 
     int JoinPossibilityBaseOnOdds(Unit unit, ResultType result) {
       bool inRange = unit.InCommanderRange();
-      if (unit.rf.general.Has(Cons.attender) || 
-        (inRange && unit.MyCommander().Has(Cons.obey))) {
+      if (inRange && unit.MyCommander().commandSkill.ObeyMyOrder()) {
         return 100;
       }
 
@@ -857,7 +845,7 @@ namespace MonoNS
 
         Unit un = atkWin ? attacker : defender;
         if (feint && !un.FollowOrder()) {
-          if (un.rf.general.Has(Cons.playSafe) || un.rf.general.Has(Cons.tactic)) {
+          if (un.rf.general.Is(Cons.conservative) || un.rf.general.Has(Cons.tactic)) {
             if (Cons.SlimChance()) {
               chasers.Add(un);
             }
@@ -888,15 +876,12 @@ namespace MonoNS
         }
 
         HashSet<Unit> geese = new HashSet<Unit>();
-        List<Unit> gonnaStick = new List<Unit>();
         List<Unit> gonnaMove = new List<Unit>();
         List<Unit> failedToMove = new List<Unit>();
         if (resultLevel != ResultType.Close) {
           foreach(Unit unit in supporters) {
             bool notMoving = unit.StickAsNailWhenDefeat();
-            if (notMoving && !feint) {
-              gonnaStick.Add(unit);
-            } else {
+            if (!notMoving || feint) {
               gonnaMove.Add(unit);
             }
           }
@@ -938,12 +923,6 @@ namespace MonoNS
             loser.defeating = true;
           }
 
-          foreach(Unit unit in supporters) {
-            if (!unit.Rout()) {
-              unit.defeating = unit.chaos = false;
-            }
-          }
-
           if (atkWin && loser.IsCamping() &&
             (resultLevel == ResultType.Crushing || resultLevel == ResultType.Great)) {
             // settlement loss
@@ -953,7 +932,7 @@ namespace MonoNS
         } else {
           bool notGonnaMove = loser.StickAsNailWhenDefeat();
           if (Cons.FiftyFifty() && !notGonnaMove) {
-            loser.defeating = loser.Rout();
+            loser.defeating = true;
           }
           if (!loser.IsCamping() && !notGonnaMove) {
             hexMap.unitAniController.Scatter(new List<Unit>(){loser}, failedToMove, -10);

@@ -8,13 +8,12 @@ namespace CourtNS {
     public abstract string Description();
     public static Ability LuckyDraw() {
       Ability[] candidates = new Ability[]{Cons.forecaster, Cons.discipline,
-        Cons.pursuer, Cons.hammer, Cons.builder, Cons.breacher, Cons.noPanic,
-        Cons.mechanician, Cons.diminisher, Cons.staminaManager, Cons.punchThrough,
-        Cons.generous, Cons.runner, Cons.fireBug, Cons.holdTheGround, Cons.breaker,
-        Cons.unshaken, Cons.formidable, Cons.attender, Cons.tactic, Cons.playSafe,
+        Cons.hammer, Cons.mechanician, Cons.diminisher, Cons.staminaManager,
+        Cons.formidable, Cons.generous, Cons.runner, Cons.fireBug,
+        Cons.holdTheGround, Cons.breaker, Cons.improvisor, Cons.tactic,
         Cons.outlooker, Cons.ambusher};
       int total = candidates.Length;
-      int luckNum = Util.Rand(0, total + 15);
+      int luckNum = Util.Rand(0, total + 10);
       if (luckNum < total) {
         return candidates[luckNum];
       }
@@ -35,45 +34,6 @@ namespace CourtNS {
     }
   }
 
-  public class OutOfControl: Ability {
-    public OutOfControl() {
-    }
-
-    public override string Name() {
-      return Cons.GetTextLib().get("ability_outOfControl");
-    }
-
-    public override string Description() {
-      return Cons.GetTextLib().get("ability_outOfControl_description");
-    }
-  }
-
-  public class OutOfOrder: Ability {
-    public OutOfOrder() {
-    }
-
-    public override string Name() {
-      return Cons.GetTextLib().get("ability_outOfOrder");
-    }
-
-    public override string Description() {
-      return Cons.GetTextLib().get("ability_outOfOrder_description");
-    }
-  }
-
-  public class MasterOfMist: Ability {
-    public MasterOfMist() {
-    }
-
-    public override string Name() {
-      return Cons.GetTextLib().get("ability_masterOfMist");
-    }
-
-    public override string Description() {
-      return Cons.GetTextLib().get("ability_masterOfMist_description");
-    }
-  }
-
   public class Forecaster: Ability {
     public Forecaster() {
     }
@@ -87,42 +47,16 @@ namespace CourtNS {
     }
   } 
 
-  public class BackStabber: Ability {
-    public BackStabber() {
+  public class Improvisor: Ability {
+    public Improvisor() {
     }
 
     public override string Name() {
-      return Cons.GetTextLib().get("ability_backStabber");
+      return Cons.GetTextLib().get("ability_improvisor");
     }
 
     public override string Description() {
-      return Cons.GetTextLib().get("ability_backStabber_description");
-    }
-  }
-
-  public class Obey: Ability {
-    public Obey() {
-    }
-
-    public override string Name() {
-      return Cons.GetTextLib().get("ability_mustObey");
-    }
-
-    public override string Description() {
-      return Cons.GetTextLib().get("ability_mustObey_description");
-    }
-  }
-
-  public class TurningTheTide: Ability {
-    public TurningTheTide() {
-    }
-
-    public override string Name() {
-      return Cons.GetTextLib().get("ability_turningTheTide");
-    }
-
-    public override string Description() {
-      return Cons.GetTextLib().get("ability_turningTheTide_description");
+      return Cons.GetTextLib().get("ability_improvisor_description");
     }
   }
 
@@ -139,19 +73,6 @@ namespace CourtNS {
     }
   }
 
-  public class Pursuer: Ability {
-    public Pursuer() {
-    }
-
-    public override string Name() {
-      return Cons.GetTextLib().get("ability_pursuer");
-    }
-
-    public override string Description() {
-      return Cons.GetTextLib().get("ability_pursuer_description");
-    }
-  }
-
   public class Hammer: Ability {
     public Hammer() {
     }
@@ -162,58 +83,6 @@ namespace CourtNS {
 
     public override string Description() {
       return Cons.GetTextLib().get("ability_hammer_description");
-    }
-  }
-
-  public class Builder: Ability {
-    public Builder() {
-    }
-
-    public override string Name() {
-      return Cons.GetTextLib().get("ability_builder");
-    }
-
-    public override string Description() {
-      return Cons.GetTextLib().get("ability_builder_description");
-    }
-  }
-
-  public class Breacher: Ability {
-    public Breacher() {
-    }
-
-    public override string Name() {
-      return Cons.GetTextLib().get("ability_breacher");
-    }
-
-    public override string Description() {
-      return Cons.GetTextLib().get("ability_breacher_description");
-    }
-  }
-
-  public class NoPanic: Ability {
-    public NoPanic() {
-    }
-
-    public override string Name() {
-      return Cons.GetTextLib().get("ability_noPanic");
-    }
-
-    public override string Description() {
-      return Cons.GetTextLib().get("ability_noPanic_description");
-    }
-  }
-
-  public class Forwarder: Ability {
-    public Forwarder() {
-    }
-
-    public override string Name() {
-      return Cons.GetTextLib().get("ability_forwarder");
-    }
-
-    public override string Description() {
-      return Cons.GetTextLib().get("ability_forwarder_description");
     }
   }
 
@@ -243,34 +112,8 @@ namespace CourtNS {
     }
   }
 
-  public class Unshaken: Ability {
-    public Unshaken() {
-    }
-
-    public override string Name() {
-      return Cons.GetTextLib().get("ability_unshaken");
-    }
-
-    public override string Description() {
-      return Cons.GetTextLib().get("ability_unshaken_description");
-    }
-  }
-
-  public class EasyTarget: Ability {
-    public EasyTarget() {
-    }
-
-    public override string Name() {
-      return Cons.GetTextLib().get("ability_easyTarget");
-    }
-
-    public override string Description() {
-      return Cons.GetTextLib().get("ability_easyTarget_description");
-    }
-  }
-
-  public class CounterAttack: Ability {
-    public CounterAttack() {
+  public class Formidable: Ability {
+    public Formidable() {
     }
 
     public override string Name() {
@@ -279,45 +122,6 @@ namespace CourtNS {
 
     public override string Description() {
       return Cons.GetTextLib().get("ability_formidable_description");
-    }
-  }
-
-  public class Attender: Ability {
-    public Attender() {
-    }
-
-    public override string Name() {
-      return Cons.GetTextLib().get("ability_attender");
-    }
-
-    public override string Description() {
-      return Cons.GetTextLib().get("ability_attender_description");
-    }
-  }
-
-  public class RefuseToRetreat: Ability {
-    public RefuseToRetreat() {
-    }
-
-    public override string Name() {
-      return Cons.GetTextLib().get("ability_refuseToRetreat");
-    }
-
-    public override string Description() {
-      return Cons.GetTextLib().get("ability_refuseToRetreat_description");
-    }
-  }
-
-  public class Retreater: Ability {
-    public Retreater() {
-    }
-
-    public override string Name() {
-      return Cons.GetTextLib().get("ability_retreater");
-    }
-
-    public override string Description() {
-      return Cons.GetTextLib().get("ability_retreater_description");
     }
   }
 
@@ -331,32 +135,6 @@ namespace CourtNS {
 
     public override string Description() {
       return Cons.GetTextLib().get("ability_tactic_description");
-    }
-  }
-
-  public class Opportunist: Ability {
-    public Opportunist() {
-    }
-
-    public override string Name() {
-      return Cons.GetTextLib().get("ability_opportunist");
-    }
-
-    public override string Description() {
-      return Cons.GetTextLib().get("ability_opportunist_description");
-    }
-  }
-
-  public class PlaySafe: Ability {
-    public PlaySafe() {
-    }
-
-    public override string Name() {
-      return Cons.GetTextLib().get("ability_playSafe");
-    }
-
-    public override string Description() {
-      return Cons.GetTextLib().get("ability_playSafe_description");
     }
   }
 
@@ -396,19 +174,6 @@ namespace CourtNS {
 
     public override string Description() {
       return Cons.GetTextLib().get("ability_staminaManager_description");
-    }
-  }
-
-  public class PunchThrough: Ability {
-    public PunchThrough() {
-    }
-
-    public override string Name() {
-      return Cons.GetTextLib().get("ability_punchThrough");
-    }
-
-    public override string Description() {
-      return Cons.GetTextLib().get("ability_punchThrough_description");
     }
   }
 

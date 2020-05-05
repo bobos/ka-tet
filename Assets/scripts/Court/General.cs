@@ -55,7 +55,6 @@ namespace CourtNS {
     public LinkedList<General> nemesis = new LinkedList<General>();
     public GeneralStat stat = GeneralStat.Idle;
     public CommandSkill commandSkill;
-    public HashSet<Ability> onFieldAbilities;
 
     HexMap hexMap;
     string name;
@@ -75,7 +74,7 @@ namespace CourtNS {
     }
 
     public bool Has(Ability ability) {
-      return onFieldAbilities.Contains(ability);
+      return acquiredAbilities.Contains(ability);
     }
 
     public bool Is(Trait trait) {
@@ -146,24 +145,11 @@ namespace CourtNS {
     public bool EnterCampaign(HexMap hexMap, Tile deploymentTile) {
       this.hexMap = hexMap;
       if (commandUnit == null) return false;
-      InitOnFieldAbilities();
       bool ready = commandUnit.EnterCampaign(deploymentTile);
       if (!ready) return ready;
       stat = GeneralStat.OnField;
       hexMap.GetWarParty(faction).JoinCampaign(this);
       return true;
-    }
-
-    public void InitOnFieldAbilities(bool isCommander = false) {
-      onFieldAbilities = new HashSet<Ability>();
-      if (isCommander) {
-        foreach(Ability ability in commandSkill.abilities) {
-          onFieldAbilities.Add(ability);
-        }
-      }
-      foreach(Ability ability in acquiredAbilities) {
-        onFieldAbilities.Add(ability);
-      }
     }
 
     public void TroopRetreat() {

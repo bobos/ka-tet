@@ -686,10 +686,10 @@ namespace MonoNS
       int dead = to.chaos ?
         (from.rf.soldiers / (from.IsHeavyCavalry() ? 3 : (from.IsCavalry() ? 5 : 10)))
       : (from.rf.soldiers / (from.IsHeavyCavalry() ? 5 : (from.IsCavalry() ? 8 : 12)));
-      dead = from.rf.general.Has(Cons.pursuer) ? (int)(dead * 1.5f) : dead;
+      dead = from.rf.general.Has(Cons.hammer) ? (int)(dead * 1.5f) : dead;
       dead = dead > to.rf.soldiers ? to.rf.soldiers : dead;
       int morale = from.IsHeavyCavalry() ? -6 : (from.IsCavalry() ? -5 : -3); 
-      morale = morale * (from.rf.general.Has(Cons.pursuer) ? 2 : 1);
+      morale = morale * (from.rf.general.Has(Cons.hammer) ? 2 : 1);
       to.Killed(dead);
       to.rf.morale += morale;
       ShowEffect(to, new int[]{morale,0,dead,0,0}, view);
@@ -751,11 +751,11 @@ namespace MonoNS
       popAniController.Show(view, textLib.get("pop_toBreakThrough"), Color.green);
       while (popAniController.Animating) { yield return null; }
       bool scared = to.CanBeShaked(from) >= Util.Rand(1, 100);
-      if (!defeatingUnit && scared && to.rf.general.Has(Cons.holdTheGround) && Cons.FiftyFifty()) {
+      if (scared && to.rf.general.Has(Cons.holdTheGround) && Cons.FiftyFifty()) {
         scared = false;
       }
       scared = defeatingUnit ? true : scared;
-      if (!scared && from.rf.general.Has(Cons.punchThrough)) {
+      if (!scared && from.rf.general.Has(Cons.formidable)) {
         scared = Cons.FiftyFifty();
       }
       int killed = Util.Rand(20, 50);

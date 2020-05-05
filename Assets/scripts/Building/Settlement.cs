@@ -97,15 +97,7 @@ public abstract class Settlement: Building
       (lastingTurns > storageLvl.LastingTurnsUnderSiege() ? storageLvl.LastingTurnsUnderSiege() : lastingTurns);
 
     if (IsUnderSiege()) {
-      bool found = false;
-      foreach(Tile tile in baseTile.neighbours) {
-        Unit u = tile.GetUnit();
-        if (u != null && u.IsAI() != owner.isAI && !u.IsCavalry() && u.rf.general.Has(Cons.diminisher)) {
-          found = true;
-          break;
-        }
-      }
-      wall.DepleteDefense(found ? 2 : 1);
+      wall.DepleteDefense(1);
     } else {
       wall.RepairDefense();
     }

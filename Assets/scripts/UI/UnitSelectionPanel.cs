@@ -338,9 +338,12 @@ namespace MonoNS
       title.fontSize = 18;
       title.text = "";
       if (unit.IsCommander()) {
-        title.text += "统帅属性:\n";
-        foreach(Ability ability in unit.rf.general.commandSkill.abilities) {
-          title.text += " {" + ability.Name() + "}: " + ability.Description() + "\n";
+        title.text += "统帅能力:\n";
+        if (unit.rf.general.commandSkill.ObeyMyOrder()) {
+          title.text += "指挥范围内友军强制服从主帅指挥\n";
+        }
+        if (unit.rf.general.commandSkill.TurningTide()) {
+          title.text += "指挥范围内友军战败溃败几率降低\n";
         }
       }
       title.text += "\n**性格**: " + unit.rf.general.trait.Name() + "\n  " + unit.rf.general.trait.Description();

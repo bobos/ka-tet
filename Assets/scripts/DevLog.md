@@ -45,6 +45,11 @@ Game Tips:
 48. 同一回合内连续战败 士气累计-5, -10, -15, -20
 49. 部队战败状态战力-20%
 
+inCommanderRange bug
+test hammer with infantry
+虚假军令 对一个敌军有效
+知天象按钮
+outlooker 发现敌军主帅
 显示进攻剩余数量
 图标单独显示
 破阵 -> 以少打多 -> 击败 -> 追击 -> 歼灭 -> 影响周边军队

@@ -97,7 +97,6 @@ namespace FieldNS
 
     public void AssignCommander(General general) {
       commanderGeneral = general;
-      general.InitOnFieldAbilities(true);
     }
 
     public WarPartyStat GetStat()

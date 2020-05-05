@@ -208,37 +208,22 @@ public class Cons {
   public static Faction GF = new Ghost();
 
   // abilities
-  public static Ability masterOfMist = new MasterOfMist();
-  public static Ability obey = new Obey();
-  public static Ability turningTide = new TurningTheTide();
-  public static Ability backStabber = new BackStabber();
-  public static Ability outOfControl = new OutOfControl();
-  public static Ability outOfOrder = new OutOfOrder();
-
-  // gained
   public static Ability forecaster = new Forecaster();
   public static Ability discipline = new Discipline();
-  public static Ability pursuer = new Pursuer();
   public static Ability hammer = new Hammer();
-  public static Ability builder = new Builder();
-  public static Ability breacher = new Breacher();
-  public static Ability noPanic = new NoPanic();
   public static Ability mechanician = new Mechanician();
   public static Ability diminisher = new Diminisher();
   public static Ability staminaManager = new StaminaManager();
-  public static Ability punchThrough = new PunchThrough();
   public static Ability generous = new Generous();
   public static Ability runner = new Runner();
   public static Ability fireBug = new FireBug();
   public static Ability holdTheGround = new HoldTheGround();
   public static Ability breaker = new Breaker();
-  public static Ability unshaken = new Unshaken();
-  public static Ability formidable = new CounterAttack();
-  public static Ability attender = new Attender();
   public static Ability tactic = new Tactic();
-  public static Ability playSafe = new PlaySafe();
   public static Ability outlooker = new Outlooker();
   public static Ability ambusher = new Ambusher();
+  public static Ability improvisor = new Improvisor();
+  public static Ability formidable = new Formidable();
 
   // trait
   public static Trait reckless = new Reckless();

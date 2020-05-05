@@ -218,8 +218,7 @@ namespace UnitNS
       if (!IsOnField() || tile.vantagePoint || alerted) {
         return 0;
       }
-      return rf.general.Is(Cons.brave) || rf.general.Is(Cons.conservative)
-      || rf.general.Has(Cons.formidable) ? 20 : 95;
+      return rf.general.Is(Cons.brave) || rf.general.Is(Cons.conservative) ? 20 : 95;
     }
 
     public bool IsHeavyCavalry() {
@@ -407,21 +406,41 @@ namespace UnitNS
       return yes;
     }
 
-    public Tile[] GetVisibleArea() {
+    public int GetVisibleRange() {
       int v;
-      if (Cons.IsMist(weatherGenerator.currentWeather)) {
+      if (Cons.IsMist(weatherGenerator.currentWeather) && !rf.general.Has(Cons.outlooker)) {
         v = L0Visibility;
       } else {
         v = vantage.IsAtVantagePoint() ? VantageVisibility : L1Visibility;
         v = (IsCommander() && rf.general.commandSkill.GetCommandRange() > v) ?
           rf.general.commandSkill.GetCommandRange() : v;
       }
-      Tile[] detectRange = tile.GetNeighboursWithinRange<Tile>(L0Visibility, (Tile _t) => true); 
-      return tile.GetNeighboursWithinRange<Tile>(v, (Tile tile) => {
-        if (tile.field == FieldType.Forest && !detectRange.Contains(tile) && !rf.general.Has(Cons.outlooker)) {
+      return v;
+    }
+
+    public Tile[] GetVisibleArea() {
+      Tile[] detectRange =
+        !rf.general.Has(Cons.outlooker) ?
+          tile.GetNeighboursWithinRange<Tile>(L0Visibility, (Tile _t) => true) : new Tile[]{}; 
+
+      return tile.GetNeighboursWithinRange<Tile>(GetVisibleRange(), (Tile tile) => {
+        if (tile.field == FieldType.Forest && !rf.general.Has(Cons.outlooker) && !detectRange.Contains(tile)) {
           return false;
         }
         return true;
+      });
+    }
+
+    public Tile[] GetCommandArea() {
+      int v = GetVisibleRange();
+      int cv = rf.general.commandSkill.GetCommandRange();
+      v = cv < v ? cv : v;
+      if (v == 0) {
+        return new Tile[]{};
+      }
+
+      return tile.GetNeighboursWithinRange<Tile>(v, (Tile _tile) => {
+          return false;
       });
     }
 
@@ -431,7 +450,7 @@ namespace UnitNS
         return true;
       }
 
-      foreach(Tile t in MyCommander().commandUnit.onFieldUnit.GetVisibleArea()) {
+      foreach(Tile t in MyCommander().commandUnit.onFieldUnit.GetCommandArea()) {
         if (Util.eq<Tile>(tile, t)) {
           inRange = true;
           break;
@@ -441,7 +460,7 @@ namespace UnitNS
     }
 
     public bool FollowOrder() {
-      return InCommanderRange() && MyCommander().commandUnit.general.Has(Cons.obey);
+      return InCommanderRange() && MyCommander().commandSkill.ObeyMyOrder();
     }
 
     public bool ImproviseOnSupply() {
@@ -449,35 +468,15 @@ namespace UnitNS
         return true;
       }
 
-      if (!MyCommander().Has(Cons.backStabber)) {
-        return false;
-      }
-
-      if (IsCommander()){
-        return true;
-      }
-
-      bool nearbyCommander = false;
-      foreach(Tile tile in MyCommander().commandUnit.onFieldUnit.tile.neighbours) {
-        if (tile.GetUnit() != null && Util.eq<Unit>(tile.GetUnit(), this)) {
-          nearbyCommander = true;
-          break;
-        }
-      }
-      return nearbyCommander;
+      return rf.general.Has(Cons.improvisor);
     }
 
     public bool StickAsNailWhenDefeat() {
       return IsCommander() || (InCommanderRange() &&
-              MyCommander().Has(Cons.turningTide) &&
-              Cons.HighlyLikely()) ||
-              (rf.general.Has(Cons.unshaken) && Cons.HighlyLikely()) ||
-              (rf.IsSpecial() && Cons.HighlyLikely());
-    }
-
-    public bool Rout() {
-      return (rf.general.Has(Cons.noPanic) && Cons.FiftyFifty()) && 
-        (!rf.IsSpecial() || Cons.FiftyFifty());
+              MyCommander().commandSkill.TurningTide() &&
+              Cons.MostLikely()) ||
+              (rf.general.Has(Cons.holdTheGround) && Cons.MostLikely()) ||
+              (rf.IsSpecial() && Cons.MostLikely());
     }
 
     public bool RetreatOnDefeat() {
