@@ -31,9 +31,7 @@ namespace UnitNS
         return 0;
       }
       lastTurns--;
-      int killed = Util.Rand(1, 10);
-      unit.Killed(killed);
-      return killed;
+      return unit.Killed(Util.Rand(2, 15));
     }
 
   }

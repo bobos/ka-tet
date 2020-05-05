@@ -171,14 +171,12 @@ namespace MonoNS
       if(tile.epidemic != null && tile.epidemic.OnWeatherChange(weather)) {
         // epidemic triggered
         Unit unit = tile.GetUnit();
-        if (!unit.IsHeatSicknessAffected() &&
-         (
+        if ((
           Util.eq<Province>(unit.rf.province, Cons.heBei) ||
           Util.eq<Province>(unit.rf.province, Cons.heDong)
-        )) {
+         ) && unit.epidemic.Occur()) {
           popAniController.Show(hexMap.GetUnitView(unit), textLib.get("pop_epidemic"), Color.white);
           while (popAniController.Animating) { yield return null; }
-          unit.epidemic.Occur();
         }
       }
 

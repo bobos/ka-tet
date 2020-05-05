@@ -22,10 +22,12 @@ namespace UnitNS
       this.unit = unit;
     }
 
-    public void Occur() {
-      if (!unit.IsHeatSicknessAffected()) {
+    public bool Occur() {
+      if (!unit.IsHeatSicknessAffected() && !unit.rf.general.Has(Cons.doctor)) {
         lastTurns += GetLastTurns();
+        return true;
       }
+      return false;
     }
 
     public void Destroy() {}
@@ -42,9 +44,7 @@ namespace UnitNS
         int morale = -6;
         effects[0] = morale;
         unit.rf.morale += morale;
-        int kiaNum = (int)(unit.rf.soldiers * KillRate);
-        unit.Killed(kiaNum);
-        effects[2] = kiaNum;
+        effects[2] = unit.Killed((int)(unit.rf.soldiers * KillRate));
       }
 
       return effects;

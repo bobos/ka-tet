@@ -30,6 +30,7 @@ namespace UnitNS
         + (unit.rf.general.Has(Cons.mechanician) ? "♜" : "")
         + (unit.rf.general.Has(Cons.holdTheGround) ? "☍" : "")
         + (unit.rf.general.Has(Cons.forecaster) ? "➹" : "")
+        + (unit.rf.general.Has(Cons.doctor) ? "✚" : "")
         + (unit.ImproviseOnSupply() ? "❥" : "");
       textMesh.fontSize = 65;
       textMesh.color = color;

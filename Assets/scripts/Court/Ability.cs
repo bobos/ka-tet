@@ -11,9 +11,9 @@ namespace CourtNS {
         Cons.hammer, Cons.mechanician, Cons.diminisher, Cons.staminaManager,
         Cons.formidable, Cons.generous, Cons.runner, Cons.fireBug,
         Cons.holdTheGround, Cons.breaker, Cons.improvisor, Cons.tactic,
-        Cons.outlooker, Cons.ambusher};
+        Cons.outlooker, Cons.ambusher, Cons.doctor};
       int total = candidates.Length;
-      int luckNum = Util.Rand(0, total + 10);
+      int luckNum = Util.Rand(0, total + 15);
       if (luckNum < total) {
         return candidates[luckNum];
       }
@@ -239,6 +239,19 @@ namespace CourtNS {
 
     public override string Description() {
       return Cons.GetTextLib().get("ability_ambusher_description");
+    }
+  }
+
+  public class Doctor: Ability {
+    public Doctor() {
+    }
+
+    public override string Name() {
+      return Cons.GetTextLib().get("ability_doctor");
+    }
+
+    public override string Description() {
+      return Cons.GetTextLib().get("ability_doctor_description");
     }
   }
 

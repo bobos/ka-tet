@@ -332,13 +332,15 @@ namespace MonoNS
       }
     }
 
-    void Helper(UnitPredict up, int dead) {
+    int Helper(UnitPredict up, int dead) {
       Unit unit = up.unit;
-      up.dead += dead;
-      unit.Killed(dead);
+      int actualDead = unit.Killed(dead);
+      up.dead += actualDead;
+      return dead - actualDead;
     }
 
     int AllocateCasualty(int total, List<UnitPredict> units) {
+      int savedLives = 0;
       foreach(UnitPredict up in units) {
         up.leastNum = (int)(up.unit.rf.soldiers * (up.unit.IsCavalry() ? 0.2f : 0.12f)); 
       }
@@ -355,14 +357,15 @@ namespace MonoNS
             continue;
           }
 
-          if (total < 20) {
+          if (total < 30) {
             if (unit.rf.soldiers < total) {
               total -= unit.rf.soldiers;
               up.dead += unit.rf.soldiers;
-              unit.Killed(unit.rf.soldiers);
+              unit.Killed(unit.rf.soldiers, true);
             } else {
-              up.dead += total;
-              unit.Killed(total);
+              int dead = unit.Killed(total);
+              up.dead += dead;
+              savedLives += total - dead;
               total = 0;
               break;
             }
@@ -370,10 +373,10 @@ namespace MonoNS
             continue;
           }
 
-          if (unit.rf.soldiers < 20) {
+          if (unit.rf.soldiers < 30) {
             total -= unit.rf.soldiers;
             up.dead += unit.rf.soldiers;
-            unit.Killed(unit.rf.soldiers);
+            unit.Killed(unit.rf.soldiers, true);
             dryUnits++;
             continue;
           }
@@ -384,11 +387,11 @@ namespace MonoNS
             if (!unit.IsCavalry()) {
               toll = dieMore ? 30 : 15;
               total -= toll;
-              Helper(up, toll);
+              savedLives += Helper(up, toll);
             } else {
               toll = dieMore ? 10 : 5;
               total -= toll;
-              Helper(up, toll);
+              savedLives += Helper(up, toll);
             }
           }
 
@@ -397,11 +400,11 @@ namespace MonoNS
             if (!unit.IsCavalry()) {
               toll = dieMore ? 16 : 8;
               total -= toll;
-              Helper(up, toll);
+              savedLives += Helper(up, toll);
             } else {
               toll = dieMore ? 6 : 3;
               total -= toll;
-              Helper(up, toll);
+              savedLives += Helper(up, toll);
             }
           }
         }
@@ -409,7 +412,7 @@ namespace MonoNS
           break;
         }
       }
-      return total;
+      return total + savedLives;
     }
 
     public enum ResultType {

@@ -576,9 +576,14 @@ namespace UnitNS
       return true;
     }
 
-    public void Killed(int killed) {
-      rf.soldiers -= killed;
-      kia += killed;
+    public int Killed(int killed, bool all = false) {
+      int num = killed;
+      if (!all && rf.general.Has(Cons.doctor)) {
+        num = (int)(killed * 0.6f);
+      }
+      rf.soldiers -= num;
+      kia += num;
+      return num;
     }
 
     public void Retreat() {
@@ -594,7 +599,7 @@ namespace UnitNS
     {
       // TODO: move the queuing unit in
       int killed = rf.soldiers;
-      Killed(killed);
+      Killed(killed, true);
       SetState(State.Disbanded);
       tile.RemoveUnit(this);
       if (tile.settlement != null && tile.settlement.owner.isAI == this.IsAI()) {
@@ -620,9 +625,7 @@ namespace UnitNS
       int moveReduce = (int)(movementRemaining * movementDropRatio);
       movementRemaining = movementRemaining - moveReduce; 
       reduced[1] = -moveReduce;
-      int kiaNum = (int)(rf.soldiers * killRatio);
-      Killed(kiaNum);
-      reduced[2] = kiaNum;
+      reduced[2] = Killed((int)(rf.soldiers * killRatio));
       return reduced;
     }
 

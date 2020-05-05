@@ -21,7 +21,7 @@
     }
 
     public bool Poision() {
-      if (poisioned) {
+      if (poisioned || unit.rf.general.Has(Cons.doctor)) {
         return false;
       }
       poisioned = true;
@@ -43,10 +43,7 @@
         int morale = -6;
         unit.rf.morale += morale;
         effects[0] = morale;
-
-        int kiaNum = Util.Rand(1, 15);
-        unit.Killed(kiaNum);
-        effects[2] = kiaNum;
+        effects[2] = unit.Killed(Util.Rand(3, 20));
       }
       return effects;
     }

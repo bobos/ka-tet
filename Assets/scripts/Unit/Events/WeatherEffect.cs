@@ -20,10 +20,8 @@
         if (Cons.TinyChance()) {
           int morale = -1;
           unit.rf.morale += morale;
-          int kiaNum = Util.Rand(0, 10);
-          unit.Killed(kiaNum);
           effects[0] = morale;
-          effects[2] = kiaNum;
+          effects[2] = unit.Killed(Util.Rand(0, 10));
         }
       } else if (Cons.IsBlizard(unit.hexMap.weatherGenerator.currentWeather)) {
         int movement = (int)(unit.movementRemaining / (-4)) * 3;
@@ -33,10 +31,8 @@
         if (Cons.SlimChance()) {
           int morale = -4;
           unit.rf.morale += morale;
-          int kiaNum = Util.Rand(4, 20);
-          unit.Killed(kiaNum);
           effects[0] = morale;
-          effects[2] = kiaNum;
+          effects[2] = unit.Killed(Util.Rand(4, 20));
         }
       }
       return effects;

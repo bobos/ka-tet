@@ -357,11 +357,10 @@ namespace MonoNS
         while (ShowAnimating) { yield return null; }
       }
 
-      if (unit.tile.deadZone.Apply(unit)) {
+      if (unit.tile.deadZone.Apply(unit) && unit.epidemic.Occur()) {
         // epimedic caused by decomposing corpse
         popAniController.Show(hexMap.GetUnitView(unit), textLib.get("pop_epidemic"), Color.white);
         while (popAniController.Animating) { yield return null; }
-        unit.epidemic.Occur();
       }
 
       if (Cons.IsHeat(hexMap.weatherGenerator.currentWeather)) {
@@ -621,10 +620,8 @@ namespace MonoNS
       if (!scared && from.rf.IsChargeBuffed()) {
         scared = Cons.HighlyLikely();
       }
-      int killed = Util.Rand(2, 15);
-      from.Killed(killed);
       // morale, movement, killed, attack, def
-      ShowEffect(from, new int[]{0,0,killed,0,0}, view);
+      ShowEffect(from, new int[]{0,0,from.Killed(Util.Rand(2, 15)),0,0}, view);
       while (ShowAnimating) { yield return null; }
       if (scared) {
         if (!to.IsGone()) {
@@ -690,9 +687,8 @@ namespace MonoNS
       dead = dead > to.rf.soldiers ? to.rf.soldiers : dead;
       int morale = from.IsHeavyCavalry() ? -6 : (from.IsCavalry() ? -5 : -3); 
       morale = morale * (from.rf.general.Has(Cons.hammer) ? 2 : 1);
-      to.Killed(dead);
       to.rf.morale += morale;
-      ShowEffect(to, new int[]{morale,0,dead,0,0}, view);
+      ShowEffect(to, new int[]{morale,0,to.Killed(dead),0,0}, view);
       while (ShowAnimating) { yield return null; }
       if (to.rf.soldiers <= Unit.DisbandUnitUnder) {
         // unit disbanded
@@ -758,10 +754,8 @@ namespace MonoNS
       if (!scared && from.rf.general.Has(Cons.formidable)) {
         scared = Cons.FiftyFifty();
       }
-      int killed = Util.Rand(20, 50);
-      from.Killed(killed);
       // morale, movement, killed, attack, def
-      ShowEffect(from, new int[]{0,0,killed,0,0}, view);
+      ShowEffect(from, new int[]{0,0,from.Killed(Util.Rand(20, 50)),0,0}, view);
       while (ShowAnimating) { yield return null; }
       if (scared) {
         Tile escapeTile = null;
@@ -813,11 +807,9 @@ namespace MonoNS
     IEnumerator CoCrashByAlly(Unit unit, int morale) {
       popAniController.Show(hexMap.GetUnitView(unit), textLib.get("pop_crashedByAlly"), Color.white);
       while (popAniController.Animating) { yield return null; }
-      int killed = Util.Rand(40, 100);
       // morale, movement, killed, attack, def
-      ShowEffect(unit, new int[]{morale,0,killed,0,0});
+      ShowEffect(unit, new int[]{morale,0,unit.Killed(Util.Rand(40, 100)),0,0});
       while (ShowAnimating) { yield return null; }
-      unit.Killed(killed);
       unit.rf.morale += morale;
       if (unit.rf.soldiers <= Unit.DisbandUnitUnder) {
         // unit disbanded
@@ -1003,8 +995,7 @@ namespace MonoNS
         int killed = from.IsCavalry() ? Util.Rand(20, 50) : Util.Rand(40, 100);
         int moraleDrop = -3; 
         from.rf.morale += moraleDrop;
-        from.Killed(killed);
-        ShowEffect(from, new int[]{moraleDrop,0,killed,0,0});
+        ShowEffect(from, new int[]{moraleDrop,0,from.Killed(killed),0,0});
         while (ShowAnimating) { yield return null; }
       } else {
         hexMap.combatController.StartOperation(from, to, null, true);

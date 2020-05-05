@@ -353,7 +353,7 @@ namespace TextNS
       {"ability_formidable", "骁勇善战"},
       {"ability_formidable_description", "所部战力+25%,当所部被全面包围时战斗力提升3倍, 突围成功率+50%"},
       {"ability_tactic", "佯败"},
-      {"ability_tactic_description", "80%几率发动佯败, 敌军退败不会主动追击"},
+      {"ability_tactic_description", "能发动佯败, 敌军退败不会主动追击"},
       {"ability_generous", "千金散尽"},
       {"ability_generous_description", "进入战场部队士气+20"},
       {"ability_runner", "神行太保"},
@@ -364,6 +364,8 @@ namespace TextNS
       {"ability_outlooker_description", "浓雾不影响视野，发现视力范围内潜伏敌军，发现视野内敌军主帅"},
       {"ability_ambusher", "神出鬼没"},
       {"ability_ambusher_description", "可发动奇袭范围增加为4格"},
+      {"ability_doctor", "华佗再世"},
+      {"ability_doctor_description", "部队不会遭受投毒或者疫病影响，降低40%死亡率"},
 
       {"trait_reckless", "鲁莽"},
       {"trait_reckless_description", "敌军退败容易主动追击"},

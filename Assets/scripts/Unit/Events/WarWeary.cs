@@ -23,9 +23,7 @@
 
     public int[] Apply() {
       int[] effects = new int[5]{0,0,0,0,0};
-      int miaNum = GetWarWearyDissertNum();
-      effects[2] = miaNum;
-      unit.Killed(miaNum);
+      effects[2] = unit.Killed(GetWarWearyDissertNum());
       return effects;
     }
 
