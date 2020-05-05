@@ -269,7 +269,7 @@ namespace UnitNS
 
     public bool FalseOrder(Unit target) {
       canFalseOrder = false;
-      bool work = target.rf.general.Is(Cons.calm) ? Cons.MostLikely() : Cons.TinyChance(); 
+      bool work = target.rf.general.Is(Cons.calm) ? Cons.MostLikely() : Cons.TinyChance() && commanderRangeCheck; 
       if (work && !fooledOnce) {
         target.fooled = target.fooledOnce = true;
       }

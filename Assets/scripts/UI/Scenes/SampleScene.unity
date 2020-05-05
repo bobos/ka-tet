@@ -876,7 +876,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u4F2A\u4EE4"
+  m_Text: "\u7591\u5175"
 --- !u!222 &149287563
 CanvasRenderer:
   m_ObjectHideFlags: 0
