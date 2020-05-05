@@ -294,6 +294,8 @@ namespace TextNS
       {"pop_surpriseAttackFailed", "早有防备!"},
       {"pop_epidemic", "感染疫病"},
       {"pop_capturedHorse", @"俘获{0}匹战马"},
+      {"pop_wheatherForecasted", "天象习得"},
+      {"pop_wheatherForecastFailed", "预测失败"},
 
       // settlement
       {"settlement_storageLvl1", "初级粮仓"},

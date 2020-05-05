@@ -21,7 +21,11 @@ namespace MonoNS
 
     public void OnNewTurn()
     {
-      bool forecast = hexMap.GetWarParty().Forecast();
+      ShowInfo();
+    }
+
+    public void ShowInfo(bool forecast = false)
+    {
       indicator.text = "今日: " + weatherGenerator.currentWeather.Name() + "\n";
       indicator.text += "预计持续: " + weatherGenerator.weatherLastingTurns + " 日\n";
       indicator.text += "明日: " + (forecast ? weatherGenerator.Forecast().Name() : " 未知") + "\n";

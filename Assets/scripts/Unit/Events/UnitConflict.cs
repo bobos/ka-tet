@@ -22,7 +22,7 @@ namespace UnitNS
 
     public ConflictResult Occur() {
       ConflictResult result = new ConflictResult();
-      if (conflicted || unit.ApplyDiscipline(Cons.MostLikely())) {
+      if (conflicted || unit.ApplyDiscipline(Cons.HighlyLikely())) {
         return result;
       }
 

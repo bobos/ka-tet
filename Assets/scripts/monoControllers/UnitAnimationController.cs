@@ -903,6 +903,31 @@ namespace MonoNS
       RetreatAnimating = false;
     }
 
+    public bool ForecastAnimating = false;
+    public void Forecast(Unit unit) {
+      if (!unit.CanForecast()) {
+        return;
+      }
+      ForecastAnimating = true;
+      hexMap.cameraKeyboardController.DisableCamera();
+      StartCoroutine(CoForecast(unit));
+    }
+
+    IEnumerator CoForecast(Unit unit) {
+      hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(unit.tile).transform.position);
+      while(hexMap.cameraKeyboardController.fixingCamera) { yield return null; }
+      if(unit.Forecast()) {
+        hexMap.weatherIndicator.ShowInfo(true);
+        popAniController.Show(hexMap.GetUnitView(unit), textLib.get("pop_wheatherForecasted"), Color.green);
+        while(popAniController.Animating) { yield return null; }
+      } else {
+        popAniController.Show(hexMap.GetUnitView(unit), textLib.get("pop_wheatherForecastFailed"), Color.white);
+        while(popAniController.Animating) { yield return null; }
+      }
+      hexMap.cameraKeyboardController.EnableCamera();
+      ForecastAnimating = false;
+    }
+
     public bool ForceRetreatAnimating = false;
     public void ForceRetreat(Unit unit, int movement, bool breakThrough = false) {
       if (unit.retreated) {

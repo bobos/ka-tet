@@ -92,6 +92,7 @@ namespace UnitNS
       onFieldComplain = new OnFieldComplain(this);
       retreatStress = new RetreatStress(this);
       InitAllowedAtmpt();
+      InitForecast();
     }
 
     public void CloneInit(float disarmorDefDebuf, Supply supply, PlainSickness plainSickness) {
@@ -247,6 +248,20 @@ namespace UnitNS
 
     public bool CanBreakThrough() {
       return IsSurrounded() && rf.soldiers >= 800 && CanAttack();
+    }
+
+    public bool canForecast = false;
+    public bool CanForecast() {
+      return canForecast;
+    }
+
+    public bool Forecast() {
+      canForecast = false;
+      return Cons.MostLikely();
+    }
+
+    void InitForecast() {
+      canForecast = rf.general.Has(Cons.forecaster);
     }
 
     public bool alerted = false;
@@ -440,7 +455,7 @@ namespace UnitNS
       }
 
       return tile.GetNeighboursWithinRange<Tile>(v, (Tile _tile) => {
-          return false;
+          return true;
       });
     }
 
@@ -523,6 +538,7 @@ namespace UnitNS
     {
       alerted = chaos = defeating = retreated = charged = unitConflict.conflicted = false;
       defeatStreak = 0;
+      InitForecast();
       InitAllowedAtmpt();
       turnDone = false;
       movementRemaining = GetFullMovement();

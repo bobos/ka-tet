@@ -267,6 +267,12 @@ namespace MonoNS
       }
     }
 
+    public void OnForecastClick() {
+      if (onBtnClick != null) {
+        onBtnClick(actionName.Forecast);
+      }
+    }
+
     public enum actionName
     {
       MOVE,
@@ -304,6 +310,7 @@ namespace MonoNS
       SurpriseAttack,
       FeintDefeat,
       Pursue,
+      Forecast
     }
 
     // Make sure this is sequential
@@ -365,6 +372,10 @@ namespace MonoNS
 
     public bool Pursue(Unit from, Unit to) {
       return DoAction(from, to, null, actionName.Pursue);
+    }
+
+    public bool Forecast(Unit unit) {
+      return DoAction(unit, null, null, actionName.Forecast);
     }
 
     public bool DoAction(Unit unit, Unit unit1, Tile tile, actionName name)
@@ -430,6 +441,10 @@ namespace MonoNS
       if (name == actionName.Pursue)
       {
         StartCoroutine(DoPursue(unit, unit1));
+      }
+      if (name == actionName.Forecast)
+      {
+        StartCoroutine(DoForecast(unit));
       }
       return true;
     }
@@ -577,6 +592,15 @@ namespace MonoNS
     IEnumerator DoPursue(Unit unit, Unit unit1) {
       unitAniController.Pursue(unit, unit1);
       while (unitAniController.PursueAnimating)
+      {
+        yield return null;
+      }
+      ActionOngoing = false;
+    }
+
+    IEnumerator DoForecast(Unit unit) {
+      unitAniController.Forecast(unit);
+      while (unitAniController.ForecastAnimating)
       {
         yield return null;
       }

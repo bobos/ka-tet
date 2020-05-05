@@ -303,6 +303,12 @@ namespace MonoNS
         }
       }
 
+      if (action == ActionController.actionName.Forecast)
+      {
+        hexMap.actionController.Forecast(selectedUnit);
+        Escape();
+      }
+
       if (action == ActionController.actionName.INPUTCONFIRM)
       {
         int _supply = hexMap.inputField.GetInput();

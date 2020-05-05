@@ -27,6 +27,7 @@ namespace MonoNS
                            RetreatButton, DecampButton, ReposButton,
                            BuryButton, ChargeButton, TroopButton, GeneralButton,
                            BreakThroughButton, SurpriseAttackButton, FeintDefeatButton,
+                           ForecastButton
                            };
       buttons = btns;
       mouseController.onUnitSelect += OnUnitSelect;
@@ -63,6 +64,7 @@ namespace MonoNS
     public GameObject GeneralButton;
     public GameObject SurpriseAttackButton;
     public GameObject FeintDefeatButton;
+    public GameObject ForecastButton;
     GameObject[] buttons;
 
     public Text title;
@@ -146,6 +148,30 @@ namespace MonoNS
       //if (!state || hexMap.combatController.start || unit.IsAI()) return;
       if (!state || hexMap.combatController.start) return;
 
+      if (!hexMap.wargameController.start && unit.CanBreakThrough() && hexMap.deployDone) {
+        BreakThroughButton.SetActive(true);
+      }
+
+      if (unit.CanAttack()) {
+        AttackButton.SetActive(true);
+      }
+
+      if (mouseController.nearFireTiles.Count > 0 && hexMap.deployDone && !hexMap.wargameController.start) {
+        FireButton.SetActive(true);
+      }
+
+      if (mouseController.nearWater && hexMap.deployDone && !hexMap.wargameController.start) {
+        DefendButton.SetActive(true);
+      }
+
+      if (!hexMap.wargameController.start && unit.CanCharge() && hexMap.deployDone) {
+        ChargeButton.SetActive(true);
+      }
+
+      if (!hexMap.wargameController.start && unit.CanForecast() && hexMap.deployDone) {
+        ForecastButton.SetActive(true);
+      }
+
       if (isGarrison) {
         deployableTiles = new List<Tile>();
         foreach(Tile tile in mouseController.selectedSettlement.baseTile.neighbours) {
@@ -156,25 +182,6 @@ namespace MonoNS
         }
         if (deployableTiles.Count > 0) {
           DecampButton.SetActive(true);
-        }
-        if (unit.CanAttack()) {
-          AttackButton.SetActive(true);
-        }
-
-        if (mouseController.nearFireTiles.Count > 0 && hexMap.deployDone && !hexMap.wargameController.start) {
-          FireButton.SetActive(true);
-        }
-
-        if (mouseController.nearWater && hexMap.deployDone && !hexMap.wargameController.start) {
-          DefendButton.SetActive(true);
-        }
-
-        if (!hexMap.wargameController.start && unit.CanCharge() && hexMap.deployDone) {
-          ChargeButton.SetActive(true);
-        }
-
-        if (!hexMap.wargameController.start && unit.CanBreakThrough() && hexMap.deployDone) {
-          BreakThroughButton.SetActive(true);
         }
 
         return;
@@ -192,7 +199,6 @@ namespace MonoNS
       }
       
       if (!hexMap.combatController.start && hexMap.deployDone && unit.CanAttack()) {
-        AttackButton.SetActive(true);
         FeintDefeatButton.SetActive(unit.rf.general.Has(Cons.tactic));
         SurpriseAttackButton.SetActive(mouseController.surpriseTargets.Length > 0);
       }
@@ -205,13 +211,6 @@ namespace MonoNS
         BuryButton.SetActive(true);
       }
 
-      if (!hexMap.wargameController.start && unit.CanCharge() && hexMap.deployDone) {
-        ChargeButton.SetActive(true);
-      }
-
-      if (!hexMap.wargameController.start && unit.CanBreakThrough() && hexMap.deployDone) {
-        BreakThroughButton.SetActive(true);
-      }
 
       if (mouseController.nearMySettlement != null && mouseController.nearMySettlement.HasRoom()
         && !mouseController.nearMySettlement.IsUnderSiege()) {
@@ -224,14 +223,6 @@ namespace MonoNS
         if (mouseController.nearDam != null || (unit.tile.siegeWall != null && unit.tile.siegeWall.owner.isAI != unit.IsAI())) {
           SabotageButton.SetActive(true);
         }
-      }
-
-      if (mouseController.nearFireTiles.Count > 0 && hexMap.deployDone && !hexMap.wargameController.start) {
-        FireButton.SetActive(true);
-      }
-
-      if (mouseController.nearWater && hexMap.deployDone && !hexMap.wargameController.start) {
-        DefendButton.SetActive(true);
       }
 
       if (unit.type == Type.Infantry && !hexMap.wargameController.start) {
