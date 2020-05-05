@@ -366,6 +366,8 @@ namespace TextNS
       {"ability_ambusher_description", "可发动奇袭范围增加为4格"},
       {"ability_doctor", "华佗再世"},
       {"ability_doctor_description", "部队不会遭受投毒或者疫病影响，降低40%死亡率"},
+      {"ability_falseCommander", "疑兵之计"},
+      {"ability_falseCommander_description", "伪造敌军主帅军令，让敌军单位处于混乱状态一回合"},
 
       {"trait_reckless", "鲁莽"},
       {"trait_reckless_description", "敌军退败容易主动追击"},
@@ -380,7 +382,7 @@ namespace TextNS
       {"trait_ego", "自负"},
       {"trait_ego_description", "容易受敌方激将"},
       {"trait_calm", "恪守"},
-      {"trait_calm_description", "恪守军令"},
+      {"trait_calm_description", "恪守军令，容易被伪造军令影响"},
       };
     }
   }

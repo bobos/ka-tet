@@ -27,7 +27,7 @@ namespace MonoNS
                            RetreatButton, DecampButton, ReposButton,
                            BuryButton, ChargeButton, TroopButton, GeneralButton,
                            BreakThroughButton, SurpriseAttackButton, FeintDefeatButton,
-                           ForecastButton
+                           ForecastButton, FalseOrderButton
                            };
       buttons = btns;
       mouseController.onUnitSelect += OnUnitSelect;
@@ -65,6 +65,7 @@ namespace MonoNS
     public GameObject SurpriseAttackButton;
     public GameObject FeintDefeatButton;
     public GameObject ForecastButton;
+    public GameObject FalseOrderButton;
     GameObject[] buttons;
 
     public Text title;
@@ -170,6 +171,10 @@ namespace MonoNS
 
       if (!hexMap.wargameController.start && unit.CanForecast() && hexMap.deployDone) {
         ForecastButton.SetActive(true);
+      }
+
+      if (!hexMap.wargameController.start && unit.CanFalseOrder() && hexMap.deployDone) {
+        FalseOrderButton.SetActive(true);
       }
 
       if (isGarrison) {

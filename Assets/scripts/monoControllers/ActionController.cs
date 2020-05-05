@@ -273,6 +273,12 @@ namespace MonoNS
       }
     }
 
+    public void OnFalseOrderClick() {
+      if (onBtnClick != null) {
+        onBtnClick(actionName.FalseOrder);
+      }
+    }
+
     public enum actionName
     {
       MOVE,
@@ -310,7 +316,8 @@ namespace MonoNS
       SurpriseAttack,
       FeintDefeat,
       Pursue,
-      Forecast
+      Forecast,
+      FalseOrder
     }
 
     // Make sure this is sequential

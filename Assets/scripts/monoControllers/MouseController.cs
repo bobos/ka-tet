@@ -97,6 +97,7 @@ namespace MonoNS
     public bool nearWater = false;
     public List<Unit> nearbyEnemey = null;
     public Unit[] surpriseTargets = null;
+    public Unit[] falseOrderTargets = null;
     public Tile[] accessibleTiles = null;
     public HashSet<Unit> nearbyAlly = null;
 
@@ -155,6 +156,8 @@ namespace MonoNS
       if (s != null && isAI != s.owner.isAI) {
         nearEnemySettlement = s;
       }
+      
+      falseOrderTargets = xxx;
 
       if (selectedUnit != null) {
         surpriseTargets = selectedUnit.GetSurpriseTargets();
@@ -269,6 +272,21 @@ namespace MonoNS
         }
       }
 
+      if (action == ActionController.actionName.FalseOrder)
+      {
+        if (falseOrderTargets.Length == 0) {
+          msgBox.Show("无可迷惑目标!");
+          Escape();
+        } else {
+          mouseMode = mode.falseOrder;
+          Update_CurrentFunc = UpdateUnitFalseOrder;
+          msgBox.Show("选择目标!");
+          foreach(Unit u in falseOrderTargets) {
+            hexMap.TargetUnit(u);
+          }
+        }
+      }
+
       if (action == ActionController.actionName.CHARGE)
       {
         mouseMode = mode.attack;
@@ -333,6 +351,7 @@ namespace MonoNS
       move,
       attack,
       surpriseAttack,
+      falseOrder,
       repos,
       sabotage,
       fire

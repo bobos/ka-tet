@@ -225,6 +225,7 @@ public class Cons {
   public static Ability improvisor = new Improvisor();
   public static Ability formidable = new Formidable();
   public static Ability doctor = new Doctor();
+  public static Ability falseCommander = new FalseCommander();
 
   // trait
   public static Trait reckless = new Reckless();

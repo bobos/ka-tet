@@ -93,6 +93,7 @@ namespace UnitNS
       retreatStress = new RetreatStress(this);
       InitAllowedAtmpt();
       InitForecast();
+      InitFalseOrder();
     }
 
     public void CloneInit(float disarmorDefDebuf, Supply supply, PlainSickness plainSickness) {
@@ -253,6 +254,26 @@ namespace UnitNS
     public bool canForecast = false;
     public bool CanForecast() {
       return canForecast;
+    }
+
+    public bool fooled = false;
+    public bool fooledOnce = false;
+    public bool canFalseOrder = false;
+    public bool CanFalseOrder() {
+      return canFalseOrder;
+    }
+
+    void InitFalseOrder() {
+      canFalseOrder = rf.general.Has(Cons.falseCommander);
+    }
+
+    public bool FalseOrder(Unit target) {
+      canFalseOrder = false;
+      bool work = target.rf.general.Is(Cons.calm) ? Cons.MostLikely() : Cons.TinyChance(); 
+      if (work && !fooledOnce) {
+        target.fooled = target.fooledOnce = true;
+      }
+      return target.fooled;
     }
 
     public bool Forecast() {
@@ -536,9 +557,10 @@ namespace UnitNS
     // Before new turn starts
     public int[] RefreshUnit()
     {
-      alerted = chaos = defeating = retreated = charged = unitConflict.conflicted = false;
+      fooled = alerted = chaos = defeating = retreated = charged = unitConflict.conflicted = false;
       defeatStreak = 0;
       InitForecast();
+      InitFalseOrder();
       InitAllowedAtmpt();
       turnDone = false;
       movementRemaining = GetFullMovement();
