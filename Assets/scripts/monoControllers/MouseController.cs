@@ -97,7 +97,7 @@ namespace MonoNS
     public bool nearWater = false;
     public List<Unit> nearbyEnemey = null;
     public Unit[] surpriseTargets = null;
-    public Unit[] falseOrderTargets = null;
+    public List<Unit> falseOrderTargets = null;
     public Tile[] accessibleTiles = null;
     public HashSet<Unit> nearbyAlly = null;
 
@@ -113,6 +113,7 @@ namespace MonoNS
       nearFireTiles = new List<Tile>();
       surpriseTargets = new Unit[]{};
       accessibleTiles = new Tile[]{};
+      falseOrderTargets = new List<Unit>();
     }
 
     public void PrepareUnitSelection() {
@@ -157,7 +158,12 @@ namespace MonoNS
         nearEnemySettlement = s;
       }
       
-      falseOrderTargets = xxx;
+      foreach(Tile tile in t.GetNeighboursWithinRange<Tile>(4, (Tile _tile) => true)) {
+        Unit unit = tile.GetUnit();
+        if (unit != null && isAI != unit.IsAI()) {
+          falseOrderTargets.Add(unit);
+        }
+      }
 
       if (selectedUnit != null) {
         surpriseTargets = selectedUnit.GetSurpriseTargets();
@@ -274,7 +280,7 @@ namespace MonoNS
 
       if (action == ActionController.actionName.FalseOrder)
       {
-        if (falseOrderTargets.Length == 0) {
+        if (falseOrderTargets.Count == 0) {
           msgBox.Show("无可迷惑目标!");
           Escape();
         } else {
@@ -400,6 +406,12 @@ namespace MonoNS
 
       if (mouseMode == mode.surpriseAttack) {
         foreach(Unit u in surpriseTargets) {
+          hexMap.SetUnitSkin(u);
+        }
+      }
+
+      if (mouseMode == mode.falseOrder) {
+        foreach(Unit u in falseOrderTargets) {
           hexMap.SetUnitSkin(u);
         }
       }
@@ -545,6 +557,13 @@ namespace MonoNS
         }
       }
 
+      if (mouseMode == mode.falseOrder) {
+        if(u != null && u.IsAI() != selectedUnit.IsAI() && falseOrderTargets.Contains(u)) {
+          targetUnit = u;
+          return;
+        }
+      }
+
       if (mouseMode == mode.repos && nearbyAlly.Contains(u)) {
         targetUnit = u;
         return;
@@ -646,6 +665,29 @@ namespace MonoNS
         if (targetUnit != null) {
           msgBox.Show("");
           hexMap.actionController.SurpriseAttack(selectedUnit, targetUnit);
+          Escape();
+        }
+      } else if (!Util.eq<Tile>(tileUnderMouse, selectedUnit.tile))
+      {
+        Unit u = tileUnderMouse.GetUnit();
+        if (u != null)
+        {
+          hover.Show(u.Name());
+        }
+      }
+    }
+
+    void UpdateUnitFalseOrder()
+    {
+      if (tileUnderMouse == null) {
+        return;
+      }
+      if (Input.GetMouseButtonUp(0))
+      {
+        ClickOnTile();
+        if (targetUnit != null) {
+          msgBox.Show("");
+          hexMap.actionController.FalseOrder(selectedUnit, targetUnit);
           Escape();
         }
       } else if (!Util.eq<Tile>(tileUnderMouse, selectedUnit.tile))

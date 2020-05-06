@@ -385,6 +385,10 @@ namespace MonoNS
       return DoAction(unit, null, null, actionName.Forecast);
     }
 
+    public bool FalseOrder(Unit unit, Unit unit1) {
+      return DoAction(unit, unit1, null, actionName.FalseOrder);
+    }
+
     public bool DoAction(Unit unit, Unit unit1, Tile tile, actionName name)
     {
       if (ActionOngoing) return false;
@@ -452,6 +456,10 @@ namespace MonoNS
       if (name == actionName.Forecast)
       {
         StartCoroutine(DoForecast(unit));
+      }
+      if (name == actionName.FalseOrder)
+      {
+        StartCoroutine(DoFalseOrder(unit, unit1));
       }
       return true;
     }
@@ -608,6 +616,15 @@ namespace MonoNS
     IEnumerator DoForecast(Unit unit) {
       unitAniController.Forecast(unit);
       while (unitAniController.ForecastAnimating)
+      {
+        yield return null;
+      }
+      ActionOngoing = false;
+    }
+
+    IEnumerator DoFalseOrder(Unit unit, Unit unit1) {
+      unitAniController.FalseOrder(unit, unit1);
+      while (unitAniController.FalseOrderAnimating)
       {
         yield return null;
       }
