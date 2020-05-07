@@ -411,6 +411,17 @@ namespace UnitNS
       return true;
     }
 
+    public List<Unit> GetFalseOrderTargets() {
+      List<Unit> units = new List<Unit>();
+      foreach(Tile t in tile.GetNeighboursWithinRange<Tile>(GetVisibleRange(), (Tile _tile) => true)) {
+        Unit unit = t.GetUnit();
+        if (unit != null && unit.IsAI() != IsAI() && !unit.fooledOnce) {
+          units.Add(unit);
+        }
+      }
+      return units;
+    }
+
     public Unit[] GetSurpriseTargets() {
       Tile[] tiles = GetSurpriseAttackTiles();
       if (tiles.Length == 0) { return new Unit[]{}; }

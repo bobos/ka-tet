@@ -158,16 +158,11 @@ namespace MonoNS
         nearEnemySettlement = s;
       }
       
-      foreach(Tile tile in t.GetNeighboursWithinRange<Tile>(4, (Tile _tile) => true)) {
-        Unit unit = tile.GetUnit();
-        if (unit != null && isAI != unit.IsAI()) {
-          falseOrderTargets.Add(unit);
-        }
-      }
-
       if (selectedUnit != null) {
         surpriseTargets = selectedUnit.GetSurpriseTargets();
         accessibleTiles = selectedUnit.GetAccessibleTiles();
+        Unit u = selectedUnit != null ? selectedUnit : hexMap.settlementViewPanel.selectedUnit;
+        falseOrderTargets = u.GetFalseOrderTargets();
       }
     }
 
