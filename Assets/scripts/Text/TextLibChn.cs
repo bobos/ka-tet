@@ -296,6 +296,8 @@ namespace TextNS
       {"pop_capturedHorse", @"俘获{0}匹战马"},
       {"pop_wheatherForecasted", "天象习得"},
       {"pop_wheatherForecastFailed", "预测失败"},
+      {"pop_falseOrderFollowed", "中计"},
+      {"pop_falseOrderFailed", "识破"},
 
       // settlement
       {"settlement_storageLvl1", "初级粮仓"},
@@ -336,7 +338,7 @@ namespace TextNS
       {"ability_forecaster_description", "80%几率推测翌日的风向与气候"},
       {"ability_improvisor", "因粮于敌"},
       {"ability_improvisor_description", "深入敌军控制区域，大幅减少因补给不济影响"},
-      {"ability_discipline", "治军有方"},
+      {"ability_discipline", "三军用命"},
       {"ability_discipline_description", "一定几率减少部队各种不满发生"},
       {"ability_hammer", "气吞万里"},
       {"ability_hammer_description", "增加对敌方溃败单位追击杀伤率和士气削减, 骑兵冲阵成功率加50%"},

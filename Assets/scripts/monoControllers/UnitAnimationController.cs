@@ -920,6 +920,30 @@ namespace MonoNS
       ForecastAnimating = false;
     }
 
+    public bool FalseOrderAnimating = false;
+    public void FalseOrder(Unit unit, Unit target) {
+      if (!unit.CanFalseOrder()) {
+        return;
+      }
+      FalseOrderAnimating = true;
+      hexMap.cameraKeyboardController.DisableCamera();
+      StartCoroutine(CoFalseOrder(unit, target));
+    }
+
+    IEnumerator CoFalseOrder(Unit unit, Unit target) {
+      hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(target.tile).transform.position);
+      while(hexMap.cameraKeyboardController.fixingCamera) { yield return null; }
+      if(unit.FalseOrder(target)) {
+        popAniController.Show(hexMap.GetUnitView(target), textLib.get("pop_falseOrderFollowed"), Color.green);
+        while(popAniController.Animating) { yield return null; }
+      } else {
+        popAniController.Show(hexMap.GetUnitView(target), textLib.get("pop_falseOrderFailed"), Color.white);
+        while(popAniController.Animating) { yield return null; }
+      }
+      hexMap.cameraKeyboardController.EnableCamera();
+      FalseOrderAnimating = false;
+    }
+
     public bool ForceRetreatAnimating = false;
     public void ForceRetreat(Unit unit, int movement, bool breakThrough = false) {
       if (unit.retreated) {

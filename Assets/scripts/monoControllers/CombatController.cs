@@ -284,6 +284,9 @@ namespace MonoNS
 
     int JoinPossibility(Unit unit, bool attacker) {
       int ret = 100;
+      if (unit.fooled) {
+        return 0;
+      }
       bool inRange = unit.InCommanderRange();
       // if the target unit is the one hated
       Unit target = attacker ? this.attacker : this.defender;
@@ -841,6 +844,9 @@ namespace MonoNS
         }
 
         foreach(UnitPredict up in atkWin ? predict.attackers : predict.defenders) {
+          if (up.unit.IsCamping() && up.unit.tile.settlement.garrison.Count == 1) {
+            continue;
+          }
           if (!up.unit.IsGone() && up.unit.rf.general.Is(Cons.reckless) && Cons.MostLikely()) {
             chasers.Add(up.unit);
           }
@@ -848,12 +854,15 @@ namespace MonoNS
 
         Unit un = atkWin ? attacker : defender;
         if (feint && !un.FollowOrder()) {
-          if (un.rf.general.Is(Cons.conservative) || un.rf.general.Has(Cons.tactic)) {
-            if (Cons.SlimChance()) {
+          if (un.IsCamping() && un.tile.settlement.garrison.Count == 1) {}
+          else {
+            if (un.rf.general.Is(Cons.conservative) || un.rf.general.Has(Cons.tactic)) {
+              if (Cons.SlimChance()) {
+                chasers.Add(un);
+              }
+            } else if (Cons.MostLikely()) {
               chasers.Add(un);
             }
-          } else if (Cons.MostLikely()) {
-            chasers.Add(un);
           }
         }
 
