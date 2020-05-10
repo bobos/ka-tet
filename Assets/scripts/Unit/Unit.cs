@@ -223,6 +223,10 @@ namespace UnitNS
       return rf.general.Is(Cons.brave) || rf.general.Is(Cons.conservative) ? 20 : 95;
     }
 
+    public bool CanBeCrashed() {
+      return !crashed;
+    }
+
     public bool IsHeavyCavalry() {
       return IsCavalry() && rf.rank == Cons.veteran;
     }
@@ -233,7 +237,7 @@ namespace UnitNS
 
     public int allowedAtmpt = 1;
     void InitAllowedAtmpt() {
-      allowedAtmpt = IsCavalry() ? 2 : 1;
+      allowedAtmpt = 1;
       if (rf.general.Has(Cons.staminaManager)) {
         allowedAtmpt++;
       }
@@ -248,7 +252,15 @@ namespace UnitNS
     }
 
     public bool CanBreakThrough() {
-      return IsSurrounded() && rf.soldiers >= 800 && CanAttack();
+      return IsSurrounded() && CanAttack();
+    }
+
+    public bool CanFire() {
+      return !fireDone;
+    }
+
+    public bool CanPoision() {
+      return !poisionDone;
     }
 
     public bool canForecast = false;
@@ -293,6 +305,9 @@ namespace UnitNS
     public bool alerted = false;
     public bool charged = false;
     public bool retreated = false;
+    public bool crashed = false;
+    public bool poisionDone = false;
+    public bool fireDone = false;
     public bool CanAttack() {
       return allowedAtmpt > 0;
     }
@@ -437,11 +452,7 @@ namespace UnitNS
     }
 
     public Tile[] GetSurpriseAttackTiles() {
-      if (hexMap.GetWarParty(this, true).GetVisibleArea().Contains(tile)) {
-        // discovered by enemy
-        return new Tile[]{};
-      }
-      Tile[] tiles = GetVisibleArea();
+      HashSet<Tile> tiles = hexMap.GetWarParty(this).GetVisibleArea();
       return tile.GetNeighboursWithinRange(rf.general.Has(Cons.ambusher) ? 4 : 2,
         (Tile t) => FindAttackPath(t).Length > 0 && tiles.Contains(t));
     }
@@ -573,7 +584,8 @@ namespace UnitNS
     // Before new turn starts
     public int[] RefreshUnit()
     {
-      fooled = alerted = chaos = defeating = retreated = charged = unitConflict.conflicted = false;
+      crashed = fooled = alerted = chaos = defeating = retreated
+        = charged = unitConflict.conflicted = poisionDone = fireDone = false;
       defeatStreak = 0;
       InitForecast();
       InitFalseOrder();

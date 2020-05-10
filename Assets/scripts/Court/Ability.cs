@@ -13,7 +13,7 @@ namespace CourtNS {
         Cons.holdTheGround, Cons.breaker, Cons.improvisor, Cons.tactic,
         Cons.outlooker, Cons.ambusher, Cons.doctor, Cons.falseCommander};
       int total = candidates.Length;
-      int luckNum = Util.Rand(0, total + 16);
+      int luckNum = Util.Rand(0, total * 2);
       if (luckNum < total) {
         return candidates[luckNum];
       }

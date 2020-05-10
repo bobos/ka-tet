@@ -456,6 +456,12 @@ namespace MapTileNS
       if (tiles.Count == 0) {
         return null;
       }
+      foreach(Tile tile in tiles) {
+        if (!DownstreamTiles<Tile>().Contains(tile)) {
+          return tile;
+        }
+      }
+
       return tiles[Util.Rand(0, tiles.Count-1)];
     }
 

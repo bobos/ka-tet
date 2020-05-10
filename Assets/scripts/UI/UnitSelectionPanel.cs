@@ -149,32 +149,32 @@ namespace MonoNS
       //if (!state || hexMap.combatController.start || unit.IsAI()) return;
       if (!state || hexMap.combatController.start) return;
 
-      if (!hexMap.wargameController.start && unit.CanBreakThrough() && hexMap.deployDone) {
-        BreakThroughButton.SetActive(true);
+      if (!hexMap.wargameController.start && hexMap.deployDone) {
+        BreakThroughButton.SetActive(unit.CanBreakThrough());
       }
 
-      if (unit.CanAttack()) {
-        AttackButton.SetActive(true);
+      if (!hexMap.wargameController.start && hexMap.deployDone) {
+        AttackButton.SetActive(unit.CanAttack());
       }
 
       if (mouseController.nearFireTiles.Count > 0 && hexMap.deployDone && !hexMap.wargameController.start) {
-        FireButton.SetActive(true);
+        FireButton.SetActive(unit.CanFire());
       }
 
       if (mouseController.nearWater && hexMap.deployDone && !hexMap.wargameController.start) {
-        DefendButton.SetActive(true);
+        DefendButton.SetActive(unit.CanPoision());
       }
 
-      if (!hexMap.wargameController.start && unit.CanCharge() && hexMap.deployDone) {
-        ChargeButton.SetActive(true);
+      if (!hexMap.wargameController.start && hexMap.deployDone) {
+        ChargeButton.SetActive(unit.CanCharge());
       }
 
-      if (!hexMap.wargameController.start && unit.CanForecast() && hexMap.deployDone) {
-        ForecastButton.SetActive(true);
+      if (!hexMap.wargameController.start && hexMap.deployDone) {
+        ForecastButton.SetActive(unit.CanForecast());
       }
 
       if (!hexMap.wargameController.start && unit.CanFalseOrder() && hexMap.deployDone) {
-        FalseOrderButton.SetActive(true);
+        FalseOrderButton.SetActive(mouseController.falseOrderTargets.Count > 0);
       }
 
       if (isGarrison) {
@@ -204,7 +204,7 @@ namespace MonoNS
       }
       
       if (!hexMap.combatController.start && hexMap.deployDone && unit.CanAttack()) {
-        FeintDefeatButton.SetActive(unit.rf.general.Has(Cons.tactic));
+        FeintDefeatButton.SetActive(unit.rf.general.Has(Cons.tactic) && mouseController.nearEnemy);
         SurpriseAttackButton.SetActive(mouseController.surpriseTargets.Length > 0);
       }
 

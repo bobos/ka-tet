@@ -120,7 +120,7 @@ namespace MonoNS
             supportAttackers.Add(u);
           }
 
-          if (u.IsAI() != attacker.IsAI() && !Util.eq<Unit>(u, attacker)) {
+          if (u.IsAI() != attacker.IsAI() && !Util.eq<Unit>(u, defender)) {
             if (!attackerVision.Contains(u.tile)) {
               hiddenDefenders.Add(u);
             } else {
@@ -242,12 +242,12 @@ namespace MonoNS
       int smaller = predict.attackerOptimPoints > predict.defenderOptimPoints ? predict.defenderOptimPoints : predict.attackerOptimPoints;
       smaller = smaller < 1 ? 1 : smaller;
       float odds = bigger / smaller;
-      if (odds <= 1.5f) {
+      if (odds <= 1.9f) {
         predict.suggestedResultType = ResultType.Close;
-      } else if (odds <= 3f) {
-        // 1.5x - 3x
+      } else if (odds <= 3.5f) {
+        // 1.9x - 3.5x
         predict.suggestedResultType = ResultType.Small;
-      } else if (odds <= 4.5f) {
+      } else if (odds <= 5f) {
         predict.suggestedResultType = ResultType.Great;
       } else {
         predict.suggestedResultType = ResultType.Crushing;
@@ -571,7 +571,7 @@ namespace MonoNS
             && !defender.IsWarWeary()
             && (predict.attackerOptimPoints > (int)(predict.defenderOptimPoints * 1.5f))
             && (defender.rf.general.Has(Cons.formidable) || Cons.FairChance())) {
-            predict.defenderOptimPoints = predict.defenderOptimPoints * 3;
+            predict.defenderOptimPoints = predict.defenderOptimPoints * 2;
             hexMap.dialogue.ShowNoRetreatEvent(defender);
             while (hexMap.dialogue.Animating) { yield return null; }
             hexMap.popAniController.Show(hexMap.GetUnitView(defender), 

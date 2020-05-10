@@ -99,6 +99,12 @@ namespace MonoNS
     public bool BurnAnimating = false;
     public bool Burn(Unit unit, Tile tile, HashSet<Tile> tiles = null)
     {
+      if (unit != null) {
+        if (!unit.CanFire()) {
+          return false;
+        }
+        unit.fireDone = true;
+      }
       hexMap.cameraKeyboardController.DisableCamera();
       Weather weather = hexMap.weatherGenerator.currentWeather;
       bool set = false;

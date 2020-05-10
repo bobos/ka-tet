@@ -45,6 +45,9 @@ Game Tips:
 49. 部队战败状态战力-20%
 
 outlooker 发现敌军主帅
+狭隘
+将领突围事件
+被包围身后是城市无法突围
 破阵 -> 以少打多 -> 击败 -> 追击 -> 歼灭 -> 影响周边军队
 兵团动态合并
 map skeleton for AI(supply route, point, value tiles, dam, supply range etc.)

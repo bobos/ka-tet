@@ -443,6 +443,10 @@ namespace MonoNS
 
     public bool PoisionAnimating = false;
     public void Poision(Unit unit, Tile tile) {
+      if (!unit.CanPoision()) {
+        return;
+      }
+      unit.poisionDone = true;
       PoisionAnimating = true;
       hexMap.cameraKeyboardController.DisableCamera();
       StartCoroutine(CoPoision(unit, tile));
@@ -450,9 +454,6 @@ namespace MonoNS
 
     IEnumerator CoPoision(Unit unit, Tile tile) {
       foreach(Unit u in tile.Poision(unit)) {
-        if (u.IsAI()) {
-          continue;
-        }
         popAniController.Show(hexMap.GetUnitView(u), textLib.get("pop_poisioned"), Color.white);
         while (popAniController.Animating) { yield return null; }
       }
@@ -581,8 +582,8 @@ namespace MonoNS
       foreach(Unit unit in failedToMove) {
         foreach(Tile t in unit.tile.neighbours) {
           Unit u = t.GetUnit();
-          if (u != null && u.IsAI() == unit.IsAI() && !units.Contains(u) && moraleDrop != 0) {
-            hexMap.unitAniController.CrashByAlly(u, moraleDrop);
+          if (u != null && u.IsAI() == unit.IsAI()&& !units.Contains(u) && moraleDrop != 0) {
+            hexMap.unitAniController.CrashByAlly(u, -3);
             while (hexMap.unitAniController.CrashAnimating) { yield return null; }
             continue;
           }
@@ -688,7 +689,7 @@ namespace MonoNS
       int morale = from.IsHeavyCavalry() ? -6 : (from.IsCavalry() ? -5 : -3); 
       morale = morale * (from.rf.general.Has(Cons.hammer) ? 2 : 1);
       to.rf.morale += morale;
-      ShowEffect(to, new int[]{morale,0,to.Killed(dead),0,0}, view);
+      ShowEffect(to, new int[]{morale,0,to.Killed(dead),0,0});
       while (ShowAnimating) { yield return null; }
       if (to.rf.soldiers <= Unit.DisbandUnitUnder) {
         // unit disbanded
@@ -799,6 +800,10 @@ namespace MonoNS
 
     public bool CrashAnimating = false;
     public void CrashByAlly(Unit unit, int morale) {
+      if (!unit.CanBeCrashed()) {
+        return;
+      }
+      unit.crashed = true;
       CrashAnimating = true;
       hexMap.cameraKeyboardController.DisableCamera();
       StartCoroutine(CoCrashByAlly(unit, morale));

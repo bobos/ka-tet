@@ -149,6 +149,10 @@ namespace MonoNS
           nearEnemy = true;
           nearbyEnemey.Add(u);
         }
+
+        if (tile.settlement != null && tile.settlement.owner.isAI != selectedUnit.IsAI()) {
+          nearEnemy = true;
+        }
       }
 
       if (s != null && isAI == s.owner.isAI) {
