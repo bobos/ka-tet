@@ -287,7 +287,7 @@ namespace MonoNS
     }
 
     IEnumerator CoUnitSurrounded(HashSet<Unit> units, HashSet<Unit> accu) {
-      const int moraleDrop = -8;
+      const int moraleDrop = -5;
       bool first = true;
       foreach(Unit unit in units) {
         accu.Add(unit);

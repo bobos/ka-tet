@@ -44,7 +44,7 @@ namespace UnitNS
       }
 
       conflicted = target.unitConflict.conflicted = true;
-      result.moralDrop = -Util.Rand(5, 10);
+      result.moralDrop = -Util.Rand(3, 8);
       result.unit1 = unit;
       result.unit2 = target;
 

@@ -135,7 +135,8 @@ namespace FieldNS
 
       foreach(Tile tile in unit.tile.neighbours) {
         Unit u = tile.GetUnit();
-        if (tile.Deployable(unit) || tile.settlement != null && tile.settlement.owner.isAI == unit.IsAI()) {
+        //if (tile.Deployable(unit) || tile.settlement != null && tile.settlement.owner.isAI == unit.IsAI()) {
+        if (tile.Deployable(unit)) {
           tiles.Add(tile);
         } else if (u != null && u.IsAI() == unit.IsAI()) {
           UpdateUnitFreeSpace(units, tiles, u);
