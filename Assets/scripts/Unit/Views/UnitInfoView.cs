@@ -59,7 +59,8 @@ namespace UnitNS
         + unit.rf.province.Name() + "-"
         + unit.GetUnitName()
         + "[" + Shorten(unit.rf.soldiers) + "]\n"
-        + "攻: " + Shorten(unit.unitCombatPoint) + "\n防: " + Shorten(totalDefendPoint);
+        + "攻: " + Shorten(unit.unitCombatPoint) + "\n防: " + Shorten(totalDefendPoint) + "\n"
+        + unit.rf.morale + "/" + unit.rf.province.region.MoralePunishLine() + "/" + unit.rf.province.region.RetreatThreshold();
       textMesh.fontSize = 45;
       textMesh.color = color;
     }

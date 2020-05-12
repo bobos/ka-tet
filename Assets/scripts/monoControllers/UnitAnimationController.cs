@@ -147,9 +147,7 @@ namespace MonoNS
         ShowEffect(unit, new int[]{moraleDrop,0,0,0,0});
         while(ShowAnimating) { yield return null; }
       }
-      if (!unit.IsAI()) {
-        hexMap.GetAIParty().UpdateAlert();
-      }
+      hexMap.GetAIParty().UpdateAlert();
 
       // stash event
       // hexMap.eventStasher.Add(unit.rf.general, MonoNS.EventDialog.EventName.FarmDestroyed);
@@ -184,7 +182,7 @@ namespace MonoNS
         while(ShowAnimating) { yield return null; }
       }
 
-      if (unit.rf.morale == 0 || unit.rf.soldiers <= Unit.DisbandUnitUnder)
+      if (unit.rf.soldiers <= Unit.DisbandUnitUnder)
       {
         hexMap.unitAniController.DestroyUnit(unit, DestroyType.ByDisband);
         while (hexMap.unitAniController.DestroyAnimating) { yield return null; }
@@ -689,6 +687,7 @@ namespace MonoNS
       : (from.rf.soldiers / (from.IsHeavyCavalry() ? 20 : (from.IsCavalry() ? 25 : 30)));
       dead = from.rf.general.Has(Cons.hammer) ? (int)(dead * 1.5f) : dead;
       dead = dead > to.rf.soldiers ? to.rf.soldiers : dead;
+      if (to.rf.morale == 0) { dead = to.rf.soldiers; }
       int morale = from.IsHeavyCavalry() ? -6 : (from.IsCavalry() ? -5 : -3); 
       morale = morale * (from.rf.general.Has(Cons.hammer) ? 2 : 1);
       to.rf.morale += morale;
@@ -896,10 +895,11 @@ namespace MonoNS
       unit.Retreat();
       if (unit.IsCommander()) {
         Unit newCommander = hexMap.GetWarParty(unit).AssignNewCommander();
-        if (newCommander.IsOnField()) {
-          popAniController.Show(hexMap.GetUnitView(newCommander), textLib.get("pop_newCommander"), Color.white);
-          while(popAniController.Animating) { yield return null; }
-        }
+        popAniController.Show(
+          newCommander.IsOnField() ? hexMap.GetUnitView(newCommander):
+          hexMap.settlementMgr.GetView(newCommander.tile.settlement),
+          textLib.get("pop_newCommander"), Color.white);
+        while(popAniController.Animating) { yield return null; }
       }
       hexMap.cameraKeyboardController.EnableCamera();
       RetreatAnimating = false;

@@ -192,9 +192,6 @@ namespace UnitNS
           chance = -30;
         }
       }
-      if (tile.terrian == TerrianType.Hill) {
-        chance += -30;
-      }
       if (charger.IsHeavyCavalry()) {
         if (Util.eq<Rank>(rf.rank, Cons.rookie)) {
           chance += 70;
@@ -232,7 +229,7 @@ namespace UnitNS
     }
 
     public bool IsVulnerable() {
-      return chaos || defeating;
+      return chaos || defeating || rf.morale == 0;
     }
 
     public int allowedAtmpt = 1;
