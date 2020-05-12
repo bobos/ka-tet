@@ -240,9 +240,14 @@ namespace MonoNS
     }
 
     public int[] OccupySettlement(Unit unit, Settlement settlement) {
-      int[] deathNum = new int[3]{0,0,0};
+      int[] deathNum = new int[]{0,0,0,0};
       settlement.owner = unit.IsAI() ? hexMap.GetAIParty() : hexMap.GetPlayerParty();
       settlement.Encamp(unit);
+      int moraleIncr = settlement.type == Settlement.Type.camp ? 8 : 10;
+      deathNum[3] = moraleIncr;
+      foreach(Unit u in hexMap.GetWarParty(unit).GetUnits()) {
+        u.rf.morale += moraleIncr;
+      }
       if (settlement.owner.attackside) {
         if (settlement.type == Settlement.Type.city) {
           int maleDead = unit.rf.soldiers * 2;

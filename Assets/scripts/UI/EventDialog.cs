@@ -70,6 +70,7 @@ namespace MonoNS
       WeCaptureCity,
       Disbanded,
       GeneralKilledInBattle,
+      GeneralRetreated,
       FarmDestroyedReported,
       UnderSiege,
       Null
@@ -168,13 +169,13 @@ namespace MonoNS
 
       if (name == EventName.WeCaptureCamp) {
         title.text = textLib.get("event_weCaptureCamp_title");
-        description.text = System.String.Format(textLib.get("event_weCaptureCamp"), settlement.name);
+        description.text = System.String.Format(textLib.get("event_weCaptureCamp"), settlement.name, argu1);
         image.sprite = CityLost;
       }
 
       if (name == EventName.WeCaptureCity) {
         title.text = textLib.get("event_weCaptureCity_title");
-        description.text = System.String.Format(textLib.get("event_weCaptureCity"), settlement.name, argu1, argu2, argu3);
+        description.text = System.String.Format(textLib.get("event_weCaptureCity"), settlement.name, argu1, argu2, argu3, argu4);
         image.sprite = CityLost;
       }
 
@@ -183,6 +184,13 @@ namespace MonoNS
         description.text = System.String.Format(textLib.get("event_generalKilled"),
           general.Name());
         image.sprite = drown;
+      }
+
+      if (name == EventName.GeneralRetreated) {
+        title.text = textLib.get("event_generalRetreated_title");
+        description.text = System.String.Format(textLib.get("event_generalRetreated"),
+          general.Name());
+        image.sprite = Resigned;
       }
 
       if (name == EventName.FarmDestroyedReported) {

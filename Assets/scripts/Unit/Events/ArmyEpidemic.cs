@@ -41,7 +41,7 @@ namespace UnitNS
       if (IsValid())
       {
         lastTurns--;
-        int morale = -6;
+        int morale = -3;
         effects[0] = morale;
         unit.rf.morale += morale;
         effects[2] = unit.Killed((int)(unit.rf.soldiers * KillRate));

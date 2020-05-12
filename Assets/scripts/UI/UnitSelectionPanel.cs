@@ -153,7 +153,7 @@ namespace MonoNS
         BreakThroughButton.SetActive(unit.CanBreakThrough());
       }
 
-      if (!hexMap.wargameController.start && hexMap.deployDone) {
+      if (hexMap.deployDone) {
         AttackButton.SetActive(unit.CanAttack());
       }
 

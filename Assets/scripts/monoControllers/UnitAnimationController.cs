@@ -60,6 +60,9 @@ namespace MonoNS
       if (general.IsDead()) {
         eventDialog.Show(new MonoNS.Event(EventDialog.EventName.GeneralKilledInBattle, null, null, 0, 0, 0, 0, 0, null, general));
         while (eventDialog.Animating) { yield return null; }
+      } else {
+        eventDialog.Show(new MonoNS.Event(EventDialog.EventName.GeneralRetreated, null, null, 0, 0, 0, 0, 0, null, general));
+        while (eventDialog.Animating) { yield return null; }
       }
       if (unit.IsCommander()) {
         Unit newCommander = hexMap.GetWarParty(unit).AssignNewCommander();
@@ -207,12 +210,12 @@ namespace MonoNS
           unit.IsAI() ? MonoNS.EventDialog.EventName.EnemyCaptureCity : MonoNS.EventDialog.EventName.WeCaptureCity,
         unit,
         settlement,
-        afterMath[0], afterMath[1], afterMath[2]));
+        afterMath[0], afterMath[1], afterMath[2], afterMath[3]));
       } else {
         eventDialog.Show(new MonoNS.Event(
           unit.IsAI() ? MonoNS.EventDialog.EventName.EnemyCaptureCamp : MonoNS.EventDialog.EventName.WeCaptureCamp,
         unit,
-        settlement));
+        settlement, afterMath[3]));
       }
       while (eventDialog.Animating) { yield return null; }
       hexMap.cameraKeyboardController.EnableCamera();
@@ -267,12 +270,12 @@ namespace MonoNS
           unit.IsAI() ? MonoNS.EventDialog.EventName.EnemyCaptureCity : MonoNS.EventDialog.EventName.WeCaptureCity,
         unit,
         settlement,
-        afterMath[0], afterMath[1], afterMath[2]));
+        afterMath[0], afterMath[1], afterMath[2], afterMath[3]));
       } else {
         eventDialog.Show(new MonoNS.Event(
           unit.IsAI() ? MonoNS.EventDialog.EventName.EnemyCaptureCamp : MonoNS.EventDialog.EventName.WeCaptureCamp,
         unit,
-        settlement));
+        settlement, afterMath[3]));
       }
       while (eventDialog.Animating) { yield return null; }
       hexMap.cameraKeyboardController.EnableCamera();
@@ -682,8 +685,8 @@ namespace MonoNS
       popAniController.Show(view, textLib.get("pop_chasing"), Color.green);
       while (popAniController.Animating) { yield return null; }
       int dead = to.chaos ?
-        (from.rf.soldiers / (from.IsHeavyCavalry() ? 3 : (from.IsCavalry() ? 5 : 10)))
-      : (from.rf.soldiers / (from.IsHeavyCavalry() ? 5 : (from.IsCavalry() ? 8 : 12)));
+        (from.rf.soldiers / (from.IsHeavyCavalry() ? 15 : (from.IsCavalry() ? 20 : 25)))
+      : (from.rf.soldiers / (from.IsHeavyCavalry() ? 20 : (from.IsCavalry() ? 25 : 30)));
       dead = from.rf.general.Has(Cons.hammer) ? (int)(dead * 1.5f) : dead;
       dead = dead > to.rf.soldiers ? to.rf.soldiers : dead;
       int morale = from.IsHeavyCavalry() ? -6 : (from.IsCavalry() ? -5 : -3); 
@@ -725,6 +728,8 @@ namespace MonoNS
           }
         }
       }
+      ShowEffect(from, new int[]{from.Victory(2), 0, 0, 0, 0});
+      while( ShowAnimating ) { yield return null; }
       hexMap.cameraKeyboardController.EnableCamera();
       PursueAnimating = false;
     }

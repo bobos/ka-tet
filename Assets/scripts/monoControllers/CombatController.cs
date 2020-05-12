@@ -597,7 +597,7 @@ namespace MonoNS
         ResultType resultLevel = predict.suggestedResultType;
         bool feint = resultLevel == ResultType.FeintDefeat;
         if (resultLevel == ResultType.FeintDefeat) {
-          attackerCasualty = (int)(attackerTotal * 0.008f);
+          attackerCasualty = (int)(attackerTotal * 0.006f);
           defenderCasualty = (int)(attackerCasualty * 0.4f);
         } else if (resultLevel == ResultType.Close) {
           // 1 - 1.5x odds
@@ -617,12 +617,12 @@ namespace MonoNS
             defenderCasualty = (int)(attackerCasualty * 0.45f);
           }
         } else {
-          float factor = 0.05f;
+          float factor = 0.04f;
           if (resultLevel == ResultType.Great) {
-            factor = 0.08f;
+            factor = 0.06f;
           }
           if (resultLevel == ResultType.Crushing) {
-            factor = 0.01f * Util.Rand(35, 45);
+            factor = 0.01f * Util.Rand(10, 25);
           }
 
           if (atkWin) {
@@ -708,8 +708,6 @@ namespace MonoNS
             hexMap.unitAniController.ShowEffect(unit, stats, view, true);
           }
         }
-        hexMap.turnController.Sleep(1);
-        while(hexMap.turnController.sleeping) { yield return null; }
 
         foreach(UnitPredict up in all) {
           Unit unit = up.unit;
@@ -723,8 +721,9 @@ namespace MonoNS
         if (defender.IsCamping()) {
           int[] stats = new int[]{0,0,settlementDead,0,0};
           hexMap.unitAniController.ShowEffect(null, stats, hexMap.settlementMgr.GetView(defender.tile.settlement));
-          while (hexMap.unitAniController.ShowAnimating) { yield return null; }
         }
+        hexMap.turnController.Sleep(1);
+        while(hexMap.turnController.sleeping) { yield return null; }
 
         int capturedHorse = (int)((atkWin ? defenderCavDead : attackerCavDead) * 0.2f);
         Unit winner = atkWin ? attacker : defender;

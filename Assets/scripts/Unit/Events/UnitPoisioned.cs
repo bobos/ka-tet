@@ -40,7 +40,7 @@
       if (IsValid())
       {
         lastTurns--;
-        int morale = -6;
+        int morale = -3;
         unit.rf.morale += morale;
         effects[0] = morale;
         effects[2] = unit.Killed(Util.Rand(3, 20));
@@ -54,7 +54,7 @@
     }
 
     int GetLastTurns() {
-      return Util.Rand(1, 2);
+      return Util.Rand(1, 3);
     }
 
   }

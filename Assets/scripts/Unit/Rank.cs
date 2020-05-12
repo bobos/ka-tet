@@ -78,7 +78,7 @@ namespace UnitNS
 
     public override float Buf(Troop troop) {
       return troop.province.region.LevelBuf(troop.type) *
-        (1 - troop.morale < troop.province.region.MoralePunishLine() ? 1f : 0f);
+        (1 - (troop.morale < troop.province.region.MoralePunishLine() ? 1f : 0f));
     }
 
     public override int RecoverPerTurn() {
