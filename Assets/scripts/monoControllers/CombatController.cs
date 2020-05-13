@@ -287,7 +287,7 @@ namespace MonoNS
       if (unit.fooled) {
         return 0;
       }
-      bool inRange = unit.InCommanderRange();
+      bool inRange = unit.inCommanderRange;
       // if the target unit is the one hated
       Unit target = attacker ? this.attacker : this.defender;
       if (unit.rf.province.region.GetConflictRegions().Contains(target.rf.province.region)
@@ -303,7 +303,7 @@ namespace MonoNS
     }
 
     int JoinPossibilityBaseOnOdds(Unit unit, ResultType result) {
-      bool inRange = unit.InCommanderRange();
+      bool inRange = unit.inCommanderRange;
       if (inRange && unit.MyCommander().commandSkill.ObeyMyOrder()) {
         return 100;
       }
@@ -571,7 +571,7 @@ namespace MonoNS
             && !defender.IsWarWeary()
             && (predict.attackerOptimPoints > (int)(predict.defenderOptimPoints * 1.5f))
             && (defender.rf.general.Has(Cons.formidable) || Cons.FairChance())) {
-            predict.defenderOptimPoints = predict.defenderOptimPoints * 2;
+            predict.defenderOptimPoints = (int)(predict.defenderOptimPoints * (defender.IsCamping() ? 1.5f : 3));
             hexMap.dialogue.ShowNoRetreatEvent(defender);
             while (hexMap.dialogue.Animating) { yield return null; }
             hexMap.popAniController.Show(hexMap.GetUnitView(defender), 

@@ -55,6 +55,7 @@ namespace MonoNS
       while (eventDialog.Animating) { yield return null; }
 
       General general = unit.rf.general;
+      bool isCommander = unit.IsCommander();
       general.TroopDestroyed(generalDead);
 
       if (general.IsDead()) {
@@ -64,12 +65,13 @@ namespace MonoNS
         eventDialog.Show(new MonoNS.Event(EventDialog.EventName.GeneralRetreated, null, null, 0, 0, 0, 0, 0, null, general));
         while (eventDialog.Animating) { yield return null; }
       }
-      if (unit.IsCommander()) {
+      if (isCommander) {
         Unit newCommander = hexMap.GetWarParty(unit).AssignNewCommander();
-        if (newCommander.IsOnField()) {
-          popAniController.Show(hexMap.GetUnitView(newCommander), textLib.get("pop_newCommander"), Color.white);
-          while(popAniController.Animating) { yield return null; }
-        }
+        popAniController.Show(
+          newCommander.IsOnField() ? hexMap.GetUnitView(newCommander):
+          hexMap.settlementMgr.GetView(newCommander.tile.settlement),
+          textLib.get("pop_newCommander"), Color.white);
+        while(popAniController.Animating) { yield return null; }
       }
 
       ShakeNearbyAllies(unit, unit.IsCommander() ? -20 : -5);
@@ -148,6 +150,7 @@ namespace MonoNS
         while(ShowAnimating) { yield return null; }
       }
       hexMap.GetAIParty().UpdateAlert();
+      hexMap.GetWarParty(unit).UpdateCommandRange();
 
       // stash event
       // hexMap.eventStasher.Add(unit.rf.general, MonoNS.EventDialog.EventName.FarmDestroyed);
@@ -358,7 +361,7 @@ namespace MonoNS
         while (ShowAnimating) { yield return null; }
       }
 
-      if (unit.tile.deadZone.Apply(unit) && unit.epidemic.Occur()) {
+      if (unit.tile.deadZone.Apply(unit) && Cons.EvenChance() && unit.epidemic.Occur()) {
         // epimedic caused by decomposing corpse
         popAniController.Show(hexMap.GetUnitView(unit), textLib.get("pop_epidemic"), Color.white);
         while (popAniController.Animating) { yield return null; }

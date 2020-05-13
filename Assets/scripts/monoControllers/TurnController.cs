@@ -223,10 +223,7 @@ namespace MonoNS
       }
 
       // fix camera on next party
-      Unit fixedAt = null;
-      foreach(Unit u in otherP.GetUnits()) {
-        fixedAt = u;
-      }
+      Unit fixedAt = otherP.commanderGeneral.commandUnit.onFieldUnit;
       Vector3 cameraPosition;
       if (fixedAt.IsCamping()) {
         cameraPosition = settlementMgr.GetView(fixedAt.tile.settlement).transform.position;

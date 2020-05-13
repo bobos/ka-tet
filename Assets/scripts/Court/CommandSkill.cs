@@ -20,10 +20,10 @@ namespace CourtNS {
       }
 
       if (commandSkill == 3) {
-        return 3;
+        return 4;
       }
 
-      return 6;
+      return 7;
     }
 
     public bool ObeyMyOrder() {

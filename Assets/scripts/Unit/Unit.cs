@@ -279,7 +279,7 @@ namespace UnitNS
     public bool FalseOrder(Unit target) {
       canFalseOrder = false;
       bool work = false;
-      if (target.InCommanderRange()) {
+      if (target.inCommanderRange) {
         work = target.rf.general.Is(Cons.calm) ? Cons.FairChance(): (target.rf.general.Is(Cons.conservative) ? Cons.SlimChance() : false);
       } else {
         work = target.rf.general.Is(Cons.calm) ? Cons.HighlyLikely(): (target.rf.general.Is(Cons.conservative) ? Cons.FairChance() : Cons.SlimChance());
@@ -504,7 +504,8 @@ namespace UnitNS
       });
     }
 
-    public bool InCommanderRange() {
+    public bool inCommanderRange = false;
+    bool UnderCommand() {
       bool inRange = false;
       if (IsCommander()) {
         return true;
@@ -520,7 +521,7 @@ namespace UnitNS
     }
 
     public bool FollowOrder() {
-      return InCommanderRange() && MyCommander().commandSkill.ObeyMyOrder();
+      return inCommanderRange && MyCommander().commandSkill.ObeyMyOrder();
     }
 
     public bool ImproviseOnSupply() {
@@ -532,7 +533,7 @@ namespace UnitNS
     }
 
     public bool StickAsNailWhenDefeat() {
-      return IsCommander() || (InCommanderRange() &&
+      return (inCommanderRange &&
               MyCommander().commandSkill.TurningTide() &&
               Cons.MostLikely()) ||
               (rf.general.Has(Cons.holdTheGround) && Cons.MostLikely()) ||
@@ -567,12 +568,16 @@ namespace UnitNS
     public int Victory(int moraleIncr) {
       defeatStreak = 0;
       rf.morale += moraleIncr;
-      movementRemaining += 30;
+      movementRemaining += 40;
       return moraleIncr;
     }
 
     protected virtual bool Concealable() {
       return false;
+    }
+
+    public void UpdateInCommanderRange() {
+      inCommanderRange = UnderCommand();
     }
 
     // ==============================================================
@@ -583,7 +588,7 @@ namespace UnitNS
     public int[] RefreshUnit()
     {
       crashed = fooled = alerted = chaos = defeating = retreated
-        = charged = unitConflict.conflicted = poisionDone = fireDone = false;
+        = charged = poisionDone = fireDone = false;
       defeatStreak = 0;
       InitForecast();
       InitFalseOrder();
