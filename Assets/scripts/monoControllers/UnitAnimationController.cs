@@ -115,7 +115,7 @@ namespace MonoNS
     }
 
     public bool MoveAnimating = false;
-    public bool MoveUnit(Unit unit, Tile tile = null, bool dontFixCamera = false) {
+    public bool MoveUnit(Unit unit, Tile tile = null, bool dontFixCamera = false, bool normalMove = true) {
       MoveAnimating = true;
       Tile old = unit.tile;
       bool continuing = unit.DoMove(tile);
@@ -132,11 +132,11 @@ namespace MonoNS
         hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(unit.tile).transform.position);
       }
       hexMap.cameraKeyboardController.DisableCamera();
-      StartCoroutine(CoMoveUnit(unit, moraleDrop));
+      StartCoroutine(CoMoveUnit(unit, moraleDrop, normalMove));
       return continuing;
     }
 
-    IEnumerator CoMoveUnit(Unit unit, int moraleDrop) {
+    IEnumerator CoMoveUnit(Unit unit, int moraleDrop, bool normalMove) {
       UnitView view = hexMap.GetUnitView(unit);
       view.Move(unit.tile);
       while (view.Animating) { yield return null; }
@@ -156,9 +156,19 @@ namespace MonoNS
         ShowEffect(unit, new int[]{moraleDrop,0,0,0,0});
         while(ShowAnimating) { yield return null; }
       }
-      hexMap.GetAIParty().UpdateAlert();
-      hexMap.GetWarParty(unit).UpdateUnitStatus();
-
+      if (normalMove) {
+        Unit ambusher = hexMap.GetWarParty(unit, true).GetAmbusher(unit);
+        if (ambusher != null) {
+          hexMap.UnsetPath(unit);
+          if (!unit.IsAI()) {
+            hexMap.mouseController.Escape();
+          }
+          // TODO: for player ask attack confirmation
+          SurpriseAttack(ambusher, unit, true);
+          while (SurpriseAnimating) { yield return null; }
+        }
+        hexMap.UpdateUnitStatus(unit);
+      }
       // stash event
       // hexMap.eventStasher.Add(unit.rf.general, MonoNS.EventDialog.EventName.FarmDestroyed);
 
@@ -291,7 +301,7 @@ namespace MonoNS
     }
 
     public bool SurroundAnimating = false;
-    public void UnitSurrounded (HashSet<Unit> units, HashSet<Unit> accu) {
+    public void UnitSurrounded(HashSet<Unit> units, HashSet<Unit> accu) {
       SurroundAnimating = true;
       hexMap.cameraKeyboardController.DisableCamera();
       StartCoroutine(CoUnitSurrounded(units, accu));
@@ -1009,26 +1019,27 @@ namespace MonoNS
         ShowEffect(unit, new int[]{moraleDrop,0,0,0,0});
         while(ShowAnimating) { yield return null; }
       }
-      unit.SetPath(new Tile[]{unit.tile});
+      hexMap.UnsetPath(unit);
       hexMap.cameraKeyboardController.EnableCamera();
       ForceRetreatAnimating = false;
     }
 
     public bool SurpriseAnimating = false;
-    public void SurpriseAttack(Unit from, Unit to) {
+    public void SurpriseAttack(Unit from, Unit to, bool hitNrun = false) {
       if (!from.CanSurpiseAttack()) {
         return;
       }
       SurpriseAnimating = true;
       hexMap.cameraKeyboardController.DisableCamera();
-      StartCoroutine(CoSurpriseAttack(from, to));
+      StartCoroutine(CoSurpriseAttack(from, to, hitNrun));
     }
 
-    IEnumerator CoSurpriseAttack(Unit from, Unit to) {
+    IEnumerator CoSurpriseAttack(Unit from, Unit to, bool hitNrun) {
       bool surprised = to.CanBeSurprised() >= Util.Rand(1, 100);
+      Tile originPos = from.tile;
       from.SetPath(from.FindAttackPath(to.tile));
       while (from.GetPath().Length > 0) {
-        MoveUnit(from);
+        MoveUnit(from, null, false, false);
         while(MoveAnimating) { yield return null; }
       }
       while(MoveAnimating) { yield return null; }
@@ -1047,6 +1058,9 @@ namespace MonoNS
         hexMap.combatController.StartOperation(from, to, null, true);
         hexMap.combatController.CommenceOperation();
         while (hexMap.combatController.commenceOpAnimating) { yield return null; }
+      }
+      if (hitNrun) {
+        MoveUnit(from, originPos);
       }
       
       hexMap.cameraKeyboardController.EnableCamera();

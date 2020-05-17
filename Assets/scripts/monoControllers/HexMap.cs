@@ -678,6 +678,17 @@ namespace MonoNS
       return turnController.playerTurn ? GetPlayerParty() : GetAIParty();
     }
 
+    public void UpdateUnitStatus(Unit unit = null) {
+      if (SettlementMgr.Ready4Refresh) {
+        if (unit != null) {
+          GetWarParty(unit).UpdateUnitStatus();
+        } else {
+          GetAIParty().UpdateUnitStatus();
+          GetPlayerParty().UpdateUnitStatus();
+        } 
+      }
+    }
+
     public void CaptureHorse(Unit unit, int num) {
       GetWarParty(unit).CaptureHorse(num);
     }
@@ -756,6 +767,12 @@ namespace MonoNS
       lineCache = new List<GameObject>();
       lineLabels = new List<GameObject>();
       toggledUnitViews = new List<UnitView>();
+    }
+
+    public void UnsetPath(Unit unit) {
+      DehighlightArea();
+      DehighlightPath();
+      unit.SetPath(new Tile[]{unit.tile});
     }
 
     public void DehighlightPath()
@@ -863,12 +880,6 @@ namespace MonoNS
       CreateUnitViewAt(unit, tile);
     }
     
-    public void HighlightUnit(Unit unit)
-    {
-      if (unit == null && unit2GO.ContainsKey(unit)) return;
-      SetTroopSkin(unit2GO[unit], UnitHightlight);
-    }
-
     public void TargetUnit(Unit unit) {
       if (unit == null && unit2GO.ContainsKey(unit)) return;
       SetTroopSkin(unit2GO[unit], unit.IsVulnerable() ? CampRange : AttackRange);

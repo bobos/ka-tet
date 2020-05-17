@@ -42,11 +42,14 @@ Game Tips:
 47. 减员超过1/2 75%几率抗议不撤退，士气-10
 48. 同一回合内连续战败 士气累计-5, -10, -15, -20
 49. 部队战败状态战力-20%
-50. 部队获胜移动力+30
+50. 部队获胜移动力+40
 51. 士气为0部队追击被亡
+52. 没有援军被两面以上攻击，受到n*0.2f debuf, 将领formidable和在高地上例外
+53. infantry soldier >= 2000, 4 unaccessible tiles, unit is unattackable
 
-infantry soldier >= 2000, 4 unaccessible tiles, unit is unattackable
-埋伏可以被动触发
+被发现不能再奇袭
+
+make attacker drag long to expose the openning
 女真吐蕃限制招募数量为3
 大坝对进攻方不可见
 观天象只对玩家有效，ai不会利用气候

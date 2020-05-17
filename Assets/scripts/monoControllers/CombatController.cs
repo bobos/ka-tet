@@ -161,6 +161,16 @@ namespace MonoNS
       unitPredict.joinPossibility = 100;
       unitPredict.operationPoint = targetSettlement != null ? targetSettlement.GetDefendForce() : defender.unitCombatPoint;
       unitPredict.operationPoint = (int)(unitPredict.percentOfEffectiveForce * 0.01f * unitPredict.operationPoint);
+      if (targetSettlement == null && !surprised
+        && supportDefenders.Count == 0
+        && hiddenDefenders.Count == 0
+        && (supportAttackers.Count) >= 2
+        && !defender.rf.general.Has(Cons.formidable)
+        && !defender.tile.vantagePoint) {
+        // defender is attacked from more than 4 directions, punish the defend point by 50%
+        unitPredict.operationPoint = (int)(unitPredict.operationPoint * (1 - supportAttackers.Count * 0.2f));
+      }
+
       predict.defenders.Add(unitPredict);
       predict.defenderOptimPoints += unitPredict.operationPoint;
       if (targetSettlement == null) {
@@ -242,10 +252,10 @@ namespace MonoNS
       int smaller = predict.attackerOptimPoints > predict.defenderOptimPoints ? predict.defenderOptimPoints : predict.attackerOptimPoints;
       smaller = smaller < 1 ? 1 : smaller;
       float odds = bigger / smaller;
-      if (odds <= 1.9f) {
+      if (odds <= 2f) {
         predict.suggestedResultType = ResultType.Close;
       } else if (odds <= 3.5f) {
-        // 1.9x - 3.5x
+        // 2x - 3.5x
         predict.suggestedResultType = ResultType.Small;
       } else if (odds <= 5f) {
         predict.suggestedResultType = ResultType.Great;
@@ -265,12 +275,12 @@ namespace MonoNS
       int smaller = predict.attackerOptimPoints > defenderPoints ? defenderPoints : predict.attackerOptimPoints;
       smaller = smaller < 1 ? 1 : smaller;
       float odds = bigger / smaller;
-      if (odds <= 1.5f) {
+      if (odds <= 2f) {
         predict.trueSuggestedResultType = ResultType.Close;
-      } else if (odds <= 3f) {
-        // 1.5x - 3x
+      } else if (odds <= 3.5f) {
+        // 2x - 3x
         predict.trueSuggestedResultType = ResultType.Small;
-      } else if (odds <= 4.5f) {
+      } else if (odds <= 5f) {
         predict.trueSuggestedResultType = ResultType.Great;
       } else {
         predict.trueSuggestedResultType = ResultType.Crushing;
@@ -448,7 +458,7 @@ namespace MonoNS
         return 0;
       }
       if (type == ResultType.Close) {
-        return -3;
+        return -2;
       }
       if (type == ResultType.Small) {
         return -6;
@@ -570,7 +580,7 @@ namespace MonoNS
           if (noRetreat && !defender.IsVulnerable()
             && !defender.IsWarWeary()
             && (predict.attackerOptimPoints > (int)(predict.defenderOptimPoints * 1.5f))
-            && (defender.rf.general.Has(Cons.formidable) || Cons.FairChance())) {
+            && defender.rf.general.Has(Cons.formidable)) {
             predict.defenderOptimPoints = (int)(predict.defenderOptimPoints * (defender.IsCamping() ? 1.5f : 3));
             hexMap.dialogue.ShowNoRetreatEvent(defender);
             while (hexMap.dialogue.Animating) { yield return null; }
@@ -600,10 +610,10 @@ namespace MonoNS
           attackerCasualty = (int)(attackerTotal * 0.006f);
           defenderCasualty = (int)(attackerCasualty * 0.4f);
         } else if (resultLevel == ResultType.Close) {
-          // 1 - 1.5x odds
-          float m = 0.025f;
+          // 1 - 2x odds
+          float m = 0.015f;
           if (Cons.SlimChance()) {
-            m = 0.03f;
+            m = 0.02f;
           }
           if (atkWin) {
             defenderCasualty = (int)(defenderTotal * m);
@@ -942,7 +952,10 @@ namespace MonoNS
           }
         } else {
           bool notGonnaMove = loser.StickAsNailWhenDefeat();
-          if (Cons.FiftyFifty() && !notGonnaMove) {
+          if (!notGonnaMove && Cons.FiftyFifty()) {
+            notGonnaMove = true;
+          }
+          if (!notGonnaMove) {
             loser.defeating = true;
           }
           if (!loser.IsCamping() && !notGonnaMove) {

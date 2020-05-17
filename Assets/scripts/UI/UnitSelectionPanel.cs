@@ -309,7 +309,7 @@ namespace MonoNS
       stateStr += unit.IsWarWeary() ? "士气低落 " : "";
       stateStr += unit.IsStarving() ? "饥饿 " : "";
       stateStr += unit.GetStateName();
-      title.text += "\n" + (unit.hasNoOpenning ? "[准备充分]" : "") + (unit.alerted ? "[有所防备]" : "")
+      title.text += "\n" + (unit.hasNoOpenning ? "[无懈可击]" : "")
         + (unit.defeatStreak > 0 ? ("[战败累计:" + unit.defeatStreak + "]") : "" ) + stateStr;
       title.text += unit.GetHeatSickTurns() > 0 ? "\n痢疾: 将持续" + unit.GetHeatSickTurns() + "回合 " : "";
       title.text += unit.GetAltitudeSickTurns() > 0 ? "\n高原反应: 将持续" + unit.GetAltitudeSickTurns() + "回合" : "";

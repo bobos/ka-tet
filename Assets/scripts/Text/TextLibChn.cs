@@ -375,8 +375,8 @@ namespace TextNS
 
       {"trait_reckless", "鲁莽"},
       {"trait_reckless_description", "敌军退败容易主动追击"},
-      {"trait_brave", "勇猛"},
-      {"trait_brave_description", "战败时容易战死,不易受突袭影响"},
+      {"trait_brave", "无畏"},
+      {"trait_brave_description", "战败时容易战死"},
       {"trait_loyal", "忠义"},
       {"trait_loyal_description", "100%参加协同作战, 容易拒绝撤退指令"},
       {"trait_conservative", "保守"},

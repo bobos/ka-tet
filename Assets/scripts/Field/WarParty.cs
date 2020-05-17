@@ -2,6 +2,7 @@
 using UnitNS;
 using CourtNS;
 using MapTileNS;
+using System.Linq;
 
 namespace FieldNS
 {
@@ -219,17 +220,20 @@ namespace FieldNS
       return point;
     }
 
-    public void UpdateAlert() {
-      foreach(Unit unit in GetUnits()) {
-        unit.UpdateAlert();
-      }
-    }
-
     public void UpdateUnitStatus() {
       foreach(Unit unit in GetUnits()) {
         unit.UpdateInCommanderRange();
         unit.UpdateOpenningStatus();
       }
+    }
+
+    public Unit GetAmbusher(Unit target) {
+      foreach(Unit unit in GetUnits()) {
+        if (unit.CanSurpiseAttack() && unit.GetSurpriseTargets().Contains(target)) {
+          return unit;
+        }
+      }
+      return null;
     }
 
   }

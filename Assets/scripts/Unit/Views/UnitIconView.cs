@@ -14,10 +14,9 @@ namespace UnitNS
       TextMesh textMesh = this.transform.GetComponent<TextMesh>();
       Color color = Color.white;
       textMesh.text = (unit.defeating ? "∇∇" : (unit.chaos ? "∇∇∇": (unit.defeatStreak > 0 ? "∇": "")))
-        + (unit.hasNoOpenning ? "⎔" : "")
+        + (unit.hasNoOpenning ? "▦" : "")
         + (unit.fooled ? "⊜" : "")
         + (unit.inCommanderRange ? "㊬" : "")
-        + (unit.alerted ? "◎" : "")
         + (unit.rf.general.Has(Cons.ambusher) ? "☸": "")
         + (unit.rf.general.Has(Cons.tactic) ? "☯" : "")
         + (unit.rf.general.Has(Cons.fireBug) ? "♨" : "")

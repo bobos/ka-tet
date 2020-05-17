@@ -15,18 +15,15 @@ namespace UnitNS
     protected abstract Unit Clone();
 
     public const int MovementcostOnHill = 25;
-    public const int MovementcostOnHillRoad = 15;
     public const int MovementcostOnPlain = 15;
     public const int MovementCostOnUnaccesible = -1;
     public const int DisbandUnitUnder = 200;
+    public const int Sides2HaveVantage = 4;
 
     public const int L0Visibility = 1;
     public const int L1Visibility = 2;
     public const int L2Visibility = 3;
     public const int VantageVisibility = 5;
-    public const int L1DiscoverRange = 1; // under 2000
-    public const int L2DiscoverRange = 2; // > 4000
-    public const int ConcealCoolDownIn = 3;
     public Type type {
       get {
         return rf.type;
@@ -214,10 +211,10 @@ namespace UnitNS
     }
 
     public int CanBeSurprised() {
-      if (!IsOnField() || tile.vantagePoint || alerted) {
+      if (!IsOnField() || tile.vantagePoint || tile.field == FieldType.Forest || rf.general.Has(Cons.ambusher)) {
         return 0;
       }
-      return rf.general.Is(Cons.brave) || rf.general.Is(Cons.conservative) ? 20 : 95;
+      return rf.general.Is(Cons.conservative) ? 20 : 95;
     }
 
     public bool CanBeCrashed() {
@@ -299,7 +296,6 @@ namespace UnitNS
       canForecast = rf.general.Has(Cons.forecaster);
     }
 
-    public bool alerted = false;
     public bool charged = false;
     public bool retreated = false;
     public bool crashed = false;
@@ -310,7 +306,7 @@ namespace UnitNS
     }
 
     public bool CanSurpiseAttack() {
-      return CanAttack() && tile.field == FieldType.Forest;
+      return CanAttack() && tile.field == FieldType.Forest && rf.general.Has(Cons.ambusher);
     }
 
     public string GetStateName()
@@ -434,42 +430,43 @@ namespace UnitNS
 
       int cnt = 0;
       foreach(Tile t in tile.neighbours) {
-        if (!IsUnaccessibleToOpponent(t)) {
+        if (!IsControlledTile(t)) {
           cnt++;
         }
       }
-      return cnt < 3;
+      return cnt <= (6 - Sides2HaveVantage);
     }
 
-    bool IsTileSelfUnaccessible(Tile t) {
-      if (!t.Accessible()) {
-        if (t.settlement != null && t.settlement.owner.isAI != IsAI()) {
-          return false;
-        }
-        return true;
-      }
+    bool IsTileControlled(Tile t) {
       Unit u = t.GetUnit();
-      return u != null && u.IsAI() == IsAI();
+      if (t.Accessible()) {
+        // empty field
+        return u != null && u.IsAI() == IsAI();
+      } else {
+        // mountain, water, burning/flooding tile, or settlement
+        return t.settlement == null || t.settlement.owner.isAI == IsAI();
+      }
     }
 
-    bool IsUnaccessibleToOpponent(Tile t) {
-      if (IsTileSelfUnaccessible(t)) {
+    bool IsControlledTile(Tile t) {
+      if (IsTileControlled(t)) {
         return true;
       }
-      // accessible, could be an empty field, or enemy unit there or enemy settlement there
+      
+      // empty field or enemy controlled settlement
+      bool controlled = false;
       if (t.GetUnit() == null && t.settlement == null) {
-        // empty field
-        bool secured = true;
+        // just empty field
+        controlled = true;
         foreach(Tile t1 in t.neighbours) {
-          if (!IsTileSelfUnaccessible(t1)) {
-            secured = false;
+          if (!IsTileControlled(t1)) {
+            controlled = false;
             break;
           }
         }
-        return secured;
       }
 
-      return false;
+      return controlled;
     }
 
     public List<Unit> GetFalseOrderTargets() {
@@ -490,7 +487,7 @@ namespace UnitNS
       List<Unit> targets = new List<Unit>();
       foreach(Tile t in tiles) {
         Unit unit = t.GetUnit();
-        if (unit != null && unit.IsAI() != IsAI() && !unit.alerted && unit.IsOnField()) {
+        if (unit != null && unit.IsAI() != IsAI() && unit.CanBeSurprised() > 0) {
           targets.Add(unit);
         }
       }
@@ -498,9 +495,7 @@ namespace UnitNS
     }
 
     public Tile[] GetSurpriseAttackTiles() {
-      HashSet<Tile> tiles = hexMap.GetWarParty(this).GetVisibleArea();
-      return tile.GetNeighboursWithinRange(rf.general.Has(Cons.ambusher) ? 3 : 2,
-        (Tile t) => FindAttackPath(t).Length > 0 && tiles.Contains(t));
+      return tile.GetNeighboursWithinRange(GetVisibleRange(), (Tile t) => FindAttackPath(t).Length > 0);
     }
 
     public bool EnemyInSight() {
@@ -520,7 +515,8 @@ namespace UnitNS
       if (Cons.IsMist(weatherGenerator.currentWeather) && !rf.general.Has(Cons.outlooker)) {
         v = L0Visibility;
       } else {
-        v = vantage.IsAtVantagePoint() ? VantageVisibility : L1Visibility;
+        v = vantage.IsAtVantagePoint() ?
+          VantageVisibility : (rf.general.Has(Cons.ambusher) ? L2Visibility : L1Visibility);
         v = (IsCommander() && rf.general.commandSkill.GetCommandRange() > v) ?
           rf.general.commandSkill.GetCommandRange() : v;
       }
@@ -637,7 +633,7 @@ namespace UnitNS
     // Before new turn starts
     public int[] RefreshUnit()
     {
-      crashed = fooled = alerted = chaos = defeating = retreated
+      crashed = fooled = chaos = defeating = retreated
         = charged = poisionDone = fireDone = false;
       defeatStreak = 0;
       InitForecast();
@@ -943,6 +939,7 @@ namespace UnitNS
       //if (!IsAI()) {
         hexMap.OnWargameMove(this, h);
       //}
+      hexMap.UpdateUnitStatus(this);
       tile = h;
     }
 
@@ -1040,23 +1037,6 @@ namespace UnitNS
       }
       target.ignoreUnit = false;
       return tiles.ToArray();
-    }
-
-    public void UpdateAlert() {
-      if (!IsAI()) {
-        // only applicable to AI
-        return;
-      }
-      if (EnemyInSight()) {
-        alerted = true;
-        // remind nearby allies
-        foreach(Tile t in tile.neighbours) {
-          Unit ally = t.GetUnit();
-          if (ally != null && ally.IsAI() == IsAI()) {
-            ally.alerted = true;
-          }
-        }
-      }
     }
 
     // only for Ghost unit to pathfind settlement path
