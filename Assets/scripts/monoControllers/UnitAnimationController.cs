@@ -74,8 +74,15 @@ namespace MonoNS
         while(popAniController.Animating) { yield return null; }
       }
 
-      ShakeNearbyAllies(unit, unit.IsCommander() ? -20 : -5);
+      ShakeNearbyAllies(unit, 0);
       while (ShakeAnimating) { yield return null; }
+      int drop = unit.IsCommander() ? -20 : -10;
+      foreach(Unit u in hexMap.GetWarParty(unit).GetUnits()) {
+        u.rf.morale += drop;
+        ShowEffect(u, new int[]{drop, 0, 0, 0, 0}, null, true);
+      }
+      hexMap.turnController.Sleep(1);
+      while(hexMap.turnController.sleeping) { yield return null; }
       hexMap.cameraKeyboardController.EnableCamera();
       DestroyAnimating = false;
     }
@@ -150,7 +157,7 @@ namespace MonoNS
         while(ShowAnimating) { yield return null; }
       }
       hexMap.GetAIParty().UpdateAlert();
-      hexMap.GetWarParty(unit).UpdateCommandRange();
+      hexMap.GetWarParty(unit).UpdateUnitStatus();
 
       // stash event
       // hexMap.eventStasher.Add(unit.rf.general, MonoNS.EventDialog.EventName.FarmDestroyed);
@@ -693,8 +700,7 @@ namespace MonoNS
       if (to.rf.morale == 0) { dead = to.rf.soldiers; }
       int morale = from.IsHeavyCavalry() ? -6 : (from.IsCavalry() ? -5 : -3); 
       morale = morale * (from.rf.general.Has(Cons.hammer) ? 2 : 1);
-      to.rf.morale += morale;
-      ShowEffect(to, new int[]{morale,0,to.Killed(dead),0,0});
+      ShowEffect(to, new int[]{to.Defeat(morale),0,to.Killed(dead),0,0});
       while (ShowAnimating) { yield return null; }
       if (to.rf.soldiers <= Unit.DisbandUnitUnder) {
         // unit disbanded
@@ -1010,6 +1016,9 @@ namespace MonoNS
 
     public bool SurpriseAnimating = false;
     public void SurpriseAttack(Unit from, Unit to) {
+      if (!from.CanSurpiseAttack()) {
+        return;
+      }
       SurpriseAnimating = true;
       hexMap.cameraKeyboardController.DisableCamera();
       StartCoroutine(CoSurpriseAttack(from, to));

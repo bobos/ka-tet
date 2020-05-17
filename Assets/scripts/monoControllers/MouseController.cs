@@ -96,6 +96,7 @@ namespace MonoNS
     public bool nearEnemy = false;
     public bool nearWater = false;
     public List<Unit> nearbyEnemey = null;
+    public List<Unit> attackableEnemy = null;
     public Unit[] surpriseTargets = null;
     public List<Unit> falseOrderTargets = null;
     public Tile[] accessibleTiles = null;
@@ -109,6 +110,7 @@ namespace MonoNS
       nearEnemy = false;
       nearWater = false;
       nearbyEnemey = new List<Unit>();
+      attackableEnemy = new List<Unit>();
       nearbyAlly = new HashSet<Unit>();
       nearFireTiles = new List<Tile>();
       surpriseTargets = new Unit[]{};
@@ -148,6 +150,9 @@ namespace MonoNS
         if (u != null && u.IsAI() != isAI) {
           nearEnemy = true;
           nearbyEnemey.Add(u);
+          if (!u.hasNoOpenning) {
+            attackableEnemy.Add(u);
+          }
         }
 
         if (tile.settlement != null && tile.settlement.owner.isAI != selectedUnit.IsAI()) {
@@ -247,14 +252,14 @@ namespace MonoNS
         mouseMode = mode.attack;
         Update_CurrentFunc = UpdateUnitAttack;
         msgBox.Show("选择目标!");
-        foreach(Unit u in nearbyEnemey) {
+        foreach(Unit u in attackableEnemy) {
           hexMap.TargetUnit(u);
         }
       }
 
       if (action == ActionController.actionName.FeintDefeat)
       {
-        mouseMode = mode.attack;
+        mouseMode = mode.feint;
         Update_CurrentFunc = UpdateUnitFeintDefeat;
         msgBox.Show("选择目标!");
         foreach(Unit u in nearbyEnemey) {
@@ -297,7 +302,7 @@ namespace MonoNS
         mouseMode = mode.attack;
         Update_CurrentFunc = UpdateUnitCharge;
         msgBox.Show("选择目标!");
-        foreach(Unit u in nearbyEnemey) {
+        foreach(Unit u in attackableEnemy) {
           if (u.CanBeShaked(selectedUnit) > 0) {
             hexMap.TargetUnit(u);
           }
@@ -309,7 +314,7 @@ namespace MonoNS
         mouseMode = mode.attack;
         Update_CurrentFunc = UpdateUnitBreakThrough;
         msgBox.Show("选择突破目标!");
-        foreach(Unit u in nearbyEnemey) {
+        foreach(Unit u in attackableEnemy) {
           if (u.CanBeShaked(selectedUnit) > 0) {
             hexMap.TargetUnit(u);
           }
@@ -355,6 +360,7 @@ namespace MonoNS
       camera,
       move,
       attack,
+      feint,
       surpriseAttack,
       falseOrder,
       repos,
@@ -397,7 +403,7 @@ namespace MonoNS
         }
       }
 
-      if (mouseMode == mode.attack) {
+      if (mouseMode == mode.attack || mouseMode == mode.feint) {
         foreach(Unit u in nearbyEnemey) {
           hexMap.SetUnitSkin(u);
         }
@@ -536,8 +542,9 @@ namespace MonoNS
         }
       }
 
-      if (mouseMode == mode.attack) {
-        if(u != null && u.IsAI() != selectedUnit.IsAI() && nearbyEnemey.Contains(u)) {
+      if (mouseMode == mode.attack || mouseMode == mode.feint) {
+        if(u != null && u.IsAI() != selectedUnit.IsAI() &&
+          (mouseMode == mode.feint ? nearbyEnemey.Contains(u) : attackableEnemy.Contains(u))) {
           targetUnit = u;
           return;
         }

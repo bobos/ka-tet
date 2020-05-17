@@ -37,9 +37,5 @@ namespace  UnitNS
         disarmorDefDebuf, supply, plainSickness);
     }
 
-    protected override bool Concealable() {
-      return false;
-    }
-
   }
 }

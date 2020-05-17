@@ -200,6 +200,10 @@ namespace MapTileNS
       {
         UpdateMovementcost();
       }
+      if (SettlementMgr.Ready4Refresh) {
+        hexMap.GetPlayerParty().UpdateUnitStatus();
+        hexMap.GetAIParty().UpdateUnitStatus();
+      }
       // TODO remove this
       hexMap.GetTileView(this).RefreshVisual();
     }

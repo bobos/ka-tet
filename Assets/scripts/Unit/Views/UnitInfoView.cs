@@ -37,6 +37,23 @@ namespace UnitNS
       return ret;
     }
 
+    public static string NumIcons(int num, bool isCalvary) {
+      string icon = isCalvary ? "♞" : "♟";
+      int n = num % 2000;
+      int u = (int)((num - n) / 2000);
+      string ret = "";
+      for (int i = 0; i < u; i++)
+      {
+        ret += icon;
+      }
+      if (n >= 1500) {
+        ret += icon;
+      } else if (n > Unit.DisbandUnitUnder) {
+        ret += (isCalvary ? "♘" : "♙");
+      }
+      return ret;
+    }
+
     public void SetName(Unit unit) {
       int totalDefendPoint = unit.unitCombatPoint;
       foreach(Tile tile in unit.tile.neighbours) {
@@ -56,9 +73,8 @@ namespace UnitNS
         + "[" + unit.rf.province.region.Name() + "]"
         + "("+unit.allowedAtmpt+")"
         + "\n"
-        + unit.rf.province.Name() + "-"
         + unit.GetUnitName()
-        + "[" + Shorten(unit.rf.soldiers) + "]\n"
+        + NumIcons(unit.rf.soldiers, unit.IsCavalry()) + "\n"
         + "攻: " + Shorten(unit.unitCombatPoint) + "\n防: " + Shorten(totalDefendPoint) + "\n"
         + unit.rf.morale + "/" + unit.rf.province.region.MoralePunishLine() + "/" + unit.rf.province.region.RetreatThreshold();
       textMesh.fontSize = 45;

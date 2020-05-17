@@ -45,6 +45,8 @@ Game Tips:
 50. 部队获胜移动力+30
 51. 士气为0部队追击被亡
 
+infantry soldier >= 2000, 4 unaccessible tiles, unit is unattackable
+埋伏可以被动触发
 女真吐蕃限制招募数量为3
 大坝对进攻方不可见
 观天象只对玩家有效，ai不会利用气候

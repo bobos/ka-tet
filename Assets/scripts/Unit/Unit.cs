@@ -179,7 +179,7 @@ namespace UnitNS
     }
 
     public int CanBeShaked(Unit charger) {
-      if (!IsOnField() || tile.vantagePoint || IsHeavyCavalry() || IsVulnerable()) {
+      if (hasNoOpenning || !IsOnField() || tile.vantagePoint || IsHeavyCavalry() || IsVulnerable()) {
         return 0;
       }
       int chance = 0;
@@ -309,6 +309,10 @@ namespace UnitNS
       return allowedAtmpt > 0;
     }
 
+    public bool CanSurpiseAttack() {
+      return CanAttack() && tile.field == FieldType.Forest;
+    }
+
     public string GetStateName()
     {
       if (state == State.Camping)
@@ -423,6 +427,51 @@ namespace UnitNS
       return true;
     }
 
+    public bool HasNoOpenning() {
+      if (IsVulnerable() || IsCamping() || IsCavalry() || rf.soldiers < 2000) {
+        return false;
+      }
+
+      int cnt = 0;
+      foreach(Tile t in tile.neighbours) {
+        if (!IsUnaccessibleToOpponent(t)) {
+          cnt++;
+        }
+      }
+      return cnt < 3;
+    }
+
+    bool IsTileSelfUnaccessible(Tile t) {
+      if (!t.Accessible()) {
+        if (t.settlement != null && t.settlement.owner.isAI != IsAI()) {
+          return false;
+        }
+        return true;
+      }
+      Unit u = t.GetUnit();
+      return u != null && u.IsAI() == IsAI();
+    }
+
+    bool IsUnaccessibleToOpponent(Tile t) {
+      if (IsTileSelfUnaccessible(t)) {
+        return true;
+      }
+      // accessible, could be an empty field, or enemy unit there or enemy settlement there
+      if (t.GetUnit() == null && t.settlement == null) {
+        // empty field
+        bool secured = true;
+        foreach(Tile t1 in t.neighbours) {
+          if (!IsTileSelfUnaccessible(t1)) {
+            secured = false;
+            break;
+          }
+        }
+        return secured;
+      }
+
+      return false;
+    }
+
     public List<Unit> GetFalseOrderTargets() {
       List<Unit> units = new List<Unit>();
       foreach(Tile t in tile.GetNeighboursWithinRange<Tile>(GetVisibleRange(), (Tile _tile) => true)) {
@@ -450,7 +499,7 @@ namespace UnitNS
 
     public Tile[] GetSurpriseAttackTiles() {
       HashSet<Tile> tiles = hexMap.GetWarParty(this).GetVisibleArea();
-      return tile.GetNeighboursWithinRange(rf.general.Has(Cons.ambusher) ? 4 : 2,
+      return tile.GetNeighboursWithinRange(rf.general.Has(Cons.ambusher) ? 3 : 2,
         (Tile t) => FindAttackPath(t).Length > 0 && tiles.Contains(t));
     }
 
@@ -572,12 +621,13 @@ namespace UnitNS
       return moraleIncr;
     }
 
-    protected virtual bool Concealable() {
-      return false;
-    }
-
     public void UpdateInCommanderRange() {
       inCommanderRange = UnderCommand();
+    }
+
+    public bool hasNoOpenning = false;
+    public void UpdateOpenningStatus() {
+      hasNoOpenning = HasNoOpenning(); 
     }
 
     // ==============================================================

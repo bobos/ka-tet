@@ -35,10 +35,5 @@ namespace  UnitNS
       return Create(true, rf, tile, state, kia, movementRemaining, disarmorDefDebuf, supply, plainSickness);
     }
 
-    protected override bool Concealable() {
-      return false;
-    }
-
-
   }
 }
