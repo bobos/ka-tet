@@ -205,7 +205,7 @@ namespace MonoNS
       
       if (!hexMap.combatController.start && hexMap.deployDone && unit.CanAttack()) {
         FeintDefeatButton.SetActive(unit.rf.general.Has(Cons.tactic) && mouseController.nearEnemy);
-        SurpriseAttackButton.SetActive(mouseController.surpriseTargets.Length > 0 && unit.CanSurpiseAttack());
+        SurpriseAttackButton.SetActive(mouseController.surpriseTargets.Length > 0 && unit.CanSurpriseAttack());
       }
 
       if (mouseController.nearAlly && hexMap.deployDone && !hexMap.wargameController.IsWargameUnit(unit)) {

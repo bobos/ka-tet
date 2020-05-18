@@ -47,8 +47,7 @@ Game Tips:
 52. 没有援军被两面以上攻击，受到n*0.2f debuf, 将领formidable和在高地上例外
 53. infantry soldier >= 2000, 4 unaccessible tiles, unit is unattackable
 
-被发现不能再奇袭
-
+佯败只能使用一次
 make attacker drag long to expose the openning
 女真吐蕃限制招募数量为3
 大坝对进攻方不可见

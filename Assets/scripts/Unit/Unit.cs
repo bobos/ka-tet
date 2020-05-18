@@ -305,8 +305,13 @@ namespace UnitNS
       return allowedAtmpt > 0;
     }
 
-    public bool CanSurpiseAttack() {
-      return CanAttack() && tile.field == FieldType.Forest && rf.general.Has(Cons.ambusher);
+    public bool CanSurpriseAttack(HashSet<Tile> tiles = null) {
+      bool ret = CanAttack() && tile.field == FieldType.Forest && rf.general.Has(Cons.ambusher);
+      if (ret) {
+        tiles = tiles == null ? hexMap.GetWarParty(this, true).GetVisibleArea() : tiles;
+        ret = !tiles.Contains(tile);
+      }
+      return ret;
     }
 
     public string GetStateName()

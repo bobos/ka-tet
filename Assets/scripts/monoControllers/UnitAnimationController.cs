@@ -640,7 +640,7 @@ namespace MonoNS
         scared = from.rf.general.Has(Cons.hammer) ? Cons.FiftyFifty() : scared;
       }
       if (!scared && from.rf.IsChargeBuffed()) {
-        scared = Cons.HighlyLikely();
+        scared = Cons.FiftyFifty();
       }
       // morale, movement, killed, attack, def
       ShowEffect(from, new int[]{0,0,from.Killed(Util.Rand(2, 15)),0,0}, view);
@@ -1026,7 +1026,7 @@ namespace MonoNS
 
     public bool SurpriseAnimating = false;
     public void SurpriseAttack(Unit from, Unit to, bool hitNrun = false) {
-      if (!from.CanSurpiseAttack()) {
+      if (!from.CanSurpriseAttack()) {
         return;
       }
       SurpriseAnimating = true;

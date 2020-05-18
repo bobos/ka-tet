@@ -228,8 +228,9 @@ namespace FieldNS
     }
 
     public Unit GetAmbusher(Unit target) {
+      HashSet<Tile> area = target.hexMap.GetWarParty(target).GetVisibleArea();
       foreach(Unit unit in GetUnits()) {
-        if (unit.CanSurpiseAttack() && unit.GetSurpriseTargets().Contains(target)) {
+        if (unit.CanSurpriseAttack(area) && unit.GetSurpriseTargets().Contains(target)) {
           return unit;
         }
       }
