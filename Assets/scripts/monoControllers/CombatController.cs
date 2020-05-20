@@ -158,17 +158,18 @@ namespace MonoNS
       unitPredict = new UnitPredict();
       unitPredict.unit = defender;
       unitPredict.percentOfEffectiveForce = surprised ? 20 : 100;
+      unitPredict.percentOfEffectiveForce += defender.hasNoOpenning ? 200 : 0;
       unitPredict.joinPossibility = 100;
       unitPredict.operationPoint = targetSettlement != null ? targetSettlement.GetDefendForce() : defender.unitCombatPoint;
       unitPredict.operationPoint = (int)(unitPredict.percentOfEffectiveForce * 0.01f * unitPredict.operationPoint);
+      int supporterCnt = supportDefenders.Count + hiddenDefenders.Count;
       if (targetSettlement == null && !surprised
-        && supportDefenders.Count == 0
-        && hiddenDefenders.Count == 0
-        && (supportAttackers.Count) >= 2
+        && supporterCnt < 2 
+        && supportAttackers.Count >= 2
         && !defender.rf.general.Has(Cons.formidable)
         && !defender.tile.vantagePoint) {
-        // defender is attacked from more than 4 directions, punish the defend point by 50%
-        unitPredict.operationPoint = (int)(unitPredict.operationPoint * (1 - supportAttackers.Count * 0.2f));
+        // no wings, flank punishment
+        unitPredict.operationPoint = (int)(unitPredict.operationPoint * (1 - (supportAttackers.Count - supporterCnt + 1) * 0.15f));
       }
 
       predict.defenders.Add(unitPredict);
@@ -254,10 +255,10 @@ namespace MonoNS
       float odds = bigger / smaller;
       if (odds <= 2f) {
         predict.suggestedResultType = ResultType.Close;
-      } else if (odds <= 3.5f) {
-        // 2x - 3.5x
+      } else if (odds <= 4f) {
+        // 2x - 4x
         predict.suggestedResultType = ResultType.Small;
-      } else if (odds <= 5f) {
+      } else if (odds <= 6f) {
         predict.suggestedResultType = ResultType.Great;
       } else {
         predict.suggestedResultType = ResultType.Crushing;
@@ -277,10 +278,10 @@ namespace MonoNS
       float odds = bigger / smaller;
       if (odds <= 2f) {
         predict.trueSuggestedResultType = ResultType.Close;
-      } else if (odds <= 3.5f) {
+      } else if (odds <= 4f) {
         // 2x - 3x
         predict.trueSuggestedResultType = ResultType.Small;
-      } else if (odds <= 5f) {
+      } else if (odds <= 6f) {
         predict.trueSuggestedResultType = ResultType.Great;
       } else {
         predict.trueSuggestedResultType = ResultType.Crushing;
@@ -461,7 +462,7 @@ namespace MonoNS
         return -2;
       }
       if (type == ResultType.Small) {
-        return -6;
+        return -3;
       }
       if (type == ResultType.Great) {
         return -10;
@@ -627,7 +628,7 @@ namespace MonoNS
             defenderCasualty = (int)(attackerCasualty * 0.45f);
           }
         } else {
-          float factor = 0.04f;
+          float factor = 0.02f;
           if (resultLevel == ResultType.Great) {
             factor = 0.06f;
           }
@@ -846,9 +847,10 @@ namespace MonoNS
         Unit loser = atkWin ? defender : attacker;
         List<Unit> supporters = new List<Unit>();
         HashSet<Unit> chasers = new HashSet<Unit>();
-        foreach(UnitPredict up in atkWin ? predict.defenders : predict.attackers) {
-          if (!up.unit.IsGone()) {
-            supporters.Add(up.unit);
+        foreach(Tile t in loser.tile.neighbours) {
+          Unit u = t.GetUnit();
+          if (u != null && u.IsAI() == loser.IsAI() && !u.IsCamping()) {
+            supporters.Add(u);
           }
         }
 
@@ -892,14 +894,19 @@ namespace MonoNS
             while (hexMap.unitAniController.ShakeAnimating) { yield return null; }
           }
         } else if (!feint && resultLevel != ResultType.Close) {
-          hexMap.unitAniController.ShakeNearbyAllies(loser, 0);
-          while (hexMap.unitAniController.ShakeAnimating) { yield return null; }
+          if (resultLevel != ResultType.Small || Cons.SlimChance()) {
+            hexMap.unitAniController.ShakeNearbyAllies(loser, 0);
+            while (hexMap.unitAniController.ShakeAnimating) { yield return null; }
+          }
         }
 
         HashSet<Unit> geese = new HashSet<Unit>();
         List<Unit> gonnaMove = new List<Unit>();
         List<Unit> failedToMove = new List<Unit>();
-        if (resultLevel != ResultType.Close) {
+        if (resultLevel == ResultType.Great
+         || resultLevel == ResultType.Crushing
+         || resultLevel == ResultType.FeintDefeat
+         || (resultLevel == ResultType.Small && Cons.SlimChance())) {
           foreach(Unit unit in supporters) {
             bool notMoving = unit.StickAsNailWhenDefeat();
             if (!notMoving || feint) {
@@ -940,7 +947,7 @@ namespace MonoNS
             }
           }
 
-          if (resultLevel == ResultType.Small && gonnaMove.Contains(loser)) {
+          if (resultLevel == ResultType.Small && gonnaMove.Contains(loser) && Cons.EvenChance()) {
             loser.defeating = true;
           }
 
@@ -949,21 +956,6 @@ namespace MonoNS
             // settlement loss
             hexMap.unitAniController.TakeSettlement(attacker, loser.tile.settlement);
             while (hexMap.unitAniController.TakeAnimating) { yield return null; }
-          }
-        } else {
-          bool notGonnaMove = loser.StickAsNailWhenDefeat();
-          if (!notGonnaMove && Cons.FiftyFifty()) {
-            notGonnaMove = true;
-          }
-          if (!notGonnaMove) {
-            loser.defeating = true;
-          }
-          if (!loser.IsCamping() && !notGonnaMove) {
-            hexMap.unitAniController.Scatter(new List<Unit>(){loser}, failedToMove, -10);
-            while (hexMap.unitAniController.ScatterAnimating) { yield return null; }
-            if (!failedToMove.Contains(loser)) {
-              geese.Add(loser);
-            }
           }
         }
 

@@ -176,7 +176,7 @@ namespace UnitNS
     }
 
     public int CanBeShaked(Unit charger) {
-      if (hasNoOpenning || !IsOnField() || tile.vantagePoint || IsHeavyCavalry() || IsVulnerable()) {
+      if (!IsOnField() || tile.vantagePoint || IsHeavyCavalry() || IsVulnerable()) {
         return 0;
       }
       int chance = 0;
@@ -205,6 +205,10 @@ namespace UnitNS
 
       if (rf.general.Is(Cons.conservative)) {
         chance += 50;
+      }
+
+      if (hasNoOpenning) {
+        chance -= 90;
       }
 
       return chance < 0 ? 0 : (chance > 100 ? 100 : chance);
@@ -610,7 +614,7 @@ namespace UnitNS
     }
 
     public int Defeat(int moraleDrop) {
-      int drop = moraleDrop + (defeatStreak++ * -5);
+      int drop = moraleDrop + (defeatStreak++ * -2);
       rf.morale += drop;
       return drop;
     }
@@ -818,7 +822,7 @@ namespace UnitNS
     }
 
     public float GetChaosBuf() {
-      return chaos ? -0.99f : (defeating ? -0.4f : (defeatStreak > 0 ? -0.2f : 0f));
+      return chaos ? -0.99f : (defeating ? -0.4f : (defeatStreak * -0.1f));
     }
 
     // ==============================================================

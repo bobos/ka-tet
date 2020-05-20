@@ -5,7 +5,7 @@ namespace  UnitNS
 {
   public class Cavalry : Unit
   {
-    public const float MovementCostModifierOnHill = 1.1f;
+    public const float MovementCostModifierOnHill = 1f;
     public const float MovementCostModifierOnPlainOrRoad = 0.65f;
     public const int MinTroopNum = 500;
 
