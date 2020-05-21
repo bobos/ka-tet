@@ -58,9 +58,7 @@ namespace MonoNS
       string finalResult = "";
       if (playerWin) {
         // player win
-        if (result == CombatController.ResultType.Close) {
-          finalResult = "event_operationResult_weCloseWin";
-        } else if (result == CombatController.ResultType.FeintDefeat) {
+        if (result == CombatController.ResultType.FeintDefeat) {
           finalResult = "event_operationResult_theyFeintDefeat";
         } else if (result == CombatController.ResultType.Small) {
           finalResult = "event_operationResult_weSmallWin";
@@ -70,9 +68,7 @@ namespace MonoNS
           finalResult = "event_operationResult_weCrushingWin";
         }
       } else {
-        if (result == CombatController.ResultType.Close) {
-          finalResult = "event_operationResult_theyCloseWin";
-        } else if (result == CombatController.ResultType.FeintDefeat) {
+        if (result == CombatController.ResultType.FeintDefeat) {
           finalResult = "event_operationResult_weFeintDefeat";
         } else if (result == CombatController.ResultType.Small) {
           finalResult = "event_operationResult_theySmallWin";

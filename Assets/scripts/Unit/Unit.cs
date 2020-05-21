@@ -591,7 +591,7 @@ namespace UnitNS
               MyCommander().commandSkill.TurningTide() &&
               Cons.MostLikely()) ||
               (rf.general.Has(Cons.holdTheGround) && Cons.MostLikely()) ||
-              (rf.IsSpecial() && Cons.MostLikely());
+              (rf.IsSpecial() && Cons.MostLikely()) || Cons.FiftyFifty();
     }
 
     public bool RetreatOnDefeat() {

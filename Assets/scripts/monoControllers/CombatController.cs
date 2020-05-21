@@ -253,10 +253,7 @@ namespace MonoNS
       int smaller = predict.attackerOptimPoints > predict.defenderOptimPoints ? predict.defenderOptimPoints : predict.attackerOptimPoints;
       smaller = smaller < 1 ? 1 : smaller;
       float odds = bigger / smaller;
-      if (odds <= 2f) {
-        predict.suggestedResultType = ResultType.Close;
-      } else if (odds <= 4f) {
-        // 2x - 4x
+      if (odds <= 3.5f) {
         predict.suggestedResultType = ResultType.Small;
       } else if (odds <= 6f) {
         predict.suggestedResultType = ResultType.Great;
@@ -276,10 +273,7 @@ namespace MonoNS
       int smaller = predict.attackerOptimPoints > defenderPoints ? defenderPoints : predict.attackerOptimPoints;
       smaller = smaller < 1 ? 1 : smaller;
       float odds = bigger / smaller;
-      if (odds <= 2f) {
-        predict.trueSuggestedResultType = ResultType.Close;
-      } else if (odds <= 4f) {
-        // 2x - 3x
+      if (odds <= 3.5f) {
         predict.trueSuggestedResultType = ResultType.Small;
       } else if (odds <= 6f) {
         predict.trueSuggestedResultType = ResultType.Great;
@@ -315,28 +309,25 @@ namespace MonoNS
 
     int JoinPossibilityBaseOnOdds(Unit unit, ResultType result) {
       bool inRange = unit.inCommanderRange;
-      if (inRange && unit.MyCommander().commandSkill.ObeyMyOrder()) {
+      if ((inRange && unit.MyCommander().commandSkill.ObeyMyOrder()) ||
+       unit.rf.general.Is(Cons.loyal)) {
         return 100;
       }
 
-      if (result == ResultType.Close) {
-        return inRange ? 100 : 90;
+      if (result == ResultType.Small) {
+        return inRange ? 100 : 95;
       }
 
       // when odds is greater than close
       if (unit.rf.general.Is(Cons.cunning)) {
-        return 50;
-      }
-
-      if (result == ResultType.Small) {
-        return inRange ? 90 : 80;
+        return 60;
       }
 
       if (result == ResultType.Great) {
-        return inRange ? 80 : 65;
+        return inRange ? 90 : 80;
       }
 
-      return inRange ? 65 : 50;
+      return inRange ? 80 : 70;
     }
 
     public void CancelOperation() {
@@ -431,7 +422,6 @@ namespace MonoNS
 
     public enum ResultType {
       FeintDefeat,
-      Close,
       Small,
       Great,
       Crushing
@@ -439,9 +429,6 @@ namespace MonoNS
 
     int GetVicBuf(ResultType type) {
       if (type == ResultType.FeintDefeat) {
-        return 0;
-      }
-      if (type == ResultType.Close) {
         return 0;
       }
       if (type == ResultType.Small) {
@@ -458,14 +445,11 @@ namespace MonoNS
       if (type == ResultType.FeintDefeat) {
         return 0;
       }
-      if (type == ResultType.Close) {
+      if (type == ResultType.Small) {
         return -2;
       }
-      if (type == ResultType.Small) {
-        return -3;
-      }
       if (type == ResultType.Great) {
-        return -10;
+        return -5;
       }
       return -15;
     }
@@ -610,27 +594,10 @@ namespace MonoNS
         if (resultLevel == ResultType.FeintDefeat) {
           attackerCasualty = (int)(attackerTotal * 0.006f);
           defenderCasualty = (int)(attackerCasualty * 0.4f);
-        } else if (resultLevel == ResultType.Close) {
-          // 1 - 2x odds
-          float m = 0.015f;
-          if (Cons.SlimChance()) {
-            m = 0.02f;
-          }
-          if (atkWin) {
-            defenderCasualty = (int)(defenderTotal * m);
-          } else {
-            attackerCasualty = (int)(attackerTotal * m);
-          }
-
-          if (atkWin) {
-            attackerCasualty = (int)(defenderCasualty * 0.45f);
-          } else {
-            defenderCasualty = (int)(attackerCasualty * 0.45f);
-          }
         } else {
-          float factor = 0.02f;
+          float factor = 0.015f;
           if (resultLevel == ResultType.Great) {
-            factor = 0.06f;
+            factor = 0.05f;
           }
           if (resultLevel == ResultType.Crushing) {
             factor = 0.01f * Util.Rand(10, 25);
@@ -643,8 +610,7 @@ namespace MonoNS
           }
 
           if (resultLevel == ResultType.Small) {
-            // 2x - 3x
-            int modifier = Util.Rand(3, 4);
+            int modifier = Util.Rand(4, 5);
             if (atkWin) {
               attackerCasualty = (int)(defenderCasualty * modifier * 0.1f);
             } else {
@@ -653,8 +619,7 @@ namespace MonoNS
           }
 
           if (resultLevel == ResultType.Great) {
-            // 3x - 4x
-            int modifier = Util.Rand(2, 3);
+            int modifier = Util.Rand(3, 4);
             if (atkWin) {
               attackerCasualty = (int)(defenderCasualty * modifier* 0.1f);
             } else {
@@ -663,7 +628,6 @@ namespace MonoNS
           }
 
           if (resultLevel == ResultType.Crushing) {
-            // 3.9x - 6x odds
             int modifier = Util.Rand(1, 2);
             if (atkWin) {
               attackerCasualty = (int)(defenderCasualty * modifier * 0.1f);
@@ -884,7 +848,7 @@ namespace MonoNS
             drop = -3;
           }
           if (resultLevel == ResultType.Great) {
-            drop = -8;
+            drop = -6;
           }
           if (resultLevel == ResultType.Crushing) {
             drop = -10;
@@ -893,20 +857,16 @@ namespace MonoNS
             hexMap.unitAniController.ShakeNearbyAllies(loser, drop);
             while (hexMap.unitAniController.ShakeAnimating) { yield return null; }
           }
-        } else if (!feint && resultLevel != ResultType.Close) {
-          if (resultLevel != ResultType.Small || Cons.SlimChance()) {
-            hexMap.unitAniController.ShakeNearbyAllies(loser, 0);
-            while (hexMap.unitAniController.ShakeAnimating) { yield return null; }
-          }
         }
 
         HashSet<Unit> geese = new HashSet<Unit>();
         List<Unit> gonnaMove = new List<Unit>();
         List<Unit> failedToMove = new List<Unit>();
-        if (resultLevel == ResultType.Great
-         || resultLevel == ResultType.Crushing
-         || resultLevel == ResultType.FeintDefeat
-         || (resultLevel == ResultType.Small && Cons.SlimChance())) {
+        if (resultLevel != ResultType.Small || Cons.SlimChance()) {
+          if (!loser.IsCommander() && !feint) {
+            hexMap.unitAniController.ShakeNearbyAllies(loser, 0);
+            while (hexMap.unitAniController.ShakeAnimating) { yield return null; }
+          }
           foreach(Unit unit in supporters) {
             bool notMoving = unit.StickAsNailWhenDefeat();
             if (!notMoving || feint) {
@@ -947,7 +907,7 @@ namespace MonoNS
             }
           }
 
-          if (resultLevel == ResultType.Small && gonnaMove.Contains(loser) && Cons.EvenChance()) {
+          if (resultLevel == ResultType.Small && gonnaMove.Contains(loser)) {
             loser.defeating = true;
           }
 
