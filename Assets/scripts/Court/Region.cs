@@ -39,7 +39,7 @@ namespace CourtNS
     {
       if (unitType == Type.Infantry)
         return 10;
-      return 40;
+      return 30;
     }
 
     public override int Will()
@@ -61,11 +61,8 @@ namespace CourtNS
       return new List<Region>(){Cons.nvzhen, Cons.han};
     }
 
-    public override float LevelBuf(Type unitType) {
-      if (unitType == Type.Cavalry) {
-        return 0.25f;
-      }
-      return 0.1f;
+    public override float LevelBuf(Type _unitType) {
+      return 0.5f;
     }
 
   }
@@ -87,7 +84,7 @@ namespace CourtNS
     {
       if (unitType == Type.Infantry)
         return 10;
-      return 30;
+      return 25;
     }
 
     public override int Will()
@@ -109,7 +106,10 @@ namespace CourtNS
       return new List<Region>();
     }
 
-    public override float LevelBuf(Type _unitType) {
+    public override float LevelBuf(Type unitType) {
+      if (unitType == Type.Cavalry) {
+        return 1f;
+      }
       return 0.5f;
     }
 
@@ -132,7 +132,7 @@ namespace CourtNS
     {
       if (unitType == Type.Infantry)
         return 10;
-      return 30;
+      return 25;
     }
 
     public override int Will()
@@ -155,6 +155,9 @@ namespace CourtNS
     }
 
     public override float LevelBuf(Type unitType) {
+      if (unitType == Type.Cavalry) {
+        return 1f;
+      }
       return 0.5f;
     }
 
@@ -177,7 +180,7 @@ namespace CourtNS
     {
       if (unitType == Type.Infantry)
         return 10;
-      return 30;
+      return 20;
     }
 
     public override int Will()
@@ -200,7 +203,10 @@ namespace CourtNS
     }
 
     public override float LevelBuf(Type unitType) {
-      return 0.3f;
+      if (unitType == Type.Cavalry) {
+        return 1f;
+      }
+      return 0.5f;
     }
 
   }
@@ -222,7 +228,7 @@ namespace CourtNS
     {
       if (unitType == Type.Infantry)
         return 10;
-      return 25;
+      return 20;
     }
 
     public override int Will()
@@ -244,7 +250,10 @@ namespace CourtNS
       return new List<Region>();
     }
 
-    public override float LevelBuf(Type _unitType) {
+    public override float LevelBuf(Type unitType) {
+      if (unitType == Type.Cavalry) {
+        return 1.5f;
+      }
       return 1f;
     }
   }

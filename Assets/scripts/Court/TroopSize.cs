@@ -9,14 +9,14 @@ namespace CourtNS {
 
     public int GetTroopSize(bool infantry) {
       if (troopSize == 1) {
-        return infantry ? 4000 : 1000;
+        return infantry ? 4000 : 800;
       }
 
       if (troopSize == 2) {
-        return infantry ? 8000 : 2000;
+        return infantry ? 8000 : 1500;
       }
 
-      return infantry ? 10000 : 3000;
+      return infantry ? 10000 : 2000;
     }
 
   }

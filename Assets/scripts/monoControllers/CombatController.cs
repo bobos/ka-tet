@@ -80,10 +80,33 @@ namespace MonoNS
     }
 
     int AttackerPoint(Unit unit, Settlement targetSettlement) {
+      int point = unit.unitCombatPoint;
       if (targetSettlement != null && unit.rf.general.Has(Cons.diminisher)) {
-        return (int)(unit.unitCombatPoint * 1.5f);
+        point = (int)(point * 1.5f);
       }
 
+      if (
+        Cons.IsRain(hexMap.weatherGenerator.currentWeather) ||
+        Cons.IsSnow(hexMap.weatherGenerator.currentWeather) ||
+        Cons.IsHeat(hexMap.weatherGenerator.currentWeather)) {
+        point = (int)(point * 0.8f); 
+      }
+
+      if (Cons.IsHeavyRain(hexMap.weatherGenerator.currentWeather)) {
+        point = (int)(point * 0.6f); 
+      }
+
+      if (Cons.IsBlizard(hexMap.weatherGenerator.currentWeather)) {
+        point = (int)(point * 0.4f); 
+      }
+
+      return point;
+    }
+
+    int DefenderPoint(Unit unit) {
+      if (!unit.vantage.IsAtVantagePoint() && !unit.IsCavalry() && unit.tile.terrian == TerrianType.Hill) {
+        return (int)(unit.unitCombatPoint * 1.2f);
+      }
       return unit.unitCombatPoint;
     }
 
@@ -137,7 +160,6 @@ namespace MonoNS
       SetGaleVantage(attacker, defender, unitPredict);
       unitPredict.operationPoint = attacker.IsCamping() ?
         attacker.unitCampingAttackCombatPoint : AttackerPoint(attacker, targetSettlement);
-      unitPredict.operationPoint = (int)(unitPredict.percentOfEffectiveForce * 0.01f * unitPredict.operationPoint);
       predict.attackers.Add(unitPredict);
       predict.attackerOptimPoints += unitPredict.operationPoint;
       hexMap.ShowAttackArrow(attacker, targetUnit, unitPredict);
@@ -149,7 +171,6 @@ namespace MonoNS
         SetGaleVantage(unit, defender, unitPredict);
         unitPredict.joinPossibility = JoinPossibility(unit, true);
         unitPredict.operationPoint = AttackerPoint(unit, targetSettlement);
-        unitPredict.operationPoint = (int)(unitPredict.percentOfEffectiveForce * 0.01f * unitPredict.operationPoint);
         predict.attackers.Add(unitPredict);
         predict.attackerOptimPoints += unitPredict.operationPoint;
       }
@@ -160,14 +181,14 @@ namespace MonoNS
       unitPredict.percentOfEffectiveForce = surprised ? 20 : 100;
       unitPredict.percentOfEffectiveForce += defender.hasNoOpenning ? 200 : 0;
       unitPredict.joinPossibility = 100;
-      unitPredict.operationPoint = targetSettlement != null ? targetSettlement.GetDefendForce() : defender.unitCombatPoint;
+      unitPredict.operationPoint = targetSettlement != null ? targetSettlement.GetDefendForce() : DefenderPoint(defender);
       unitPredict.operationPoint = (int)(unitPredict.percentOfEffectiveForce * 0.01f * unitPredict.operationPoint);
       int supporterCnt = supportDefenders.Count + hiddenDefenders.Count;
       if (targetSettlement == null && !surprised
         && supporterCnt < 2 
         && supportAttackers.Count >= 2
         && !defender.rf.general.Has(Cons.formidable)
-        && !defender.tile.vantagePoint) {
+        && !defender.vantage.IsAtVantagePoint()) {
         // no wings, flank punishment
         unitPredict.operationPoint = (int)(unitPredict.operationPoint * (1 - (supportAttackers.Count - supporterCnt + 1) * 0.15f));
       }
@@ -197,8 +218,7 @@ namespace MonoNS
         unitPredict.unit = unit;
         unitPredict.percentOfEffectiveForce = 100;
         unitPredict.joinPossibility = JoinPossibility(unit, false);
-        unitPredict.operationPoint = unit.unitCombatPoint;
-        unitPredict.operationPoint = (int)(unitPredict.percentOfEffectiveForce * 0.01f * unitPredict.operationPoint);
+        unitPredict.operationPoint = DefenderPoint(unit);
         predict.defenders.Add(unitPredict);
         predict.defenderOptimPoints += unitPredict.operationPoint;
       }
@@ -208,8 +228,7 @@ namespace MonoNS
         unitPredict.unit = unit;
         unitPredict.percentOfEffectiveForce = 100;
         unitPredict.joinPossibility = JoinPossibility(unit, false);
-        unitPredict.operationPoint = unit.unitCombatPoint;
-        unitPredict.operationPoint = (int)(unitPredict.percentOfEffectiveForce * 0.01f * unitPredict.operationPoint);
+        unitPredict.operationPoint = DefenderPoint(unit);
         predict.hiddenDefenders.Add(unitPredict);
         predict.hiddenDefenderOptimPoints += unitPredict.operationPoint;
       }
@@ -566,7 +585,7 @@ namespace MonoNS
             && !defender.IsWarWeary()
             && (predict.attackerOptimPoints > (int)(predict.defenderOptimPoints * 1.5f))
             && defender.rf.general.Has(Cons.formidable)) {
-            predict.defenderOptimPoints = (int)(predict.defenderOptimPoints * (defender.IsCamping() ? 1.5f : 3));
+            predict.defenderOptimPoints = (int)(predict.defenderOptimPoints * 3);
             hexMap.dialogue.ShowNoRetreatEvent(defender);
             while (hexMap.dialogue.Animating) { yield return null; }
             hexMap.popAniController.Show(hexMap.GetUnitView(defender), 
@@ -809,7 +828,7 @@ namespace MonoNS
         }
 
         Unit loser = atkWin ? defender : attacker;
-        List<Unit> supporters = new List<Unit>();
+        List<Unit> supporters = new List<Unit>{loser};
         HashSet<Unit> chasers = new HashSet<Unit>();
         foreach(Tile t in loser.tile.neighbours) {
           Unit u = t.GetUnit();
@@ -867,10 +886,14 @@ namespace MonoNS
             hexMap.unitAniController.ShakeNearbyAllies(loser, 0);
             while (hexMap.unitAniController.ShakeAnimating) { yield return null; }
           }
-          foreach(Unit unit in supporters) {
-            bool notMoving = unit.StickAsNailWhenDefeat();
-            if (!notMoving || feint) {
-              gonnaMove.Add(unit);
+          if (feint) {
+            gonnaMove.Add(loser);
+          } else {
+            foreach(Unit unit in supporters) {
+              bool notMoving = unit.StickAsNailWhenDefeat();
+              if (!notMoving || feint) {
+                gonnaMove.Add(unit);
+              }
             }
           }
           if (gonnaMove.Count > 2 && !feint) {

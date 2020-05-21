@@ -424,10 +424,32 @@ namespace MonoNS
         ShowEffect(conflict.unit2, new int[]{conflict.moralDrop, 0, 0, 0, 0}, null, true); 
         hexMap.turnController.Sleep(1);
         while(hexMap.turnController.sleeping) { yield return null; }
-        ShowEffect(unit, new int[]{0, 0, conflict.unit1Dead, 0, 0}, null, true); 
-        ShowEffect(conflict.unit2, new int[]{0, 0, conflict.unit2Dead, 0, 0}, null, true); 
+        ShowEffect(unit, new int[]{0, 0, conflict.unit1Dead, 0, 0}, null, true);
+        ShowEffect(conflict.unit2, new int[]{0, 0, conflict.unit2Dead, 0, 0}, null, true);
         hexMap.turnController.Sleep(1);
         while(hexMap.turnController.sleeping) { yield return null; }
+        Tile moveTile = null;
+        foreach(Tile tile in conflict.unit2.tile.neighbours) {
+          if (tile.Deployable(conflict.unit2)) {
+            moveTile = tile;
+            break;
+          }
+        }
+        if (moveTile != null) {
+          MoveUnit(conflict.unit2, moveTile);
+          while(MoveAnimating) { yield return null; };
+        } else {
+          foreach(Tile tile in unit.tile.neighbours) {
+            if (tile.Deployable(unit)) {
+              moveTile = tile;
+              break;
+            }
+          }
+          if (moveTile != null) {
+            MoveUnit(unit, moveTile);
+            while(MoveAnimating) { yield return null; };
+          }
+        }
       }
 
       if (Cons.FiftyFifty()) {
@@ -703,12 +725,12 @@ namespace MonoNS
       popAniController.Show(view, textLib.get("pop_chasing"), Color.green);
       while (popAniController.Animating) { yield return null; }
       int dead = to.chaos ?
-        (from.rf.soldiers / (from.IsHeavyCavalry() ? 15 : (from.IsCavalry() ? 20 : 25)))
-      : (from.rf.soldiers / (from.IsHeavyCavalry() ? 20 : (from.IsCavalry() ? 25 : 30)));
+        (from.rf.soldiers / (from.IsCavalry() ? 8 : 60))
+      : (from.rf.soldiers / (from.IsCavalry() ? 16 : 100));
       dead = from.rf.general.Has(Cons.hammer) ? (int)(dead * 1.5f) : dead;
       dead = dead > to.rf.soldiers ? to.rf.soldiers : dead;
       if (to.rf.morale == 0) { dead = to.rf.soldiers; }
-      int morale = from.IsHeavyCavalry() ? -6 : (from.IsCavalry() ? -5 : -3); 
+      int morale = from.IsCavalry() ? -6 : -2; 
       morale = morale * (from.rf.general.Has(Cons.hammer) ? 2 : 1);
       ShowEffect(to, new int[]{to.Defeat(morale),0,to.Killed(dead),0,0});
       while (ShowAnimating) { yield return null; }

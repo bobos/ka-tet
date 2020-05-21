@@ -186,7 +186,7 @@ public abstract class Settlement: Building
         unit.rf.general.Has(Cons.mechanician) ? 1.5f : 1f
       ));
       if (IsUnderSiege() && unit.rf.general.Has(Cons.formidable)) {
-        point = point * 3;
+        point = (int)(point * 1.5f);
       }
       force += point;
     }

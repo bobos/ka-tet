@@ -944,7 +944,7 @@ namespace MonoNS
         }
         fieldType = FieldType.Wild;
         tile.SetTerrianType(TerrianType.Mountain);
-        if(Cons.SlimChance()) {
+        if(Cons.EvenChance()) {
           tile.burnable = true;
         }
       }
@@ -953,7 +953,6 @@ namespace MonoNS
         if (!Cons.HighlyLikely()) {
           // vantage point
           prefab = MountainRootPrefab;
-          tile.burnable = true;
           tile.SetTerrianType(TerrianType.Hill);
           fieldType = FieldType.Wild;
           tile.vantagePoint = true;
@@ -961,9 +960,9 @@ namespace MonoNS
           prefab = HighGroundPrefab;
           fieldType = Cons.MostLikely() ? FieldType.Wild : (Cons.MostLikely() ? FieldType.Forest : FieldType.Wild);
           tile.SetTerrianType(TerrianType.Hill);
-          if(fieldType == FieldType.Wild && Cons.SlimChance()) {
-            tile.burnable = true;
-          }
+        }
+        if(fieldType == FieldType.Wild && Cons.EvenChance()) {
+          tile.burnable = true;
         }
       }
       else if (elevation >= HeightFlat)
@@ -971,6 +970,9 @@ namespace MonoNS
         prefab = HexPrefab;
         tile.SetTerrianType(TerrianType.Plain);
         fieldType = Cons.FairChance() ? FieldType.Wild : (Cons.SlimChance() ? FieldType.Forest : FieldType.Wild);
+        if(fieldType == FieldType.Wild && Cons.FairChance()) {
+          tile.burnable = true;
+        }
       }
       else
       {

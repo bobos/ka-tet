@@ -270,8 +270,8 @@ namespace MapTileNS
           (terrian == TerrianType.Plain) ?
           Cavalry.MovementCostModifierOnPlainOrRoad : Cavalry.MovementCostModifierOnHill));
         if (unit.IsHeavyCavalry()) {
-          // movement punishment on elite cavalry
-          ret = (int)(ret * 1.2f);
+          // movement punishment on heavy cavalry
+          ret = (int)(ret * 1.5f);
         }
       }
 

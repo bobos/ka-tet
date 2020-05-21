@@ -18,7 +18,7 @@
 
       if (unit.tile.terrian == MapTileNS.TerrianType.Hill) {
         if (IsAtVantagePoint()) {
-          return 0.5f;
+          return 1f;
         }
 
         if (unit.IsCavalry()) {
