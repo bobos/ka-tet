@@ -98,6 +98,7 @@ namespace MonoNS
     public List<Unit> nearbyEnemey = null;
     public Unit[] surpriseTargets = null;
     public List<Unit> falseOrderTargets = null;
+    public List<Unit> alienateTargets = null;
     public Tile[] accessibleTiles = null;
     public HashSet<Unit> nearbyAlly = null;
 
@@ -114,6 +115,7 @@ namespace MonoNS
       surpriseTargets = new Unit[]{};
       accessibleTiles = new Tile[]{};
       falseOrderTargets = new List<Unit>();
+      alienateTargets = new List<Unit>();
     }
 
     public void PrepareUnitSelection() {
@@ -167,6 +169,7 @@ namespace MonoNS
         accessibleTiles = selectedUnit.GetAccessibleTiles();
         Unit u = selectedUnit != null ? selectedUnit : hexMap.settlementViewPanel.selectedUnit;
         falseOrderTargets = u.GetFalseOrderTargets();
+        alienateTargets = u.GetAlienateTargets();
       }
     }
 
@@ -292,6 +295,21 @@ namespace MonoNS
         }
       }
 
+      if (action == ActionController.actionName.Alienate)
+      {
+        if (alienateTargets.Count == 0) {
+          msgBox.Show("无可离间目标!");
+          Escape();
+        } else {
+          mouseMode = mode.alienate;
+          Update_CurrentFunc = UpdateUnitAlienate;
+          msgBox.Show("选择目标!");
+          foreach(Unit u in alienateTargets) {
+            hexMap.TargetUnit(u);
+          }
+        }
+      }
+
       if (action == ActionController.actionName.CHARGE)
       {
         mouseMode = mode.attack;
@@ -358,6 +376,7 @@ namespace MonoNS
       feint,
       surpriseAttack,
       falseOrder,
+      alienate,
       repos,
       sabotage,
       fire
@@ -412,6 +431,12 @@ namespace MonoNS
 
       if (mouseMode == mode.falseOrder) {
         foreach(Unit u in falseOrderTargets) {
+          hexMap.SetUnitSkin(u);
+        }
+      }
+
+      if (mouseMode == mode.alienate) {
+        foreach(Unit u in alienateTargets) {
           hexMap.SetUnitSkin(u);
         }
       }
@@ -564,6 +589,13 @@ namespace MonoNS
         }
       }
 
+      if (mouseMode == mode.alienate) {
+        if(u != null && u.IsAI() != selectedUnit.IsAI() && alienateTargets.Contains(u)) {
+          targetUnit = u;
+          return;
+        }
+      }
+
       if (mouseMode == mode.repos && nearbyAlly.Contains(u)) {
         targetUnit = u;
         return;
@@ -688,6 +720,29 @@ namespace MonoNS
         if (targetUnit != null) {
           msgBox.Show("");
           hexMap.actionController.FalseOrder(selectedUnit, targetUnit);
+          Escape();
+        }
+      } else if (!Util.eq<Tile>(tileUnderMouse, selectedUnit.tile))
+      {
+        Unit u = tileUnderMouse.GetUnit();
+        if (u != null)
+        {
+          hover.Show(u.Name());
+        }
+      }
+    }
+
+    void UpdateUnitAlienate()
+    {
+      if (tileUnderMouse == null) {
+        return;
+      }
+      if (Input.GetMouseButtonUp(0))
+      {
+        ClickOnTile();
+        if (targetUnit != null) {
+          msgBox.Show("");
+          hexMap.actionController.Alienate(selectedUnit, targetUnit);
           Escape();
         }
       } else if (!Util.eq<Tile>(tileUnderMouse, selectedUnit.tile))

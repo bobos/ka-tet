@@ -175,8 +175,18 @@ namespace UnitNS
       return Util.eq<General>(hexMap.GetWarParty(this).commanderGeneral, rf.general);
     }
 
+    int _chargeChance = 100;
+    public int chargeChance {
+      get {
+        return _chargeChance;
+      }
+      set {
+        _chargeChance = value < 0 ? 0 : value;
+      }
+    }
+
     public int CanBeShaked(Unit charger) {
-      if (!IsOnField() || tile.vantagePoint || IsHeavyCavalry() || IsVulnerable()) {
+      if (!IsOnField() || tile.vantagePoint || IsHeavyCavalry() || IsVulnerable() || chargeChance == 0) {
         return 0;
       }
       int chance = 0;
@@ -189,22 +199,15 @@ namespace UnitNS
           chance = -30;
         }
       }
-      if (charger.IsHeavyCavalry()) {
-        if (Util.eq<Rank>(rf.rank, Cons.rookie)) {
-          chance += 70;
-        } else {
-          chance += 40;
-        }
+
+      if (Util.eq<Rank>(rf.rank, Cons.rookie)) {
+        chance += 40;
       } else {
-        if (Util.eq<Rank>(rf.rank, Cons.rookie)) {
-          chance += 30;
-        } else {
-          chance += 10;
-        }
+        chance += 20;
       }
 
       if (rf.general.Is(Cons.conservative)) {
-        chance += 50;
+        chance += 30;
       }
 
       if (hasNoOpenning) {
@@ -246,7 +249,7 @@ namespace UnitNS
     }
 
     public bool CanCharge() {
-      return IsHeavyCavalry() && !charged && rf.soldiers >= 800;
+      return IsHeavyCavalry() && !charged && !IsSurrounded();
     }
 
     public bool CanBreakThrough() {
@@ -269,17 +272,25 @@ namespace UnitNS
     public bool fooled = false;
     public bool fooledOnce = false;
     public bool canFalseOrder = false;
+    public bool canAlienate = false;
     public bool CanFalseOrder() {
       return canFalseOrder;
     }
 
+    public bool CanAlienate() {
+      return canAlienate;
+    }
+
     void InitFalseOrder() {
-      canFalseOrder = rf.general.Has(Cons.falseCommander);
+      canFalseOrder = canAlienate = rf.general.Has(Cons.conspirator);
     }
 
     public bool FalseOrder(Unit target) {
       canFalseOrder = false;
       bool work = false;
+      if (target.rf.general.Is(Cons.cunning)) {
+        return work;
+      }
       if (target.inCommanderRange) {
         work = target.rf.general.Is(Cons.calm) ? Cons.FairChance(): (target.rf.general.Is(Cons.conservative) ? Cons.SlimChance() : false);
       } else {
@@ -289,6 +300,11 @@ namespace UnitNS
         target.fooled = target.fooledOnce = true;
       }
       return target.fooled;
+    }
+
+    public ConflictResult Alienate(Unit target) {
+      canAlienate = false;
+      return target.unitConflict.Occur();
     }
 
     public bool Forecast() {
@@ -433,7 +449,7 @@ namespace UnitNS
     }
 
     public bool HasNoOpenning() {
-      if (IsVulnerable() || IsCamping() || IsCavalry() || rf.soldiers < 2000) {
+      if (IsVulnerable() || IsCamping()) {
         return false;
       }
 
@@ -482,7 +498,18 @@ namespace UnitNS
       List<Unit> units = new List<Unit>();
       foreach(Tile t in tile.GetNeighboursWithinRange<Tile>(GetVisibleRange(), (Tile _tile) => true)) {
         Unit unit = t.GetUnit();
-        if (unit != null && unit.IsAI() != IsAI() && !unit.fooledOnce) {
+        if (unit != null && unit.IsAI() != IsAI() && !unit.fooledOnce && !unit.IsCommander()) {
+          units.Add(unit);
+        }
+      }
+      return units;
+    }
+
+    public List<Unit> GetAlienateTargets() {
+      List<Unit> units = new List<Unit>();
+      foreach(Tile t in tile.GetNeighboursWithinRange<Tile>(GetVisibleRange(), (Tile _tile) => true)) {
+        Unit unit = t.GetUnit();
+        if (unit != null && unit.IsAI() != IsAI() && !unit.unitConflict.conflicted && !unit.IsCommander()) {
           units.Add(unit);
         }
       }
@@ -505,18 +532,6 @@ namespace UnitNS
 
     public Tile[] GetSurpriseAttackTiles() {
       return tile.GetNeighboursWithinRange(GetVisibleRange(), (Tile t) => FindAttackPath(t).Length > 0);
-    }
-
-    public bool EnemyInSight() {
-      bool yes = false;
-      Tile[] myRange = GetVisibleArea();
-      foreach(Unit u in hexMap.GetWarParty(this, true).GetUnits()) {
-        if (u.IsOnField() && myRange.Contains(u.tile)) {
-          yes = true;
-          break;
-        }
-      }
-      return yes;
     }
 
     public int GetVisibleRange() {
@@ -746,7 +761,6 @@ namespace UnitNS
       return (int)(
         // ghost unit doesnt have vantage
         rf.mov *
-        (IsStarving() ? 0.8f : 1) *
         (IsSick() ? 0.4f : 1));
     }
 

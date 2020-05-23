@@ -11,7 +11,7 @@ namespace CourtNS {
         Cons.hammer, Cons.mechanician, Cons.diminisher, Cons.staminaManager,
         Cons.formidable, Cons.generous, Cons.runner, Cons.fireBug,
         Cons.holdTheGround, Cons.breaker, Cons.improvisor, Cons.tactic,
-        Cons.outlooker, Cons.ambusher, Cons.doctor, Cons.falseCommander};
+        Cons.outlooker, Cons.ambusher, Cons.doctor, Cons.conspirator};
       int total = candidates.Length;
       int luckNum = Util.Rand(0, total * 2);
       if (luckNum < total) {
@@ -255,16 +255,16 @@ namespace CourtNS {
     }
   }
 
-  public class FalseCommander: Ability {
-    public FalseCommander() {
+  public class Conspirator: Ability {
+    public Conspirator() {
     }
 
     public override string Name() {
-      return Cons.GetTextLib().get("ability_falseCommander");
+      return Cons.GetTextLib().get("ability_conspirator");
     }
 
     public override string Description() {
-      return Cons.GetTextLib().get("ability_falseCommander_description");
+      return Cons.GetTextLib().get("ability_conspirator_description");
     }
   }
 

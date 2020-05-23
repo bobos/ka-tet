@@ -414,44 +414,6 @@ namespace MonoNS
         }
       }
 
-      ConflictResult conflict = unit.unitConflict.Occur();
-      if (conflict.moralDrop != 0) {
-        hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetUnitView(unit).transform.position);
-        while (hexMap.cameraKeyboardController.fixingCamera) { yield return null; }
-        hexMap.dialogue.ShowUnitConflict(unit, conflict.unit2);
-        while (hexMap.dialogue.Animating) { yield return null; }
-        ShowEffect(unit, new int[]{conflict.moralDrop, 0, 0, 0, 0}, null, true); 
-        ShowEffect(conflict.unit2, new int[]{conflict.moralDrop, 0, 0, 0, 0}, null, true); 
-        hexMap.turnController.Sleep(1);
-        while(hexMap.turnController.sleeping) { yield return null; }
-        ShowEffect(unit, new int[]{0, 0, conflict.unit1Dead, 0, 0}, null, true);
-        ShowEffect(conflict.unit2, new int[]{0, 0, conflict.unit2Dead, 0, 0}, null, true);
-        hexMap.turnController.Sleep(1);
-        while(hexMap.turnController.sleeping) { yield return null; }
-        Tile moveTile = null;
-        foreach(Tile tile in conflict.unit2.tile.neighbours) {
-          if (tile.Deployable(conflict.unit2)) {
-            moveTile = tile;
-            break;
-          }
-        }
-        if (moveTile != null) {
-          MoveUnit(conflict.unit2, moveTile);
-          while(MoveAnimating) { yield return null; };
-        } else {
-          foreach(Tile tile in unit.tile.neighbours) {
-            if (tile.Deployable(unit)) {
-              moveTile = tile;
-              break;
-            }
-          }
-          if (moveTile != null) {
-            MoveUnit(unit, moveTile);
-            while(MoveAnimating) { yield return null; };
-          }
-        }
-      }
-
       if (Cons.FiftyFifty()) {
         int ret = unit.plainSickness.Occur();
         if (ret != 0) {
@@ -516,7 +478,7 @@ namespace MonoNS
 
     IEnumerator CoBury(Unit unit) {
       if (!unit.ApplyDiscipline(Cons.FiftyFifty())) {
-        int moraleDrop = -3;
+        int moraleDrop = -1;
         unit.rf.morale += moraleDrop;
         ShowEffect(unit, new int[]{moraleDrop,0,0,0,0});
         while(ShowAnimating) { yield return null; }
@@ -658,12 +620,6 @@ namespace MonoNS
       if (scared && to.rf.general.Has(Cons.holdTheGround) && Cons.FiftyFifty()) {
         scared = false;
       }
-      if (!scared) {
-        scared = from.rf.general.Has(Cons.hammer) ? Cons.FiftyFifty() : scared;
-      }
-      if (!scared && from.rf.IsChargeBuffed()) {
-        scared = Cons.FiftyFifty();
-      }
       // morale, movement, killed, attack, def
       ShowEffect(from, new int[]{0,0,from.Killed(Util.Rand(2, 15)),0,0}, view);
       while (ShowAnimating) { yield return null; }
@@ -698,6 +654,7 @@ namespace MonoNS
       } else {
         popAniController.Show(hexMap.GetUnitView(to), textLib.get("pop_holding"), Color.green);
         while (popAniController.Animating) { yield return null; }
+        to.chargeChance -= 50;
         int morale1 = -2;
         from.rf.morale += morale1;
         ShowEffect(from, new int[]{morale1,0,0,0,0}, view, true);
@@ -993,6 +950,68 @@ namespace MonoNS
       }
       hexMap.cameraKeyboardController.EnableCamera();
       FalseOrderAnimating = false;
+    }
+
+    public bool AlienateAnimating = false;
+    public void Alienate(Unit unit, Unit target) {
+      if (!unit.CanAlienate()) {
+        return;
+      }
+      AlienateAnimating = true;
+      hexMap.cameraKeyboardController.DisableCamera();
+      StartCoroutine(CoAlienate(unit, target));
+    }
+
+    IEnumerator CoAlienate(Unit from, Unit target) {
+      hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(target.tile).transform.position);
+      while(hexMap.cameraKeyboardController.fixingCamera) { yield return null; }
+
+      ConflictResult conflict = from.Alienate(target);
+      if (conflict.moralDrop != 0) {
+        popAniController.Show(hexMap.GetUnitView(target), textLib.get("pop_alienated"), Color.green);
+        while(popAniController.Animating) { yield return null; }
+        Unit unit = conflict.unit1;
+
+        hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetUnitView(unit).transform.position);
+        while (hexMap.cameraKeyboardController.fixingCamera) { yield return null; }
+        hexMap.dialogue.ShowUnitConflict(unit, conflict.unit2);
+        while (hexMap.dialogue.Animating) { yield return null; }
+        ShowEffect(unit, new int[]{conflict.moralDrop, 0, 0, 0, 0}, null, true); 
+        ShowEffect(conflict.unit2, new int[]{conflict.moralDrop, 0, 0, 0, 0}, null, true); 
+        hexMap.turnController.Sleep(1);
+        while(hexMap.turnController.sleeping) { yield return null; }
+        ShowEffect(unit, new int[]{0, 0, conflict.unit1Dead, 0, 0}, null, true);
+        ShowEffect(conflict.unit2, new int[]{0, 0, conflict.unit2Dead, 0, 0}, null, true);
+        hexMap.turnController.Sleep(1);
+        while(hexMap.turnController.sleeping) { yield return null; }
+        Tile moveTile = null;
+        foreach(Tile tile in conflict.unit2.tile.neighbours) {
+          if (tile.Deployable(conflict.unit2)) {
+            moveTile = tile;
+            break;
+          }
+        }
+        if (moveTile != null) {
+          MoveUnit(conflict.unit2, moveTile);
+          while(MoveAnimating) { yield return null; };
+        } else {
+          foreach(Tile tile in unit.tile.neighbours) {
+            if (tile.Deployable(unit)) {
+              moveTile = tile;
+              break;
+            }
+          }
+          if (moveTile != null) {
+            MoveUnit(unit, moveTile);
+            while(MoveAnimating) { yield return null; };
+          }
+        }
+      } else {
+        popAniController.Show(hexMap.GetUnitView(target), textLib.get("pop_alienateFailed"), Color.white);
+        while(popAniController.Animating) { yield return null; }
+      }
+      hexMap.cameraKeyboardController.EnableCamera();
+      AlienateAnimating = false;
     }
 
     public bool ForceRetreatAnimating = false;

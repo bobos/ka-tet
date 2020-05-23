@@ -22,20 +22,33 @@ namespace UnitNS
 
     public ConflictResult Occur() {
       ConflictResult result = new ConflictResult();
-      if (conflicted || unit.ApplyDiscipline(Cons.HighlyLikely())) {
+      if (conflicted || unit.IsCommander() || unit.ApplyDiscipline(false) || unit.rf.general.Is(Cons.cunning)) {
         return result;
       }
 
+      conflicted = true;
       List<Region> conflictRegions = unit.rf.province.region.GetConflictRegions();
       Unit target = null;
       foreach(Tile tile in unit.tile.neighbours) {
         Unit u = tile.GetUnit();
         if (u != null &&
-        u.IsAI() == unit.IsAI() &&
-        !u.unitConflict.conflicted &&
-        conflictRegions.Contains(u.rf.province.region)) {
-          target = u;
-          break;
+        !u.IsCommander() &&
+        u.IsAI() == unit.IsAI()) {
+          int chance = unit.inCommanderRange ? 0 : 40;
+          if(conflictRegions.Contains(u.rf.province.region)) {
+            chance += 50;
+          } else if (!Util.eq<Region>(u.rf.province.region, unit.rf.province.region)) {
+            chance += 30;
+          } else if (!Util.eq<Province>(u.rf.province, unit.rf.province)) {
+            chance += 20;
+          } else {
+            chance = 0;
+          }
+
+          if (Util.Rand(1, 100) < chance) {
+            target = u;
+            break;
+          }
         }
       }
 
@@ -43,7 +56,6 @@ namespace UnitNS
         return result;
       }
 
-      conflicted = target.unitConflict.conflicted = true;
       result.moralDrop = -Util.Rand(3, 5);
       result.unit1 = unit;
       result.unit2 = target;

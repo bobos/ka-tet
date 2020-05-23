@@ -961,7 +961,7 @@ namespace MonoNS
           fieldType = Cons.MostLikely() ? FieldType.Wild : (Cons.MostLikely() ? FieldType.Forest : FieldType.Wild);
           tile.SetTerrianType(TerrianType.Hill);
         }
-        if(fieldType == FieldType.Wild && Cons.EvenChance()) {
+        if(fieldType == FieldType.Wild && Cons.FairChance()) {
           tile.burnable = true;
         }
       }
@@ -970,7 +970,7 @@ namespace MonoNS
         prefab = HexPrefab;
         tile.SetTerrianType(TerrianType.Plain);
         fieldType = Cons.FairChance() ? FieldType.Wild : (Cons.SlimChance() ? FieldType.Forest : FieldType.Wild);
-        if(fieldType == FieldType.Wild && Cons.FairChance()) {
+        if(fieldType == FieldType.Wild && Cons.SlimChance()) {
           tile.burnable = true;
         }
       }

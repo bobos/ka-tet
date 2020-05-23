@@ -18,7 +18,7 @@ namespace UnitNS
         + (unit.fooled ? "⊜" : "")
         + (unit.inCommanderRange ? "㊬" : "")
         + (unit.rf.general.Has(Cons.ambusher) ? "☸": "")
-        + (unit.rf.general.Has(Cons.tactic) ? "☯" : "")
+        + (unit.rf.general.Has(Cons.tactic) ? "≜" : "")
         + (unit.rf.general.Has(Cons.fireBug) ? "♨" : "")
         + (unit.rf.general.Has(Cons.runner) ? "↹" : "")
         + (unit.rf.general.Has(Cons.staminaManager) ? "♋" : "")
@@ -33,7 +33,7 @@ namespace UnitNS
         + (unit.rf.general.Has(Cons.holdTheGround) ? "☍" : "")
         + (unit.rf.general.Has(Cons.forecaster) ? "➹" : "")
         + (unit.rf.general.Has(Cons.doctor) ? "✚" : "")
-        + (unit.rf.general.Has(Cons.falseCommander) ? "㊙" : "")
+        + (unit.rf.general.Has(Cons.conspirator) ? "☯" : "")
         + (unit.ImproviseOnSupply() ? "❥" : "");
       textMesh.fontSize = 65;
       textMesh.color = color;

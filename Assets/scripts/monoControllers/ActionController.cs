@@ -279,6 +279,12 @@ namespace MonoNS
       }
     }
 
+    public void OnAlienate() {
+      if (onBtnClick != null) {
+        onBtnClick(actionName.Alienate);
+      }
+    }
+
     public enum actionName
     {
       MOVE,
@@ -317,7 +323,8 @@ namespace MonoNS
       FeintDefeat,
       Pursue,
       Forecast,
-      FalseOrder
+      FalseOrder,
+      Alienate
     }
 
     // Make sure this is sequential
@@ -387,6 +394,10 @@ namespace MonoNS
 
     public bool FalseOrder(Unit unit, Unit unit1) {
       return DoAction(unit, unit1, null, actionName.FalseOrder);
+    }
+
+    public bool Alienate(Unit unit, Unit unit1) {
+      return DoAction(unit, unit1, null, actionName.Alienate);
     }
 
     public bool DoAction(Unit unit, Unit unit1, Tile tile, actionName name)
@@ -460,6 +471,10 @@ namespace MonoNS
       if (name == actionName.FalseOrder)
       {
         StartCoroutine(DoFalseOrder(unit, unit1));
+      }
+      if (name == actionName.Alienate)
+      {
+        StartCoroutine(DoAlienate(unit, unit1));
       }
       return true;
     }
@@ -625,6 +640,15 @@ namespace MonoNS
     IEnumerator DoFalseOrder(Unit unit, Unit unit1) {
       unitAniController.FalseOrder(unit, unit1);
       while (unitAniController.FalseOrderAnimating)
+      {
+        yield return null;
+      }
+      ActionOngoing = false;
+    }
+
+    IEnumerator DoAlienate(Unit unit, Unit unit1) {
+      unitAniController.Alienate(unit, unit1);
+      while (unitAniController.AlienateAnimating)
       {
         yield return null;
       }

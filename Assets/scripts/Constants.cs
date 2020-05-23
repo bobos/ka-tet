@@ -26,7 +26,7 @@ public class Cons {
   }
 
   public static bool SlimChance() {
-    return FairChance() && FairChance();
+    return FairChance() && EvenChance();
   }
 
   public static bool TinyChance() {
@@ -225,7 +225,7 @@ public class Cons {
   public static Ability improvisor = new Improvisor();
   public static Ability formidable = new Formidable();
   public static Ability doctor = new Doctor();
-  public static Ability falseCommander = new FalseCommander();
+  public static Ability conspirator = new Conspirator();
 
   // trait
   public static Trait reckless = new Reckless();

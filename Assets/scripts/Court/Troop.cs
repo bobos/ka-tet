@@ -47,11 +47,6 @@ namespace CourtNS
       return Util.eq<Region>(province.region, Cons.nvzhen);
     }
 
-    public bool IsChargeBuffed() {
-      // iron buddist, extra charge buf
-      return IsSpecial() && type == Type.Cavalry && Util.eq<Rank>(rank, Cons.veteran);
-    }
-
     public bool IsRest() {
       return state == TroopState.Rest;
     }

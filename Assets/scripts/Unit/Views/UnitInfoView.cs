@@ -73,7 +73,7 @@ namespace UnitNS
         + "[" + unit.rf.province.region.Name() + "]"
         + "("+unit.allowedAtmpt+")"
         + "\n"
-        + unit.GetUnitName()
+        + unit.rf.province.Name() + "-" + unit.GetUnitName()
         + NumIcons(unit.rf.soldiers, unit.IsCavalry()) + "\n"
         + "攻: " + Shorten(unit.unitCombatPoint) + "\n防: " + Shorten(totalDefendPoint) + "\n"
         + unit.rf.morale + "/" + unit.rf.province.region.MoralePunishLine() + "/" + unit.rf.province.region.RetreatThreshold();

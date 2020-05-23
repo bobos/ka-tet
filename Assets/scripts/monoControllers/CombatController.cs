@@ -294,7 +294,7 @@ namespace MonoNS
       float odds = bigger / smaller;
       if (odds <= 3.5f) {
         predict.trueSuggestedResultType = ResultType.Small;
-      } else if (odds <= 6f) {
+      } else if (odds <= 5.5f) {
         predict.trueSuggestedResultType = ResultType.Great;
       } else {
         predict.trueSuggestedResultType = ResultType.Crushing;
@@ -320,7 +320,11 @@ namespace MonoNS
       }
 
       if (attacker && !inRange) {
-        ret = ret < 85 ? ret : 85;
+        ret = ret < 90 ? ret : 90;
+      }
+
+      if (!attacker && !inRange && Cons.IsMist(hexMap.weatherGenerator.currentWeather)) {
+        ret = ret < 50 ? ret : 50;
       }
 
       return ret;
@@ -333,20 +337,22 @@ namespace MonoNS
         return 100;
       }
 
+      int chance = 100;
       if (result == ResultType.Small) {
-        return inRange ? 100 : 95;
+        chance = inRange ? 100 : 95;
+      }
+      else if (result == ResultType.Great) {
+        chance = inRange ? 90 : 80;
+      }
+      else if (result == ResultType.Crushing) {
+        chance = inRange ? 80 : 70;
       }
 
-      // when odds is greater than close
       if (unit.rf.general.Is(Cons.cunning)) {
-        return 60;
+        chance -= 20;
       }
 
-      if (result == ResultType.Great) {
-        return inRange ? 90 : 80;
-      }
-
-      return inRange ? 80 : 70;
+      return chance;
     }
 
     public void CancelOperation() {

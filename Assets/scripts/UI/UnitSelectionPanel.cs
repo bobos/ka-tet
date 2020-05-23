@@ -27,7 +27,7 @@ namespace MonoNS
                            RetreatButton, DecampButton, ReposButton,
                            BuryButton, ChargeButton, TroopButton, GeneralButton,
                            BreakThroughButton, SurpriseAttackButton, FeintDefeatButton,
-                           ForecastButton, FalseOrderButton
+                           ForecastButton, FalseOrderButton, AlienateButton
                            };
       buttons = btns;
       mouseController.onUnitSelect += OnUnitSelect;
@@ -66,6 +66,7 @@ namespace MonoNS
     public GameObject FeintDefeatButton;
     public GameObject ForecastButton;
     public GameObject FalseOrderButton;
+    public GameObject AlienateButton;
     GameObject[] buttons;
 
     public Text title;
@@ -175,6 +176,10 @@ namespace MonoNS
 
       if (!hexMap.wargameController.start && unit.CanFalseOrder() && hexMap.deployDone) {
         FalseOrderButton.SetActive(mouseController.falseOrderTargets.Count > 0);
+      }
+
+      if (!hexMap.wargameController.start && unit.CanAlienate() && hexMap.deployDone) {
+        AlienateButton.SetActive(mouseController.alienateTargets.Count > 0);
       }
 
       if (isGarrison) {
@@ -307,7 +312,7 @@ namespace MonoNS
       string stateStr = unit.tile.siegeWall != null && unit.tile.siegeWall.IsFunctional() ? "围城中 " :
         (unit.tile.siegeWall != null && unit.tile.siegeWall.owner.isAI == unit.IsAI() ? ("建长围中:" + unit.tile.siegeWall.buildTurns + "回合完成 ") : "");
       stateStr += unit.IsWarWeary() ? "士气低落 " : "";
-      stateStr += unit.IsStarving() ? "饥饿 " : "";
+      stateStr += unit.IsStarving() ? "补给不济 " : "";
       stateStr += unit.GetStateName();
       title.text += "\n" + (unit.hasNoOpenning ? "[无懈可击]" : "")
         + (unit.defeatStreak > 0 ? ("[战败累计:" + unit.defeatStreak + "]") : "" ) + stateStr;
