@@ -27,7 +27,7 @@ namespace MonoNS
                            RetreatButton, DecampButton, ReposButton,
                            BuryButton, ChargeButton, TroopButton, GeneralButton,
                            BreakThroughButton, SurpriseAttackButton, FeintDefeatButton,
-                           ForecastButton, FalseOrderButton, AlienateButton
+                           ForecastButton, FalseOrderButton, AlienateButton, SkirmishButton
                            };
       buttons = btns;
       mouseController.onUnitSelect += OnUnitSelect;
@@ -67,6 +67,7 @@ namespace MonoNS
     public GameObject ForecastButton;
     public GameObject FalseOrderButton;
     public GameObject AlienateButton;
+    public GameObject SkirmishButton;
     GameObject[] buttons;
 
     public Text title;
@@ -168,6 +169,7 @@ namespace MonoNS
 
       if (!hexMap.wargameController.start && hexMap.deployDone) {
         ChargeButton.SetActive(unit.CanCharge());
+        SkirmishButton.SetActive(unit.CanSkirmish());
       }
 
       if (!hexMap.wargameController.start && hexMap.deployDone) {
@@ -284,8 +286,7 @@ namespace MonoNS
       // set attack, defense details
       string details = 
       "惩罚:\n"
-      + "战败惩罚:" + unit.GetChaosBuf() * 100
-      + "%\n厌战惩罚:" + unit.GetWarwearyBuf() * 100
+      + "心理影响:" + unit.GetMentalBuf() * 100
       + "%\n无胄惩罚:" + unit.disarmorDefDebuf * 100
       + "%\n平原反应:" + unit.plainSickness.debuf * 100
       + "%\n加成:\n"

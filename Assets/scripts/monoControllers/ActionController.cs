@@ -285,6 +285,12 @@ namespace MonoNS
       }
     }
 
+    public void OnSkirmish() {
+      if (onBtnClick != null) {
+        onBtnClick(actionName.Skirmish);
+      }
+    }
+
     public enum actionName
     {
       MOVE,
@@ -324,7 +330,8 @@ namespace MonoNS
       Pursue,
       Forecast,
       FalseOrder,
-      Alienate
+      Alienate,
+      Skirmish
     }
 
     // Make sure this is sequential
@@ -398,6 +405,10 @@ namespace MonoNS
 
     public bool Alienate(Unit unit, Unit unit1) {
       return DoAction(unit, unit1, null, actionName.Alienate);
+    }
+
+    public bool Skirmish(Unit unit, Unit unit1) {
+      return DoAction(unit, unit1, null, actionName.Skirmish);
     }
 
     public bool DoAction(Unit unit, Unit unit1, Tile tile, actionName name)
@@ -475,6 +486,10 @@ namespace MonoNS
       if (name == actionName.Alienate)
       {
         StartCoroutine(DoAlienate(unit, unit1));
+      }
+      if (name == actionName.Skirmish)
+      {
+        StartCoroutine(DoSkirmish(unit, unit1));
       }
       return true;
     }
@@ -649,6 +664,15 @@ namespace MonoNS
     IEnumerator DoAlienate(Unit unit, Unit unit1) {
       unitAniController.Alienate(unit, unit1);
       while (unitAniController.AlienateAnimating)
+      {
+        yield return null;
+      }
+      ActionOngoing = false;
+    }
+
+    IEnumerator DoSkirmish(Unit unit, Unit unit1) {
+      unitAniController.Skirmish(unit, unit1);
+      while (unitAniController.SkirmishAnimating)
       {
         yield return null;
       }

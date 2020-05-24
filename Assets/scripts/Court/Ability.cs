@@ -11,7 +11,7 @@ namespace CourtNS {
         Cons.hammer, Cons.mechanician, Cons.diminisher, Cons.staminaManager,
         Cons.formidable, Cons.generous, Cons.runner, Cons.fireBug,
         Cons.holdTheGround, Cons.breaker, Cons.improvisor, Cons.tactic,
-        Cons.outlooker, Cons.ambusher, Cons.doctor, Cons.conspirator};
+        Cons.outlooker, Cons.ambusher, Cons.doctor, Cons.conspirator, Cons.vanguard};
       int total = candidates.Length;
       int luckNum = Util.Rand(0, total * 2);
       if (luckNum < total) {
@@ -265,6 +265,19 @@ namespace CourtNS {
 
     public override string Description() {
       return Cons.GetTextLib().get("ability_conspirator_description");
+    }
+  }
+
+  public class Vanguard: Ability {
+    public Vanguard() {
+    }
+
+    public override string Name() {
+      return Cons.GetTextLib().get("ability_vanguard");
+    }
+
+    public override string Description() {
+      return Cons.GetTextLib().get("ability_vanguard_description");
     }
   }
 

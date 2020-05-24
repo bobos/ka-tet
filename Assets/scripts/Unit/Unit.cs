@@ -51,7 +51,7 @@ namespace UnitNS
     WeatherGenerator weatherGenerator;
     TurnController turnController;
     public int defeatStreak = 0;
-    public bool chaos = false;
+    public Mental mentality = Mental.Normal;
     public int surroundCnt = 0;
     public Unit(bool clone, Troop troop, Tile tile, State state,
                 int kia, int movement = -1)
@@ -150,7 +150,6 @@ namespace UnitNS
     public int kia;
     public Troop rf;
     public State state = State.Stand;
-    public bool defeating = false;
 
     int __movementRemaining;
     Queue<Tile> path;
@@ -186,42 +185,92 @@ namespace UnitNS
     }
 
     public int CanBeShaked(Unit charger) {
-      if (!IsOnField() || tile.vantagePoint || IsHeavyCavalry() || IsVulnerable() || chargeChance == 0) {
+      if (!IsOnField() || tile.vantagePoint || IsVulnerable() || chargeChance == 0) {
         return 0;
       }
-      int chance = 0;
+      int chance = MentallyWeak() ? 95 : 5;
       if (Cons.IsGale(hexMap.windGenerator.current)) {
         WindAdvantage advantage = charger.tile.GetGaleAdvantage(tile);
         if (advantage == WindAdvantage.Advantage) {
-          chance = 30;
+          chance += 80;
         }
         if (advantage == WindAdvantage.Disadvantage) {
-          chance = -30;
+          chance -= 80;
         }
-      }
-
-      if (Util.eq<Rank>(rf.rank, Cons.rookie)) {
-        chance += 40;
-      } else {
-        chance += 20;
-      }
-
-      if (rf.general.Is(Cons.conservative)) {
-        chance += 30;
       }
 
       if (hasNoOpenning) {
-        chance -= 90;
+        chance = 5;
       }
 
       return chance < 0 ? 0 : (chance > 100 ? 100 : chance);
+    }
+
+    public int Skirmished(Unit skirmisher) {
+      int point = 0;
+      if (IsCavalry()) {
+        point = IsHeavyCavalry() ? 10 : 20;
+      } else {
+        if (Util.eq<Rank>(rf.rank, Cons.rookie)) {
+          point = 40;
+        } else {
+          point = 30;
+        }
+      }
+      if (Cons.IsGale(hexMap.windGenerator.current)) {
+        WindAdvantage advantage = skirmisher.tile.GetGaleAdvantage(tile);
+        if (advantage == WindAdvantage.Advantage) {
+          point += 30;
+        }
+        if (advantage == WindAdvantage.Disadvantage) {
+          point += -30;
+        }
+      }
+      if (skirmisher.rf.general.Has(Cons.vanguard)) {
+        point += 40;
+      }
+      if (rf.general.Has(Cons.holdTheGround)) {
+        point -= 40;
+      }
+      if (tile.terrian == TerrianType.Hill) {
+        point = (int)(point * 0.8f);
+      }
+      if (skirmisher.rf.soldiers < 1500 && skirmisher.rf.soldiers >= 800) {
+        point = (int)(point * 0.8f);
+      }
+      if (skirmisher.rf.soldiers < 800) {
+        point = (int)(point * 0.5f);
+      }
+      point = point < 0 ? 0 : point;
+      wavingPoint += point;
+      return wavingPoint;
+    }
+
+    public int wavingPoint {
+      get {
+        return _wavingPoint;
+      }
+      set {
+        _wavingPoint = value > 100 ? 100 : (value < 0 ? 0 : value);
+        if (value == 100 && (mentality != Mental.Defeating || mentality != Mental.Chaotic)) {
+          mentality = Mental.Waving;
+        }
+      }
+    }
+
+    int _wavingPoint = 0;
+    public bool CanBeWaved() {
+      if (!IsOnField() || tile.vantagePoint || IsVulnerable() || MentallyWeak()) {
+        return false;
+      }
+      return true;
     }
 
     public int CanBeSurprised() {
       if (!IsOnField() || tile.vantagePoint || tile.field == FieldType.Forest || rf.general.Has(Cons.ambusher)) {
         return 0;
       }
-      return rf.general.Is(Cons.conservative) ? 20 : 95;
+      return (!MentallyWeak() && (rf.general.Is(Cons.conservative) || rf.general.Is(Cons.cunning))) ? 20 : 95;
     }
 
     public bool CanBeCrashed() {
@@ -233,7 +282,7 @@ namespace UnitNS
     }
 
     public bool IsVulnerable() {
-      return chaos || defeating || rf.morale == 0;
+      return mentality == Mental.Defeating || mentality == Mental.Chaotic|| rf.morale == 0;
     }
 
     public int allowedAtmpt = 1;
@@ -249,7 +298,11 @@ namespace UnitNS
     }
 
     public bool CanCharge() {
-      return IsHeavyCavalry() && !charged && !IsSurrounded();
+      return IsHeavyCavalry() && CanAttack() && !IsSurrounded() && !MentallyWeak();
+    }
+
+    public bool CanSkirmish() {
+      return IsCavalry() && !IsHeavyCavalry() && CanAttack() && !IsSurrounded() && !MentallyWeak() && !IsCamping();
     }
 
     public bool CanBreakThrough() {
@@ -316,7 +369,6 @@ namespace UnitNS
       canForecast = rf.general.Has(Cons.forecaster);
     }
 
-    public bool charged = false;
     public bool retreated = false;
     public bool crashed = false;
     public bool poisionDone = false;
@@ -601,10 +653,17 @@ namespace UnitNS
       return rf.general.Has(Cons.improvisor);
     }
 
+    public bool MentallyWeak() {
+      return mentality == Mental.Waving || mentality == Mental.Defeating
+       || mentality == Mental.Chaotic || warWeary.IsWarWeary();
+    }
+
     public bool StickAsNailWhenDefeat() {
+      if (MentallyWeak()) {
+        return Cons.EvenChance();
+      }
       return (inCommanderRange &&
-              MyCommander().commandSkill.TurningTide() &&
-              Cons.MostLikely()) ||
+              MyCommander().commandSkill.TurningTide()) ||
               (rf.general.Has(Cons.holdTheGround) && Cons.MostLikely()) ||
               (rf.IsSpecial() && Cons.MostLikely()) || Cons.FiftyFifty();
     }
@@ -613,7 +672,7 @@ namespace UnitNS
       if (IsCamping()) {
         return false;
       }
-      if (rf.general.Is(Cons.conservative)) {
+      if (rf.general.Is(Cons.conservative) || MentallyWeak()) {
         return Cons.EvenChance();
       } else {
         return Cons.SlimChance();
@@ -629,13 +688,18 @@ namespace UnitNS
     }
 
     public int Defeat(int moraleDrop) {
+      if (mentality == Mental.Supercharged) {
+        mentality = Mental.Normal;
+      }
+      wavingPoint += 20;
       int drop = moraleDrop + (defeatStreak++ * -2);
       rf.morale += drop;
       return drop;
     }
 
     public int Victory(int moraleIncr) {
-      defeatStreak = 0;
+      mentality = Mental.Supercharged;
+      wavingPoint = defeatStreak = 0;
       rf.morale += moraleIncr;
       movementRemaining += 40;
       return moraleIncr;
@@ -657,8 +721,9 @@ namespace UnitNS
     // Before new turn starts
     public int[] RefreshUnit()
     {
-      crashed = fooled = chaos = defeating = retreated
-        = charged = poisionDone = fireDone = false;
+      mentality = Mental.Normal;
+      crashed = fooled = retreated = poisionDone = fireDone = false;
+      wavingPoint = 0;
       defeatStreak = 0;
       InitForecast();
       InitFalseOrder();
@@ -795,7 +860,7 @@ namespace UnitNS
     public int unitPureCombatPoint {
       get {
         int total = vantage.TotalPoints(cp);
-        total = (int)((total + total * rf.lvlBuf) * 0.1f);
+        total = (int)((total + total * rf.lvlBuf) * 0.001f * rf.morale);
         return total < 0 ? 0 : total;
       }
     }
@@ -814,7 +879,7 @@ namespace UnitNS
 
     float GetCampingAttackBuff()
     {
-      return GetGeneralBuf() + GetChaosBuf() + GetWarwearyBuf() - plainSickness.debuf + rf.lvlBuf - disarmorDefDebuf;
+      return GetGeneralBuf() + GetMentalBuf() - plainSickness.debuf + rf.lvlBuf - disarmorDefDebuf;
     }
 
     public float GetBuff()
@@ -826,17 +891,23 @@ namespace UnitNS
       return IsHeavyCavalry() ? 0.2f : 0f;
     }
 
-    public float GetWarwearyBuf()
-    {
-      return warWeary.GetBuf();
-    }
-
     public float GetGeneralBuf() {
       return rf.general.Has(Cons.formidable) ? 0.25f : 0f;
     }
 
-    public float GetChaosBuf() {
-      return chaos ? -0.99f : (defeating ? -0.4f : (defeatStreak * -0.1f));
+    public float GetMentalBuf() {
+      float ret = defeatStreak * -0.1f;
+      if (mentality == Mental.Supercharged) {
+        ret += 0.1f;
+      } else if (mentality == Mental.Waving) {
+        ret += -0.1f;
+      } else if (mentality == Mental.Defeating) {
+        ret += -0.4f;
+      } else if (mentality == Mental.Chaotic) {
+        ret = -0.99f;
+      }
+      ret += warWeary.GetBuf();
+      return ret < -0.99f ? -0.99f : ret;
     }
 
     // ==============================================================

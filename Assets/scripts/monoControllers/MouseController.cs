@@ -322,6 +322,18 @@ namespace MonoNS
         }
       }
 
+      if (action == ActionController.actionName.Skirmish)
+      {
+        mouseMode = mode.attack;
+        Update_CurrentFunc = UpdateUnitSkirmish;
+        msgBox.Show("选择目标!");
+        foreach(Unit u in nearbyEnemey) {
+          if (u.CanBeWaved()) {
+            hexMap.TargetUnit(u);
+          }
+        }
+      }
+
       if (action == ActionController.actionName.Breakthrough)
       {
         mouseMode = mode.attack;
@@ -789,6 +801,22 @@ namespace MonoNS
         if (targetUnit != null && targetUnit.CanBeShaked(selectedUnit) > 0) {
           msgBox.Show("");
           actionController.charge(selectedUnit, targetUnit);
+          Escape();
+        }
+      }
+    }
+
+    void UpdateUnitSkirmish()
+    {
+      if (tileUnderMouse == null) {
+        return;
+      }
+      if (Input.GetMouseButtonUp(0))
+      {
+        ClickOnTile();
+        if (targetUnit != null && targetUnit.CanBeWaved()) {
+          msgBox.Show("");
+          actionController.Skirmish(selectedUnit, targetUnit);
           Escape();
         }
       }

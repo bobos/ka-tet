@@ -286,7 +286,6 @@ namespace TextNS
       {"pop_retreat", "撤退!"},
       {"pop_charging", "冲阵!"},
       {"pop_chasing", "乘胜追击!"},
-      {"pop_shaked", "阵脚松动!"},
       {"pop_holding", "稳住阵脚"},
       {"pop_newCommander", "新主帅"},
       {"pop_failedToBreakthrough", "突围失败"},
@@ -374,6 +373,8 @@ namespace TextNS
       {"ability_doctor_description", "部队不会遭受投毒或者疫病影响，降低40%死亡率"},
       {"ability_conspirator", "攻心术"},
       {"ability_conspirator_description", "伪造敌军主帅军令，让敌军单位处于混乱状态一回合, 挑拨敌军部队关系"},
+      {"ability_vanguard", "掠阵者"},
+      {"ability_vanguard_description", "统领轻骑兵时，对敌军发动掠阵，阵脚松动+50"},
 
       {"trait_reckless", "鲁莽"},
       {"trait_reckless_description", "敌军退败容易主动追击"},

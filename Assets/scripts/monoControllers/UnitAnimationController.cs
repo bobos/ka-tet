@@ -610,16 +610,13 @@ namespace MonoNS
     }
 
     IEnumerator CoCharge(Unit from, Unit to) {
-      from.charged = true;
+      from.UseAtmpt();
       View view = from.IsCamping() ?
         settlementMgr.GetView(from.tile.settlement) : hexMap.GetUnitView(from);
 
       popAniController.Show(view, textLib.get("pop_charging"), Color.green);
       while (popAniController.Animating) { yield return null; }
       bool scared = to.CanBeShaked(from) >= Util.Rand(1, 100);
-      if (scared && to.rf.general.Has(Cons.holdTheGround) && Cons.FiftyFifty()) {
-        scared = false;
-      }
       // morale, movement, killed, attack, def
       ShowEffect(from, new int[]{0,0,from.Killed(Util.Rand(2, 15)),0,0}, view);
       while (ShowAnimating) { yield return null; }
@@ -655,6 +652,7 @@ namespace MonoNS
         popAniController.Show(hexMap.GetUnitView(to), textLib.get("pop_holding"), Color.green);
         while (popAniController.Animating) { yield return null; }
         to.chargeChance -= 50;
+        to.mentality = Mental.Supercharged;
         int morale1 = -2;
         from.rf.morale += morale1;
         ShowEffect(from, new int[]{morale1,0,0,0,0}, view, true);
@@ -662,6 +660,27 @@ namespace MonoNS
       }
       hexMap.cameraKeyboardController.EnableCamera();
       ChargeAnimating = false;
+    }
+
+    public bool SkirmishAnimating = false;
+    public void Skirmish(Unit from, Unit to) {
+      if (!to.CanBeWaved()) {
+        return;
+      }
+      SkirmishAnimating = true;
+      hexMap.cameraKeyboardController.DisableCamera();
+      StartCoroutine(CoSkirmish(from, to));
+    }
+
+    IEnumerator CoSkirmish(Unit from, Unit to) {
+      from.UseAtmpt();
+      int wavingPoint = to.Skirmished(from);
+      ShowEffect(from, new int[]{0, 0, from.Killed(Util.Rand(20, 60)), 0, 0}, null, true);
+      ShowEffect(to, new int[]{0, 0, to.Killed(Util.Rand(10, 30)), 0, 0}, null, true);
+      hexMap.turnController.Sleep(1);
+      while(hexMap.turnController.sleeping) { yield return null; }
+      hexMap.cameraKeyboardController.EnableCamera();
+      SkirmishAnimating = false;
     }
 
     public bool PursueAnimating = false;
@@ -676,12 +695,13 @@ namespace MonoNS
 
     IEnumerator CoPursue(Unit from, Unit to) {
       from.UseAtmpt();
+      from.mentality = Mental.Supercharged;
       View view = from.IsCamping() ?
         settlementMgr.GetView(from.tile.settlement) : hexMap.GetUnitView(from);
 
       popAniController.Show(view, textLib.get("pop_chasing"), Color.green);
       while (popAniController.Animating) { yield return null; }
-      int dead = to.chaos ?
+      int dead = to.mentality == Mental.Chaotic ?
         (from.rf.soldiers / (from.IsCavalry() ? 8 : 60))
       : (from.rf.soldiers / (from.IsCavalry() ? 16 : 100));
       dead = from.rf.general.Has(Cons.hammer) ? (int)(dead * 1.5f) : dead;
@@ -750,9 +770,6 @@ namespace MonoNS
       popAniController.Show(view, textLib.get("pop_toBreakThrough"), Color.green);
       while (popAniController.Animating) { yield return null; }
       bool scared = to.CanBeShaked(from) >= Util.Rand(1, 100);
-      if (scared && to.rf.general.Has(Cons.holdTheGround) && Cons.FiftyFifty()) {
-        scared = false;
-      }
       scared = defeatingUnit ? true : scared;
       if (!scared && from.rf.general.Has(Cons.formidable)) {
         scared = Cons.FiftyFifty();
@@ -1034,9 +1051,9 @@ namespace MonoNS
         while(hexMap.dialogue.Animating) { yield return null; }
       } else {
         if (breakThrough && !unit.rf.IsSpecial()) {
-          unit.chaos = true;
+          unit.mentality = Mental.Chaotic;
         } else {
-          unit.defeating = true;
+          unit.mentality = Mental.Defeating;
         }
         hexMap.dialogue.ShowRetreat(unit);
         while(hexMap.dialogue.Animating) { yield return null; }
@@ -1095,7 +1112,9 @@ namespace MonoNS
         from.rf.morale += moraleDrop;
         ShowEffect(from, new int[]{moraleDrop,0,from.Killed(killed),0,0});
         while (ShowAnimating) { yield return null; }
+        to.mentality = Mental.Supercharged;
       } else {
+        to.wavingPoint += 80;
         hexMap.combatController.StartOperation(from, to, null, true);
         hexMap.combatController.CommenceOperation();
         while (hexMap.combatController.commenceOpAnimating) { yield return null; }

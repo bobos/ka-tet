@@ -14,6 +14,14 @@
     Retreated
   }
 
+  public enum Mental {
+    Supercharged,
+    Normal,
+    Waving,
+    Defeating,
+    Chaotic
+  }
+
   public enum ActionType {
     UnitVisible,
     UnitLeft,

@@ -327,6 +327,10 @@ namespace MonoNS
         ret = ret < 50 ? ret : 50;
       }
 
+      if (unit.MentallyWeak()) {
+        ret -= 10;
+      }
+
       return ret;
     }
 
@@ -926,9 +930,9 @@ namespace MonoNS
 
           foreach (Unit unit in gonnaMove) {
             if (resultLevel == ResultType.Crushing) {
-              unit.chaos = true;
+              unit.mentality = Mental.Chaotic;
             } else if (resultLevel == ResultType.Great) {
-              unit.defeating = true;
+              unit.mentality = Mental.Defeating;
             }
 
             if (!failedToMove.Contains(unit)) {
@@ -937,7 +941,7 @@ namespace MonoNS
           }
 
           if (resultLevel == ResultType.Small && gonnaMove.Contains(loser)) {
-            loser.defeating = true;
+            loser.mentality = Mental.Defeating;
           }
 
           if (atkWin && loser.IsCamping() &&
