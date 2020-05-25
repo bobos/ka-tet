@@ -188,7 +188,7 @@ namespace UnitNS
       if (!IsOnField() || tile.vantagePoint || IsVulnerable() || chargeChance == 0) {
         return 0;
       }
-      int chance = MentallyWeak() ? 95 : 5;
+      int chance = MentallyWeak() || IsCavalry() ? 90 : 5;
       if (Cons.IsGale(hexMap.windGenerator.current)) {
         WindAdvantage advantage = charger.tile.GetGaleAdvantage(tile);
         if (advantage == WindAdvantage.Advantage) {
@@ -223,14 +223,14 @@ namespace UnitNS
           point += 30;
         }
         if (advantage == WindAdvantage.Disadvantage) {
-          point += -30;
+          point -= 30;
         }
       }
       if (skirmisher.rf.general.Has(Cons.vanguard)) {
         point += 40;
       }
       if (rf.general.Has(Cons.holdTheGround)) {
-        point -= 40;
+        point -= 25;
       }
       if (tile.terrian == TerrianType.Hill) {
         point = (int)(point * 0.8f);
@@ -252,8 +252,9 @@ namespace UnitNS
       }
       set {
         _wavingPoint = value > 100 ? 100 : (value < 0 ? 0 : value);
-        if (value == 100 && (mentality != Mental.Defeating || mentality != Mental.Chaotic)) {
+        if (_wavingPoint == 100 && (mentality != Mental.Defeating || mentality != Mental.Chaotic)) {
           mentality = Mental.Waving;
+          _wavingPoint = 0;
         }
       }
     }
@@ -723,7 +724,6 @@ namespace UnitNS
     {
       mentality = Mental.Normal;
       crashed = fooled = retreated = poisionDone = fireDone = false;
-      wavingPoint = 0;
       defeatStreak = 0;
       InitForecast();
       InitFalseOrder();

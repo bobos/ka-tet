@@ -594,6 +594,10 @@ namespace MonoNS
           }
         }
       }
+
+      if (moraleDrop == 0) {
+        loser.movementRemaining = 40;
+      }
       
       hexMap.cameraKeyboardController.EnableCamera();
       ScatterAnimating = false;

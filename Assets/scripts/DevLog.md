@@ -42,8 +42,10 @@ Game Tips:
 46. overcharged metality incr 10% attack point
 47. mental weak affects join possibility(-10), easy to surprise, easy to charge, easy to scatter, easy to retreat on defeat 
 
+chaotic 60%几率 & defeating 1回合40%几率变waving, 技能直接变normal
 wavingpoint 累计 战胜清零
 测试 掠阵，字体显示问题
+敌军将领范围不显示，直接交战80%几率发现敌军主帅
 全局ai和集团军ai两套
 ai撤退条件：
 主帅阵亡，歼灭，丧失战斗力

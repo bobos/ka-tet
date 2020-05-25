@@ -374,7 +374,7 @@ namespace TextNS
       {"ability_conspirator", "攻心术"},
       {"ability_conspirator_description", "伪造敌军主帅军令，让敌军单位处于混乱状态一回合, 挑拨敌军部队关系"},
       {"ability_vanguard", "掠阵者"},
-      {"ability_vanguard_description", "统领轻骑兵时，对敌军发动掠阵，阵脚松动+50"},
+      {"ability_vanguard_description", "统领轻骑兵时，对敌军发动掠阵，阵脚松动+40"},
 
       {"trait_reckless", "鲁莽"},
       {"trait_reckless_description", "敌军退败容易主动追击"},
