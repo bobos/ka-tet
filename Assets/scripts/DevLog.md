@@ -41,9 +41,9 @@ Game Tips:
 45. 主帅至少两翼有友军，否则冲阵走一只，容易被四面夹击
 46. overcharged metality incr 10% attack point
 47. mental weak affects join possibility(-10), easy to surprise, easy to charge, easy to scatter, easy to retreat on defeat 
+48. chaotic 60%几率 & defeating 40%几率变waving, discpline技能直接变normal
 
-chaotic 60%几率 & defeating 1回合40%几率变waving, 技能直接变normal
-wavingpoint 累计 战胜清零
+轻骑兵无法被围攻除非完全包围
 测试 掠阵，字体显示问题
 敌军将领范围不显示，直接交战80%几率发现敌军主帅
 全局ai和集团军ai两套

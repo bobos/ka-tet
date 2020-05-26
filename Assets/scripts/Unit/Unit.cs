@@ -722,7 +722,17 @@ namespace UnitNS
     // Before new turn starts
     public int[] RefreshUnit()
     {
-      mentality = Mental.Normal;
+      if ((mentality == Mental.Chaotic && Cons.MostLikely()) || (
+           mentality == Mental.Defeating && Cons.EvenChance())) {
+        mentality = Mental.Waving;
+        wavingPoint = 0;
+      } else {
+        mentality = Mental.Normal;
+      }
+
+      if (rf.general.Has(Cons.discipline)) {
+        mentality = Mental.Normal;
+      }
       crashed = fooled = retreated = poisionDone = fireDone = false;
       defeatStreak = 0;
       InitForecast();
