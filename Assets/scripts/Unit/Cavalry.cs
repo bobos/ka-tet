@@ -5,8 +5,8 @@ namespace  UnitNS
 {
   public class Cavalry : Unit
   {
-    public const float MovementCostModifierOnHill = 1f;
-    public const float MovementCostModifierOnPlainOrRoad = 0.65f;
+    public const float MovementCostModifierOnHill = 0.7f;
+    public const float MovementCostModifierOnPlainOrRoad = 0.5f;
     public const int MinTroopNum = 500;
 
     public static Unit Create(bool clone, Troop troop, Tile tile, State state = State.Stand, 

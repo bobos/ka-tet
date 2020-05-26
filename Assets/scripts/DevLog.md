@@ -43,7 +43,7 @@ Game Tips:
 47. mental weak affects join possibility(-10), easy to surprise, easy to charge, easy to scatter, easy to retreat on defeat 
 48. chaotic 60%几率 & defeating 40%几率变waving, discpline技能直接变normal
 
-轻骑兵无法被围攻除非完全包围
+掠阵必须空一格(弓箭手攻击范围)
 测试 掠阵，字体显示问题
 敌军将领范围不显示，直接交战80%几率发现敌军主帅
 全局ai和集团军ai两套
