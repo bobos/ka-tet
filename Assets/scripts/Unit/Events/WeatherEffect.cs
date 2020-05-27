@@ -9,7 +9,7 @@
 
     public int[] Apply() {
       int[] effects = new int[5]{0,0,0,0,0};
-      if (Cons.IsHeavyRain(unit.hexMap.weatherGenerator.currentWeather)) {
+      if (Cons.IsHeavyRain(unit.hexMap.weatherGenerator.currentWeather) && unit.IsCavalry()) {
         int movement = (int)(unit.movementRemaining / (-2));
         unit.movementRemaining += movement;
       } else if (Cons.IsSnow(unit.hexMap.weatherGenerator.currentWeather)) {

@@ -15,7 +15,7 @@ namespace UnitNS
     protected abstract Unit Clone();
 
     public const int MovementcostOnHill = 25;
-    public const int MovementcostOnPlain = 15;
+    public const int MovementcostOnPlain = 25;
     public const int MovementCostOnUnaccesible = -1;
     public const int DisbandUnitUnder = 200;
     public const int Sides2HaveVantage = 4;
@@ -206,15 +206,33 @@ namespace UnitNS
       return chance < 0 ? 0 : (chance > 100 ? 100 : chance);
     }
 
+    public List<Unit> GetHarrasTargets() {
+      List<Unit> units = new List<Unit>();
+      const int range = 2;
+      if (GetVisibleRange() < range) {
+        return units;
+      }
+
+      HashSet<Tile> visible = hexMap.GetWarParty(this).GetVisibleArea();
+      foreach(Tile t in tile.GetNeighboursWithinRange<Tile>(range, (Tile t1) =>
+        !tile.neighbours.Contains(t1) && visible.Contains(t1))) {
+        Unit u = t.GetUnit();
+        if (u != null && u.IsAI() != IsAI() && u.CanBeWaved() && !u.IsCamping()) {
+          units.Add(u);
+        }
+      }
+      return units;
+    }
+
     public int Skirmished(Unit skirmisher) {
       int point = 0;
       if (IsCavalry()) {
-        point = IsHeavyCavalry() ? 10 : 20;
+        point = 10;
       } else {
         if (Util.eq<Rank>(rf.rank, Cons.rookie)) {
-          point = 40;
-        } else {
           point = 30;
+        } else {
+          point = 20;
         }
       }
       if (Cons.IsGale(hexMap.windGenerator.current)) {
@@ -227,10 +245,10 @@ namespace UnitNS
         }
       }
       if (skirmisher.rf.general.Has(Cons.vanguard)) {
-        point += 40;
+        point += 30;
       }
       if (rf.general.Has(Cons.holdTheGround)) {
-        point -= 25;
+        point -= 20;
       }
       if (tile.terrian == TerrianType.Hill) {
         point = (int)(point * 0.8f);
@@ -302,7 +320,7 @@ namespace UnitNS
       return IsHeavyCavalry() && CanAttack() && !IsSurrounded() && !MentallyWeak();
     }
 
-    public bool CanSkirmish() {
+    public bool CanHarras() {
       return IsCavalry() && !IsHeavyCavalry() && CanAttack() && !IsSurrounded() && !MentallyWeak() && !IsCamping();
     }
 
@@ -702,7 +720,9 @@ namespace UnitNS
       mentality = Mental.Supercharged;
       wavingPoint = defeatStreak = 0;
       rf.morale += moraleIncr;
-      movementRemaining += 40;
+      if (movementRemaining < 50) {
+        movementRemaining = 50;
+      }
       return moraleIncr;
     }
 
@@ -909,8 +929,6 @@ namespace UnitNS
       float ret = defeatStreak * -0.1f;
       if (mentality == Mental.Supercharged) {
         ret += 0.1f;
-      } else if (mentality == Mental.Waving) {
-        ret += -0.1f;
       } else if (mentality == Mental.Defeating) {
         ret += -0.4f;
       } else if (mentality == Mental.Chaotic) {

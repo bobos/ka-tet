@@ -169,7 +169,7 @@ namespace MonoNS
 
       if (!hexMap.wargameController.start && hexMap.deployDone) {
         ChargeButton.SetActive(unit.CanCharge());
-        SkirmishButton.SetActive(unit.CanSkirmish());
+        SkirmishButton.SetActive(unit.CanHarras() && unit.GetHarrasTargets().Count > 0);
       }
 
       if (!hexMap.wargameController.start && hexMap.deployDone) {

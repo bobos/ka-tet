@@ -679,8 +679,9 @@ namespace MonoNS
     IEnumerator CoSkirmish(Unit from, Unit to) {
       from.UseAtmpt();
       to.Skirmished(from);
-      ShowEffect(from, new int[]{0, 0, from.Killed(Util.Rand(10, 40)), 0, 0}, null, true);
-      ShowEffect(to, new int[]{0, 0, to.Killed(Util.Rand(10, 20)), 0, 0}, null, true);
+      ShowEffect(from, new int[]{0, 0, from.Killed(Util.Rand(10, 30)), 0, 0}, null, true);
+      int dead = to.IsHeavyCavalry() ? Util.Rand(1, 5) : (to.rf.rank.Level() == 1 ? Util.Rand(10, 30) : Util.Rand(5, 20)); 
+      ShowEffect(to, new int[]{0, 0, to.Killed(dead), 0, 0}, null, true);
       hexMap.turnController.Sleep(1);
       while(hexMap.turnController.sleeping) { yield return null; }
       hexMap.cameraKeyboardController.EnableCamera();

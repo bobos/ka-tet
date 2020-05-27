@@ -99,6 +99,7 @@ namespace MonoNS
     public Unit[] surpriseTargets = null;
     public List<Unit> falseOrderTargets = null;
     public List<Unit> alienateTargets = null;
+    public List<Unit> harrasTargets = null;
     public Tile[] accessibleTiles = null;
     public HashSet<Unit> nearbyAlly = null;
 
@@ -116,6 +117,7 @@ namespace MonoNS
       accessibleTiles = new Tile[]{};
       falseOrderTargets = new List<Unit>();
       alienateTargets = new List<Unit>();
+      harrasTargets = new List<Unit>();
     }
 
     public void PrepareUnitSelection() {
@@ -170,6 +172,7 @@ namespace MonoNS
         Unit u = selectedUnit != null ? selectedUnit : hexMap.settlementViewPanel.selectedUnit;
         falseOrderTargets = u.GetFalseOrderTargets();
         alienateTargets = u.GetAlienateTargets();
+        harrasTargets = u.GetHarrasTargets();
       }
     }
 
@@ -324,13 +327,11 @@ namespace MonoNS
 
       if (action == ActionController.actionName.Skirmish)
       {
-        mouseMode = mode.attack;
+        mouseMode = mode.harras;
         Update_CurrentFunc = UpdateUnitSkirmish;
         msgBox.Show("选择目标!");
-        foreach(Unit u in nearbyEnemey) {
-          if (u.CanBeWaved()) {
-            hexMap.TargetUnit(u);
-          }
+        foreach(Unit u in harrasTargets) {
+          hexMap.TargetUnit(u);
         }
       }
 
@@ -389,6 +390,7 @@ namespace MonoNS
       surpriseAttack,
       falseOrder,
       alienate,
+      harras,
       repos,
       sabotage,
       fire
@@ -449,6 +451,12 @@ namespace MonoNS
 
       if (mouseMode == mode.alienate) {
         foreach(Unit u in alienateTargets) {
+          hexMap.SetUnitSkin(u);
+        }
+      }
+
+      if (mouseMode == mode.harras) {
+        foreach(Unit u in harrasTargets) {
           hexMap.SetUnitSkin(u);
         }
       }
@@ -603,6 +611,13 @@ namespace MonoNS
 
       if (mouseMode == mode.alienate) {
         if(u != null && u.IsAI() != selectedUnit.IsAI() && alienateTargets.Contains(u)) {
+          targetUnit = u;
+          return;
+        }
+      }
+
+      if (mouseMode == mode.harras) {
+        if(u != null && u.IsAI() != selectedUnit.IsAI() && harrasTargets.Contains(u)) {
           targetUnit = u;
           return;
         }
@@ -814,7 +829,7 @@ namespace MonoNS
       if (Input.GetMouseButtonUp(0))
       {
         ClickOnTile();
-        if (targetUnit != null && targetUnit.CanBeWaved()) {
+        if (targetUnit != null) {
           msgBox.Show("");
           actionController.Skirmish(selectedUnit, targetUnit);
           Escape();

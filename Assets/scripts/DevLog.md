@@ -1,7 +1,7 @@
 Game Tips:
 1. 酷暑行军，一定几率增加部队不满
 2. 菜鸟部队酷暑在野外50%几率发生脱帽事件
-3. 暴雨，大雪，小雪，移动力至少降低50%
+3. 暴雨(骑兵)，大雪，小雪，移动力至少降低50%
 4. 夏季，下雨天于河东河北密林中，部队一定几率染上痢疾
 5. 20回合后，战争泥潭，攻击部队每回合士气-4，防御部队每两回合士气-4
 6. 士气低于惩罚阈值，等级加成消失，低于撤退阈值战斗力下降8成
@@ -43,8 +43,8 @@ Game Tips:
 47. mental weak affects join possibility(-10), easy to surprise, easy to charge, easy to scatter, easy to retreat on defeat 
 48. chaotic 60%几率 & defeating 40%几率变waving, discpline技能直接变normal
 
-掠阵必须空一格(弓箭手攻击范围)
-测试 掠阵，字体显示问题
+harras only works with reachable target
+字体显示问题
 敌军将领范围不显示，直接交战80%几率发现敌军主帅
 全局ai和集团军ai两套
 ai撤退条件：
