@@ -43,7 +43,7 @@ Game Tips:
 47. mental weak affects join possibility(-10), easy to surprise, easy to charge, easy to scatter, easy to retreat on defeat 
 48. chaotic 60%几率 & defeating 40%几率变waving, discpline技能直接变normal
 
-harras only works with reachable target
+袭扰不空一格
 字体显示问题
 敌军将领范围不显示，直接交战80%几率发现敌军主帅
 全局ai和集团军ai两套

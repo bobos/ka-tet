@@ -678,6 +678,9 @@ namespace MonoNS
 
     IEnumerator CoSkirmish(Unit from, Unit to) {
       from.UseAtmpt();
+      if (from.movementRemaining < 60) {
+        from.movementRemaining += 20;
+      }
       to.Skirmished(from);
       ShowEffect(from, new int[]{0, 0, from.Killed(Util.Rand(10, 30)), 0, 0}, null, true);
       int dead = to.IsHeavyCavalry() ? Util.Rand(1, 5) : (to.rf.rank.Level() == 1 ? Util.Rand(10, 30) : Util.Rand(5, 20)); 
