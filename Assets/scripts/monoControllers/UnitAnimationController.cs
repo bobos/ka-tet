@@ -679,7 +679,7 @@ namespace MonoNS
     IEnumerator CoSkirmish(Unit from, Unit to) {
       from.UseAtmpt();
       if (from.movementRemaining < 60) {
-        from.movementRemaining += 20;
+        from.movementRemaining = 60;
       }
       to.Skirmished(from);
       ShowEffect(from, new int[]{0, 0, from.Killed(Util.Rand(10, 30)), 0, 0}, null, true);

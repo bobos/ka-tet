@@ -208,14 +208,7 @@ namespace UnitNS
 
     public List<Unit> GetHarrasTargets() {
       List<Unit> units = new List<Unit>();
-      const int range = 2;
-      if (GetVisibleRange() < range) {
-        return units;
-      }
-
-      HashSet<Tile> visible = hexMap.GetWarParty(this).GetVisibleArea();
-      foreach(Tile t in tile.GetNeighboursWithinRange<Tile>(range, (Tile t1) =>
-        !tile.neighbours.Contains(t1) && visible.Contains(t1))) {
+      foreach(Tile t in tile.neighbours) {
         Unit u = t.GetUnit();
         if (u != null && u.IsAI() != IsAI() && u.CanBeWaved() && !u.IsCamping()) {
           units.Add(u);

@@ -43,11 +43,12 @@ Game Tips:
 47. mental weak affects join possibility(-10), easy to surprise, easy to charge, easy to scatter, easy to retreat on defeat 
 48. chaotic 60%几率 & defeating 40%几率变waving, discpline技能直接变normal
 
-袭扰不空一格
+奇袭多人埋伏只能一人触发
 字体显示问题
 敌军将领范围不显示，直接交战80%几率发现敌军主帅
 全局ai和集团军ai两套
-ai撤退条件：
+ai撤退条件（敌方主帅性格）：
+鲁莽英勇死战不退
 主帅阵亡，歼灭，丧失战斗力
 核心部队2只以上丧失战斗力
 超过1/3部队丧失战斗力
@@ -67,6 +68,7 @@ map skeleton for AI(supply route, point, value tiles, dam, supply range etc.)
 ai和玩家战术，偏师一个方向吸引敌军主力，另一路伏兵从后方伏击后队敌军
 AI ambush doesn't need to check players alert status, only check if ambusher is in player's visible field before attack
 use as much configuration as possible for Mod development, and think about flexibility
+初期：真宗朝，党项为附庸，中期党项称帝，历史进程引导游戏进展
 
 in Attached script to direct access gameobject:
  public void Destroy()
