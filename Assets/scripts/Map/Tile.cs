@@ -271,7 +271,7 @@ namespace MapTileNS
           Cavalry.MovementCostModifierOnPlainOrRoad : Cavalry.MovementCostModifierOnHill));
         if (unit.IsHeavyCavalry()) {
           // movement punishment on heavy cavalry
-          ret = (int)(ret * 1.8f);
+          ret = (int)(ret * 1.4f);
         }
       }
 

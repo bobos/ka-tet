@@ -307,6 +307,12 @@ namespace UnitNS
 
     public void UseAtmpt() {
       allowedAtmpt--;
+      if (IsCavalry() && !IsHeavyCavalry()) {
+        movementRemaining = GetFullMovement();
+      } else {
+        int p = (int)(GetFullMovement() / 2);
+        movementRemaining = movementRemaining > p ? movementRemaining : p;
+      }
     }
 
     public bool CanCharge() {
@@ -713,9 +719,6 @@ namespace UnitNS
       mentality = Mental.Supercharged;
       wavingPoint = defeatStreak = 0;
       rf.morale += moraleIncr;
-      if (movementRemaining < 50) {
-        movementRemaining = 50;
-      }
       return moraleIncr;
     }
 
@@ -846,10 +849,18 @@ namespace UnitNS
 
     public int GetFullMovement()
     {
-      return (int)(
+      int full = (int)(
         // ghost unit doesnt have vantage
         rf.mov *
         (IsSick() ? 0.4f : 1));
+      if (Cons.IsHeavyRain(hexMap.weatherGenerator.currentWeather) && IsCavalry()) {
+        full = (int)(full / 2);
+      } else if (Cons.IsSnow(hexMap.weatherGenerator.currentWeather)) {
+        full = (int)(full / 2);
+      } else if (Cons.IsBlizard(hexMap.weatherGenerator.currentWeather)) {
+        full = (int)(full / 4);
+      }
+      return full;
     }
 
     // ==============================================================

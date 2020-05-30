@@ -9,12 +9,7 @@
 
     public int[] Apply() {
       int[] effects = new int[5]{0,0,0,0,0};
-      if (Cons.IsHeavyRain(unit.hexMap.weatherGenerator.currentWeather) && unit.IsCavalry()) {
-        int movement = (int)(unit.movementRemaining / (-2));
-        unit.movementRemaining += movement;
-      } else if (Cons.IsSnow(unit.hexMap.weatherGenerator.currentWeather)) {
-        int movement = (int)(unit.movementRemaining / (-2));
-        unit.movementRemaining += movement;
+      if (Cons.IsSnow(unit.hexMap.weatherGenerator.currentWeather)) {
         if (unit.IsCamping()) return effects;
 
         if (Cons.TinyChance()) {
@@ -24,8 +19,6 @@
           effects[2] = unit.Killed(Util.Rand(0, 10));
         }
       } else if (Cons.IsBlizard(unit.hexMap.weatherGenerator.currentWeather)) {
-        int movement = (int)(unit.movementRemaining / (-4)) * 3;
-        unit.movementRemaining += movement;
         if (unit.IsCamping()) return effects;
 
         if (Cons.SlimChance()) {

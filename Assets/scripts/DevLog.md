@@ -42,9 +42,9 @@ Game Tips:
 46. overcharged metality incr 10% attack point
 47. mental weak affects join possibility(-10), easy to surprise, easy to charge, easy to scatter, easy to retreat on defeat 
 48. chaotic 60%几率 & defeating 40%几率变waving, discpline技能直接变normal
+49. 移动范围，步兵4格 重骑兵5格 轻骑兵6格，轻骑兵行动后获得100%移动力, 其他兵种行动后获得50%移动力
 
-步兵4格 重骑兵5格 轻骑兵7格，轻骑兵攻击或者袭扰移动力100
-RPG + SLG: RPG部分探寻发现将领历史人物名将（韩琦，夏松等）
+战争期2年24回合-》和平期10年2回合 -> 战争期
 奇袭多人埋伏只能一人触发
 字体显示问题
 敌军将领范围不显示，直接交战80%几率发现敌军主帅
@@ -70,7 +70,6 @@ map skeleton for AI(supply route, point, value tiles, dam, supply range etc.)
 ai和玩家战术，偏师一个方向吸引敌军主力，另一路伏兵从后方伏击后队敌军
 AI ambush doesn't need to check players alert status, only check if ambusher is in player's visible field before attack
 use as much configuration as possible for Mod development, and think about flexibility
-初期：真宗朝，党项为附庸，中期党项称帝，历史进程引导游戏进展
 
 in Attached script to direct access gameobject:
  public void Destroy()
