@@ -188,7 +188,7 @@ namespace UnitNS
       if (!IsOnField() || tile.vantagePoint || IsVulnerable() || chargeChance == 0) {
         return 0;
       }
-      int chance = MentallyWeak() || IsCavalry() ? 90 : 5;
+      int chance = MentallyWeak() || (IsCavalry() && !IsHeavyCavalry()) ? 90 : 5;
       if (Cons.IsGale(hexMap.windGenerator.current)) {
         WindAdvantage advantage = charger.tile.GetGaleAdvantage(tile);
         if (advantage == WindAdvantage.Advantage) {

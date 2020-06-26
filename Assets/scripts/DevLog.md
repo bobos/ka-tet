@@ -44,6 +44,7 @@ Game Tips:
 48. chaotic 60%几率 & defeating 40%几率变waving, discpline技能直接变normal
 49. 移动范围，步兵4格 重骑兵5格 轻骑兵6格，轻骑兵行动后获得100%移动力, 其他兵种行动后获得50%移动力
 
+morale punish line: 战斗力减半
 战争期2年24回合-》和平期10年2回合 -> 战争期
 奇袭多人埋伏只能一人触发
 字体显示问题

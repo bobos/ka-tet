@@ -388,7 +388,7 @@ namespace TextNS
       {"trait_cunning_description", "己方处于劣势时容易按兵不动,不易战死,计谋无效"},
       {"trait_ego", "自负"},
       {"trait_ego_description", "容易受敌方激将"},
-      {"trait_calm", "恪守"},
+      {"trait_calm", "中庸"},
       {"trait_calm_description", "恪守军令，容易被伪造军令影响"},
       };
     }
