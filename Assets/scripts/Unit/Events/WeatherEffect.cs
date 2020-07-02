@@ -12,7 +12,7 @@
       if (Cons.IsSnow(unit.hexMap.weatherGenerator.currentWeather)) {
         if (unit.IsCamping()) return effects;
 
-        if (Cons.TinyChance()) {
+        if (Cons.EvenChance()) {
           int morale = -1;
           unit.rf.morale += morale;
           effects[0] = morale;

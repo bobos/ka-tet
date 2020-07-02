@@ -151,20 +151,21 @@ namespace MonoNS
           return Cons.heat;
         } else if (luckNum < 8) {
           return Cons.mist;
-        }
-        else
-        {
+        } else {
           return Cons.dry;
         }
       }
       else
       {
-        if (luckNum < 7)
+        if (luckNum < 2)
         {
+          return Cons.cloudy;
+        } else if (luckNum < 3)
+        {
+          return Cons.rain;
+        } else if (luckNum < 7) {
           return Cons.snow;
-        }
-        else
-        {
+        } else {
           return Cons.blizard;
         }
       }
