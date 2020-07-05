@@ -131,7 +131,11 @@ namespace MonoNS
           s = tile.settlement;
         }
 
-        if (tile.burnable || selectedUnit.rf.general.Has(Cons.fireBug) && tile.field == FieldType.Wild) {
+        if (tile.burnable ||
+          selectedSettlement == null &&
+          selectedUnit != null &&
+          selectedUnit.rf.general.Has(Cons.fireBug) &&
+          tile.field == FieldType.Forest) {
           nearFireTiles.Add(tile);
         }
 
@@ -636,7 +640,9 @@ namespace MonoNS
         {
           selectedSettlement = s;
           PrepareUnitSelection();
-          if (onSettlementSelect != null) onSettlementSelect(s);
+          if (onSettlementSelect != null) {
+            onSettlementSelect(s);
+          }
         }
         else if (u != null)
         {
