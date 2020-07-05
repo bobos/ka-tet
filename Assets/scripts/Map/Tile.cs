@@ -241,6 +241,10 @@ namespace MapTileNS
       {
         movementCost = Unit.MovementCostOnUnaccesible;
       }
+
+      if (field == FieldType.Flooded && movementCost != Unit.MovementCostOnUnaccesible) {
+        movementCost = movementCost * 4;
+      }
     }
 
     public bool ignoreUnit = false;
