@@ -35,16 +35,15 @@ public class TileView : View
       txt += "☠☠☠☠\n";
     }
     if (tile.vantagePoint) {
-      txt += "Vat\n";
+      txt += "hi\n";
     }
     if (tile.terrian == TerrianType.Water) {
       if (tile.isDam)
       {
         txt = txt + "Dam\n";
       }
-    } else if (tile.terrian != TerrianType.Mountain) {
-      txt = txt + (tile.burnable ? "Fire" : "");
     }
+    txt = txt + (tile.burnable ? " Fr" : "");
     if (tile.field == FieldType.Forest) {
       txt = txt + " Fst";
     }

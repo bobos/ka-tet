@@ -223,7 +223,6 @@ namespace MonoNS
         BuryButton.SetActive(true);
       }
 
-
       if (mouseController.nearMySettlement != null && mouseController.nearMySettlement.HasRoom()
         && !mouseController.nearMySettlement.IsUnderSiege()) {
         if (!hexMap.wargameController.start) {

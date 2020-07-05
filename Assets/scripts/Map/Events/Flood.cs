@@ -73,7 +73,7 @@ namespace MapTileNS
     public bool CanBeFloodedByNearByTile()
     {
       return tile.field != FieldType.Settlement &&
-        (tile.terrian == TerrianType.Plain || tile.terrian == TerrianType.Hill);
+        (tile.terrian == TerrianType.Plain || (tile.terrian == TerrianType.Hill && !tile.vantagePoint));
     }
 
     void FloodRecede()

@@ -91,7 +91,7 @@ namespace MonoNS
     public Material TransMat;
     public Material WarningMat;
     public Material SupplyRouteMat;
-    [System.NonSerialized] public float HeightMountain = 0.33f, HeightHill = 0.23f, HeightFlat = 0f;
+    [System.NonSerialized] public float HeightMountain = 0.33f, HeightHill = 0.15f, HeightFlat = 0f;
     public GameObject InfantryPrefab;
     public GameObject CavalryPrefab;
     public GameObject HexPrefab;
@@ -950,17 +950,16 @@ namespace MonoNS
       }
       else if (elevation >= HeightHill)
       {
+        tile.SetTerrianType(TerrianType.Hill);
         if (!Cons.MostLikely()) {
           // vantage point
           prefab = MountainRootPrefab;
-          tile.SetTerrianType(TerrianType.Hill);
           tile.vantagePoint = true;
         } else {
           prefab = HighGroundPrefab;
-          tile.SetTerrianType(TerrianType.Hill);
         }
         fieldType = Cons.MostLikely() ? FieldType.Wild : (Cons.MostLikely() ? FieldType.Forest : FieldType.Wild);
-        if(fieldType == FieldType.Forest && Cons.FairChance()) {
+        if(fieldType == FieldType.Forest && Cons.EvenChance()) {
           tile.burnable = true;
         }
       }
@@ -968,8 +967,8 @@ namespace MonoNS
       {
         prefab = HexPrefab;
         tile.SetTerrianType(TerrianType.Plain);
-        fieldType = Cons.FairChance() ? FieldType.Wild : (Cons.SlimChance() ? FieldType.Forest : FieldType.Wild);
-        if(fieldType == FieldType.Forest && Cons.SlimChance()) {
+        fieldType = Cons.MostLikely() ? FieldType.Wild : (Cons.FairChance() ? FieldType.Forest : FieldType.Wild);
+        if(fieldType == FieldType.Forest && Cons.EvenChance()) {
           tile.burnable = true;
         }
       }

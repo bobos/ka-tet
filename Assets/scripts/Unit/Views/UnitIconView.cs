@@ -41,7 +41,7 @@ namespace UnitNS
       + (unit.rf.general.Has(Cons.doctor) ? "✚" : "")
       + (unit.rf.general.Has(Cons.conspirator) ? "☯" : "")
       + (unit.rf.general.Has(Cons.vanguard) && unit.IsCavalry() && !unit.IsHeavyCavalry()? "♦" : "")
-      + (unit.ImproviseOnSupply() ? "❥" : "");
+      + (unit.rf.general.Has(Cons.improvisor) ? "❥" : "");
       textMesh.fontSize = 65;
       textMesh.color = color;
     }

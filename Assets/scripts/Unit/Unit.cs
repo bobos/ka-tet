@@ -664,12 +664,14 @@ namespace UnitNS
       return inCommanderRange && MyCommander().commandSkill.ObeyMyOrder();
     }
 
-    public bool ImproviseOnSupply() {
-      if(Util.eq<Region>(rf.province.region, Cons.tubo)) {
-        return true;
+    public int ImproviseOnSupply() {
+      if (rf.general.Has(Cons.improvisor)) {
+        return -1; 
       }
-
-      return rf.general.Has(Cons.improvisor);
+      if(Util.eq<Region>(rf.province.region, Cons.tubo)) {
+        return -3;
+      }
+      return -5;
     }
 
     public bool MentallyWeak() {

@@ -26,11 +26,10 @@ namespace UnitNS
         false;
 
       if (!consumed) {
-        bool improvise = unit.ImproviseOnSupply();
-        int moraleReduce = improvise ? -1 : -4;
+        int moraleReduce = unit.ImproviseOnSupply();
         unit.rf.morale += moraleReduce;
         effects[0] = moraleReduce;
-        effects[2] = unit.Killed(Util.Rand(0, improvise ? 10 : 30));
+        effects[2] = unit.Killed(Util.Rand(0, 15));
       }
     }
 

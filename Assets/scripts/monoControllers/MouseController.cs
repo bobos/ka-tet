@@ -131,7 +131,7 @@ namespace MonoNS
           s = tile.settlement;
         }
 
-        if (tile.burnable) {
+        if (tile.burnable || selectedUnit.rf.general.Has(Cons.fireBug) && tile.field == FieldType.Wild) {
           nearFireTiles.Add(tile);
         }
 
