@@ -47,7 +47,7 @@ namespace MapTileNS
     }
 
     public bool Burnable() {
-      if (Cons.IsSpring(tile.weatherGenerator.season) || Cons.IsWinter(tile.weatherGenerator.season))
+      if (Cons.IsWinter(tile.weatherGenerator.season))
       {
         return false;
       }
@@ -142,28 +142,32 @@ namespace MapTileNS
     public bool CanCatchFire()
     {
       return tile.field != FieldType.Settlement
-        && (tile.terrian == TerrianType.Hill || tile.terrian == TerrianType.Mountain);
+        && (tile.field == FieldType.Forest || tile.terrian == TerrianType.Mountain);
     }
 
     // Can the plain tile caught fire by nearby burning tiles
-    public bool CanPlainCatchFire()
+    public bool CanWildFieldCatchFire()
     {
-      return tile.field == FieldType.Wild && Cons.IsAutumn(tile.weatherGenerator.season);
+      if (Cons.IsWinter(tile.weatherGenerator.season)) {
+        return false;
+      }
+      return Cons.IsAutumn(tile.weatherGenerator.season) && Cons.HighlyLikely()
+        || Cons.FairChance();
     }
 
     void PickTile2Burn(HashSet<Tile> tiles, Tile tile1, Tile tile2, Tile tile3, bool chance1, bool chance2, bool chance3)
     {
       if (tile1 != null && chance1 &&
           ((tile1.wildFire != null && tile1.wildFire.CanCatchFire())
-           || (tile1.terrian == TerrianType.Plain && tile1.wildFire.CanPlainCatchFire()))
+           || (tile1.field == FieldType.Wild && tile1.wildFire.CanWildFieldCatchFire()))
           ) tiles.Add(tile1);
       if (tile2 != null && chance2 &&
           ((tile2.wildFire != null && tile2.wildFire.CanCatchFire())
-           || (tile2.terrian == TerrianType.Plain && tile2.wildFire.CanPlainCatchFire()))
+           || (tile2.field == FieldType.Wild && tile2.wildFire.CanWildFieldCatchFire()))
       ) tiles.Add(tile2);
       if (tile3 != null && chance3 &&
           ((tile3.wildFire != null && tile3.wildFire.CanCatchFire())
-           || (tile3.terrian == TerrianType.Plain && tile3.wildFire.CanPlainCatchFire()))
+           || (tile3.field == FieldType.Wild && tile3.wildFire.CanWildFieldCatchFire()))
       ) tiles.Add(tile3);
     }
   }

@@ -185,7 +185,7 @@ namespace UnitNS
     }
 
     public int CanBeShaked(Unit charger) {
-      if (!IsOnField() || tile.vantagePoint || IsVulnerable() || chargeChance == 0) {
+      if (!IsOnField() || IsVulnerable() || chargeChance == 0) {
         return 0;
       }
       int chance = MentallyWeak() || (IsCavalry() && !IsHeavyCavalry()) ? 90 : 5;
@@ -279,7 +279,7 @@ namespace UnitNS
     }
 
     public int CanBeSurprised() {
-      if (!IsOnField() || tile.vantagePoint || tile.field == FieldType.Forest || rf.general.Has(Cons.ambusher)) {
+      if (!IsOnField() || tile.vantagePoint || rf.general.Has(Cons.ambusher)) {
         return 0;
       }
       return (!MentallyWeak() && (rf.general.Is(Cons.conservative) || rf.general.Is(Cons.cunning))) ? 20 : 95;
@@ -396,7 +396,7 @@ namespace UnitNS
     }
 
     public bool CanSurpriseAttack(HashSet<Tile> tiles = null) {
-      bool ret = CanAttack() && tile.field == FieldType.Forest && rf.general.Has(Cons.ambusher);
+      bool ret = CanAttack() && tile.field == FieldType.Forest;
       if (ret) {
         tiles = tiles == null ? hexMap.GetWarParty(this, true).GetVisibleArea() : tiles;
         ret = !tiles.Contains(tile);
@@ -601,7 +601,9 @@ namespace UnitNS
     }
 
     public Tile[] GetSurpriseAttackTiles() {
-      return tile.GetNeighboursWithinRange(GetVisibleRange(), (Tile t) => FindAttackPath(t).Length > 0);
+      int range = GetVisibleRange();
+      return tile.GetNeighboursWithinRange(
+        rf.general.Has(Cons.ambusher) && range != L0Visibility ? 4 : range, (Tile t) => FindAttackPath(t).Length > 0);
     }
 
     public int GetVisibleRange() {
@@ -609,8 +611,7 @@ namespace UnitNS
       if (Cons.IsMist(weatherGenerator.currentWeather) && !rf.general.Has(Cons.outlooker)) {
         v = L0Visibility;
       } else {
-        v = vantage.IsAtVantagePoint() ?
-          VantageVisibility : (rf.general.Has(Cons.ambusher) ? L2Visibility : L1Visibility);
+        v = vantage.IsAtVantagePoint() ? VantageVisibility : L1Visibility;
         v = (IsCommander() && rf.general.commandSkill.GetCommandRange() > v) ?
           rf.general.commandSkill.GetCommandRange() : v;
       }

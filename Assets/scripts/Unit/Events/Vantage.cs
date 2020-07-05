@@ -18,10 +18,8 @@
 
       if (unit.tile.terrian == MapTileNS.TerrianType.Hill) {
         if (IsAtVantagePoint()) {
-          return 1f;
-        }
-
-        if (unit.IsCavalry()) {
+          return 0.4f;
+        } else if (unit.IsCavalry()) {
           // cavary debuf on hill
           return -0.2f;
         }

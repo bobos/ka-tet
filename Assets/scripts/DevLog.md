@@ -1,7 +1,7 @@
 Game Tips:
 1. 酷暑行军，一定几率增加部队不满
 2. 菜鸟部队酷暑在野外50%几率发生脱帽事件
-3. 暴雨(骑兵)，大雪，小雪，移动力至少降低50%
+3. 暴雨，大雪，移动力至少降低50%
 4. 夏季，下雨天于河东河北密林中，部队一定几率染上痢疾
 5. 20回合后，战争泥潭，攻击部队每回合士气-4，防御部队每两回合士气-4
 6. 士气低于惩罚阈值，等级加成消失，低于撤退阈值战斗力下降8成
@@ -43,9 +43,15 @@ Game Tips:
 47. mental weak affects join possibility(-10), easy to surprise, easy to charge, easy to scatter, easy to retreat on defeat 
 48. chaotic 60%几率 & defeating 40%几率变waving, discpline技能直接变normal
 49. 移动范围，步兵4格 重骑兵5格 轻骑兵6格，轻骑兵行动后获得100%移动力, 其他兵种行动后获得50%移动力
-abcdefghijklmnopqrstuvwxyz
 
+普通将领只能在放火点放火，firebug可以在任一forest放火
+取消放火成功率
+泥地移动点数*4
+drill master: 部队平士组织度不掉
+替换等级为组织度，组织度小于某值视为rookie
+神出鬼没：暴雨不影响移动力, 烂泥地不影响移动力，不受地块辐射影响,利用暴雨 大雾大提升奇袭成功度
 morale punish line: 战斗力减半
+部队类型 轻骑兵 重骑兵 步兵 组织度设定
 奇袭多人埋伏只能一人触发
 字体显示问题
 敌军将领范围不显示，直接交战80%几率发现敌军主帅

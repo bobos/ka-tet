@@ -104,9 +104,6 @@ namespace MonoNS
     }
 
     int DefenderPoint(Unit unit) {
-      if (!unit.vantage.IsAtVantagePoint() && !unit.IsCavalry() && unit.tile.terrian == TerrianType.Hill) {
-        return (int)(unit.unitCombatPoint * 1.2f);
-      }
       return unit.unitCombatPoint;
     }
 
@@ -187,8 +184,7 @@ namespace MonoNS
       if (targetSettlement == null && !surprised
         && supporterCnt < 2 
         && supportAttackers.Count >= 2
-        && !defender.rf.general.Has(Cons.formidable)
-        && !defender.vantage.IsAtVantagePoint()) {
+        && !defender.rf.general.Has(Cons.formidable)) {
         // no wings, flank punishment
         unitPredict.operationPoint = (int)(unitPredict.operationPoint * (1 - (supportAttackers.Count - supporterCnt + 1) * 0.15f));
       }

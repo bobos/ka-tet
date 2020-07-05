@@ -25,7 +25,6 @@ namespace MapTileNS
     public DeadZone deadZone = null;
     public bool waterBound = false;
     public bool burnable = false;
-    public bool road = false;
     public bool vantagePoint = false;
     public SiegeWall siegeWall = null;
 
@@ -48,7 +47,7 @@ namespace MapTileNS
       if (terrian == TerrianType.Water) {
         poision = new Poision(this);
       }
-      if (field == FieldType.Wild || field == FieldType.Forest) {
+      if (field == FieldType.Forest) {
         if ((Util.eq<Province>(hexMap.warProvince, Cons.heBei)
              || Util.eq<Province>(hexMap.warProvince, Cons.heDong)) && Cons.FiftyFifty()) {
           epidemic = new Epidemic(this);
