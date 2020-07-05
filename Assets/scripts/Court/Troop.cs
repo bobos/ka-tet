@@ -26,11 +26,25 @@ namespace CourtNS
     int _soldiers;
     public int combatPoint;
     public int movementPoint;
-    public Level level = new Level();
+    int _battleExp;
+    public int battleExp {
+      get {
+        return _battleExp;
+      }
+      set {
+        _battleExp = value < 0 ? 0 : (value > 100 ? 100 : value);
+      }
+    }
+    public Rank rank {
+      get {
+        return battleExp < 50 ? Cons.rookie : Cons.veteran;
+      }
+    }
+
     TroopState state;
 
-    public Troop(int soldiers, Province province, Type type, Rank rank, General general) {
-      this.rank = rank;
+    public Troop(int soldiers, Province province, Type type, General general, int exp = 0) {
+      this.battleExp = exp;
       this.type = type;
       this.soldiers = soldiers;
       this.general = general;
@@ -78,17 +92,6 @@ namespace CourtNS
     public int mov {
       get {
         return movementPoint;
-      }
-    }
-
-    Rank _rank;
-
-    public Rank rank {
-      get {
-        return _rank;
-      }
-      set {
-        _rank = value;
       }
     }
 

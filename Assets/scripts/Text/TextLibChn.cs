@@ -73,10 +73,11 @@ namespace TextNS
       {"u_infantryName", @"{0}步兵"},
       {"u_cavalryName", @"{0}骑兵"},
 
-      {"rank_hanInfantryRookie", "厢军"},
-      {"rank_hanCavalryRookie", "游弋"},
-      {"rank_hanInfantryVeteran", "禁军"},
-      {"rank_hanCavalryVeteran", "大全装"},
+      {"rank_hanInfantryRookie", "厢军步兵"},
+      {"rank_hanLightCavRookie", "厢军轻骑兵"},
+      {"rank_hanInfantryVeteran", "禁军步兵"},
+      {"rank_hanLightCavVeteran", "禁军轻骑兵"},
+      {"rank_hanHeavyCavVeteran", "禁军重骑兵"},
 
       {"rank_qidanInfantryRookie", "部族军"},
       {"rank_qidanCavalryRookie", "打草谷"},

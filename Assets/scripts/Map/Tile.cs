@@ -265,18 +265,10 @@ namespace MapTileNS
         }
       }
 
-      int ret = mov;
-      if (unit.IsCavalry())
-      {
-        // apply movement modifier for calvary unit
-        ret = (int)(mov * (
+      // apply movement modifier
+      int ret = (int)(mov * (
           (terrian == TerrianType.Plain) ?
-          Cavalry.MovementCostModifierOnPlainOrRoad : Cavalry.MovementCostModifierOnHill));
-        if (unit.IsHeavyCavalry()) {
-          // movement punishment on heavy cavalry
-          ret = (int)(ret * 1.4f);
-        }
-      }
+          unit.MovementCostModifierOnPlainOrRoad() : unit.MovementCostModifierOnHill()));
 
       if (vantagePoint) {
         ret = (int)(ret * 1.2f);

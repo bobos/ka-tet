@@ -11,12 +11,17 @@ namespace UnitNS
 {
   public abstract class Unit : PFUnit, DataModel
   {
-    public abstract bool IsCavalry();
     protected abstract Unit Clone();
 
     public const int MovementcostOnHill = 25;
     public const int MovementcostOnPlain = 25;
     public const int MovementCostOnUnaccesible = -1;
+    public virtual float MovementCostModifierOnHill() {
+      return 1f;
+    }
+    public virtual float MovementCostModifierOnPlainOrRoad() {
+      return 1f;
+    }
     public const int DisbandUnitUnder = 200;
     public const int Sides2HaveVantage = 4;
 
@@ -162,7 +167,7 @@ namespace UnitNS
     }
 
     public string GetUnitName() {
-      return rf.rank.Name(rf.province.region, IsCavalry());
+      return rf.rank.Name(rf.province.region, type);
     }
 
     public string GeneralName()
@@ -287,10 +292,6 @@ namespace UnitNS
 
     public bool CanBeCrashed() {
       return !crashed;
-    }
-
-    public bool IsHeavyCavalry() {
-      return IsCavalry() && rf.rank == Cons.veteran;
     }
 
     public bool IsVulnerable() {

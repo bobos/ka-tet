@@ -2,7 +2,8 @@
 {
   public enum Type
   {
-    Cavalry,
+    LightCavalry,
+    HeavyCavalry,
     Infantry
   }
 

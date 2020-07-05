@@ -7,6 +7,7 @@ namespace  UnitNS
   public class Infantry : Unit
   {
     public const int MinTroopNum = 1000;
+    public const int MinExpForCombat = 10;
 
     public static Unit Create(bool clone, Troop troop, Tile tile, State state = State.Stand, 
                     int kia = 0, int movement = -1, float disarmorDefDebuf = 0f,
@@ -23,11 +24,6 @@ namespace  UnitNS
                     int kia = 0, int movement = -1):
           base(clone, troop, tile, state, kia, movement)
     {
-    }
-
-    public override bool IsCavalry()
-    {
-      return false;
     }
 
     protected override Unit Clone()
