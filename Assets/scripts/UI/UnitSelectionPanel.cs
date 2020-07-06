@@ -219,7 +219,7 @@ namespace MonoNS
         ReposButton.SetActive(true);
       }
 
-      if (!hexMap.wargameController.start && !unit.IsCavalry() && unit.tile.deadZone.DecompositionCntDown > 0) {
+      if (!hexMap.wargameController.start && unit.type == Type.Infantry && unit.tile.deadZone.DecompositionCntDown > 0) {
         BuryButton.SetActive(true);
       }
 
@@ -291,7 +291,6 @@ namespace MonoNS
       + "%\n加成:\n"
       + "等级加成:" + unit.rf.lvlBuf * 100
       + "%\n地形加成:" + unit.vantage.Buf() * 100
-      + "%\n重骑加成:" + unit.HeavyCavalryBuf() * 100
       + "%\n将领加成:" + unit.GetGeneralBuf() * 100
       + "%\n总计加成:" + (unit.GetBuff() *100) + "%\n\n";
       hexMap.hoverInfo.Show(details);

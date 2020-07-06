@@ -114,9 +114,7 @@ namespace FieldNS
             stat.numOfInfantry += unit.rf.soldiers;
             stat.numOfInfantryUnit++;
           }
-        }
-
-        if (unit.type == Type.Cavalry) {
+        } else { 
           stat.numOfCavalryDead += totalDead;
           if (!unit.IsGone()) {
             stat.numOfCavalry += unit.rf.soldiers;

@@ -159,15 +159,18 @@ namespace MapTileNS
     {
       if (tile1 != null && chance1 &&
           ((tile1.wildFire != null && tile1.wildFire.CanCatchFire())
-           || (tile1.field == FieldType.Wild && tile1.wildFire.CanWildFieldCatchFire()))
+           || (tile1.field == FieldType.Wild && tile1.wildFire != null
+           && tile1.wildFire.CanWildFieldCatchFire()))
           ) tiles.Add(tile1);
       if (tile2 != null && chance2 &&
           ((tile2.wildFire != null && tile2.wildFire.CanCatchFire())
-           || (tile2.field == FieldType.Wild && tile2.wildFire.CanWildFieldCatchFire()))
+           || (tile2.field == FieldType.Wild && tile2.wildFire != null
+           && tile2.wildFire.CanWildFieldCatchFire()))
       ) tiles.Add(tile2);
       if (tile3 != null && chance3 &&
           ((tile3.wildFire != null && tile3.wildFire.CanCatchFire())
-           || (tile3.field == FieldType.Wild && tile3.wildFire.CanWildFieldCatchFire()))
+           || (tile3.field == FieldType.Wild && tile3.wildFire != null
+           && tile3.wildFire.CanWildFieldCatchFire()))
       ) tiles.Add(tile3);
     }
   }

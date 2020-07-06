@@ -365,7 +365,7 @@ namespace TextNS
       {"ability_runner", "神行太保"},
       {"ability_runner_description", "部队移动力提升50%"},
       {"ability_fireBug", "祝融之名"},
-      {"ability_fireBug_description", "放火成功率100%"},
+      {"ability_fireBug_description", "任意密林都可以放火"},
       {"ability_outlooker", "千里眼"},
       {"ability_outlooker_description", "浓雾不影响视野，发现视力范围内潜伏敌军，发现视野内敌军主帅"},
       {"ability_ambusher", "神出鬼没"},

@@ -15,7 +15,7 @@ namespace UnitNS
       WarParty enWp = unit.IsAI() ? unit.hexMap.GetPlayerParty() : unit.hexMap.GetAIParty();
       bool odds = (int)(enWp.GetTotalPoint() / myWp.GetTotalPoint()) >= 2;
       if (!unit.hexMap.IsAttackSide(unit.IsAI()) && !fired && Cons.IsHan(unit.rf.province.region)
-        && odds && unit.IsOnField() && !unit.IsCavalry() && !unit.ApplyDiscipline(Cons.FiftyFifty())) {
+        && odds && unit.IsOnField() && unit.type == Type.Infantry && !unit.ApplyDiscipline(Cons.FiftyFifty())) {
         fired = true;
         return MoraleDrop();
       }

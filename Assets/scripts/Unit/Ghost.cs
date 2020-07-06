@@ -14,7 +14,7 @@ namespace UnitNS
       General gen = new General("x", "x", Cons.heBei, new CommandSkill(1), new TroopSize(1));
       gen.JoinFaction(Cons.GF, Cons.NoParty);
 
-      return new GhostUnit(new Troop(3800, Cons.heBei, Type.Infantry, Cons.veteran, gen));
+      return new GhostUnit(new Troop(3800, Cons.heBei, Type.Infantry, gen));
     }
   }
 }

@@ -524,7 +524,7 @@ namespace MonoNS
       General weakest = commander;
       int num = System.Int32.MaxValue;
       foreach(General g in attackers) {
-        if (g.commandUnit.type == Type.Cavalry) {
+        if (g.commandUnit.type == Type.LightCavalry) {
           continue;
         }
         int cp = (int)(g.commandUnit.soldiers * (1 + g.commandUnit.lvlBuf));
@@ -541,7 +541,7 @@ namespace MonoNS
         if (Util.eq<General>(g, weakest)) {
           continue;
         }
-        if (g.commandUnit.type == Type.Cavalry) {
+        if (g.commandUnit.type == Type.LightCavalry) {
           cavalries.Add(g);
         } else {
           infantries.Add(g);
@@ -1139,7 +1139,7 @@ namespace MonoNS
       if (unit2GO.ContainsKey(unit)) {
         return;
       }
-      GameObject prefab = unit.IsCavalry() ? CavalryPrefab : InfantryPrefab;
+      GameObject prefab = unit.type == Type.Infantry ? InfantryPrefab : CavalryPrefab;
       GameObject tileGO = tile2GO[tile];
       //NOTE: spawn as child gameobject of hex
       Vector3 position = tile.GetSurfacePosition();

@@ -10,7 +10,7 @@
 
     public int Occur() {
       if (!fired && Cons.IsQidan(unit.rf.province.region) && !unit.hexMap.IsAttackSide(unit.IsAI())
-        && unit.IsCavalry() && unit.IsCamping() && !unit.ApplyDiscipline(Cons.MostLikely())) {
+        && unit.type != Type.Infantry && unit.IsCamping() && !unit.ApplyDiscipline(Cons.MostLikely())) {
         fired = true;
         return MoraleDrop();
       }

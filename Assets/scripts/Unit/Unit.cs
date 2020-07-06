@@ -193,7 +193,7 @@ namespace UnitNS
       if (!IsOnField() || IsVulnerable() || chargeChance == 0) {
         return 0;
       }
-      int chance = MentallyWeak() || (IsCavalry() && !IsHeavyCavalry()) ? 90 : 5;
+      int chance = MentallyWeak() || type == Type.LightCavalry ? 90 : 5;
       if (Cons.IsGale(hexMap.windGenerator.current)) {
         WindAdvantage advantage = charger.tile.GetGaleAdvantage(tile);
         if (advantage == WindAdvantage.Advantage) {
@@ -224,14 +224,14 @@ namespace UnitNS
 
     public int Skirmished(Unit skirmisher) {
       int point = 0;
-      if (IsCavalry()) {
-        point = 10;
-      } else {
+      if (type == Type.Infantry) {
         if (Util.eq<Rank>(rf.rank, Cons.rookie)) {
           point = 30;
         } else {
           point = 20;
         }
+      } else {
+        point = 10;
       }
       if (Cons.IsGale(hexMap.windGenerator.current)) {
         WindAdvantage advantage = skirmisher.tile.GetGaleAdvantage(tile);
@@ -308,7 +308,7 @@ namespace UnitNS
 
     public void UseAtmpt() {
       allowedAtmpt--;
-      if (IsCavalry() && !IsHeavyCavalry()) {
+      if (type == Type.LightCavalry) {
         movementRemaining = GetFullMovement();
       } else {
         int p = (int)(GetFullMovement() / 2);
@@ -317,11 +317,11 @@ namespace UnitNS
     }
 
     public bool CanCharge() {
-      return IsHeavyCavalry() && CanAttack() && !IsSurrounded() && !MentallyWeak();
+      return type == Type.HeavyCavalry && CanAttack() && !IsSurrounded() && !MentallyWeak();
     }
 
     public bool CanHarras() {
-      return IsCavalry() && !IsHeavyCavalry() && CanAttack() && !IsSurrounded() && !MentallyWeak() && !IsCamping();
+      return type == Type.LightCavalry && CanAttack() && !IsSurrounded() && !MentallyWeak() && !IsCamping();
     }
 
     public bool CanBreakThrough() {
@@ -857,7 +857,7 @@ namespace UnitNS
         // ghost unit doesnt have vantage
         rf.mov *
         (IsSick() ? 0.4f : 1));
-      if (Cons.IsHeavyRain(hexMap.weatherGenerator.currentWeather) && IsCavalry()) {
+      if (Cons.IsHeavyRain(hexMap.weatherGenerator.currentWeather) && type != Type.Infantry) {
         full = (int)(full / 2);
       } else if (Cons.IsSnow(hexMap.weatherGenerator.currentWeather)) {
         full = (int)(full / 2);
@@ -922,11 +922,7 @@ namespace UnitNS
 
     public float GetBuff()
     {
-      return GetCampingAttackBuff() + vantage.Buf() + HeavyCavalryBuf();
-    }
-
-    public float HeavyCavalryBuf() {
-      return IsHeavyCavalry() ? 0.2f : 0f;
+      return GetCampingAttackBuff() + vantage.Buf();
     }
 
     public float GetGeneralBuf() {

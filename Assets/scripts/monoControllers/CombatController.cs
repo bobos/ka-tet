@@ -372,7 +372,7 @@ namespace MonoNS
     int AllocateCasualty(int total, List<UnitPredict> units) {
       int savedLives = 0;
       foreach(UnitPredict up in units) {
-        up.leastNum = (int)(up.unit.rf.soldiers * (up.unit.IsCavalry() ? 0.2f : 0.12f)); 
+        up.leastNum = (int)(up.unit.rf.soldiers * (up.unit.type != Type.Infantry ? 0.2f : 0.12f)); 
       }
 
       bool dieMore = false; 
@@ -413,8 +413,8 @@ namespace MonoNS
 
           // rookie
           int toll = 0;
-          if (unit.rf.rank.Level() == 1) {
-            if (!unit.IsCavalry()) {
+          if (unit.rf.rank == Cons.rookie) {
+            if (unit.type == Type.Infantry) {
               toll = dieMore ? 30 : 15;
               total -= toll;
               savedLives += Helper(up, toll);
@@ -426,8 +426,8 @@ namespace MonoNS
           }
 
           // veteran
-          if (unit.rf.rank.Level() == 2) {
-            if (!unit.IsCavalry()) {
+          if (unit.rf.rank == Cons.veteran) {
+            if (unit.type == Type.Infantry) {
               toll = dieMore ? 16 : 8;
               total -= toll;
               savedLives += Helper(up, toll);
@@ -534,20 +534,20 @@ namespace MonoNS
 
         foreach (UnitPredict u in predict.attackers) {
           attackerTotal += u.unit.rf.soldiers;
-          if (u.unit.IsCavalry()) {
-            attackerCavTotal += u.unit.rf.soldiers;
-          } else {
+          if (u.unit.type == Type.Infantry) {
             attackerInfTotal += u.unit.rf.soldiers;
+          } else {
+            attackerCavTotal += u.unit.rf.soldiers;
           }
           predict.attackerOptimPoints += u.operationPoint;
         }
 
         foreach (UnitPredict u in predict.defenders) {
           defenderTotal += u.unit.rf.soldiers;
-          if (u.unit.IsCavalry()) {
-            defenderCavTotal += u.unit.rf.soldiers;
-          } else {
+          if (u.unit.type == Type.Infantry) {
             defenderInfTotal += u.unit.rf.soldiers;
+          } else {
+            defenderCavTotal += u.unit.rf.soldiers;
           }
           predict.defenderOptimPoints += u.operationPoint;
         }
@@ -675,19 +675,19 @@ namespace MonoNS
         int defenderCavDead = 0;
 
         foreach(UnitPredict up in predict.attackers) {
-          if (up.unit.IsCavalry()) {
-            attackerCavDead += up.dead;
-          } else {
+          if (up.unit.type == Type.Infantry) {
             attackerInfDead += up.dead;
+          } else {
+            attackerCavDead += up.dead;
           }
           all.Add(up);
         }
 
         foreach(UnitPredict up in predict.defenders) {
-          if (up.unit.IsCavalry()) {
-            defenderCavDead += up.dead;
-          } else {
+          if (up.unit.type == Type.Infantry) {
             defenderInfDead += up.dead;
+          } else {
+            defenderCavDead += up.dead;
           }
           all.Add(up);
         }

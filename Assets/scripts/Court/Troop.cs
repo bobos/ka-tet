@@ -112,10 +112,12 @@ namespace CourtNS
         morale += 10;
       }
       movementPoint = general.Has(Cons.runner) ? 150 : 100;
-      if(type == Type.Cavalry) {
-        onFieldUnit = Cavalry.Create(false, this, deploymentTile);
-      } else {
+      if(type == Type.HeavyCavalry) {
+        onFieldUnit = HeavyCavalry.Create(false, this, deploymentTile);
+      } else if (type == Type.Infantry) {
         onFieldUnit = Infantry.Create(false, this, deploymentTile);
+      } else {
+        onFieldUnit = LightCavalry.Create(false, this, deploymentTile);
       }
       return true;
     }

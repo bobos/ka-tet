@@ -49,7 +49,7 @@ namespace MonoNS
     public bool FloodAnimating = false;
     public bool Flood(Unit unit, Tile tile, HashSet<Tile> tiles = null)
     {
-      if (unit != null && unit.IsCavalry()) {
+      if (unit != null && unit.type != Type.Infantry) {
         return false;
       }
       FloodAnimating = true;

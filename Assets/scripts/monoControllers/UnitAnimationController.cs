@@ -468,7 +468,7 @@ namespace MonoNS
 
     public bool BuryAnimating = false;
     public void Bury(Unit unit) {
-      if (unit.IsCavalry()) {
+      if (unit.type != Type.Infantry) {
         return;
       }
       BuryAnimating = true;
@@ -680,7 +680,7 @@ namespace MonoNS
       from.UseAtmpt();
       to.Skirmished(from);
       ShowEffect(from, new int[]{0, 0, from.Killed(Util.Rand(10, 30)), 0, 0}, null, true);
-      int dead = to.IsHeavyCavalry() ? Util.Rand(1, 5) : (to.rf.rank.Level() == 1 ? Util.Rand(10, 30) : Util.Rand(5, 20)); 
+      int dead = to.type == Type.HeavyCavalry ? Util.Rand(1, 5) : (to.rf.rank == Cons.rookie ? Util.Rand(10, 30) : Util.Rand(5, 20)); 
       ShowEffect(to, new int[]{0, 0, to.Killed(dead), 0, 0}, null, true);
       hexMap.turnController.Sleep(1);
       while(hexMap.turnController.sleeping) { yield return null; }
@@ -707,12 +707,12 @@ namespace MonoNS
       popAniController.Show(view, textLib.get("pop_chasing"), Color.green);
       while (popAniController.Animating) { yield return null; }
       int dead = to.mentality == Mental.Chaotic ?
-        (from.rf.soldiers / (from.IsCavalry() ? 8 : 60))
-      : (from.rf.soldiers / (from.IsCavalry() ? 16 : 100));
+        (from.rf.soldiers / (from.type == Type.Infantry ? 60 : 8))
+      : (from.rf.soldiers / (from.type == Type.Infantry ? 100 : 16));
       dead = from.rf.general.Has(Cons.hammer) ? (int)(dead * 1.5f) : dead;
       dead = dead > to.rf.soldiers ? to.rf.soldiers : dead;
       if (to.rf.morale == 0) { dead = to.rf.soldiers; }
-      int morale = from.IsCavalry() ? -6 : -2; 
+      int morale = from.type == Type.Infantry ? -2 : -6; 
       morale = morale * (from.rf.general.Has(Cons.hammer) ? 2 : 1);
       ShowEffect(to, new int[]{to.Defeat(morale),0,to.Killed(dead),0,0});
       while (ShowAnimating) { yield return null; }
@@ -1112,7 +1112,7 @@ namespace MonoNS
         from.UseAtmpt();
         popAniController.Show(hexMap.GetUnitView(to), textLib.get("pop_surpriseAttackFailed"), Color.white);
         while(popAniController.Animating) { yield return null; }
-        int killed = from.IsCavalry() ? Util.Rand(20, 50) : Util.Rand(40, 100);
+        int killed = from.type == Type.Infantry ? Util.Rand(40, 100) : Util.Rand(20, 50);
         int moraleDrop = -3; 
         from.rf.morale += moraleDrop;
         ShowEffect(from, new int[]{moraleDrop,0,from.Killed(killed),0,0});

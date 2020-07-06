@@ -98,11 +98,11 @@ public class Starter : MonoBehaviour {
     zhaoyun.CreateTroop(hexMap, 5000, Cons.heBei, Type.Infantry, 50);
     guanyu.CreateTroop(hexMap, 8000, Cons.heBei, Type.Infantry, 30);
     machao.CreateTroop(hexMap, 8000, Cons.heDong, Type.Infantry, 50);
-    zhangfei.CreateTroop(hexMap, 2000, Cons.heXi, Type.Cavalry, 50);
+    zhangfei.CreateTroop(hexMap, 2000, Cons.heXi, Type.HeavyCavalry, 50);
     y1.CreateTroop(hexMap, 4000, Cons.heDong, Type.Infantry, 20);
     y2.CreateTroop(hexMap, 4000, Cons.heDong, Type.Infantry, 20);
     y3.CreateTroop(hexMap, 4000, Cons.heHuang, Type.Infantry, 50);
-    y4.CreateTroop(hexMap, 2000, Cons.shanXi, Type.Cavalry, 20);
+    y4.CreateTroop(hexMap, 2000, Cons.shanXi, Type.LightCavalry, 50);
 
     General caocao = new General("g_caocao", "g_caocao_d", Cons.xiJing, new CommandSkill(3), new TroopSize(3)); 
     General xuchu = new General("g_xuchu", "g_xuchu_d", Cons.xiJing, new CommandSkill(2), new TroopSize(3)); 
@@ -128,14 +128,14 @@ public class Starter : MonoBehaviour {
     x8.JoinFaction(Cons.Liao, Cons.NorthCourt);
 
     caocao.CreateTroop(hexMap, 10000, Cons.xiJing, Type.Infantry, 50);
-    xuchu.CreateTroop(hexMap, 3000, Cons.shangJing, Type.Cavalry, 50);
+    xuchu.CreateTroop(hexMap, 3000, Cons.shangJing, Type.HeavyCavalry, 50);
     abc.CreateTroop(hexMap, 8000, Cons.zhongJing, Type.Infantry, 50);
-    x1.CreateTroop(hexMap, 3000, Cons.xiJing, Type.Cavalry, 20);
+    x1.CreateTroop(hexMap, 3000, Cons.xiJing, Type.LightCavalry, 30);
     x2.CreateTroop(hexMap, 8000, Cons.xiJing, Type.Infantry, 20);
     x3.CreateTroop(hexMap, 10000, Cons.xiJing, Type.Infantry, 20);
     x4.CreateTroop(hexMap, 8000, Cons.zhongJing, Type.Infantry, 20);
     x5.CreateTroop(hexMap, 8000, Cons.zhongJing, Type.Infantry, 50);
-    x6.CreateTroop(hexMap, 2000, Cons.zhongJing, Type.Cavalry, 20);
+    x6.CreateTroop(hexMap, 2000, Cons.zhongJing, Type.LightCavalry, 60);
     x7.CreateTroop(hexMap, 8000, Cons.zhongJing, Type.Infantry, 20);
     x8.CreateTroop(hexMap, 10000, Cons.zhongJing, Type.Infantry, 50);
 

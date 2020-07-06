@@ -33,14 +33,14 @@ namespace UnitNS
       + (unit.rf.general.Has(Cons.discipline) ? "✪" : "")
       + (unit.rf.general.Has(Cons.generous) ? "㊎" : "")
       + (unit.rf.general.Has(Cons.hammer) ? "➲" : "")
-      + (unit.rf.general.Has(Cons.breaker) && unit.IsHeavyCavalry() ? "♗" : "")
+      + (unit.rf.general.Has(Cons.breaker) && unit.type == Type.HeavyCavalry ? "♗" : "")
       + (unit.rf.general.Has(Cons.diminisher) ? "▣" : "")
       + (unit.rf.general.Has(Cons.mechanician) ? "♜" : "")
       + (unit.rf.general.Has(Cons.holdTheGround) ? "☍" : "")
       + (unit.rf.general.Has(Cons.forecaster) ? "➹" : "")
       + (unit.rf.general.Has(Cons.doctor) ? "✚" : "")
       + (unit.rf.general.Has(Cons.conspirator) ? "☯" : "")
-      + (unit.rf.general.Has(Cons.vanguard) && unit.IsCavalry() && !unit.IsHeavyCavalry()? "♦" : "")
+      + (unit.rf.general.Has(Cons.vanguard) && unit.type == Type.LightCavalry ? "♦" : "")
       + (unit.rf.general.Has(Cons.improvisor) ? "❥" : "");
       textMesh.fontSize = 65;
       textMesh.color = color;

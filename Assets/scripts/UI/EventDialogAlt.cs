@@ -153,20 +153,20 @@ namespace MonoNS
         + (u.windDisadvantage ? ("[" + textLib.get("misc_windDisadvantage") + "]") : "")
         + "\n";
 
-        if (u.unit.IsCavalry()) {
-          atkCav += u.unit.rf.soldiers;
-        } else {
+        if (u.unit.type == Type.Infantry) {
           atkInf += u.unit.rf.soldiers;
+        } else {
+          atkCav += u.unit.rf.soldiers;
         }
       }
 
       foreach (UnitPredict u in predict.defenders) {
         defGenerals += u.unit.GeneralName() + "\n";
 
-        if (u.unit.IsCavalry()) {
-          defCav += u.unit.rf.soldiers;
-        } else {
+        if (u.unit.type == Type.Infantry) {
           defInf += u.unit.rf.soldiers;
+        } else {
+          defCav += u.unit.rf.soldiers;
         }
       }
 

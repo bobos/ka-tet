@@ -37,8 +37,7 @@ namespace CourtNS
 
     public override int CombatPoint(Type unitType)
     {
-      if (unitType == Type.Infantry)
-        return 10;
+      if (unitType == Type.Infantry) return 10;
       return 30;
     }
 
@@ -61,8 +60,10 @@ namespace CourtNS
       return new List<Region>(){Cons.nvzhen, Cons.han};
     }
 
-    public override float LevelBuf(Type _unitType) {
-      return 0.5f;
+    public override float LevelBuf(Type unitType) {
+      if (unitType == Type.Infantry) return 0.5f;
+      if (unitType == Type.HeavyCavalry) return 0.5f;
+      return 0.3f;
     }
 
   }
@@ -107,10 +108,9 @@ namespace CourtNS
     }
 
     public override float LevelBuf(Type unitType) {
-      if (unitType == Type.Cavalry) {
-        return 1f;
-      }
-      return 0.5f;
+      if (unitType == Type.Infantry) return 0.5f;
+      if (unitType == Type.HeavyCavalry) return 1f;
+      return 0.3f;
     }
 
   }
@@ -155,10 +155,9 @@ namespace CourtNS
     }
 
     public override float LevelBuf(Type unitType) {
-      if (unitType == Type.Cavalry) {
-        return 1f;
-      }
-      return 0.5f;
+      if (unitType == Type.Infantry) return 0.5f;
+      if (unitType == Type.HeavyCavalry) return 1f;
+      return 0.3f;
     }
 
   }
@@ -203,10 +202,9 @@ namespace CourtNS
     }
 
     public override float LevelBuf(Type unitType) {
-      if (unitType == Type.Cavalry) {
-        return 1f;
-      }
-      return 0.5f;
+      if (unitType == Type.Infantry) return 0.5f;
+      if (unitType == Type.HeavyCavalry) return 1f;
+      return 0.3f;
     }
 
   }
@@ -251,10 +249,9 @@ namespace CourtNS
     }
 
     public override float LevelBuf(Type unitType) {
-      if (unitType == Type.Cavalry) {
-        return 1.5f;
-      }
-      return 1f;
+      if (unitType == Type.Infantry) return 1f;
+      if (unitType == Type.HeavyCavalry) return 1.5f;
+      return 0.5f;
     }
   }
 
