@@ -935,7 +935,7 @@ namespace UnitNS
     }
 
     public float GetGeneralBuf() {
-      return rf.general.Has(Cons.formidable) ? 0.25f : 0f;
+      return rf.general.Has(Cons.formidable) ? 1f : 0f;
     }
 
     public float GetMentalBuf() {

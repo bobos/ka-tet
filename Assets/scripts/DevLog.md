@@ -44,7 +44,12 @@ Game Tips:
 48. chaotic 60%几率 & defeating 40%几率变waving, discpline技能直接变normal
 49. 移动范围，步兵4格 重骑兵5格 轻骑兵6格，轻骑兵行动后获得100%移动力, 其他兵种行动后获得50%移动力
 
-3星将领技能 fortify 2次 制造障碍物 持续若干回合
+提高攻心术成功率
+5星佯败 触发口袋阵
+华佗再世：伤亡减半 士气影响减半
+检查部队连同城市被包围算不算被包围
+fortify: 步兵在高山上建造公事，只能使用一次，工事内部队无法被攻击，被包围时前3回合士气不减，进攻或者离开工事工事自动消失，可以趁狂风被火烧毁,工事内军队不参加协同作战
+4星将领技能 fortify 5次
 veteran light cavalry increase wave point
 rookie unit displine event increase wave point(+10)
 other event flood fire sick unit increase wave point
