@@ -310,7 +310,7 @@ namespace MonoNS
       }
       string stateStr = unit.tile.siegeWall != null && unit.tile.siegeWall.IsFunctional() ? "围城中 " :
         (unit.tile.siegeWall != null && unit.tile.siegeWall.owner.isAI == unit.IsAI() ? ("建长围中:" + unit.tile.siegeWall.buildTurns + "回合完成 ") : "");
-      stateStr += unit.IsWarWeary() ? "士气低落 " : "";
+      stateStr += unit.IsWarWeary() ? "士气低落 " : (unit.IsUnwilling() ? "士气不佳" : "");
       stateStr += unit.IsStarving() ? "补给不济 " : "";
       stateStr += unit.GetStateName();
       title.text += "\n" + (unit.hasNoOpenning ? "[无懈可击]" : "")

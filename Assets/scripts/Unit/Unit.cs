@@ -463,6 +463,10 @@ namespace UnitNS
       return warWeary.IsWarWeary();
     }
 
+    public bool IsUnwilling() {
+      return warWeary.IsUnwilling();
+    }
+
     public bool IsOnField() {
       return state == State.Stand;
     }
@@ -873,6 +877,11 @@ namespace UnitNS
     public int GetRetreatThreshold()
     {
       return rf.province.region.RetreatThreshold();
+    }
+
+    public int GetPunishThreshold()
+    {
+      return rf.province.region.MoralePunishLine();
     }
 
     // ==============================================================

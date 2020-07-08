@@ -44,13 +44,12 @@ Game Tips:
 48. chaotic 60%几率 & defeating 40%几率变waving, discpline技能直接变normal
 49. 移动范围，步兵4格 重骑兵5格 轻骑兵6格，轻骑兵行动后获得100%移动力, 其他兵种行动后获得50%移动力
 
-morale punishline 战斗力下降40%
+3星将领技能 fortify 2次 制造障碍物 持续若干回合
 veteran light cavalry increase wave point
 rookie unit displine event increase wave point(+10)
 other event flood fire sick unit increase wave point
 unit conflict 小概率发生
 增加火焰洪水持续时间
-破坏山路 制造障碍物
 rookie骑兵袭扰2次，veteran袭扰3次，技能+1次
 增加战胜实力比
 指令焚毁大本营或者省会城市中的粮草储备
