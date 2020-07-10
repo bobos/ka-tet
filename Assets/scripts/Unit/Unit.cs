@@ -308,12 +308,8 @@ namespace UnitNS
 
     public void UseAtmpt() {
       allowedAtmpt--;
-      if (type == Type.LightCavalry) {
-        movementRemaining = GetFullMovement();
-      } else {
-        int p = (int)(GetFullMovement() / 2);
-        movementRemaining = movementRemaining > p ? movementRemaining : p;
-      }
+      int p = (int)(GetFullMovement() / 2);
+      movementRemaining = movementRemaining > p ? movementRemaining : p;
     }
 
     public bool CanCharge() {

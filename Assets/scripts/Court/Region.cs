@@ -63,7 +63,7 @@ namespace CourtNS
     public override float LevelBuf(Type unitType) {
       if (unitType == Type.Infantry) return 0.5f;
       if (unitType == Type.HeavyCavalry) return 0.5f;
-      return 0.3f;
+      return 0.2f;
     }
 
   }
@@ -110,7 +110,7 @@ namespace CourtNS
     public override float LevelBuf(Type unitType) {
       if (unitType == Type.Infantry) return 0.5f;
       if (unitType == Type.HeavyCavalry) return 1f;
-      return 0.3f;
+      return 0.2f;
     }
 
   }
@@ -157,7 +157,7 @@ namespace CourtNS
     public override float LevelBuf(Type unitType) {
       if (unitType == Type.Infantry) return 0.5f;
       if (unitType == Type.HeavyCavalry) return 1f;
-      return 0.3f;
+      return 0.2f;
     }
 
   }
@@ -204,7 +204,7 @@ namespace CourtNS
     public override float LevelBuf(Type unitType) {
       if (unitType == Type.Infantry) return 0.5f;
       if (unitType == Type.HeavyCavalry) return 1f;
-      return 0.3f;
+      return 0.2f;
     }
 
   }
@@ -251,7 +251,7 @@ namespace CourtNS
     public override float LevelBuf(Type unitType) {
       if (unitType == Type.Infantry) return 1f;
       if (unitType == Type.HeavyCavalry) return 1.5f;
-      return 0.5f;
+      return 0.3f;
     }
   }
 
