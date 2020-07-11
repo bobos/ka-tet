@@ -60,9 +60,8 @@ namespace CourtNS {
     string name;
     string biography;
     TextLib txtLib = Cons.GetTextLib();
-    public TroopSize size;
 
-    public General(string name, string biography, Province province, CommandSkill commandSkill, TroopSize size,
+    public General(string name, string biography, Province province, CommandSkill commandSkill,
       List<Trait> traits = null, List<Ability> acquired = null) {
       this.name = name;
       this.biography = biography;
@@ -70,7 +69,6 @@ namespace CourtNS {
       this.trait = Trait.Random();
       acquiredAbilities = acquired == null ? Ability.RandomAcquiredAbilities() : acquired;
       this.commandSkill = commandSkill;
-      this.size = size;
     }
 
     public bool Has(Ability ability) {
@@ -115,7 +113,7 @@ namespace CourtNS {
     }
 
     public int MaxNum(UnitNS.Type type) {
-      return size.GetTroopSize(type == UnitNS.Type.Infantry);
+      return type == UnitNS.Type.Infantry ? 10000 : 3000;
     }
 
     public void JoinParty(Party party) {

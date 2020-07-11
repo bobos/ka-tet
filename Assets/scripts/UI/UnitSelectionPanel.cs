@@ -297,7 +297,6 @@ namespace MonoNS
 
       title.text = unit.GeneralName();
       title.text += "\n统帅度:" + GetStarRate(unit.rf.general.commandSkill.commandSkill);
-      title.text += "\n指挥度:" + GetStarRate(unit.rf.general.size.troopSize);
       title.text += "\n移动力:" + (isPreflight ? mouseController.selectedUnit.movementRemaining + " -> " : "")
         + unit.movementRemaining + "/" + unit.GetFullMovement();
       title.text += "\n" + unit.Name() + "[" + unit.GetUnitName() + " 兵:" + unit.rf.soldiers + "/亡:" + unit.kia + "]";

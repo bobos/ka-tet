@@ -10,16 +10,20 @@ namespace CourtNS
     public abstract string Name();
     public abstract string Description();
     public List<Region> UncomfortableRegions = new List<Region>();
-    public abstract int CombatPoint(Type unitType);
-    public int Mov(Type unitType)
+    public virtual int CombatPoint(Type unitType)
     {
-      return 100;
+      if (unitType == Type.Infantry) return 10;
+      if (unitType == Type.LightCavalry) return 20;
+      return 50;
+    }
+    public virtual float LevelBuf(Type unitType) {
+      if (unitType == Type.HeavyCavalry) return 0f;
+      return 0.2f;
     }
     public abstract int Will();
     public abstract int RetreatThreshold();
     public abstract int MoralePunishLine();
     public abstract List<Region> GetConflictRegions();
-    public abstract float LevelBuf(Type unitType);
   }
 
   public class QidanRegion : Region
@@ -33,12 +37,6 @@ namespace CourtNS
     public override string Description()
     {
       return textLib.get("region_qidanRegion_description");
-    }
-
-    public override int CombatPoint(Type unitType)
-    {
-      if (unitType == Type.Infantry) return 10;
-      return 30;
     }
 
     public override int Will()
@@ -60,12 +58,6 @@ namespace CourtNS
       return new List<Region>(){Cons.nvzhen, Cons.han};
     }
 
-    public override float LevelBuf(Type unitType) {
-      if (unitType == Type.Infantry) return 0.5f;
-      if (unitType == Type.HeavyCavalry) return 0.5f;
-      return 0.2f;
-    }
-
   }
 
   public class HanRegion : Region
@@ -79,13 +71,6 @@ namespace CourtNS
     public override string Description()
     {
       return textLib.get("region_hanRegion_description");
-    }
-
-    public override int CombatPoint(Type unitType)
-    {
-      if (unitType == Type.Infantry)
-        return 10;
-      return 25;
     }
 
     public override int Will()
@@ -107,12 +92,6 @@ namespace CourtNS
       return new List<Region>();
     }
 
-    public override float LevelBuf(Type unitType) {
-      if (unitType == Type.Infantry) return 0.5f;
-      if (unitType == Type.HeavyCavalry) return 1f;
-      return 0.2f;
-    }
-
   }
 
   public class DangxiangRegion : Region
@@ -126,13 +105,6 @@ namespace CourtNS
     public override string Description()
     {
       return textLib.get("region_dangxiangRegion_description");
-    }
-
-    public override int CombatPoint(Type unitType)
-    {
-      if (unitType == Type.Infantry)
-        return 10;
-      return 25;
     }
 
     public override int Will()
@@ -154,12 +126,6 @@ namespace CourtNS
       return new List<Region>(){Cons.tubo, Cons.qidan};
     }
 
-    public override float LevelBuf(Type unitType) {
-      if (unitType == Type.Infantry) return 0.5f;
-      if (unitType == Type.HeavyCavalry) return 1f;
-      return 0.2f;
-    }
-
   }
 
   public class TuboRegion : Region
@@ -177,9 +143,9 @@ namespace CourtNS
 
     public override int CombatPoint(Type unitType)
     {
-      if (unitType == Type.Infantry)
-        return 10;
-      return 20;
+      if (unitType == Type.Infantry) return 10;
+      if (unitType == Type.LightCavalry) return 20;
+      return 40;
     }
 
     public override int Will()
@@ -202,9 +168,8 @@ namespace CourtNS
     }
 
     public override float LevelBuf(Type unitType) {
-      if (unitType == Type.Infantry) return 0.5f;
-      if (unitType == Type.HeavyCavalry) return 1f;
-      return 0.2f;
+      if (unitType == Type.HeavyCavalry) return 0f;
+      return 0.1f;
     }
 
   }
@@ -224,9 +189,9 @@ namespace CourtNS
 
     public override int CombatPoint(Type unitType)
     {
-      if (unitType == Type.Infantry)
-        return 10;
-      return 20;
+      if (unitType == Type.Infantry) return 10;
+      if (unitType == Type.LightCavalry) return 20;
+      return 60;
     }
 
     public override int Will()
@@ -246,12 +211,6 @@ namespace CourtNS
 
     public override List<Region> GetConflictRegions() {
       return new List<Region>();
-    }
-
-    public override float LevelBuf(Type unitType) {
-      if (unitType == Type.Infantry) return 1f;
-      if (unitType == Type.HeavyCavalry) return 1.5f;
-      return 0.3f;
     }
   }
 
