@@ -14,7 +14,7 @@ namespace CourtNS
   {
     const int AbilityMin = 40;
     const int AbilityMax = 80;
-    public const int MaxMorale = 100;
+    public const int MaxOrg = 100;
 
     public string name;
     public Faction faction;
@@ -22,29 +22,13 @@ namespace CourtNS
     public General general;
     public Unit onFieldUnit;
     public Type type;
-    int _morale;
+    int _org;
     int _soldiers;
     public int combatPoint;
     public int movementPoint;
-    int _battleExp;
-    public int battleExp {
-      get {
-        return _battleExp;
-      }
-      set {
-        _battleExp = value < 0 ? 0 : (value > 100 ? 100 : value);
-      }
-    }
-    public Rank rank {
-      get {
-        return battleExp < 50 ? Cons.rookie : Cons.veteran;
-      }
-    }
-
     TroopState state;
 
-    public Troop(int soldiers, Province province, Type type, General general, int exp = 0) {
-      this.battleExp = exp;
+    public Troop(int soldiers, Province province, Type type, General general) {
       this.type = type;
       this.soldiers = soldiers;
       this.general = general;
@@ -52,7 +36,7 @@ namespace CourtNS
       name = province.region.Name();
       combatPoint = province.region.CombatPoint(type);
       movementPoint = 100;
-      morale = province.region.Will();
+      org = province.region.MilitarySkill();
       this.province = province;
       state = TroopState.Idle;
     }
@@ -65,12 +49,12 @@ namespace CourtNS
       return state == TroopState.Rest;
     }
 
-    public int morale {
+    public int org {
       get {
-        return _morale;
+        return _org;
       }
       set {
-        _morale = value < 0 ? 0 : (value > MaxMorale ? MaxMorale : value);
+        _org = value < 0 ? 0 : (value > MaxOrg ? MaxOrg : value);
       }
     }
 
@@ -80,12 +64,6 @@ namespace CourtNS
       }
       set {
         _soldiers = value < 0 ? 0 : value;
-      }
-    }
-
-    public float lvlBuf {
-      get {
-        return rank.Buf(this);
       }
     }
 
@@ -109,7 +87,7 @@ namespace CourtNS
       }
       state = TroopState.OnField;
       if (general.Has(Cons.generous)) {
-        morale += 10;
+        org += 10;
       }
       movementPoint = general.Has(Cons.runner) ? 150 : 100;
       if(type == Type.HeavyCavalry) {

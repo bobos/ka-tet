@@ -105,11 +105,11 @@ namespace CourtNS {
     }
 
     // At Court Actions
-    public void CreateTroop(HexMap hexMap, int num, Province province, UnitNS.Type type, int exp = 0) {
+    public void CreateTroop(HexMap hexMap, int num, Province province, UnitNS.Type type) {
       ResetFieldRecords();
       this.hexMap = hexMap;
       int maxNum = MaxNum(type);
-      commandUnit = new Troop(num > maxNum ? maxNum : num, province, type, this, exp);
+      commandUnit = new Troop(num > maxNum ? maxNum : num, province, type, this);
     }
 
     public int MaxNum(UnitNS.Type type) {

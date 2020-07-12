@@ -58,6 +58,15 @@ namespace UnitNS
     public int defeatStreak = 0;
     public Mental mentality = Mental.Normal;
     public int surroundCnt = 0;
+    private int _org = 100;
+    public int org {
+      get {
+        return _org;
+      }
+      set {
+        _org = value < -1 ? -1 : (value > 100 ? 100 : value);
+      }
+    }
     public Unit(bool clone, Troop troop, Tile tile, State state,
                 int kia, int movement = -1)
     {
@@ -742,6 +751,7 @@ namespace UnitNS
     // Before new turn starts
     public int[] RefreshUnit()
     {
+      org += 20;
       if ((mentality == Mental.Chaotic && Cons.MostLikely()) || (
            mentality == Mental.Defeating && Cons.EvenChance())) {
         mentality = Mental.Waving;

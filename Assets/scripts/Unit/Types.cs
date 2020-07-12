@@ -10,17 +10,10 @@
   public enum State
   {
     Stand,
+    Routed,
     Camping,
     Disbanded,
     Retreated
-  }
-
-  public enum Mental {
-    Supercharged,
-    Normal,
-    Waving,
-    Defeating,
-    Chaotic
   }
 
   public enum ActionType {

@@ -14,15 +14,15 @@ namespace CourtNS
     {
       if (unitType == Type.Infantry) return 10;
       if (unitType == Type.LightCavalry) return 20;
+      return 40;
+    }
+    public abstract int MilitarySkill();
+    public int RetreatUnder() {
+      return 20;
+    }
+    public int MilitaryPunishmentUnder() {
       return 50;
     }
-    public virtual float LevelBuf(Type unitType) {
-      if (unitType == Type.HeavyCavalry) return 0f;
-      return 0.2f;
-    }
-    public abstract int Will();
-    public abstract int RetreatThreshold();
-    public abstract int MoralePunishLine();
     public abstract List<Region> GetConflictRegions();
   }
 
@@ -39,19 +39,16 @@ namespace CourtNS
       return textLib.get("region_qidanRegion_description");
     }
 
-    public override int Will()
+    public override int MilitarySkill()
     {
       return 90;
     }
 
-    public override int MoralePunishLine()
+    public override int CombatPoint(Type unitType)
     {
-      return 55;
-    }
-
-    public override int RetreatThreshold()
-    {
-      return 35;
+      if (unitType == Type.Infantry) return 10;
+      if (unitType == Type.LightCavalry) return 25;
+      return 45;
     }
 
     public override List<Region> GetConflictRegions() {
@@ -73,19 +70,9 @@ namespace CourtNS
       return textLib.get("region_hanRegion_description");
     }
 
-    public override int Will()
+    public override int MilitarySkill()
     {
-      return 90;
-    }
-
-    public override int MoralePunishLine()
-    {
-      return 55;
-    }
-
-    public override int RetreatThreshold()
-    {
-      return 35;
+      return 100;
     }
 
     public override List<Region> GetConflictRegions() {
@@ -107,19 +94,9 @@ namespace CourtNS
       return textLib.get("region_dangxiangRegion_description");
     }
 
-    public override int Will()
+    public override int MilitarySkill()
     {
-      return 80;
-    }
-
-    public override int MoralePunishLine()
-    {
-      return 55;
-    }
-
-    public override int RetreatThreshold()
-    {
-      return 40;
+      return 85;
     }
 
     public override List<Region> GetConflictRegions() {
@@ -148,28 +125,13 @@ namespace CourtNS
       return 40;
     }
 
-    public override int Will()
+    public override int MilitarySkill()
     {
-      return 85;
-    }
-
-    public override int MoralePunishLine()
-    {
-      return 50;
-    }
-
-    public override int RetreatThreshold()
-    {
-      return 40;
+      return 80;
     }
 
     public override List<Region> GetConflictRegions() {
       return new List<Region>(){Cons.dangxiang};
-    }
-
-    public override float LevelBuf(Type unitType) {
-      if (unitType == Type.HeavyCavalry) return 0f;
-      return 0.1f;
     }
 
   }
@@ -191,22 +153,12 @@ namespace CourtNS
     {
       if (unitType == Type.Infantry) return 10;
       if (unitType == Type.LightCavalry) return 20;
-      return 60;
+      return 50;
     }
 
-    public override int Will()
+    public override int MilitarySkill()
     {
-      return 100;
-    }
-
-    public override int MoralePunishLine()
-    {
-      return 30;
-    }
-
-    public override int RetreatThreshold()
-    {
-      return 20;
+      return 75;
     }
 
     public override List<Region> GetConflictRegions() {
