@@ -13,8 +13,7 @@ namespace CourtNS
     public virtual int CombatPoint(Type unitType)
     {
       if (unitType == Type.Infantry) return 10;
-      if (unitType == Type.LightCavalry) return 20;
-      return 40;
+      return 45;
     }
     public abstract int MilitarySkill();
     public int RetreatUnder() {
@@ -47,8 +46,7 @@ namespace CourtNS
     public override int CombatPoint(Type unitType)
     {
       if (unitType == Type.Infantry) return 10;
-      if (unitType == Type.LightCavalry) return 25;
-      return 45;
+      return 50;
     }
 
     public override List<Region> GetConflictRegions() {
@@ -121,7 +119,6 @@ namespace CourtNS
     public override int CombatPoint(Type unitType)
     {
       if (unitType == Type.Infantry) return 10;
-      if (unitType == Type.LightCavalry) return 20;
       return 40;
     }
 
@@ -152,8 +149,7 @@ namespace CourtNS
     public override int CombatPoint(Type unitType)
     {
       if (unitType == Type.Infantry) return 10;
-      if (unitType == Type.LightCavalry) return 20;
-      return 50;
+      return 55;
     }
 
     public override int MilitarySkill()
