@@ -36,7 +36,7 @@ namespace CourtNS
       name = province.region.Name();
       combatPoint = province.region.CombatPoint(type);
       movementPoint = 100;
-      org = province.region.MilitarySkill();
+      org = province.region.MaxOrganizationPoint();
       this.province = province;
       state = TroopState.Idle;
     }
@@ -90,12 +90,10 @@ namespace CourtNS
         org += 10;
       }
       movementPoint = general.Has(Cons.runner) ? 150 : 100;
-      if(type == Type.HeavyCavalry) {
-        onFieldUnit = HeavyCavalry.Create(false, this, deploymentTile);
-      } else if (type == Type.Infantry) {
+      if (type == Type.Infantry) {
         onFieldUnit = Infantry.Create(false, this, deploymentTile);
       } else {
-        onFieldUnit = LightCavalry.Create(false, this, deploymentTile);
+        onFieldUnit = Cavalry.Create(false, this, deploymentTile);
       }
       return true;
     }

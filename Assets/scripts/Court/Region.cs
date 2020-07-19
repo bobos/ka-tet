@@ -13,9 +13,9 @@ namespace CourtNS
     public virtual int CombatPoint(Type unitType)
     {
       if (unitType == Type.Infantry) return 10;
-      return 45;
+      return 30;
     }
-    public abstract int MilitarySkill();
+    public abstract int MaxOrganizationPoint();
     public int RetreatUnder() {
       return 20;
     }
@@ -38,7 +38,7 @@ namespace CourtNS
       return textLib.get("region_qidanRegion_description");
     }
 
-    public override int MilitarySkill()
+    public override int MaxOrganizationPoint()
     {
       return 90;
     }
@@ -46,7 +46,7 @@ namespace CourtNS
     public override int CombatPoint(Type unitType)
     {
       if (unitType == Type.Infantry) return 10;
-      return 50;
+      return 35;
     }
 
     public override List<Region> GetConflictRegions() {
@@ -68,7 +68,7 @@ namespace CourtNS
       return textLib.get("region_hanRegion_description");
     }
 
-    public override int MilitarySkill()
+    public override int MaxOrganizationPoint()
     {
       return 100;
     }
@@ -92,9 +92,15 @@ namespace CourtNS
       return textLib.get("region_dangxiangRegion_description");
     }
 
-    public override int MilitarySkill()
+    public override int MaxOrganizationPoint()
     {
       return 85;
+    }
+
+    public override int CombatPoint(Type unitType)
+    {
+      if (unitType == Type.Infantry) return 10;
+      return 35;
     }
 
     public override List<Region> GetConflictRegions() {
@@ -116,13 +122,7 @@ namespace CourtNS
       return textLib.get("region_tuboRegion_description");
     }
 
-    public override int CombatPoint(Type unitType)
-    {
-      if (unitType == Type.Infantry) return 10;
-      return 40;
-    }
-
-    public override int MilitarySkill()
+    public override int MaxOrganizationPoint()
     {
       return 80;
     }
@@ -149,10 +149,10 @@ namespace CourtNS
     public override int CombatPoint(Type unitType)
     {
       if (unitType == Type.Infantry) return 10;
-      return 55;
+      return 50;
     }
 
-    public override int MilitarySkill()
+    public override int MaxOrganizationPoint()
     {
       return 75;
     }
