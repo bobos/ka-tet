@@ -113,7 +113,7 @@ namespace CourtNS {
     }
 
     public int MaxNum(UnitNS.Type type) {
-      return type == UnitNS.Type.Infantry ? 10000 : 3000;
+      return type == UnitNS.Type.Infantry ? 10000 : 5000;
     }
 
     public void JoinParty(Party party) {
