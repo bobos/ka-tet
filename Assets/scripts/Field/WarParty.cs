@@ -221,7 +221,6 @@ namespace FieldNS
     public void UpdateUnitStatus() {
       foreach(Unit unit in GetUnits()) {
         unit.UpdateInCommanderRange();
-        unit.UpdateOpenningStatus();
       }
     }
 

@@ -13,21 +13,19 @@ namespace CourtNS
     public virtual int CombatPoint(Type unitType)
     {
       if (unitType == Type.Infantry) return 10;
-      return 25;
+      return 30;
     }
-    public abstract int MaxOrganizationPoint();
-    public int RetreatUnder() {
-      return 20;
+    public virtual int DefaultOrganizationPoint() {
+      return 35;
     }
-    public int MilitaryPunishmentUnder() {
-      return 50;
+    public virtual int MaxOrganizationPoint() {
+      return 65;
     }
     public abstract List<Region> GetConflictRegions();
   }
 
   public class QidanRegion : Region
   {
-
     public override string Name()
     {
       return textLib.get("region_qidanRegion");
@@ -36,17 +34,6 @@ namespace CourtNS
     public override string Description()
     {
       return textLib.get("region_qidanRegion_description");
-    }
-
-    public override int MaxOrganizationPoint()
-    {
-      return 90;
-    }
-
-    public override int CombatPoint(Type unitType)
-    {
-      if (unitType == Type.Infantry) return 10;
-      return 30;
     }
 
     public override List<Region> GetConflictRegions() {
@@ -68,11 +55,6 @@ namespace CourtNS
       return textLib.get("region_hanRegion_description");
     }
 
-    public override int MaxOrganizationPoint()
-    {
-      return 100;
-    }
-
     public override List<Region> GetConflictRegions() {
       return new List<Region>();
     }
@@ -92,17 +74,6 @@ namespace CourtNS
       return textLib.get("region_dangxiangRegion_description");
     }
 
-    public override int MaxOrganizationPoint()
-    {
-      return 85;
-    }
-
-    public override int CombatPoint(Type unitType)
-    {
-      if (unitType == Type.Infantry) return 10;
-      return 30;
-    }
-
     public override List<Region> GetConflictRegions() {
       return new List<Region>(){Cons.tubo, Cons.qidan};
     }
@@ -120,11 +91,6 @@ namespace CourtNS
     public override string Description()
     {
       return textLib.get("region_tuboRegion_description");
-    }
-
-    public override int MaxOrganizationPoint()
-    {
-      return 80;
     }
 
     public override List<Region> GetConflictRegions() {
@@ -152,8 +118,12 @@ namespace CourtNS
       return 40;
     }
 
-    public override int MaxOrganizationPoint()
+    public override int DefaultOrganizationPoint()
     {
+      return 50;
+    }
+
+    public override int MaxOrganizationPoint() {
       return 75;
     }
 

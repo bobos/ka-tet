@@ -14,7 +14,7 @@ namespace CourtNS
   {
     const int AbilityMin = 40;
     const int AbilityMax = 80;
-    public const int MaxOrg = 100;
+    public const int MaxOrg = 65;
 
     public string name;
     public Faction faction;
@@ -23,20 +23,20 @@ namespace CourtNS
     public Unit onFieldUnit;
     public Type type;
     int _org;
-    int _soldiers;
+    int _soldiers = 0;
     public int combatPoint;
     public int movementPoint;
     TroopState state;
 
     public Troop(int soldiers, Province province, Type type, General general) {
       this.type = type;
-      this.soldiers = soldiers;
+      Enlist(soldiers);
       this.general = general;
       faction = general.faction;
       name = province.region.Name();
       combatPoint = province.region.CombatPoint(type);
       movementPoint = 100;
-      org = province.region.MaxOrganizationPoint();
+      org = province.region.DefaultOrganizationPoint();
       this.province = province;
       state = TroopState.Idle;
     }
@@ -54,7 +54,8 @@ namespace CourtNS
         return _org;
       }
       set {
-        _org = value < 0 ? 0 : (value > MaxOrg ? MaxOrg : value);
+        _org = value < 0 ? 0 : (value > province.region.MaxOrganizationPoint()
+         ? province.region.MaxOrganizationPoint() : value);
       }
     }
 
@@ -74,7 +75,8 @@ namespace CourtNS
     }
 
     public int Enlist(int rookies) {
-      int gap = general.MaxNum(type) - soldiers;
+      int maxNum = type == Type.Infantry ? Infantry.MaxTroopNum : Cavalry.MaxTroopNum;
+      int gap = maxNum - soldiers;
       if (rookies < gap) { gap = rookies; }
       int returned = rookies - gap;
       soldiers += gap;

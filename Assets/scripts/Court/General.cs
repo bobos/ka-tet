@@ -108,12 +108,7 @@ namespace CourtNS {
     public void CreateTroop(HexMap hexMap, int num, Province province, UnitNS.Type type) {
       ResetFieldRecords();
       this.hexMap = hexMap;
-      int maxNum = MaxNum(type);
-      commandUnit = new Troop(num > maxNum ? maxNum : num, province, type, this);
-    }
-
-    public int MaxNum(UnitNS.Type type) {
-      return type == UnitNS.Type.Infantry ? 10000 : 5000;
+      commandUnit = new Troop(num, province, type, this);
     }
 
     public void JoinParty(Party party) {

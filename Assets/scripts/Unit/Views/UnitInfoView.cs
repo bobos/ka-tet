@@ -73,8 +73,7 @@ namespace UnitNS
         + "[" + unit.rf.province.region.Name() + "]"
         + "("+unit.allowedAtmpt+")"
         + "\n"
-        + unit.rf.province.Name() + "-" + unit.GetUnitName()
-        + NumIcons(unit.rf.soldiers, unit.type != Type.Infantry) + "\n"
+        + unit.rf.province.Name() + NumIcons(unit.rf.soldiers, unit.type != Type.Infantry) + "\n"
         + "攻: " + Shorten(unit.unitCombatPoint) + "\n防: " + Shorten(totalDefendPoint) + "\n"
         + unit.rf.morale + "/" + unit.rf.province.region.MoralePunishLine() + "/" + unit.rf.province.region.RetreatThreshold();
       textMesh.fontSize = 45;

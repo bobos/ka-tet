@@ -22,6 +22,9 @@ namespace UnitNS
     public virtual float MovementCostModifierOnPlainOrRoad() {
       return 1f;
     }
+    public virtual bool IsCavalry() {
+      return false;
+    }
     public const int DisbandUnitUnder = 200;
     public const int Sides2HaveVantage = 4;
 
@@ -56,15 +59,14 @@ namespace UnitNS
     WeatherGenerator weatherGenerator;
     TurnController turnController;
     public int defeatStreak = 0;
-    public Mental mentality = Mental.Normal;
     public int surroundCnt = 0;
-    private int _org = 100;
-    public int org {
+    private int _morale = 100;
+    public int morale {
       get {
-        return _org;
+        return _morale;
       }
       set {
-        _org = value < -1 ? -1 : (value > 100 ? 100 : value);
+        _morale = value < 0 ? 0 : (value > 100 ? 100 : value);
       }
     }
     public Unit(bool clone, Troop troop, Tile tile, State state,
@@ -175,10 +177,6 @@ namespace UnitNS
       return rf.name;
     }
 
-    public string GetUnitName() {
-      return rf.rank.Name(rf.province.region, type);
-    }
-
     public string GeneralName()
     {
       return rf.general != null ? rf.general.Name() : " ";
@@ -188,108 +186,18 @@ namespace UnitNS
       return Util.eq<General>(hexMap.GetWarParty(this).commanderGeneral, rf.general);
     }
 
-    int _chargeChance = 100;
-    public int chargeChance {
-      get {
-        return _chargeChance;
-      }
-      set {
-        _chargeChance = value < 0 ? 0 : value;
-      }
-    }
-
-    public int CanBeShaked(Unit charger) {
-      if (!IsOnField() || IsVulnerable() || chargeChance == 0) {
-        return 0;
-      }
-      int chance = MentallyWeak() || type == Type.LightCavalry ? 90 : 5;
-      if (Cons.IsGale(hexMap.windGenerator.current)) {
-        WindAdvantage advantage = charger.tile.GetGaleAdvantage(tile);
-        if (advantage == WindAdvantage.Advantage) {
-          chance += 80;
-        }
-        if (advantage == WindAdvantage.Disadvantage) {
-          chance -= 80;
-        }
-      }
-
-      if (hasNoOpenning) {
-        chance = 5;
-      }
-
-      return chance < 0 ? 0 : (chance > 100 ? 100 : chance);
-    }
-
-    public List<Unit> GetHarrasTargets() {
-      List<Unit> units = new List<Unit>();
-      foreach(Tile t in tile.neighbours) {
-        Unit u = t.GetUnit();
-        if (u != null && u.IsAI() != IsAI() && u.CanBeWaved() && !u.IsCamping()) {
-          units.Add(u);
-        }
-      }
-      return units;
-    }
-
-    public int Skirmished(Unit skirmisher) {
-      int point = 0;
-      if (type == Type.Infantry) {
-        if (Util.eq<Rank>(rf.rank, Cons.rookie)) {
-          point = 30;
-        } else {
-          point = 20;
-        }
-      } else {
-        point = 10;
-      }
-      if (Cons.IsGale(hexMap.windGenerator.current)) {
-        WindAdvantage advantage = skirmisher.tile.GetGaleAdvantage(tile);
-        if (advantage == WindAdvantage.Advantage) {
-          point += 30;
-        }
-        if (advantage == WindAdvantage.Disadvantage) {
-          point -= 30;
-        }
-      }
-      if (skirmisher.rf.general.Has(Cons.vanguard)) {
-        point += 30;
-      }
-      if (rf.general.Has(Cons.holdTheGround)) {
-        point -= 20;
-      }
-      if (tile.terrian == TerrianType.Hill) {
-        point = (int)(point * 0.8f);
-      }
-      if (skirmisher.rf.soldiers < 1500 && skirmisher.rf.soldiers >= 800) {
-        point = (int)(point * 0.8f);
-      }
-      if (skirmisher.rf.soldiers < 800) {
-        point = (int)(point * 0.5f);
-      }
-      point = point < 0 ? 0 : point;
-      wavingPoint += point;
-      return wavingPoint;
-    }
-
-    public int wavingPoint {
-      get {
-        return _wavingPoint;
-      }
-      set {
-        _wavingPoint = value > 100 ? 100 : (value < 0 ? 0 : value);
-        if (_wavingPoint == 100 && (mentality != Mental.Defeating || mentality != Mental.Chaotic)) {
-          mentality = Mental.Waving;
-          _wavingPoint = 0;
-        }
-      }
-    }
-
-    int _wavingPoint = 0;
-    public bool CanBeWaved() {
-      if (!IsOnField() || tile.vantagePoint || IsVulnerable() || MentallyWeak()) {
-        return false;
-      }
-      return true;
+    public bool CanBeShaked(Unit charger) {
+      return IsOnField() && !IsVulnerable();
+      //int chance = IsCavalry() ? 0 : 10;
+      //if (Cons.IsGale(hexMap.windGenerator.current)) {
+      //  WindAdvantage advantage = charger.tile.GetGaleAdvantage(tile);
+      //  if (advantage == WindAdvantage.Advantage) {
+      //    chance += 40;
+      //  }
+      //  if (advantage == WindAdvantage.Disadvantage) {
+      //    chance -= 40;
+      //  }
+      //}
     }
 
     public int CanBeSurprised() {
@@ -304,7 +212,7 @@ namespace UnitNS
     }
 
     public bool IsVulnerable() {
-      return mentality == Mental.Defeating || mentality == Mental.Chaotic|| rf.morale == 0;
+      return morale == 0;
     }
 
     public int allowedAtmpt = 1;
@@ -468,10 +376,6 @@ namespace UnitNS
       return warWeary.IsWarWeary();
     }
 
-    public bool IsUnwilling() {
-      return warWeary.IsUnwilling();
-    }
-
     public bool IsOnField() {
       return state == State.Stand;
     }
@@ -526,52 +430,6 @@ namespace UnitNS
       // TODO: uncomment me
       // return !IsAI() || (IsAI() && view != null && view.viewActivated);
       return true;
-    }
-
-    public bool HasNoOpenning() {
-      if (IsVulnerable() || IsCamping()) {
-        return false;
-      }
-
-      int cnt = 0;
-      foreach(Tile t in tile.neighbours) {
-        if (!IsControlledTile(t)) {
-          cnt++;
-        }
-      }
-      return cnt <= (6 - Sides2HaveVantage);
-    }
-
-    bool IsTileControlled(Tile t) {
-      Unit u = t.GetUnit();
-      if (t.Accessible()) {
-        // empty field
-        return u != null && u.IsAI() == IsAI();
-      } else {
-        // mountain, water, burning/flooding tile, or settlement
-        return t.settlement == null || t.settlement.owner.isAI == IsAI();
-      }
-    }
-
-    bool IsControlledTile(Tile t) {
-      if (IsTileControlled(t)) {
-        return true;
-      }
-      
-      // empty field or enemy controlled settlement
-      bool controlled = false;
-      if (t.GetUnit() == null && t.settlement == null) {
-        // just empty field
-        controlled = true;
-        foreach(Tile t1 in t.neighbours) {
-          if (!IsTileControlled(t1)) {
-            controlled = false;
-            break;
-          }
-        }
-      }
-
-      return controlled;
     }
 
     public List<Unit> GetFalseOrderTargets() {
@@ -684,11 +542,6 @@ namespace UnitNS
       return -5;
     }
 
-    public bool MentallyWeak() {
-      return mentality == Mental.Waving || mentality == Mental.Defeating
-       || mentality == Mental.Chaotic || warWeary.IsWarWeary();
-    }
-
     public bool StickAsNailWhenDefeat() {
       if (MentallyWeak()) {
         return Cons.EvenChance();
@@ -737,11 +590,6 @@ namespace UnitNS
 
     public void UpdateInCommanderRange() {
       inCommanderRange = UnderCommand();
-    }
-
-    public bool hasNoOpenning = false;
-    public void UpdateOpenningStatus() {
-      hasNoOpenning = HasNoOpenning(); 
     }
 
     // ==============================================================

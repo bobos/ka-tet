@@ -299,7 +299,7 @@ namespace MonoNS
       title.text += "\n统帅度:" + GetStarRate(unit.rf.general.commandSkill.commandSkill);
       title.text += "\n移动力:" + (isPreflight ? mouseController.selectedUnit.movementRemaining + " -> " : "")
         + unit.movementRemaining + "/" + unit.GetFullMovement();
-      title.text += "\n" + unit.Name() + "[" + unit.GetUnitName() + " 兵:" + unit.rf.soldiers + "/亡:" + unit.kia + "]";
+      title.text += "\n" + unit.Name() + "[兵:" + unit.rf.soldiers + "/亡:" + unit.kia + "]";
       title.text += "\n士气: " + unit.rf.morale;
       title.text += "\n单兵战力: " + GetCombatpointRate((int)(unit.cp * (1 + unit.rf.lvlBuf)));
       if (unit.IsCamping()) {

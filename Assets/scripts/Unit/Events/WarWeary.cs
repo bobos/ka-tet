@@ -9,15 +9,12 @@
     }
 
     public float GetBuf() {
-      return IsWarWeary() ? -0.8f : (IsUnwilling() ? 0.4f : 0);
+      return IsWarWeary() ? -0.8f : 0;
     }
 
     public bool IsWarWeary() {
-      return unit.rf.morale < unit.GetRetreatThreshold();
-    }
-
-    public bool IsUnwilling() {
-      return !IsWarWeary() && unit.rf.morale < unit.GetPunishThreshold();
+      return unit.rf.soldiers <
+      (unit.IsCavalry() ? Cavalry.MaxTroopNum : Infantry.MaxTroopNum) * (100 - unit.rf.org);
     }
 
     public int GetWarWearyDissertNum()
