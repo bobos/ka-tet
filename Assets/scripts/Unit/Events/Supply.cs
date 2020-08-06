@@ -27,7 +27,7 @@ namespace UnitNS
 
       if (!consumed) {
         int moraleReduce = unit.ImproviseOnSupply();
-        unit.rf.morale += moraleReduce;
+        unit.morale += moraleReduce;
         effects[0] = moraleReduce;
         effects[2] = unit.Killed(Util.Rand(0, 15));
       }

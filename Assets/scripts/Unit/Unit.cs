@@ -60,13 +60,13 @@ namespace UnitNS
     TurnController turnController;
     public int defeatStreak = 0;
     public int surroundCnt = 0;
-    private int _morale = 100;
+    private int _morale = 85;
     public int morale {
       get {
         return _morale;
       }
       set {
-        _morale = value < 0 ? 0 : (value > 100 ? 100 : value);
+        _morale = value < 0 ? 0 : (value > MaxMorale() ? MaxMorale() : value);
       }
     }
     public Unit(bool clone, Troop troop, Tile tile, State state,
@@ -126,6 +126,10 @@ namespace UnitNS
         tile.settlement.Encamp(this);
       }
       movementRemaining = GetFullMovement();
+    }
+
+    public int MaxMorale() {
+      return rf.general.Has(Cons.generous) ? 100 : 85;
     }
 
     State[] visibleStates = {State.Stand};
@@ -201,10 +205,10 @@ namespace UnitNS
     }
 
     public int CanBeSurprised() {
-      if (!IsOnField() || tile.vantagePoint || rf.general.Has(Cons.ambusher)) {
+      if (!IsOnField() || IsVulnerable() || tile.vantagePoint || rf.general.Has(Cons.ambusher)) {
         return 0;
       }
-      return (!MentallyWeak() && (rf.general.Is(Cons.conservative) || rf.general.Is(Cons.cunning))) ? 20 : 95;
+      return rf.general.Is(Cons.conservative) || rf.general.Is(Cons.cunning) ? 20 : 95;
     }
 
     public bool CanBeCrashed() {
@@ -230,15 +234,11 @@ namespace UnitNS
     }
 
     public bool CanCharge() {
-      return type == Type.HeavyCavalry && CanAttack() && !IsSurrounded() && !MentallyWeak();
-    }
-
-    public bool CanHarras() {
-      return type == Type.LightCavalry && CanAttack() && !IsSurrounded() && !MentallyWeak() && !IsCamping();
+      return IsCavalry() && CanAttack() && !IsSurrounded() && !IsVulnerable();
     }
 
     public bool CanBreakThrough() {
-      return IsSurrounded() && CanAttack();
+      return IsSurrounded() && CanAttack() && !IsVulnerable();
     }
 
     public bool CanFire() {
@@ -534,17 +534,17 @@ namespace UnitNS
 
     public int ImproviseOnSupply() {
       if (rf.general.Has(Cons.improvisor)) {
-        return -1; 
+        return -10; 
       }
       if(Util.eq<Region>(rf.province.region, Cons.tubo)) {
-        return -3;
+        return -15;
       }
-      return -5;
+      return -30;
     }
 
     public bool StickAsNailWhenDefeat() {
-      if (MentallyWeak()) {
-        return Cons.EvenChance();
+      if (IsVulnerable()) {
+        return false;
       }
       return (inCommanderRange &&
               MyCommander().commandSkill.TurningTide()) ||
@@ -553,10 +553,13 @@ namespace UnitNS
     }
 
     public bool RetreatOnDefeat() {
+      if (IsVulnerable()) {
+        return true;
+      }
       if (IsCamping()) {
         return false;
       }
-      if (rf.general.Is(Cons.conservative) || MentallyWeak()) {
+      if (rf.general.Is(Cons.conservative)) {
         return Cons.EvenChance();
       } else {
         return Cons.SlimChance();
@@ -572,19 +575,13 @@ namespace UnitNS
     }
 
     public int Defeat(int moraleDrop) {
-      if (mentality == Mental.Supercharged) {
-        mentality = Mental.Normal;
-      }
-      wavingPoint += 20;
       int drop = moraleDrop + (defeatStreak++ * -2);
-      rf.morale += drop;
+      morale += drop;
       return drop;
     }
 
     public int Victory(int moraleIncr) {
-      mentality = Mental.Supercharged;
-      wavingPoint = defeatStreak = 0;
-      rf.morale += moraleIncr;
+      morale += moraleIncr;
       return moraleIncr;
     }
 

@@ -308,7 +308,7 @@ namespace MonoNS
     }
 
     IEnumerator CoUnitSurrounded(HashSet<Unit> units, HashSet<Unit> accu) {
-      const int moraleDrop = -5;
+      const int moraleDrop = -10;
       bool first = true;
       foreach(Unit unit in units) {
         accu.Add(unit);
@@ -320,7 +320,7 @@ namespace MonoNS
         }
         unit.surroundCnt++;
         int drop = moraleDrop * unit.surroundCnt;
-        unit.rf.morale += drop;
+        unit.morale += drop;
         ShowEffect(unit, new int[]{drop,0,0,0,0});
       }
       hexMap.turnController.Sleep(1);
@@ -700,21 +700,15 @@ namespace MonoNS
 
     IEnumerator CoPursue(Unit from, Unit to) {
       from.UseAtmpt();
-      from.mentality = Mental.Supercharged;
       View view = from.IsCamping() ?
         settlementMgr.GetView(from.tile.settlement) : hexMap.GetUnitView(from);
 
       popAniController.Show(view, textLib.get("pop_chasing"), Color.green);
       while (popAniController.Animating) { yield return null; }
-      int dead = to.mentality == Mental.Chaotic ?
-        (from.rf.soldiers / (from.type == Type.Infantry ? 60 : 8))
-      : (from.rf.soldiers / (from.type == Type.Infantry ? 100 : 16));
+      int dead = from.rf.soldiers / (from.type == Type.Infantry ? 30 : 6);
       dead = from.rf.general.Has(Cons.hammer) ? (int)(dead * 1.5f) : dead;
       dead = dead > to.rf.soldiers ? to.rf.soldiers : dead;
-      if (to.rf.morale == 0) { dead = to.rf.soldiers; }
-      int morale = from.type == Type.Infantry ? -2 : -6; 
-      morale = morale * (from.rf.general.Has(Cons.hammer) ? 2 : 1);
-      ShowEffect(to, new int[]{to.Defeat(morale),0,to.Killed(dead),0,0});
+      ShowEffect(to, new int[]{0,0,to.Killed(dead),0,0});
       while (ShowAnimating) { yield return null; }
       if (to.rf.soldiers <= Unit.DisbandUnitUnder) {
         // unit disbanded

@@ -12,10 +12,6 @@ namespace CourtNS
 
   public class Troop
   {
-    const int AbilityMin = 40;
-    const int AbilityMax = 80;
-    public const int MaxOrg = 65;
-
     public string name;
     public Faction faction;
     public Province province;
