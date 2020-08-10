@@ -100,26 +100,13 @@ namespace MonoNS
     public bool Burn(Unit unit, Tile tile, HashSet<Tile> tiles = null)
     {
       if (unit != null) {
-        if (!unit.CanFire()) {
+        if (!unit.CanFire() || !unit.GetBurnableTiles().Contains(tile)) {
           return false;
         }
         unit.fireDone = true;
       }
       hexMap.cameraKeyboardController.DisableCamera();
-      Weather weather = hexMap.weatherGenerator.currentWeather;
-      bool set = false;
-      if(unit != null && !Cons.IsHeavyRain(weather) && ! Cons.IsRain(weather) && !Cons.IsBlizard(weather)) {
-        if (unit.tile.GetGaleAdvantage(tile) == WindAdvantage.Advantage) {
-          set = true;
-        }
-        if (unit.rf.general.Has(Cons.fireBug)) {
-          set = true;
-        }
-        if (unit.tile.GetGaleAdvantage(tile) == WindAdvantage.Disadvantage) {
-          set = false;
-        }
-      }
-      tiles = tiles == null ? tile.SetFire(set) : tiles;
+      tiles = tiles == null ? tile.SetFire() : tiles;
       BurnAnimating = true;
       StartCoroutine(CoBurn(tile, tiles));
       return true;
@@ -127,37 +114,32 @@ namespace MonoNS
 
     IEnumerator CoBurn(Tile t, HashSet<Tile> tiles)
     {
-      if (tiles.Count == 0) {
-        popAniController.Show(hexMap.GetTileView(t), textLib.get("pop_setFireFail"), Color.white);
-        while (popAniController.Animating) { yield return null; }
-      } else {
-        popAniController.Show(hexMap.GetTileView(t), textLib.get("pop_setFire"), Color.yellow);
-        while (popAniController.Animating) { yield return null; }
-        foreach(Tile tile in tiles) {
-          hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(tile).transform.position);
-          Unit unit = tile.GetUnit();
-          tile.Burn();
-          TileView view = hexMap.GetTileView(tile);
-          view.BurnAnimation();
-          while (view.Animating) { yield return null; }
-          if (tile.siegeWall != null) {
-            DestroySiegeWall(null, tile);
-            while (DestroySiegeAnimating) { yield return null; }
-          }
+      popAniController.Show(hexMap.GetTileView(t), textLib.get("pop_setFire"), Color.yellow);
+      while (popAniController.Animating) { yield return null; }
+      foreach(Tile tile in tiles) {
+        hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(tile).transform.position);
+        Unit unit = tile.GetUnit();
+        tile.Burn();
+        TileView view = hexMap.GetTileView(tile);
+        view.BurnAnimation();
+        while (view.Animating) { yield return null; }
+        if (tile.siegeWall != null) {
+          DestroySiegeWall(null, tile);
+          while (DestroySiegeAnimating) { yield return null; }
+        }
 
-          if (unit != null) {
-            Tile newTile = tile.Escape();
-            newTile = newTile == null ? unit.FindBreakThroughPoint() : newTile;
+        if (unit != null) {
+          Tile newTile = tile.Escape();
+          newTile = newTile == null ? unit.FindBreakThroughPoint() : newTile;
 
-            if (newTile == null) {
-              unitAniController.DestroyUnit(unit, DestroyType.ByWildFire);
-              while (unitAniController.DestroyAnimating) { yield return null; }
-            } else {
-              unitAniController.ShowEffect(unit, DisasterEffect.Apply(DisasterType.WildFire, unit));
-              while(unitAniController.ShowAnimating) { yield return null; }
-              unitAniController.MoveUnit(unit, newTile);
-              while (unitAniController.MoveAnimating) { yield return null; }
-            }
+          if (newTile == null) {
+            unitAniController.DestroyUnit(unit, DestroyType.ByWildFire);
+            while (unitAniController.DestroyAnimating) { yield return null; }
+          } else {
+            unitAniController.ShowEffect(unit, DisasterEffect.Apply(DisasterType.WildFire, unit));
+            while(unitAniController.ShowAnimating) { yield return null; }
+            unitAniController.MoveUnit(unit, newTile);
+            while (unitAniController.MoveAnimating) { yield return null; }
           }
         }
       }

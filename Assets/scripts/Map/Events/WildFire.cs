@@ -35,14 +35,11 @@ namespace MapTileNS
       }
     }
 
-    public HashSet<Tile> Start(bool started = false) {
+    public HashSet<Tile> Start() {
       HashSet<Tile> affectedTiles = new HashSet<Tile>();
-      if (started || Burnable()) 
-      {
-        tile.burnable = false;
-        affectedTiles.Add(tile);
-        GetTile2Burn(affectedTiles);
-      }
+      tile.burnable = false;
+      affectedTiles.Add(tile);
+      GetTile2Burn(affectedTiles);
       return affectedTiles;
     }
 

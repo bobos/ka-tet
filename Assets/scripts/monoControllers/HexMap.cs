@@ -942,7 +942,7 @@ namespace MonoNS
         } else {
           prefab = MountainPrefab;
         }
-        fieldType = FieldType.Wild;
+        fieldType = FieldType.Forest;
         tile.SetTerrianType(TerrianType.Mountain);
         if(Cons.EvenChance()) {
           tile.burnable = true;

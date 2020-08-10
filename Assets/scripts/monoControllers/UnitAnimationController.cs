@@ -188,26 +188,11 @@ namespace MonoNS
     }
 
     IEnumerator CoPostTurnAction(Unit unit) {
-      UnitView view = hexMap.GetUnitView(unit);
-      if (unit.IsCamping()) {
-        unit.rf.morale = unit.rf.morale > unit.GetRetreatThreshold() ? unit.rf.morale: unit.GetRetreatThreshold();
-      }
-
-      int moraleDrop = unit.retreatStress.Occur();
-      if (moraleDrop != 0) {
-        unit.rf.morale += moraleDrop;
-        hexMap.dialogue.ShowRetreatStress(unit);
-        while(hexMap.dialogue.Animating) { yield return null; }
-        ShowEffect(unit, new int[]{moraleDrop, 0, 0, 0, 0});
-        while(ShowAnimating) { yield return null; }
-      }
-
       if (unit.rf.soldiers <= Unit.DisbandUnitUnder)
       {
         hexMap.unitAniController.DestroyUnit(unit, DestroyType.ByDisband);
         while (hexMap.unitAniController.DestroyAnimating) { yield return null; }
       }
-
       hexMap.cameraKeyboardController.EnableCamera();
       PostAnimating = false;
     }

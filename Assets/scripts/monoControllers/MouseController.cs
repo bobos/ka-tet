@@ -99,7 +99,6 @@ namespace MonoNS
     public Unit[] surpriseTargets = null;
     public List<Unit> falseOrderTargets = null;
     public List<Unit> alienateTargets = null;
-    public List<Unit> harrasTargets = null;
     public Tile[] accessibleTiles = null;
     public HashSet<Unit> nearbyAlly = null;
 
@@ -117,7 +116,6 @@ namespace MonoNS
       accessibleTiles = new Tile[]{};
       falseOrderTargets = new List<Unit>();
       alienateTargets = new List<Unit>();
-      harrasTargets = new List<Unit>();
     }
 
     public void PrepareUnitSelection() {
@@ -176,7 +174,7 @@ namespace MonoNS
         Unit u = selectedUnit != null ? selectedUnit : hexMap.settlementViewPanel.selectedUnit;
         falseOrderTargets = u.GetFalseOrderTargets();
         alienateTargets = u.GetAlienateTargets();
-        harrasTargets = u.GetHarrasTargets();
+        nearFireTiles = selectedUnit.GetBurnableTiles();
       }
     }
 

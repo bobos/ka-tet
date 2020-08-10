@@ -117,7 +117,6 @@ namespace MapTileNS
     public WeatherGenerator weatherGenerator;
     public TurnController turnController;
 
-
     public void ListenOnTurnEnd(TurnController.OnNewTurn onNewTurn)
     {
       turnController.onNewTurn -= onNewTurn;
@@ -132,10 +131,10 @@ namespace MapTileNS
     // ==============================================================
     // ================= Disasters ==================================
     // ==============================================================
-    public HashSet<Tile> SetFire(bool started = false)
+    public HashSet<Tile> SetFire()
     {
       if (wildFire != null) {
-        return wildFire.Start(started);
+        return wildFire.Start();
       }
       return new HashSet<Tile>();
     }

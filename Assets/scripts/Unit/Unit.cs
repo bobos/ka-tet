@@ -6,6 +6,7 @@ using UnityEngine;
 using CourtNS;
 using FieldNS;
 using System.Linq;
+using NatureNS;
 
 namespace UnitNS
 {
@@ -55,7 +56,6 @@ namespace UnitNS
     public Vantage vantage;
     public InCampComplain inCampComplain;
     public OnFieldComplain onFieldComplain;
-    public RetreatStress retreatStress;
     WeatherGenerator weatherGenerator;
     TurnController turnController;
     public int defeatStreak = 0;
@@ -103,7 +103,6 @@ namespace UnitNS
       vantage = new Vantage(this);
       inCampComplain = new InCampComplain(this);
       onFieldComplain = new OnFieldComplain(this);
-      retreatStress = new RetreatStress(this);
       InitAllowedAtmpt();
       InitForecast();
       InitFalseOrder();
@@ -239,6 +238,28 @@ namespace UnitNS
 
     public bool CanBreakThrough() {
       return IsSurrounded() && CanAttack() && !IsVulnerable();
+    }
+
+    public List<Tile> GetBurnableTiles() {
+      List<Tile> tiles = new List<Tile>();
+      Weather weather = weatherGenerator.currentWeather;
+      if(Cons.IsHeavyRain(weather) || Cons.IsRain(weather)
+        || Cons.IsSnow(weather) || Cons.IsBlizard(weather) || !CanFire()) {
+        return tiles;
+      }
+
+      foreach(Tile t in tile.neighbours) {
+        if (t.field != FieldType.Forest || tile.GetGaleAdvantage(t) == WindAdvantage.Disadvantage) {
+          continue;
+        }
+        if (t.burnable ||
+            rf.general.Has(Cons.fireBug) ||
+            tile.GetGaleAdvantage(t) == WindAdvantage.Advantage) {
+            tiles.Add(t);
+          }
+      }
+
+      return tiles;
     }
 
     public bool CanFire() {
@@ -596,19 +617,8 @@ namespace UnitNS
     // Before new turn starts
     public int[] RefreshUnit()
     {
-      org += 20;
-      if ((mentality == Mental.Chaotic && Cons.MostLikely()) || (
-           mentality == Mental.Defeating && Cons.EvenChance())) {
-        mentality = Mental.Waving;
-        wavingPoint = 0;
-      } else {
-        mentality = Mental.Normal;
-      }
-
-      if (rf.general.Has(Cons.discipline)) {
-        mentality = Mental.Normal;
-      }
-      crashed = fooled = retreated = poisionDone = fireDone = false;
+      morale += IsCamping() ? 30 : (rf.general.Has(Cons.discipline) ? 15: 10);
+      crashed = fooled = retreated = false;
       defeatStreak = 0;
       InitForecast();
       InitFalseOrder();
