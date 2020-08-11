@@ -13,7 +13,7 @@ namespace UnitNS
   public abstract class Unit : PFUnit, DataModel
   {
     protected abstract Unit Clone();
-    public const int MovementcostOnHill = 30;
+    public const int MovementcostOnHill = 25;
     public const int MovementcostOnPlain = 25;
     public const int MovementCostOnUnaccesible = -1;
     public virtual float MovementCostModifierOnHill() {
