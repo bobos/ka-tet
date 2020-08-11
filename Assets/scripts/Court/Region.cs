@@ -114,17 +114,17 @@ namespace CourtNS
 
     public override int CombatPoint(Type unitType)
     {
-      if (unitType == Type.Infantry) return 10;
+      if (unitType == Type.Infantry) return 15;
       return 40;
     }
 
     public override int DefaultOrganizationPoint()
     {
-      return 50;
+      return 40;
     }
 
     public override int MaxOrganizationPoint() {
-      return 75;
+      return 70;
     }
 
     public override List<Region> GetConflictRegions() {

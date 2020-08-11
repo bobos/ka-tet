@@ -13,8 +13,7 @@ namespace UnitNS
   public abstract class Unit : PFUnit, DataModel
   {
     protected abstract Unit Clone();
-
-    public const int MovementcostOnHill = 25;
+    public const int MovementcostOnHill = 30;
     public const int MovementcostOnPlain = 25;
     public const int MovementCostOnUnaccesible = -1;
     public virtual float MovementCostModifierOnHill() {
@@ -58,7 +57,6 @@ namespace UnitNS
     public OnFieldComplain onFieldComplain;
     WeatherGenerator weatherGenerator;
     TurnController turnController;
-    public int defeatStreak = 0;
     public int surroundCnt = 0;
     private int _morale = 85;
     public int morale {
@@ -596,9 +594,8 @@ namespace UnitNS
     }
 
     public int Defeat(int moraleDrop) {
-      int drop = moraleDrop + (defeatStreak++ * -2);
-      morale += drop;
-      return drop;
+      morale += moraleDrop;
+      return moraleDrop;
     }
 
     public int Victory(int moraleIncr) {
@@ -619,7 +616,6 @@ namespace UnitNS
     {
       morale += IsCamping() ? 30 : (rf.general.Has(Cons.discipline) ? 15: 10);
       crashed = fooled = retreated = false;
-      defeatStreak = 0;
       InitForecast();
       InitFalseOrder();
       InitAllowedAtmpt();
@@ -886,37 +882,35 @@ namespace UnitNS
       if (toTile != null) {
         path = null;
         next = toTile;
-      } else if (path != null && path.Count > 0) {
-        //next = path.Peek();
-        next = path.Dequeue();
       } else {
-        return false;
-      }
+        if (path != null && path.Count > 0) {
+          next = path.Peek();
+        } else {
+          return false;
+        }
 
-/*
-      if (movementRemaining <= 0) {
-        return false;
-      }
+        if (movementRemaining <= 0) {
+          return false;
+        }
 
-      int takenMovement = CostToEnterTile(next, PathFind.Mode.Normal);
-      if (takenMovement < 0)
-      {
-        // path blocked, empty path and set idle
-        path = null;
-        return false;
-      }
-      if (movementRemaining < takenMovement)
-      {
-        return false;
-      }
-      if (toTile == null) {
+        int takenMovement = CostToEnterTile(next, PathFind.Mode.Normal);
+        if (takenMovement < 0)
+        {
+          // path blocked, empty path and set idle
+          path = null;
+          return false;
+        }
+        if (movementRemaining < takenMovement)
+        {
+          return false;
+        }
         next = path.Dequeue();
       }
+
       if (!next.Deployable(this))
       {
         return false;
       }
-*/
       movementRemaining -= CostToEnterTile(next, PathFind.Mode.Normal);
       SetTile(next);
       foreach(Tile t in GetVisibleArea()) {

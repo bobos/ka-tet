@@ -13,8 +13,8 @@
     }
 
     public bool IsWarWeary() {
-      return unit.rf.soldiers <
-      (unit.IsCavalry() ? Cavalry.MaxTroopNum : Infantry.MaxTroopNum) * (100 - unit.rf.org);
+      int total = unit.kia + unit.rf.soldiers;
+      return total * unit.rf.org < unit.kia; 
     }
 
     public int GetWarWearyDissertNum()

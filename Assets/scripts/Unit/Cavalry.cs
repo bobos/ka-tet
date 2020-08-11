@@ -5,8 +5,8 @@ namespace  UnitNS
 {
   public class Cavalry : Unit
   {
-    public const float ModifierOnHill = 0.8f; // 20 movement points, 5 blocks
-    public const float ModifierOnPlainOrRoad = 0.64f; // 16 movement points, 6 blocks
+    public const float ModifierOnHill = 0.8f; // 4 blocks
+    public const float ModifierOnPlainOrRoad = 0.8f; // 5 blocks
     public const int MaxTroopNum = 3000;
 
     public override float MovementCostModifierOnHill() {

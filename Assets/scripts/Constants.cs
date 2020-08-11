@@ -149,9 +149,6 @@ public class Cons {
     return textLib;
   }
 
-  public static UnitNS.Rank rookie = new UnitNS.Rookie();
-  public static UnitNS.Rank veteran = new UnitNS.Veteran();
-
   public static Region han = new HanRegion();
   public static Region qidan = new QidanRegion();
   public static Region dangxiang = new DangxiangRegion();

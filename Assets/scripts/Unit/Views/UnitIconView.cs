@@ -14,13 +14,9 @@ namespace UnitNS
       TextMesh textMesh = this.transform.GetComponent<TextMesh>();
       Color color = Color.white;
       textMesh.text =
-      unit.wavingPoint +
-      (unit.mentality == Mental.Supercharged ? "☻" :
-      (unit.mentality == Mental.Waving ? "∇" :
-      (unit.mentality == Mental.Defeating ? "∇∇" :
-      (unit.mentality == Mental.Chaotic ? "∇∇∇": ""))))
-      + (unit.defeatStreak > 0 ? "☹": "")
-      + (unit.hasNoOpenning ? "▦" : "")
+      unit.morale
+      + (unit.IsVulnerable() ? "∇": "")
+      + (unit.IsWarWeary() ? "☹": "")
       + (unit.fooled ? "⊜" : "")
       + (unit.inCommanderRange ? "㊬" : "")
       + (unit.rf.general.Has(Cons.ambusher) ? "☸": "")
@@ -33,14 +29,14 @@ namespace UnitNS
       + (unit.rf.general.Has(Cons.discipline) ? "✪" : "")
       + (unit.rf.general.Has(Cons.generous) ? "㊎" : "")
       + (unit.rf.general.Has(Cons.hammer) ? "➲" : "")
-      + (unit.rf.general.Has(Cons.breaker) && unit.type == Type.HeavyCavalry ? "♗" : "")
+      + (unit.rf.general.Has(Cons.breaker) && unit.IsCavalry() ? "♗" : "")
       + (unit.rf.general.Has(Cons.diminisher) ? "▣" : "")
       + (unit.rf.general.Has(Cons.mechanician) ? "♜" : "")
       + (unit.rf.general.Has(Cons.holdTheGround) ? "☍" : "")
       + (unit.rf.general.Has(Cons.forecaster) ? "➹" : "")
       + (unit.rf.general.Has(Cons.doctor) ? "✚" : "")
       + (unit.rf.general.Has(Cons.conspirator) ? "☯" : "")
-      + (unit.rf.general.Has(Cons.vanguard) && unit.type == Type.LightCavalry ? "♦" : "")
+      + (unit.rf.general.Has(Cons.vanguard) ? "♦" : "")
       + (unit.rf.general.Has(Cons.improvisor) ? "❥" : "");
       textMesh.fontSize = 65;
       textMesh.color = color;
