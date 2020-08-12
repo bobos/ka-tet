@@ -929,28 +929,24 @@ namespace MonoNS
       ForecastAnimating = false;
     }
 
-    public bool FalseOrderAnimating = false;
-    public void FalseOrder(Unit unit, Unit target) {
-      if (!unit.CanFalseOrder()) {
+    public bool DecieveAnimating = false;
+    public void Decieve(Unit unit, Unit target) {
+      if (!unit.CanDecieve() || !unit.GetDeceptionTargets().Contains(target)) {
         return;
       }
-      FalseOrderAnimating = true;
+      unit.Decieve(target);
+      DecieveAnimating = true;
       hexMap.cameraKeyboardController.DisableCamera();
-      StartCoroutine(CoFalseOrder(unit, target));
+      StartCoroutine(CoDecieve(unit, target));
     }
 
-    IEnumerator CoFalseOrder(Unit unit, Unit target) {
+    IEnumerator CoDecieve(Unit _unit, Unit target) {
       hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(target.tile).transform.position);
       while(hexMap.cameraKeyboardController.fixingCamera) { yield return null; }
-      if(unit.FalseOrder(target)) {
-        popAniController.Show(hexMap.GetUnitView(target), textLib.get("pop_falseOrderFollowed"), Color.green);
-        while(popAniController.Animating) { yield return null; }
-      } else {
-        popAniController.Show(hexMap.GetUnitView(target), textLib.get("pop_falseOrderFailed"), Color.white);
-        while(popAniController.Animating) { yield return null; }
-      }
+      popAniController.Show(hexMap.GetUnitView(target), textLib.get("pop_falseOrderFollowed"), Color.green);
+      while(popAniController.Animating) { yield return null; }
       hexMap.cameraKeyboardController.EnableCamera();
-      FalseOrderAnimating = false;
+      DecieveAnimating = false;
     }
 
     public bool AlienateAnimating = false;

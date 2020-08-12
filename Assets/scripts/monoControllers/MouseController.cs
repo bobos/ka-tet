@@ -97,7 +97,7 @@ namespace MonoNS
     public bool nearWater = false;
     public List<Unit> nearbyEnemey = null;
     public Unit[] surpriseTargets = null;
-    public List<Unit> falseOrderTargets = null;
+    public List<Unit> deceptionTargets = null;
     public List<Unit> alienateTargets = null;
     public Tile[] accessibleTiles = null;
     public HashSet<Unit> nearbyAlly = null;
@@ -114,7 +114,7 @@ namespace MonoNS
       nearFireTiles = new List<Tile>();
       surpriseTargets = new Unit[]{};
       accessibleTiles = new Tile[]{};
-      falseOrderTargets = new List<Unit>();
+      deceptionTargets = new List<Unit>();
       alienateTargets = new List<Unit>();
     }
 
@@ -172,7 +172,7 @@ namespace MonoNS
         surpriseTargets = selectedUnit.GetSurpriseTargets();
         accessibleTiles = selectedUnit.GetAccessibleTiles();
         Unit u = selectedUnit != null ? selectedUnit : hexMap.settlementViewPanel.selectedUnit;
-        falseOrderTargets = u.GetFalseOrderTargets();
+        deceptionTargets = u.GetDeceptionTargets();
         alienateTargets = u.GetAlienateTargets();
         nearFireTiles = selectedUnit.GetBurnableTiles();
       }
@@ -285,16 +285,16 @@ namespace MonoNS
         }
       }
 
-      if (action == ActionController.actionName.FalseOrder)
+      if (action == ActionController.actionName.Decieve)
       {
-        if (falseOrderTargets.Count == 0) {
+        if (deceptionTargets.Count == 0) {
           msgBox.Show("无可迷惑目标!");
           Escape();
         } else {
-          mouseMode = mode.falseOrder;
-          Update_CurrentFunc = UpdateUnitFalseOrder;
+          mouseMode = mode.decieve;
+          Update_CurrentFunc = UpdateUnitDecieve;
           msgBox.Show("选择目标!");
-          foreach(Unit u in falseOrderTargets) {
+          foreach(Unit u in deceptionTargets) {
             hexMap.TargetUnit(u);
           }
         }
@@ -390,7 +390,7 @@ namespace MonoNS
       attack,
       feint,
       surpriseAttack,
-      falseOrder,
+      decieve,
       alienate,
       harras,
       repos,
@@ -445,8 +445,8 @@ namespace MonoNS
         }
       }
 
-      if (mouseMode == mode.falseOrder) {
-        foreach(Unit u in falseOrderTargets) {
+      if (mouseMode == mode.decieve) {
+        foreach(Unit u in deceptionTargets) {
           hexMap.SetUnitSkin(u);
         }
       }
@@ -604,8 +604,8 @@ namespace MonoNS
         }
       }
 
-      if (mouseMode == mode.falseOrder) {
-        if(u != null && u.IsAI() != selectedUnit.IsAI() && falseOrderTargets.Contains(u)) {
+      if (mouseMode == mode.decieve) {
+        if(u != null && u.IsAI() != selectedUnit.IsAI() && deceptionTargets.Contains(u)) {
           targetUnit = u;
           return;
         }
@@ -740,7 +740,7 @@ namespace MonoNS
       }
     }
 
-    void UpdateUnitFalseOrder()
+    void UpdateUnitDecieve()
     {
       if (tileUnderMouse == null) {
         return;
@@ -750,7 +750,7 @@ namespace MonoNS
         ClickOnTile();
         if (targetUnit != null) {
           msgBox.Show("");
-          hexMap.actionController.FalseOrder(selectedUnit, targetUnit);
+          hexMap.actionController.Decieve(selectedUnit, targetUnit);
           Escape();
         }
       } else if (!Util.eq<Tile>(tileUnderMouse, selectedUnit.tile))

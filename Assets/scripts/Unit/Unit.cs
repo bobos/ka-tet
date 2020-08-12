@@ -26,11 +26,9 @@ namespace UnitNS
       return false;
     }
     public const int DisbandUnitUnder = 200;
-    public const int Sides2HaveVantage = 4;
 
     public const int L0Visibility = 1;
     public const int L1Visibility = 2;
-    public const int L2Visibility = 3;
     public const int VantageVisibility = 5;
     public Type type {
       get {
@@ -103,7 +101,7 @@ namespace UnitNS
       onFieldComplain = new OnFieldComplain(this);
       InitAllowedAtmpt();
       InitForecast();
-      InitFalseOrder();
+      InitPlotAtmpt();
     }
 
     public void CloneInit(float disarmorDefDebuf, Supply supply, PlainSickness plainSickness) {
@@ -230,6 +228,16 @@ namespace UnitNS
       movementRemaining = movementRemaining > p ? movementRemaining : p;
     }
 
+    int _plotAtmpt = 0;
+    public int plotAtmpt {
+      get {
+        return _plotAtmpt;
+      }
+      set {
+        _plotAtmpt = value < 0 ? 0 : value;
+      }
+    }
+
     public bool CanCharge() {
       return IsCavalry() && CanAttack() && !IsSurrounded() && !IsVulnerable();
     }
@@ -274,39 +282,24 @@ namespace UnitNS
     }
 
     public bool fooled = false;
-    public bool fooledOnce = false;
-    public bool canFalseOrder = false;
-    public bool canAlienate = false;
-    public bool CanFalseOrder() {
-      return canFalseOrder;
+    public bool CanDecieve() {
+      return plotAtmpt > 0;
     }
 
-    public bool CanAlienate() {
-      return canAlienate;
+    public bool CanPlot() {
+      return plotAtmpt > 0;
     }
 
-    void InitFalseOrder() {
-      canFalseOrder = canAlienate = rf.general.Has(Cons.conspirator);
+    void InitPlotAtmpt() {
+      plotAtmpt = rf.general.Has(Cons.conspirator) ? 3 : 0;
     }
 
-    public bool FalseOrder(Unit target) {
-      canFalseOrder = false;
-      bool work = false;
-      if (target.rf.general.Is(Cons.cunning)) {
-        return work;
-      }
-      if (target.inCommanderRange) {
-        work = target.rf.general.Is(Cons.calm) ? Cons.FairChance(): (target.rf.general.Is(Cons.conservative) ? Cons.SlimChance() : false);
-      } else {
-        work = target.rf.general.Is(Cons.calm) ? Cons.HighlyLikely(): (target.rf.general.Is(Cons.conservative) ? Cons.FairChance() : Cons.SlimChance());
-      }
-      if (work && !fooledOnce) {
-        target.fooled = target.fooledOnce = true;
-      }
-      return target.fooled;
+    public void Decieve(Unit target) {
+      plotAtmpt--;
+      target.fooled = true;
     }
 
-    public ConflictResult Alienate(Unit target) {
+    public ConflictResult Plot(Unit target) {
       canAlienate = false;
       return target.unitConflict.Occur();
     }
@@ -451,11 +444,14 @@ namespace UnitNS
       return true;
     }
 
-    public List<Unit> GetFalseOrderTargets() {
+    public List<Unit> GetDeceptionTargets() {
       List<Unit> units = new List<Unit>();
       foreach(Tile t in tile.GetNeighboursWithinRange<Tile>(GetVisibleRange(), (Tile _tile) => true)) {
         Unit unit = t.GetUnit();
-        if (unit != null && unit.IsAI() != IsAI() && !unit.fooledOnce && !unit.IsCommander()) {
+        if (unit != null && unit.IsAI() != IsAI() && !unit.fooled && !unit.IsCommander()
+          && (unit.rf.general.Is(Cons.calm) ||
+              (unit.inCommanderRange ? false :
+               unit.rf.general.Is(Cons.conservative) || unit.rf.general.Is(Cons.loyal)))) {
           units.Add(unit);
         }
       }
@@ -615,7 +611,7 @@ namespace UnitNS
     public int[] RefreshUnit()
     {
       morale += IsCamping() ? 30 : (rf.general.Has(Cons.discipline) ? 15: 10);
-      crashed = fooled = retreated = false;
+      crashed = retreated = false;
       InitForecast();
       InitFalseOrder();
       InitAllowedAtmpt();

@@ -275,7 +275,7 @@ namespace MonoNS
 
     public void OnFalseOrderClick() {
       if (onBtnClick != null) {
-        onBtnClick(actionName.FalseOrder);
+        onBtnClick(actionName.Decieve);
       }
     }
 
@@ -329,7 +329,7 @@ namespace MonoNS
       FeintDefeat,
       Pursue,
       Forecast,
-      FalseOrder,
+      Decieve,
       Alienate,
       Skirmish
     }
@@ -399,8 +399,8 @@ namespace MonoNS
       return DoAction(unit, null, null, actionName.Forecast);
     }
 
-    public bool FalseOrder(Unit unit, Unit unit1) {
-      return DoAction(unit, unit1, null, actionName.FalseOrder);
+    public bool Decieve(Unit unit, Unit unit1) {
+      return DoAction(unit, unit1, null, actionName.Decieve);
     }
 
     public bool Alienate(Unit unit, Unit unit1) {
@@ -479,9 +479,9 @@ namespace MonoNS
       {
         StartCoroutine(DoForecast(unit));
       }
-      if (name == actionName.FalseOrder)
+      if (name == actionName.Decieve)
       {
-        StartCoroutine(DoFalseOrder(unit, unit1));
+        StartCoroutine(DoDecieve(unit, unit1));
       }
       if (name == actionName.Alienate)
       {
@@ -652,9 +652,9 @@ namespace MonoNS
       ActionOngoing = false;
     }
 
-    IEnumerator DoFalseOrder(Unit unit, Unit unit1) {
-      unitAniController.FalseOrder(unit, unit1);
-      while (unitAniController.FalseOrderAnimating)
+    IEnumerator DoDecieve(Unit unit, Unit unit1) {
+      unitAniController.Decieve(unit, unit1);
+      while (unitAniController.DecieveAnimating)
       {
         yield return null;
       }
