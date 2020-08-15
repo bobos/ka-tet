@@ -943,29 +943,29 @@ namespace MonoNS
     IEnumerator CoDecieve(Unit _unit, Unit target) {
       hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(target.tile).transform.position);
       while(hexMap.cameraKeyboardController.fixingCamera) { yield return null; }
-      popAniController.Show(hexMap.GetUnitView(target), textLib.get("pop_falseOrderFollowed"), Color.green);
+      popAniController.Show(hexMap.GetUnitView(target), textLib.get("pop_decieved"), Color.green);
       while(popAniController.Animating) { yield return null; }
       hexMap.cameraKeyboardController.EnableCamera();
       DecieveAnimating = false;
     }
 
-    public bool AlienateAnimating = false;
-    public void Alienate(Unit unit, Unit target) {
-      if (!unit.CanAlienate()) {
+    public bool PlotAnimating = false;
+    public void Plot(Unit unit, Unit target) {
+      if (!unit.CanPlot()) {
         return;
       }
-      AlienateAnimating = true;
+      PlotAnimating = true;
       hexMap.cameraKeyboardController.DisableCamera();
-      StartCoroutine(CoAlienate(unit, target));
+      StartCoroutine(CoPlot(unit, target));
     }
 
-    IEnumerator CoAlienate(Unit from, Unit target) {
+    IEnumerator CoPlot(Unit from, Unit target) {
       hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(target.tile).transform.position);
       while(hexMap.cameraKeyboardController.fixingCamera) { yield return null; }
 
-      ConflictResult conflict = from.Alienate(target);
+      ConflictResult conflict = from.Plot(target);
       if (conflict.moralDrop != 0) {
-        popAniController.Show(hexMap.GetUnitView(target), textLib.get("pop_alienated"), Color.green);
+        popAniController.Show(hexMap.GetUnitView(target), textLib.get("pop_plot"), Color.green);
         while(popAniController.Animating) { yield return null; }
         Unit unit = conflict.unit1;
 
@@ -973,8 +973,8 @@ namespace MonoNS
         while (hexMap.cameraKeyboardController.fixingCamera) { yield return null; }
         hexMap.dialogue.ShowUnitConflict(unit, conflict.unit2);
         while (hexMap.dialogue.Animating) { yield return null; }
-        ShowEffect(unit, new int[]{conflict.moralDrop, 0, 0, 0, 0}, null, true); 
-        ShowEffect(conflict.unit2, new int[]{conflict.moralDrop, 0, 0, 0, 0}, null, true); 
+        ShowEffect(unit, new int[]{conflict.moralDrop, 0, 0, 0, 0}, null, true);
+        ShowEffect(conflict.unit2, new int[]{conflict.moralDrop, 0, 0, 0, 0}, null, true);
         hexMap.turnController.Sleep(1);
         while(hexMap.turnController.sleeping) { yield return null; }
         ShowEffect(unit, new int[]{0, 0, conflict.unit1Dead, 0, 0}, null, true);
@@ -1004,11 +1004,11 @@ namespace MonoNS
           }
         }
       } else {
-        popAniController.Show(hexMap.GetUnitView(target), textLib.get("pop_alienateFailed"), Color.white);
+        popAniController.Show(hexMap.GetUnitView(target), textLib.get("pop_failed"), Color.white);
         while(popAniController.Animating) { yield return null; }
       }
       hexMap.cameraKeyboardController.EnableCamera();
-      AlienateAnimating = false;
+      PlotAnimating = false;
     }
 
     public bool ForceRetreatAnimating = false;

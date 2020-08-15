@@ -1,5 +1,6 @@
 ﻿using UnitNS;
 using TextNS;
+using System.Collections.Generic;
 
 namespace CourtNS
 {
@@ -24,6 +25,10 @@ namespace CourtNS
       );
     }
 
+    public virtual List<Province> GetConflictProvinces() {
+      return new List<Province>();
+    }
+
   }
 
   // 河湟 吐蕃
@@ -46,6 +51,10 @@ namespace CourtNS
     public override string Description()
     {
       return description;
+    }
+
+    public override List<Province> GetConflictProvinces() {
+      return new List<Province>(){Cons.heXi, Cons.shanXi};
     }
   }
 

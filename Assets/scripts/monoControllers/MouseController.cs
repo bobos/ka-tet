@@ -98,7 +98,7 @@ namespace MonoNS
     public List<Unit> nearbyEnemey = null;
     public Unit[] surpriseTargets = null;
     public List<Unit> deceptionTargets = null;
-    public List<Unit> alienateTargets = null;
+    public List<Unit> plotTargets = null;
     public Tile[] accessibleTiles = null;
     public HashSet<Unit> nearbyAlly = null;
 
@@ -115,7 +115,7 @@ namespace MonoNS
       surpriseTargets = new Unit[]{};
       accessibleTiles = new Tile[]{};
       deceptionTargets = new List<Unit>();
-      alienateTargets = new List<Unit>();
+      plotTargets = new List<Unit>();
     }
 
     public void PrepareUnitSelection() {
@@ -173,7 +173,7 @@ namespace MonoNS
         accessibleTiles = selectedUnit.GetAccessibleTiles();
         Unit u = selectedUnit != null ? selectedUnit : hexMap.settlementViewPanel.selectedUnit;
         deceptionTargets = u.GetDeceptionTargets();
-        alienateTargets = u.GetAlienateTargets();
+        plotTargets = u.GetPlotTargets();
         nearFireTiles = selectedUnit.GetBurnableTiles();
       }
     }
@@ -288,7 +288,7 @@ namespace MonoNS
       if (action == ActionController.actionName.Decieve)
       {
         if (deceptionTargets.Count == 0) {
-          msgBox.Show("无可迷惑目标!");
+          msgBox.Show("无可疑兵目标!");
           Escape();
         } else {
           mouseMode = mode.decieve;
@@ -300,16 +300,16 @@ namespace MonoNS
         }
       }
 
-      if (action == ActionController.actionName.Alienate)
+      if (action == ActionController.actionName.Plot)
       {
-        if (alienateTargets.Count == 0) {
+        if (plotTargets.Count == 0) {
           msgBox.Show("无可离间目标!");
           Escape();
         } else {
-          mouseMode = mode.alienate;
-          Update_CurrentFunc = UpdateUnitAlienate;
+          mouseMode = mode.plot;
+          Update_CurrentFunc = UpdateUnitPlot;
           msgBox.Show("选择目标!");
-          foreach(Unit u in alienateTargets) {
+          foreach(Unit u in plotTargets) {
             hexMap.TargetUnit(u);
           }
         }
@@ -324,16 +324,6 @@ namespace MonoNS
           if (u.CanBeShaked(selectedUnit) > 0) {
             hexMap.TargetUnit(u);
           }
-        }
-      }
-
-      if (action == ActionController.actionName.Skirmish)
-      {
-        mouseMode = mode.harras;
-        Update_CurrentFunc = UpdateUnitSkirmish;
-        msgBox.Show("选择目标!");
-        foreach(Unit u in harrasTargets) {
-          hexMap.TargetUnit(u);
         }
       }
 
@@ -391,8 +381,7 @@ namespace MonoNS
       feint,
       surpriseAttack,
       decieve,
-      alienate,
-      harras,
+      plot,
       repos,
       sabotage,
       fire
@@ -451,14 +440,8 @@ namespace MonoNS
         }
       }
 
-      if (mouseMode == mode.alienate) {
-        foreach(Unit u in alienateTargets) {
-          hexMap.SetUnitSkin(u);
-        }
-      }
-
-      if (mouseMode == mode.harras) {
-        foreach(Unit u in harrasTargets) {
+      if (mouseMode == mode.plot) {
+        foreach(Unit u in plotTargets) {
           hexMap.SetUnitSkin(u);
         }
       }
@@ -611,15 +594,8 @@ namespace MonoNS
         }
       }
 
-      if (mouseMode == mode.alienate) {
-        if(u != null && u.IsAI() != selectedUnit.IsAI() && alienateTargets.Contains(u)) {
-          targetUnit = u;
-          return;
-        }
-      }
-
-      if (mouseMode == mode.harras) {
-        if(u != null && u.IsAI() != selectedUnit.IsAI() && harrasTargets.Contains(u)) {
+      if (mouseMode == mode.plot) {
+        if(u != null && u.IsAI() != selectedUnit.IsAI() && plotTargets.Contains(u)) {
           targetUnit = u;
           return;
         }
@@ -763,7 +739,7 @@ namespace MonoNS
       }
     }
 
-    void UpdateUnitAlienate()
+    void UpdateUnitPlot()
     {
       if (tileUnderMouse == null) {
         return;
@@ -773,7 +749,7 @@ namespace MonoNS
         ClickOnTile();
         if (targetUnit != null) {
           msgBox.Show("");
-          hexMap.actionController.Alienate(selectedUnit, targetUnit);
+          hexMap.actionController.Plot(selectedUnit, targetUnit);
           Escape();
         }
       } else if (!Util.eq<Tile>(tileUnderMouse, selectedUnit.tile))
@@ -820,22 +796,6 @@ namespace MonoNS
         if (targetUnit != null && targetUnit.CanBeShaked(selectedUnit) > 0) {
           msgBox.Show("");
           actionController.charge(selectedUnit, targetUnit);
-          Escape();
-        }
-      }
-    }
-
-    void UpdateUnitSkirmish()
-    {
-      if (tileUnderMouse == null) {
-        return;
-      }
-      if (Input.GetMouseButtonUp(0))
-      {
-        ClickOnTile();
-        if (targetUnit != null) {
-          msgBox.Show("");
-          actionController.Skirmish(selectedUnit, targetUnit);
           Escape();
         }
       }

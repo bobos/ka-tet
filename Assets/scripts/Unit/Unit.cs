@@ -300,7 +300,7 @@ namespace UnitNS
     }
 
     public ConflictResult Plot(Unit target) {
-      canAlienate = false;
+      plotAtmpt--;
       return target.unitConflict.Occur();
     }
 
@@ -458,12 +458,21 @@ namespace UnitNS
       return units;
     }
 
-    public List<Unit> GetAlienateTargets() {
+    public List<Unit> GetPlotTargets() {
       List<Unit> units = new List<Unit>();
       foreach(Tile t in tile.GetNeighboursWithinRange<Tile>(GetVisibleRange(), (Tile _tile) => true)) {
         Unit unit = t.GetUnit();
-        if (unit != null && unit.IsAI() != IsAI() && !unit.unitConflict.conflicted && !unit.IsCommander()) {
-          units.Add(unit);
+        if (unit != null && unit.IsAI() != IsAI() && !unit.unitConflict.conflicted && !unit.ApplyDiscipline()) {
+          List<Province> conflictProvinces = unit.rf.province.GetConflictProvinces();
+          foreach(Tile tile in unit.tile.neighbours) {
+            Unit u = tile.GetUnit();
+            if (u != null && u.IsAI() == unit.IsAI()) {
+              if(conflictProvinces.Contains(u.rf.province) ||
+                !Util.eq<Region>(u.rf.province.region, unit.rf.province.region)) {
+                units.Add(unit);
+              }
+            }
+          }
         }
       }
       return units;
@@ -581,8 +590,8 @@ namespace UnitNS
       }
     }
 
-    public bool ApplyDiscipline(bool applied) {
-      return rf.IsSpecial() || (rf.general.Has(Cons.discipline) && Cons.HighlyLikely()) || applied;
+    public bool ApplyDiscipline() {
+      return rf.IsSpecial() || rf.general.Has(Cons.discipline);
     }
 
     public General MyCommander() {

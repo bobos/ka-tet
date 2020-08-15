@@ -43,6 +43,7 @@ Game Tips:
 48. chaotic 60%几率 & defeating 40%几率变waving, discpline技能直接变normal
 49. 移动范围，步兵4格 重骑兵5格 轻骑兵6格，兵种行动后获得50%移动力
 
+replace skirmish button
 vanguard triat
 骑兵周围移动力成本*2 步兵周围移动力成本*1.5, 不累计
 骑兵不会被腹背受敌

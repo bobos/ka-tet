@@ -310,9 +310,10 @@ namespace MonoNS
       bool inRange = unit.inCommanderRange;
       // if the target unit is the one hated
       Unit target = attacker ? this.attacker : this.defender;
-      if (unit.rf.province.region.GetConflictRegions().Contains(target.rf.province.region)
+      if ((unit.rf.province.GetConflictProvinces().Contains(target.rf.province) ||
+        !Util.eq<Region>(unit.rf.province.region, target.rf.province.region))
         && !unit.FollowOrder()) {
-        ret = ret < 75 ? ret : 75;
+        ret = ret < 85 ? ret : 85;
       }
 
       if (attacker && !inRange) {
@@ -323,11 +324,11 @@ namespace MonoNS
         ret = ret < 50 ? ret : 50;
       }
 
-      if (unit.MentallyWeak()) {
-        ret -= 10;
+      if (unit.IsWarWeary()) {
+        ret -= 60;
       }
 
-      return ret;
+      return ret < 0 ? 0 : (ret > 100 ? 100 : ret);
     }
 
     int JoinPossibilityBaseOnOdds(Unit unit, ResultType result) {

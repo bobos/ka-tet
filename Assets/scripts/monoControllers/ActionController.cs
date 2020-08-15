@@ -281,13 +281,12 @@ namespace MonoNS
 
     public void OnAlienate() {
       if (onBtnClick != null) {
-        onBtnClick(actionName.Alienate);
+        onBtnClick(actionName.Plot);
       }
     }
 
     public void OnSkirmish() {
       if (onBtnClick != null) {
-        onBtnClick(actionName.Skirmish);
       }
     }
 
@@ -330,8 +329,7 @@ namespace MonoNS
       Pursue,
       Forecast,
       Decieve,
-      Alienate,
-      Skirmish
+      Plot
     }
 
     // Make sure this is sequential
@@ -403,12 +401,8 @@ namespace MonoNS
       return DoAction(unit, unit1, null, actionName.Decieve);
     }
 
-    public bool Alienate(Unit unit, Unit unit1) {
-      return DoAction(unit, unit1, null, actionName.Alienate);
-    }
-
-    public bool Skirmish(Unit unit, Unit unit1) {
-      return DoAction(unit, unit1, null, actionName.Skirmish);
+    public bool Plot(Unit unit, Unit unit1) {
+      return DoAction(unit, unit1, null, actionName.Plot);
     }
 
     public bool DoAction(Unit unit, Unit unit1, Tile tile, actionName name)
@@ -483,13 +477,9 @@ namespace MonoNS
       {
         StartCoroutine(DoDecieve(unit, unit1));
       }
-      if (name == actionName.Alienate)
+      if (name == actionName.Plot)
       {
-        StartCoroutine(DoAlienate(unit, unit1));
-      }
-      if (name == actionName.Skirmish)
-      {
-        StartCoroutine(DoSkirmish(unit, unit1));
+        StartCoroutine(DoPlot(unit, unit1));
       }
       return true;
     }
@@ -661,9 +651,9 @@ namespace MonoNS
       ActionOngoing = false;
     }
 
-    IEnumerator DoAlienate(Unit unit, Unit unit1) {
-      unitAniController.Alienate(unit, unit1);
-      while (unitAniController.AlienateAnimating)
+    IEnumerator DoPlot(Unit unit, Unit unit1) {
+      unitAniController.Plot(unit, unit1);
+      while (unitAniController.PlotAnimating)
       {
         yield return null;
       }

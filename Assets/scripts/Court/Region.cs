@@ -21,7 +21,6 @@ namespace CourtNS
     public virtual int MaxOrganizationPoint() {
       return 65;
     }
-    public abstract List<Region> GetConflictRegions();
   }
 
   public class QidanRegion : Region
@@ -35,11 +34,6 @@ namespace CourtNS
     {
       return textLib.get("region_qidanRegion_description");
     }
-
-    public override List<Region> GetConflictRegions() {
-      return new List<Region>(){Cons.nvzhen, Cons.han};
-    }
-
   }
 
   public class HanRegion : Region
@@ -54,11 +48,6 @@ namespace CourtNS
     {
       return textLib.get("region_hanRegion_description");
     }
-
-    public override List<Region> GetConflictRegions() {
-      return new List<Region>();
-    }
-
   }
 
   public class DangxiangRegion : Region
@@ -73,11 +62,6 @@ namespace CourtNS
     {
       return textLib.get("region_dangxiangRegion_description");
     }
-
-    public override List<Region> GetConflictRegions() {
-      return new List<Region>(){Cons.tubo, Cons.qidan};
-    }
-
   }
 
   public class TuboRegion : Region
@@ -92,11 +76,6 @@ namespace CourtNS
     {
       return textLib.get("region_tuboRegion_description");
     }
-
-    public override List<Region> GetConflictRegions() {
-      return new List<Region>(){Cons.dangxiang};
-    }
-
   }
 
   public class NvZhenRegion : Region
@@ -125,10 +104,6 @@ namespace CourtNS
 
     public override int MaxOrganizationPoint() {
       return 70;
-    }
-
-    public override List<Region> GetConflictRegions() {
-      return new List<Region>();
     }
   }
 

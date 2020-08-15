@@ -298,10 +298,9 @@ namespace TextNS
       {"pop_capturedHorse", @"俘获{0}匹战马"},
       {"pop_wheatherForecasted", "天象习得"},
       {"pop_wheatherForecastFailed", "预测失败"},
-      {"pop_falseOrderFollowed", "中计"},
-      {"pop_falseOrderFailed", "识破"},
-      {"pop_alienated", "离间成功"},
-      {"pop_alienateFailed", "识破"},
+      {"pop_decieved", "中计"},
+      {"pop_failed", "识破"},
+      {"pop_plot", "离间成功"},
 
       // settlement
       {"settlement_storageLvl1", "初级粮仓"},

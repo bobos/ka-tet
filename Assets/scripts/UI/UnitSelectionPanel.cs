@@ -27,7 +27,7 @@ namespace MonoNS
                            RetreatButton, DecampButton, ReposButton,
                            BuryButton, ChargeButton, TroopButton, GeneralButton,
                            BreakThroughButton, SurpriseAttackButton, FeintDefeatButton,
-                           ForecastButton, FalseOrderButton, AlienateButton, SkirmishButton
+                           ForecastButton, FalseOrderButton, AlienateButton
                            };
       buttons = btns;
       mouseController.onUnitSelect += OnUnitSelect;
@@ -67,7 +67,6 @@ namespace MonoNS
     public GameObject ForecastButton;
     public GameObject FalseOrderButton;
     public GameObject AlienateButton;
-    public GameObject SkirmishButton;
     GameObject[] buttons;
 
     public Text title;
@@ -169,19 +168,15 @@ namespace MonoNS
 
       if (!hexMap.wargameController.start && hexMap.deployDone) {
         ChargeButton.SetActive(unit.CanCharge());
-        SkirmishButton.SetActive(unit.CanHarras() && unit.GetHarrasTargets().Count > 0);
-      }
-
-      if (!hexMap.wargameController.start && hexMap.deployDone) {
         ForecastButton.SetActive(unit.CanForecast());
       }
 
-      if (!hexMap.wargameController.start && unit.CanFalseOrder() && hexMap.deployDone) {
-        FalseOrderButton.SetActive(mouseController.falseOrderTargets.Count > 0);
+      if (!hexMap.wargameController.start && unit.CanDecieve() && hexMap.deployDone) {
+        FalseOrderButton.SetActive(mouseController.deceptionTargets.Count > 0);
       }
 
-      if (!hexMap.wargameController.start && unit.CanAlienate() && hexMap.deployDone) {
-        AlienateButton.SetActive(mouseController.alienateTargets.Count > 0);
+      if (!hexMap.wargameController.start && unit.CanPlot() && hexMap.deployDone) {
+        AlienateButton.SetActive(mouseController.plotTargets.Count > 0);
       }
 
       if (isGarrison) {
@@ -289,7 +284,6 @@ namespace MonoNS
       + "%\n无胄惩罚:" + unit.disarmorDefDebuf * 100
       + "%\n平原反应:" + unit.plainSickness.debuf * 100
       + "%\n加成:\n"
-      + "等级加成:" + unit.rf.lvlBuf * 100
       + "%\n地形加成:" + unit.vantage.Buf() * 100
       + "%\n将领加成:" + unit.GetGeneralBuf() * 100
       + "%\n总计加成:" + (unit.GetBuff() *100) + "%\n\n";
@@ -300,8 +294,8 @@ namespace MonoNS
       title.text += "\n移动力:" + (isPreflight ? mouseController.selectedUnit.movementRemaining + " -> " : "")
         + unit.movementRemaining + "/" + unit.GetFullMovement();
       title.text += "\n" + unit.Name() + "[兵:" + unit.rf.soldiers + "/亡:" + unit.kia + "]";
-      title.text += "\n士气: " + unit.rf.morale;
-      title.text += "\n单兵战力: " + GetCombatpointRate((int)(unit.cp * (1 + unit.rf.lvlBuf)));
+      title.text += "\n伤亡承受率: " + unit.rf.org + "%";
+      title.text += "\n单兵战力: " + GetCombatpointRate(unit.cp);
       if (unit.IsCamping()) {
         title.text += "\n部队战力: " + UnitInfoView.Shorten(unit.unitCampingAttackCombatPoint);
       } else {
@@ -309,11 +303,10 @@ namespace MonoNS
       }
       string stateStr = unit.tile.siegeWall != null && unit.tile.siegeWall.IsFunctional() ? "围城中 " :
         (unit.tile.siegeWall != null && unit.tile.siegeWall.owner.isAI == unit.IsAI() ? ("建长围中:" + unit.tile.siegeWall.buildTurns + "回合完成 ") : "");
-      stateStr += unit.IsWarWeary() ? "士气低落 " : (unit.IsUnwilling() ? "士气不佳" : "");
+      stateStr += unit.IsWarWeary() ? "无心恋战 " : "";
       stateStr += unit.IsStarving() ? "补给不济 " : "";
       stateStr += unit.GetStateName();
-      title.text += "\n" + (unit.hasNoOpenning ? "[无懈可击]" : "")
-        + (unit.defeatStreak > 0 ? ("[战败累计:" + unit.defeatStreak + "]") : "" ) + stateStr;
+      title.text += "\n" + stateStr;
       title.text += unit.GetHeatSickTurns() > 0 ? "\n痢疾: 将持续" + unit.GetHeatSickTurns() + "回合 " : "";
       title.text += unit.GetAltitudeSickTurns() > 0 ? "\n高原反应: 将持续" + unit.GetAltitudeSickTurns() + "回合" : "";
       title.text += unit.plainSickness.affected  ? "\n平原反应" : "";
