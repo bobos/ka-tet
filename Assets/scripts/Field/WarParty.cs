@@ -213,7 +213,7 @@ namespace FieldNS
     public int GetTotalPoint() {
       int point = 0;
       foreach(Unit u in GetUnits()) {
-        point += u.unitPureCombatPoint;
+        point += u.unitCombatPoint;
       }
       return point;
     }

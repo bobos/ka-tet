@@ -38,14 +38,11 @@ Game Tips:
 42. 利用大雾攻击对方指挥范围外部队
 43. 两次冲阵失败，对方冲阵免疫
 44. 地域冲突换成挑拨技能，任何来自不同行省军队都能挑拨，来自不同民族军队挑拨几率极高，成功两军发生冲突后撤
-46. overcharged metality incr 10% attack point
-47. mental weak affects join possibility(-10), easy to surprise, easy to charge, easy to scatter, easy to retreat on defeat 
-48. chaotic 60%几率 & defeating 40%几率变waving, discpline技能直接变normal
-49. 移动范围，步兵4格 重骑兵5格 轻骑兵6格，兵种行动后获得50%移动力
 
+战胜方除了大获全胜外，也减少士气5-15
 replace skirmish button
 vanguard triat
-骑兵周围移动力成本*2 步兵周围移动力成本*1.5, 不累计
+骑兵周围只能移动一格 步兵周围移动力成本*1.5, 不累计
 骑兵不会被腹背受敌
 背部攻击的发起方，步兵战力+100%，骑兵加+150%，被攻击方战力不变
 主帅部队战力加成50%

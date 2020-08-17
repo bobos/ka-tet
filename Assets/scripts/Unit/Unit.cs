@@ -622,7 +622,6 @@ namespace UnitNS
       morale += IsCamping() ? 30 : (rf.general.Has(Cons.discipline) ? 15: 10);
       crashed = retreated = false;
       InitForecast();
-      InitFalseOrder();
       InitAllowedAtmpt();
       turnDone = false;
       movementRemaining = GetFullMovement();
@@ -663,7 +662,7 @@ namespace UnitNS
     public int Killed(int killed, bool all = false) {
       int num = killed;
       if (!all && rf.general.Has(Cons.doctor)) {
-        num = (int)(killed * 0.6f);
+        num = (int)(killed * 0.5f);
       }
       rf.soldiers -= num;
       kia += num;
@@ -704,7 +703,7 @@ namespace UnitNS
       float killRatio = 0f) {
       // morale, movement, killed, attack, def
       int[] reduced = new int[]{0,0,0,0,0};
-      rf.morale -= reduceMorale;
+      morale -= reduceMorale;
       reduced[0] = -reduceMorale;
       int moveReduce = (int)(movementRemaining * movementDropRatio);
       movementRemaining = movementRemaining - moveReduce; 
@@ -719,31 +718,14 @@ namespace UnitNS
 
     public int GetFullMovement()
     {
-      int full = (int)(
-        // ghost unit doesnt have vantage
-        rf.mov *
-        (IsSick() ? 0.4f : 1));
-      if (Cons.IsHeavyRain(hexMap.weatherGenerator.currentWeather) && type != Type.Infantry) {
-        full = (int)(full / 2);
-      } else if (Cons.IsSnow(hexMap.weatherGenerator.currentWeather)) {
+      int full = (int)( rf.mov * (IsSick() ? 0.4f : 1));
+      if (Cons.IsHeavyRain(hexMap.weatherGenerator.currentWeather) ||
+        Cons.IsSnow(hexMap.weatherGenerator.currentWeather)) {
         full = (int)(full / 2);
       } else if (Cons.IsBlizard(hexMap.weatherGenerator.currentWeather)) {
         full = (int)(full / 4);
       }
       return full;
-    }
-
-    // ==============================================================
-    // ================= morale mangement ===========================
-    // ==============================================================
-    public int GetRetreatThreshold()
-    {
-      return rf.province.region.RetreatThreshold();
-    }
-
-    public int GetPunishThreshold()
-    {
-      return rf.province.region.MoralePunishLine();
     }
 
     // ==============================================================
@@ -766,14 +748,6 @@ namespace UnitNS
       }
     }
 
-    public int unitPureCombatPoint {
-      get {
-        int total = vantage.TotalPoints(cp);
-        total = (int)((total + total * rf.lvlBuf) * 0.001f * rf.morale);
-        return total < 0 ? 0 : total;
-      }
-    }
-
     public int unitCampingAttackCombatPoint {
       get {
         int total = vantage.TotalPoints(cp);
@@ -788,7 +762,7 @@ namespace UnitNS
 
     float GetCampingAttackBuff()
     {
-      return GetGeneralBuf() + GetMentalBuf() - plainSickness.debuf + rf.lvlBuf - disarmorDefDebuf;
+      return GetGeneralBuf() + GetMentalBuf() - plainSickness.debuf - disarmorDefDebuf;
     }
 
     public float GetBuff()
@@ -797,20 +771,11 @@ namespace UnitNS
     }
 
     public float GetGeneralBuf() {
-      return rf.general.Has(Cons.formidable) ? 1f : 0f;
+      return rf.general.Has(Cons.formidable) ? 0.5f : 0f;
     }
 
     public float GetMentalBuf() {
-      float ret = defeatStreak * -0.1f;
-      if (mentality == Mental.Supercharged) {
-        ret += 0.1f;
-      } else if (mentality == Mental.Defeating) {
-        ret += -0.4f;
-      } else if (mentality == Mental.Chaotic) {
-        ret = -0.99f;
-      }
-      ret += warWeary.GetBuf();
-      return ret < -0.99f ? -0.99f : ret;
+      return warWeary.GetBuf();
     }
 
     // ==============================================================
