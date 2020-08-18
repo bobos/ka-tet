@@ -321,7 +321,7 @@ namespace MonoNS
         Update_CurrentFunc = UpdateUnitCharge;
         msgBox.Show("选择目标!");
         foreach(Unit u in nearbyEnemey) {
-          if (u.CanBeShaked(selectedUnit) > 0) {
+          if (u.CanBeShaked(selectedUnit)) {
             hexMap.TargetUnit(u);
           }
         }
@@ -333,7 +333,7 @@ namespace MonoNS
         Update_CurrentFunc = UpdateUnitBreakThrough;
         msgBox.Show("选择突破目标!");
         foreach(Unit u in nearbyEnemey) {
-          if (u.CanBeShaked(selectedUnit) > 0) {
+          if (u.CanBeShaked(selectedUnit)) {
             hexMap.TargetUnit(u);
           }
         }
@@ -793,7 +793,7 @@ namespace MonoNS
       if (Input.GetMouseButtonUp(0))
       {
         ClickOnTile();
-        if (targetUnit != null && targetUnit.CanBeShaked(selectedUnit) > 0) {
+        if (targetUnit != null && targetUnit.CanBeShaked(selectedUnit)) {
           msgBox.Show("");
           actionController.charge(selectedUnit, targetUnit);
           Escape();
@@ -809,7 +809,7 @@ namespace MonoNS
       if (Input.GetMouseButtonUp(0))
       {
         ClickOnTile();
-        if (targetUnit != null && targetUnit.CanBeShaked(selectedUnit) > 0) {
+        if (targetUnit != null && targetUnit.CanBeShaked(selectedUnit)) {
           msgBox.Show("");
           actionController.breakThrough(selectedUnit, targetUnit);
           Escape();

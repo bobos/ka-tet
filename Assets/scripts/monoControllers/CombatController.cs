@@ -176,7 +176,6 @@ namespace MonoNS
       unitPredict = new UnitPredict();
       unitPredict.unit = defender;
       unitPredict.percentOfEffectiveForce = surprised ? 20 : 100;
-      unitPredict.percentOfEffectiveForce += defender.hasNoOpenning ? 200 : 0;
       unitPredict.joinPossibility = 100;
       unitPredict.operationPoint = targetSettlement != null ? targetSettlement.GetDefendForce() : DefenderPoint(defender);
       unitPredict.operationPoint = (int)(unitPredict.percentOfEffectiveForce * 0.01f * unitPredict.operationPoint);
@@ -268,9 +267,9 @@ namespace MonoNS
       int smaller = predict.attackerOptimPoints > predict.defenderOptimPoints ? predict.defenderOptimPoints : predict.attackerOptimPoints;
       smaller = smaller < 1 ? 1 : smaller;
       float odds = bigger / smaller;
-      if (odds <= 3.5f) {
+      if (odds < 3f) {
         predict.suggestedResultType = ResultType.Small;
-      } else if (odds <= 6f) {
+      } else if (odds >= 3f && odds < 4f) {
         predict.suggestedResultType = ResultType.Great;
       } else {
         predict.suggestedResultType = ResultType.Crushing;
@@ -288,9 +287,9 @@ namespace MonoNS
       int smaller = predict.attackerOptimPoints > defenderPoints ? defenderPoints : predict.attackerOptimPoints;
       smaller = smaller < 1 ? 1 : smaller;
       float odds = bigger / smaller;
-      if (odds <= 3.5f) {
+      if (odds < 3f) {
         predict.trueSuggestedResultType = ResultType.Small;
-      } else if (odds <= 5.5f) {
+      } else if (odds >= 3f && odds < 4f) {
         predict.trueSuggestedResultType = ResultType.Great;
       } else {
         predict.trueSuggestedResultType = ResultType.Crushing;
@@ -414,29 +413,14 @@ namespace MonoNS
 
           // rookie
           int toll = 0;
-          if (unit.rf.rank == Cons.rookie) {
-            if (unit.type == Type.Infantry) {
-              toll = dieMore ? 30 : 15;
-              total -= toll;
-              savedLives += Helper(up, toll);
-            } else {
-              toll = dieMore ? 10 : 5;
-              total -= toll;
-              savedLives += Helper(up, toll);
-            }
-          }
-
-          // veteran
-          if (unit.rf.rank == Cons.veteran) {
-            if (unit.type == Type.Infantry) {
-              toll = dieMore ? 16 : 8;
-              total -= toll;
-              savedLives += Helper(up, toll);
-            } else {
-              toll = dieMore ? 6 : 3;
-              total -= toll;
-              savedLives += Helper(up, toll);
-            }
+          if (unit.type == Type.Infantry) {
+            toll = dieMore ? 16 : 8;
+            total -= toll;
+            savedLives += Helper(up, toll);
+          } else {
+            toll = dieMore ? 6 : 3;
+            total -= toll;
+            savedLives += Helper(up, toll);
           }
         }
         if (dryUnits == units.Count) {
@@ -458,12 +442,12 @@ namespace MonoNS
         return 0;
       }
       if (type == ResultType.Small) {
-        return 0;
+        return -15;
       }
       if (type == ResultType.Great) {
-        return 1;
+        return -5;
       }
-      return 2;
+      return 20;
     }
 
     // initiatorMorale, supporterMorale, initiatorDiscontent
@@ -472,12 +456,12 @@ namespace MonoNS
         return 0;
       }
       if (type == ResultType.Small) {
-        return -2;
+        return -25;
       }
       if (type == ResultType.Great) {
-        return -5;
+        return -40;
       }
-      return -15;
+      return -90;
     }
 
     public bool commenceOpAnimating = false;
@@ -623,7 +607,7 @@ namespace MonoNS
         } else {
           float factor = 0.015f;
           if (resultLevel == ResultType.Great) {
-            factor = 0.05f;
+            factor = 0.04f;
           }
           if (resultLevel == ResultType.Crushing) {
             factor = 0.01f * Util.Rand(10, 25);
@@ -926,19 +910,9 @@ namespace MonoNS
           }
 
           foreach (Unit unit in gonnaMove) {
-            if (resultLevel == ResultType.Crushing) {
-              unit.mentality = Mental.Chaotic;
-            } else if (resultLevel == ResultType.Great) {
-              unit.mentality = Mental.Defeating;
-            }
-
             if (!failedToMove.Contains(unit)) {
               geese.Add(unit);
             }
-          }
-
-          if (resultLevel == ResultType.Small && gonnaMove.Contains(loser)) {
-            loser.mentality = Mental.Defeating;
           }
 
           if (atkWin && loser.IsCamping() &&

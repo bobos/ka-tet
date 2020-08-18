@@ -394,8 +394,7 @@ namespace MonoNS
 
     public class Army {
       public General leader;
-      public List<General> lightCavalries = new List<General>();
-      public List<General> heavyCavalries = new List<General>();
+      public List<General> cavalries = new List<General>();
       public List<General> infantries = new List<General>();
       public List<General> all = new List<General>();
       public int point;
@@ -435,10 +434,8 @@ namespace MonoNS
           General general = all[index++];
           if (general.commandUnit.type == Type.Infantry) {
             army.infantries.Add(general);
-          } else if (general.commandUnit.rank == Cons.veteran) {
-            army.heavyCavalries.Add(general);
           } else {
-            army.lightCavalries.Add(general);
+            army.cavalries.Add(general);
           }
           army.all.Add(general);
         }
@@ -453,10 +450,8 @@ namespace MonoNS
         General general = all[i];
         if (general.commandUnit.type == Type.Infantry) {
           armies[armyIndex].infantries.Add(general);
-        } else if (general.commandUnit.rank == Cons.veteran) {
-          armies[armyIndex].heavyCavalries.Add(general);
         } else {
-          armies[armyIndex].lightCavalries.Add(general);
+          armies[armyIndex].cavalries.Add(general);
         }
         armies[armyIndex].all.Add(general);
         armyIndex++;
@@ -467,7 +462,7 @@ namespace MonoNS
         General leader = null;
         int score = 0;
         foreach(General general in army.all) {
-          int point = (int)(general.commandUnit.soldiers * ( 1 + general.commandUnit.lvlBuf));
+          int point = (int)(general.commandUnit.soldiers * general.commandUnit.combatPoint);
           army.point += point;
           if (Util.eq<General>(GetWarParty(general.faction).commanderGeneral, general)) {
             army.leader = general;
@@ -524,10 +519,10 @@ namespace MonoNS
       General weakest = commander;
       int num = System.Int32.MaxValue;
       foreach(General g in attackers) {
-        if (g.commandUnit.type == Type.LightCavalry) {
+        if (g.commandUnit.type == Type.Cavalry) {
           continue;
         }
-        int cp = (int)(g.commandUnit.soldiers * (1 + g.commandUnit.lvlBuf));
+        int cp = g.commandUnit.soldiers;
         if (cp < num) {
           num = cp;
           weakest = g;
@@ -541,7 +536,7 @@ namespace MonoNS
         if (Util.eq<General>(g, weakest)) {
           continue;
         }
-        if (g.commandUnit.type == Type.LightCavalry) {
+        if (g.commandUnit.type == Type.Cavalry) {
           cavalries.Add(g);
         } else {
           infantries.Add(g);
@@ -623,7 +618,7 @@ namespace MonoNS
         General weak = null;
         num = System.Int32.MaxValue;
         foreach(General g in rest) {
-          int cp = (int)(g.commandUnit.soldiers * (1 + g.commandUnit.lvlBuf));
+          int cp = g.commandUnit.soldiers * g.commandUnit.combatPoint;
           if (cp < num) {
             num = cp;
             weak = g;

@@ -590,7 +590,7 @@ namespace MonoNS
 
     public bool ChargeAnimating = false;
     public void Charge(Unit from, Unit to) {
-      if (!from.CanCharge() || to.IsVulnerable()) {
+      if (!from.CanCharge() || !to.CanBeShaked(from)) {
         return;
       }
       ChargeAnimating = true;
@@ -599,13 +599,24 @@ namespace MonoNS
     }
 
     IEnumerator CoCharge(Unit from, Unit to) {
-      from.UseAtmpt();
+      from.Charge();
       View view = from.IsCamping() ?
         settlementMgr.GetView(from.tile.settlement) : hexMap.GetUnitView(from);
 
       popAniController.Show(view, textLib.get("pop_charging"), Color.green);
       while (popAniController.Animating) { yield return null; }
-      bool scared = to.CanBeShaked(from) >= Util.Rand(1, 100);
+      int chance = to.IsCavalry() ? 0 : 25 + (from.morale - to.morale);
+      if (Cons.IsGale(hexMap.windGenerator.current)) {
+        WindAdvantage advantage = from.tile.GetGaleAdvantage(to.tile);
+        if (advantage == WindAdvantage.Advantage) {
+          chance += 55;
+        }
+        if (advantage == WindAdvantage.Disadvantage) {
+          chance -= 55;
+        }
+      }
+      chance += from.rf.general.Has(Cons.vanguard) ? 40 : 0;
+      bool scared = chance >= Util.Rand(1, 100);
       // morale, movement, killed, attack, def
       ShowEffect(from, new int[]{0,0,from.Killed(Util.Rand(2, 15)),0,0}, view);
       while (ShowAnimating) { yield return null; }
@@ -640,37 +651,16 @@ namespace MonoNS
       } else {
         popAniController.Show(hexMap.GetUnitView(to), textLib.get("pop_holding"), Color.green);
         while (popAniController.Animating) { yield return null; }
-        to.chargeChance -= 50;
-        to.mentality = Mental.Supercharged;
-        int morale1 = -2;
-        from.rf.morale += morale1;
-        ShowEffect(from, new int[]{morale1,0,0,0,0}, view, true);
-        while(ShowAnimating) { yield return null; }
+        int morale = -10;
+        from.morale += morale;
+        to.morale += morale;
+        ShowEffect(from, new int[]{morale,0,0,0,0}, view, true);
+        ShowEffect(to, new int[]{morale,0,0,0,0}, null, true);
+        hexMap.turnController.Sleep(1);
+        while(hexMap.turnController.sleeping) { yield return null; }
       }
       hexMap.cameraKeyboardController.EnableCamera();
       ChargeAnimating = false;
-    }
-
-    public bool SkirmishAnimating = false;
-    public void Skirmish(Unit from, Unit to) {
-      if (!to.CanBeWaved()) {
-        return;
-      }
-      SkirmishAnimating = true;
-      hexMap.cameraKeyboardController.DisableCamera();
-      StartCoroutine(CoSkirmish(from, to));
-    }
-
-    IEnumerator CoSkirmish(Unit from, Unit to) {
-      from.UseAtmpt();
-      to.Skirmished(from);
-      ShowEffect(from, new int[]{0, 0, from.Killed(Util.Rand(10, 30)), 0, 0}, null, true);
-      int dead = to.type == Type.HeavyCavalry ? Util.Rand(1, 5) : (to.rf.rank == Cons.rookie ? Util.Rand(10, 30) : Util.Rand(5, 20)); 
-      ShowEffect(to, new int[]{0, 0, to.Killed(dead), 0, 0}, null, true);
-      hexMap.turnController.Sleep(1);
-      while(hexMap.turnController.sleeping) { yield return null; }
-      hexMap.cameraKeyboardController.EnableCamera();
-      SkirmishAnimating = false;
     }
 
     public bool PursueAnimating = false;

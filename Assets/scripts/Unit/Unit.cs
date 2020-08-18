@@ -102,6 +102,7 @@ namespace UnitNS
       InitAllowedAtmpt();
       InitForecast();
       InitPlotAtmpt();
+      InitChargeAtmpt();
     }
 
     public void CloneInit(float disarmorDefDebuf, Supply supply, PlainSickness plainSickness) {
@@ -187,16 +188,6 @@ namespace UnitNS
 
     public bool CanBeShaked(Unit charger) {
       return IsOnField() && !IsVulnerable();
-      //int chance = IsCavalry() ? 0 : 10;
-      //if (Cons.IsGale(hexMap.windGenerator.current)) {
-      //  WindAdvantage advantage = charger.tile.GetGaleAdvantage(tile);
-      //  if (advantage == WindAdvantage.Advantage) {
-      //    chance += 40;
-      //  }
-      //  if (advantage == WindAdvantage.Disadvantage) {
-      //    chance -= 40;
-      //  }
-      //}
     }
 
     public int CanBeSurprised() {
@@ -238,8 +229,27 @@ namespace UnitNS
       }
     }
 
+    int _chargeAtmpt = 0;
+    public int chargeAtmpt {
+      get {
+        return _chargeAtmpt;
+      }
+      set {
+        _chargeAtmpt = value < 0 ? 0 : value;
+      }
+    }
+
+    void InitChargeAtmpt() {
+      plotAtmpt = IsCavalry() ? 3 : 0;
+    }
+
     public bool CanCharge() {
-      return IsCavalry() && CanAttack() && !IsSurrounded() && !IsVulnerable();
+      return IsCavalry() && CanAttack() && !IsSurrounded() && !IsVulnerable() && chargeAtmpt > 0;
+    }
+
+    public void Charge() {
+      UseAtmpt();
+      chargeAtmpt--;
     }
 
     public bool CanBreakThrough() {
