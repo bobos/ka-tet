@@ -94,14 +94,14 @@ public class Starter : MonoBehaviour {
     y3.JoinFaction(Cons.Song, Cons.OldParty);
     y4.JoinFaction(Cons.Song, Cons.OldParty);
 
-    liubei.CreateTroop(hexMap, 10000, Cons.heNan, Type.Infantry, 50);
-    zhaoyun.CreateTroop(hexMap, 10000, Cons.heBei, Type.Infantry, 50);
-    guanyu.CreateTroop(hexMap, 10000, Cons.heBei, Type.Infantry, 30);
-    machao.CreateTroop(hexMap, 10000, Cons.heDong, Type.Infantry, 30);
-    zhangfei.CreateTroop(hexMap, 3000, Cons.heXi, Type.HeavyCavalry, 50);
-    y1.CreateTroop(hexMap, 10000, Cons.heDong, Type.Infantry, 20);
-    y2.CreateTroop(hexMap, 10000, Cons.heDong, Type.Infantry, 20);
-    y4.CreateTroop(hexMap, 3000, Cons.shanXi, Type.LightCavalry, 50);
+    liubei.CreateTroop(hexMap, 10000, Cons.heNan, Type.Infantry);
+    zhaoyun.CreateTroop(hexMap, 10000, Cons.heBei, Type.Infantry);
+    guanyu.CreateTroop(hexMap, 10000, Cons.heBei, Type.Infantry);
+    machao.CreateTroop(hexMap, 10000, Cons.heDong, Type.Infantry);
+    zhangfei.CreateTroop(hexMap, 3000, Cons.heXi, Type.Cavalry);
+    y1.CreateTroop(hexMap, 10000, Cons.heDong, Type.Infantry);
+    y2.CreateTroop(hexMap, 10000, Cons.heDong, Type.Infantry);
+    y4.CreateTroop(hexMap, 3000, Cons.shanXi, Type.Cavalry);
 
     General caocao = new General("g_caocao", "g_caocao_d", Cons.xiJing, new CommandSkill(3)); 
     General xuchu = new General("g_xuchu", "g_xuchu_d", Cons.xiJing, new CommandSkill(2)); 
@@ -128,18 +128,18 @@ public class Starter : MonoBehaviour {
     x8.JoinFaction(Cons.Liao, Cons.NorthCourt);
     x9.JoinFaction(Cons.Liao, Cons.NorthCourt);
 
-    caocao.CreateTroop(hexMap, 10000, Cons.xiJing, Type.Infantry, 50);
-    xuchu.CreateTroop(hexMap, 3000, Cons.shangJing, Type.HeavyCavalry, 50);
-    abc.CreateTroop(hexMap, 10000, Cons.zhongJing, Type.Infantry, 50);
-    x1.CreateTroop(hexMap, 3000, Cons.xiJing, Type.LightCavalry, 30);
-    x2.CreateTroop(hexMap, 10000, Cons.xiJing, Type.Infantry, 20);
-    x3.CreateTroop(hexMap, 10000, Cons.xiJing, Type.Infantry, 20);
-    x4.CreateTroop(hexMap, 10000, Cons.zhongJing, Type.Infantry, 20);
-    x5.CreateTroop(hexMap, 10000, Cons.zhongJing, Type.Infantry, 50);
-    x6.CreateTroop(hexMap, 3000, Cons.zhongJing, Type.LightCavalry, 60);
-    x7.CreateTroop(hexMap, 10000, Cons.zhongJing, Type.Infantry, 20);
-    x8.CreateTroop(hexMap, 10000, Cons.zhongJing, Type.Infantry, 50);
-    x9.CreateTroop(hexMap, 10000, Cons.zhongJing, Type.Infantry, 30);
+    caocao.CreateTroop(hexMap, 10000, Cons.xiJing, Type.Infantry);
+    xuchu.CreateTroop(hexMap, 3000, Cons.shangJing, Type.Cavalry);
+    abc.CreateTroop(hexMap, 10000, Cons.zhongJing, Type.Infantry);
+    x1.CreateTroop(hexMap, 3000, Cons.xiJing, Type.Cavalry);
+    x2.CreateTroop(hexMap, 10000, Cons.xiJing, Type.Infantry);
+    x3.CreateTroop(hexMap, 10000, Cons.xiJing, Type.Infantry);
+    x4.CreateTroop(hexMap, 10000, Cons.zhongJing, Type.Infantry);
+    x5.CreateTroop(hexMap, 10000, Cons.zhongJing, Type.Infantry);
+    x6.CreateTroop(hexMap, 3000, Cons.zhongJing, Type.Cavalry);
+    x7.CreateTroop(hexMap, 10000, Cons.zhongJing, Type.Infantry);
+    x8.CreateTroop(hexMap, 10000, Cons.zhongJing, Type.Infantry);
+    x9.CreateTroop(hexMap, 10000, Cons.zhongJing, Type.Infantry);
 
     // for 100k man fight for 6 months
     const int supply = 100000 * 60;

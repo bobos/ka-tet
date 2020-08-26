@@ -442,12 +442,12 @@ namespace MonoNS
         return 0;
       }
       if (type == ResultType.Small) {
-        return -15;
+        return -10;
       }
       if (type == ResultType.Great) {
         return -5;
       }
-      return 20;
+      return 10;
     }
 
     // initiatorMorale, supporterMorale, initiatorDiscontent
@@ -456,7 +456,7 @@ namespace MonoNS
         return 0;
       }
       if (type == ResultType.Small) {
-        return -25;
+        return -20;
       }
       if (type == ResultType.Great) {
         return -40;

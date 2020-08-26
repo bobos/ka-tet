@@ -55,6 +55,10 @@ namespace CourtNS
       }
     }
 
+    public bool IsVeteran() {
+      return org >= Region.VeteranOrg;
+    }
+
     public int soldiers {
       get {
         return _soldiers;

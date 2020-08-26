@@ -25,6 +25,11 @@ namespace UnitNS
     public virtual bool IsCavalry() {
       return false;
     }
+
+    public bool IsVeteran() {
+      return rf.IsVeteran();
+    }
+
     public const int DisbandUnitUnder = 200;
 
     public const int L0Visibility = 1;
@@ -546,7 +551,6 @@ namespace UnitNS
       });
     }
 
-    public bool inCommanderRange = false;
     bool UnderCommand() {
       bool inRange = false;
       if (IsCommander()) {
@@ -629,7 +633,7 @@ namespace UnitNS
     // Before new turn starts
     public int[] RefreshUnit()
     {
-      morale += IsCamping() ? 30 : (rf.general.Has(Cons.discipline) ? 15: 10);
+      morale += IsCamping() ? 15 : (rf.general.Has(Cons.discipline) ? 10: 5);
       crashed = retreated = false;
       InitForecast();
       InitAllowedAtmpt();

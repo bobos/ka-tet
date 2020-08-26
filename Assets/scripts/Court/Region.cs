@@ -21,6 +21,7 @@ namespace CourtNS
     public virtual int MaxOrganizationPoint() {
       return 65;
     }
+    public static int VeteranOrg = 50;
   }
 
   public class QidanRegion : Region

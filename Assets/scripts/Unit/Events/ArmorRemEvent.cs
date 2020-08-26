@@ -14,24 +14,21 @@
         return 0;
       }
 
-      if ((unit.rf.rank == Cons.rookie || first != null)
-          && !unit.ApplyDiscipline(Cons.FiftyFifty())
+      if ((!unit.IsVeteran() || first != null)
+          && !unit.ApplyDiscipline()
           && !unit.IsAI() && !fired && unit.IsOnField()) {
         fired = true;
-        if (unit.rf.general.Has(Cons.discipline)) {
-          return MoraleDrop();
-        }
         return Cons.FiftyFifty() ? MoraleDrop() : DefReduce();
       }
       return 0;
     }
 
     int DefReduce() {
-      return 20;
+      return 20; // cp reduced 20%
     } 
 
     int MoraleDrop() {
-      return -8;
+      return -40;
     } 
 
     public void Destroy() {}

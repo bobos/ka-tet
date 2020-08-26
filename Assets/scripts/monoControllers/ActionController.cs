@@ -660,15 +660,6 @@ namespace MonoNS
       ActionOngoing = false;
     }
 
-    IEnumerator DoSkirmish(Unit unit, Unit unit1) {
-      unitAniController.Skirmish(unit, unit1);
-      while (unitAniController.SkirmishAnimating)
-      {
-        yield return null;
-      }
-      ActionOngoing = false;
-    }
-
   }
 
 }
