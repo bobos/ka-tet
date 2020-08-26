@@ -245,7 +245,7 @@ namespace UnitNS
     }
 
     void InitChargeAtmpt() {
-      plotAtmpt = IsCavalry() ? 3 : 0;
+      chargeAtmpt = IsCavalry() ? 3 : 0;
     }
 
     public bool CanCharge() {

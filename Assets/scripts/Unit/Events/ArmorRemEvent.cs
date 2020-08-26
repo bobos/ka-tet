@@ -25,7 +25,7 @@
 
     int DefReduce() {
       return 20; // cp reduced 20%
-    } 
+    }
 
     int MoraleDrop() {
       return -40;
