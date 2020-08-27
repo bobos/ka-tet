@@ -40,8 +40,8 @@
       if (IsValid())
       {
         lastTurns--;
-        int morale = -3;
-        unit.rf.morale += morale;
+        int morale = -20;
+        unit.morale += morale;
         effects[0] = morale;
         effects[2] = unit.Killed(Util.Rand(3, 20));
       }

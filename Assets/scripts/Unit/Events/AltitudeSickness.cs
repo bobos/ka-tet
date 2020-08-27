@@ -23,7 +23,7 @@ namespace UnitNS
 
       triggered = true;
       lastTurns = Util.Rand(1, 3);
-      return -5;
+      return -40;
     }
 
     public int Apply() {

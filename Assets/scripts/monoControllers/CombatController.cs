@@ -306,7 +306,6 @@ namespace MonoNS
       if (unit.fooled) {
         return 0;
       }
-      bool inRange = unit.inCommanderRange;
       // if the target unit is the one hated
       Unit target = attacker ? this.attacker : this.defender;
       if ((unit.rf.province.GetConflictProvinces().Contains(target.rf.province) ||
@@ -315,11 +314,7 @@ namespace MonoNS
         ret = ret < 85 ? ret : 85;
       }
 
-      if (attacker && !inRange) {
-        ret = ret < 90 ? ret : 90;
-      }
-
-      if (!attacker && !inRange && Cons.IsMist(hexMap.weatherGenerator.currentWeather)) {
+      if (!attacker && Cons.IsMist(hexMap.weatherGenerator.currentWeather)) {
         ret = ret < 50 ? ret : 50;
       }
 
@@ -331,25 +326,23 @@ namespace MonoNS
     }
 
     int JoinPossibilityBaseOnOdds(Unit unit, ResultType result) {
-      bool inRange = unit.inCommanderRange;
-      if ((inRange && unit.MyCommander().commandSkill.ObeyMyOrder()) ||
-       unit.rf.general.Is(Cons.loyal)) {
+      if (unit.FollowOrder()) {
         return 100;
       }
 
       int chance = 100;
       if (result == ResultType.Small) {
-        chance = inRange ? 100 : 95;
+        chance = 95;
       }
       else if (result == ResultType.Great) {
-        chance = inRange ? 90 : 80;
+        chance = 80;
       }
       else if (result == ResultType.Crushing) {
-        chance = inRange ? 80 : 70;
+        chance = 70;
       }
 
       if (unit.rf.general.Is(Cons.cunning)) {
-        chance -= 20;
+        chance -= 25;
       }
 
       return chance;
@@ -442,10 +435,10 @@ namespace MonoNS
         return 0;
       }
       if (type == ResultType.Small) {
-        return -10;
+        return -5;
       }
       if (type == ResultType.Great) {
-        return -5;
+        return 0;
       }
       return 10;
     }
@@ -456,10 +449,10 @@ namespace MonoNS
         return 0;
       }
       if (type == ResultType.Small) {
-        return -20;
+        return -15;
       }
       if (type == ResultType.Great) {
-        return -40;
+        return -35;
       }
       return -90;
     }

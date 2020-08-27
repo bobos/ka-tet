@@ -25,8 +25,8 @@ namespace UnitNS
       happened = true;
       if (Cons.SlimChance()) {
         affected = true;
-        debuf = 0.2f;
-        return 1;
+        debuf = 0.25f;
+        return -25;
       }
 
       return 0;

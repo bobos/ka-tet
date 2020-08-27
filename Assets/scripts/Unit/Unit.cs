@@ -464,9 +464,7 @@ namespace UnitNS
       foreach(Tile t in tile.GetNeighboursWithinRange<Tile>(GetVisibleRange(), (Tile _tile) => true)) {
         Unit unit = t.GetUnit();
         if (unit != null && unit.IsAI() != IsAI() && !unit.fooled && !unit.IsCommander()
-          && (unit.rf.general.Is(Cons.calm) ||
-              (unit.inCommanderRange ? false :
-               unit.rf.general.Is(Cons.conservative) || unit.rf.general.Is(Cons.loyal)))) {
+          && (unit.rf.general.Is(Cons.calm) || unit.rf.general.Is(Cons.conservative))) {
           units.Add(unit);
         }
       }
@@ -519,8 +517,6 @@ namespace UnitNS
         v = L0Visibility;
       } else {
         v = vantage.IsAtVantagePoint() ? VantageVisibility : L1Visibility;
-        v = (IsCommander() && rf.general.commandSkill.GetCommandRange() > v) ?
-          rf.general.commandSkill.GetCommandRange() : v;
       }
       return v;
     }
@@ -538,56 +534,31 @@ namespace UnitNS
       });
     }
 
-    public Tile[] GetCommandArea() {
-      int v = GetVisibleRange();
-      int cv = rf.general.commandSkill.GetCommandRange();
-      v = cv < v ? cv : v;
-      if (v == 0) {
-        return new Tile[]{};
-      }
-
-      return tile.GetNeighboursWithinRange<Tile>(v, (Tile _tile) => {
-          return true;
-      });
-    }
-
-    bool UnderCommand() {
-      bool inRange = false;
-      if (IsCommander()) {
-        return true;
-      }
-
-      foreach(Tile t in MyCommander().commandUnit.onFieldUnit.GetCommandArea()) {
-        if (Util.eq<Tile>(tile, t)) {
-          inRange = true;
-          break;
-        }
-      }
-      return inRange;
-    }
-
     public bool FollowOrder() {
-      return inCommanderRange && MyCommander().commandSkill.ObeyMyOrder();
+      return MyCommander().commandSkill.ObeyMyOrder() || rf.general.Is(Cons.loyal);
+    }
+
+    public bool TurningTide() {
+      return MyCommander().commandSkill.TurningTide() && Cons.FiftyFifty();
     }
 
     public int ImproviseOnSupply() {
       if (rf.general.Has(Cons.improvisor)) {
-        return -10; 
+        return -5; 
       }
       if(Util.eq<Region>(rf.province.region, Cons.tubo)) {
-        return -15;
+        return -10;
       }
-      return -30;
+      return -25;
     }
 
     public bool StickAsNailWhenDefeat() {
       if (IsVulnerable()) {
         return false;
       }
-      return (inCommanderRange &&
-              MyCommander().commandSkill.TurningTide()) ||
-              (rf.general.Has(Cons.holdTheGround) && Cons.MostLikely()) ||
-              (rf.IsSpecial() && Cons.MostLikely()) || Cons.FiftyFifty();
+      return TurningTide() ||
+        (rf.general.Has(Cons.holdTheGround) && Cons.MostLikely()) ||
+        (rf.IsSpecial() && Cons.MostLikely()) || Cons.FiftyFifty();
     }
 
     public bool RetreatOnDefeat() {
@@ -622,10 +593,6 @@ namespace UnitNS
       return moraleIncr;
     }
 
-    public void UpdateInCommanderRange() {
-      inCommanderRange = UnderCommand();
-    }
-
     // ==============================================================
     // ================= Unit Settled&Refresh =======================
     // ==============================================================
@@ -633,7 +600,7 @@ namespace UnitNS
     // Before new turn starts
     public int[] RefreshUnit()
     {
-      morale += IsCamping() ? 15 : (rf.general.Has(Cons.discipline) ? 10: 5);
+      morale += IsCamping() ? 10 : 5;
       crashed = retreated = false;
       InitForecast();
       InitAllowedAtmpt();

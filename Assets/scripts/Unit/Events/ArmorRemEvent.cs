@@ -28,7 +28,7 @@
     }
 
     int MoraleDrop() {
-      return -40;
+      return -35;
     } 
 
     public void Destroy() {}

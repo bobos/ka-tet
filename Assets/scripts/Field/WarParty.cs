@@ -218,12 +218,6 @@ namespace FieldNS
       return point;
     }
 
-    public void UpdateUnitStatus() {
-      foreach(Unit unit in GetUnits()) {
-        unit.UpdateInCommanderRange();
-      }
-    }
-
     public Unit GetAmbusher(Unit target) {
       HashSet<Tile> area = target.hexMap.GetWarParty(target).GetVisibleArea();
       foreach(Unit unit in GetUnits()) {

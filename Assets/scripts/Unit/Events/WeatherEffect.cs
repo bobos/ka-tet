@@ -13,8 +13,8 @@
         if (unit.IsCamping()) return effects;
 
         if (Cons.EvenChance()) {
-          int morale = -1;
-          unit.rf.morale += morale;
+          int morale = -5;
+          unit.morale += morale;
           effects[0] = morale;
           effects[2] = unit.Killed(Util.Rand(0, 10));
         }
@@ -22,8 +22,8 @@
         if (unit.IsCamping()) return effects;
 
         if (Cons.SlimChance()) {
-          int morale = -4;
-          unit.rf.morale += morale;
+          int morale = -10;
+          unit.morale += morale;
           effects[0] = morale;
           effects[2] = unit.Killed(Util.Rand(4, 20));
         }

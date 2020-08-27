@@ -145,7 +145,6 @@ public abstract class Settlement: Building
       garrison.Add(unit);
       parkSlots--;
       unit.Encamp(baseTile);
-      hexMap.UpdateUnitStatus(unit);
       return true;
     }
     return false;
@@ -166,7 +165,6 @@ public abstract class Settlement: Building
       garrison.Remove(unit);
       parkSlots++;
       unit.Decamp(targetTile);
-      hexMap.UpdateUnitStatus(unit);
       return true;
     }
     else

@@ -76,9 +76,9 @@ namespace MonoNS
 
       ShakeNearbyAllies(unit, 0);
       while (ShakeAnimating) { yield return null; }
-      int drop = unit.IsCommander() ? -20 : -10;
+      int drop = unit.IsCommander() ? -30 : -15;
       foreach(Unit u in hexMap.GetWarParty(unit).GetUnits()) {
-        u.rf.morale += drop;
+        u.morale += drop;
         ShowEffect(u, new int[]{drop, 0, 0, 0, 0}, null, true);
       }
       hexMap.turnController.Sleep(1);
@@ -98,7 +98,7 @@ namespace MonoNS
         Unit u = t.GetUnit();
         if (u != null && u.IsAI() == unit.IsAI() && !Util.eq<Unit>(unit, u)) {
           int[] stats = new int[]{moraleDrop,0,0,0,0};
-          u.rf.morale += moraleDrop;
+          u.morale += moraleDrop;
           if (u.IsShowingAnimation()) {
             hexMap.unitAniController.ShowEffect(u, stats, null, true);
           }
@@ -148,11 +148,11 @@ namespace MonoNS
           while(popAniController.Animating) { yield return null; }
         }
         ShowEffect(unit, new int[]{r,0,0,0,0});
-        unit.rf.morale += r;
+        unit.morale += r;
         while(ShowAnimating) { yield return null; }
       }
       if (moraleDrop != 0) {
-        unit.rf.morale += moraleDrop;
+        unit.morale += moraleDrop;
         ShowEffect(unit, new int[]{moraleDrop,0,0,0,0});
         while(ShowAnimating) { yield return null; }
       }
@@ -167,7 +167,6 @@ namespace MonoNS
           SurpriseAttack(ambusher, unit, true);
           while (SurpriseAnimating) { yield return null; }
         }
-        hexMap.UpdateUnitStatus(unit);
       }
       // stash event
       // hexMap.eventStasher.Add(unit.rf.general, MonoNS.EventDialog.EventName.FarmDestroyed);

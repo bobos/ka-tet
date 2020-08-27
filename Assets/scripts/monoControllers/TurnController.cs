@@ -190,19 +190,16 @@ namespace MonoNS
             WarWeary();
           }
 
+          int moraleDrop = 5;
           WarParty atkParty = playerParty.attackside ? playerParty : aiParty;
           WarParty defParty = playerParty.attackside ? aiParty : playerParty;
           foreach (Unit unit in atkParty.GetUnits()) {
-            if (unit.rf.morale >= unit.rf.province.region.MoralePunishLine()) {
-              unit.rf.morale -= 2;
-            }
+            unit.morale -= moraleDrop;
           }
 
           if ((turnNum % 2) != 0) {
             foreach(Unit unit in defParty.GetUnits()) {
-              if (unit.rf.morale >= unit.rf.province.region.MoralePunishLine()) {
-                unit.rf.morale -= 2;
-              }
+              unit.morale -= moraleDrop;
             }
           }
         }

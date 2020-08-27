@@ -673,17 +673,6 @@ namespace MonoNS
       return turnController.playerTurn ? GetPlayerParty() : GetAIParty();
     }
 
-    public void UpdateUnitStatus(Unit unit = null) {
-      if (SettlementMgr.Ready4Refresh) {
-        if (unit != null) {
-          GetWarParty(unit).UpdateUnitStatus();
-        } else {
-          GetAIParty().UpdateUnitStatus();
-          GetPlayerParty().UpdateUnitStatus();
-        } 
-      }
-    }
-
     public void CaptureHorse(Unit unit, int num) {
       GetWarParty(unit).CaptureHorse(num);
     }

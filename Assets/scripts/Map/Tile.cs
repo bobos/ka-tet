@@ -198,7 +198,6 @@ namespace MapTileNS
       {
         UpdateMovementcost();
       }
-      hexMap.UpdateUnitStatus();
       // TODO remove this
       hexMap.GetTileView(this).RefreshVisual();
     }

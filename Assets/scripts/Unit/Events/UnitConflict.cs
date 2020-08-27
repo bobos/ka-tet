@@ -39,7 +39,7 @@ namespace UnitNS
         return result;
       }
 
-      result.moralDrop = -Util.Rand(35, 55);
+      result.moralDrop = -Util.Rand(25, 40);
       result.unit1 = unit;
       result.unit2 = target;
 
