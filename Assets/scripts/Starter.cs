@@ -257,7 +257,6 @@ public class Starter : MonoBehaviour {
     } else {
       view = hexMap.GetUnitView(commander);
     }
-    hexMap.UpdateUnitStatus();
     cameraKeyboardController.FixCameraAt(view.transform.position);
   }
 }

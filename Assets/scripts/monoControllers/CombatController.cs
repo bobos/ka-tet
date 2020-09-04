@@ -848,13 +848,13 @@ namespace MonoNS
         if (loser.IsCommander() && !feint) {
           int drop = 0;
           if (resultLevel == ResultType.Small) {
-            drop = -3;
+            drop = -10;
           }
           if (resultLevel == ResultType.Great) {
-            drop = -6;
+            drop = -20;
           }
           if (resultLevel == ResultType.Crushing) {
-            drop = -10;
+            drop = -30;
           }
           if (drop != 0) {
             hexMap.unitAniController.ShakeNearbyAllies(loser, drop);
@@ -898,7 +898,7 @@ namespace MonoNS
             while(hexMap.dialogue.Animating) { yield return null; }
           }
           if (gonnaMove.Count > 0) {
-            hexMap.unitAniController.Scatter(gonnaMove, failedToMove, feint ? 0 : -10);
+            hexMap.unitAniController.Scatter(gonnaMove, failedToMove, feint);
             while(hexMap.unitAniController.ScatterAnimating) { yield return null; }
           }
 

@@ -333,7 +333,7 @@ namespace MonoNS
         Update_CurrentFunc = UpdateUnitBreakThrough;
         msgBox.Show("选择突破目标!");
         foreach(Unit u in nearbyEnemey) {
-          if (u.CanBeShaked(selectedUnit)) {
+          if (u.IsOnField()) {
             hexMap.TargetUnit(u);
           }
         }
@@ -809,7 +809,7 @@ namespace MonoNS
       if (Input.GetMouseButtonUp(0))
       {
         ClickOnTile();
-        if (targetUnit != null && targetUnit.CanBeShaked(selectedUnit)) {
+        if (targetUnit != null && targetUnit.IsOnField()) {
           msgBox.Show("");
           actionController.breakThrough(selectedUnit, targetUnit);
           Escape();

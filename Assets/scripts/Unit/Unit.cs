@@ -542,6 +542,10 @@ namespace UnitNS
       return MyCommander().commandSkill.TurningTide() && Cons.FiftyFifty();
     }
 
+    public bool StandStill() {
+      return StickAsNailWhenDefeat() || rf.general.Has(Cons.holdTheGround) || Cons.FiftyFifty();
+    }
+
     public int ImproviseOnSupply() {
       if (rf.general.Has(Cons.improvisor)) {
         return -5; 
@@ -880,7 +884,6 @@ namespace UnitNS
       //if (!IsAI()) {
         hexMap.OnWargameMove(this, h);
       //}
-      hexMap.UpdateUnitStatus(this);
       tile = h;
     }
 

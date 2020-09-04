@@ -380,7 +380,7 @@ namespace MonoNS
               hexMap.dialogue.ShowRemoveHelmetFollow(unit, false);
             }
             while (hexMap.dialogue.Animating) { yield return null; }
-            unit.rf.morale += ret;
+            unit.morale += ret;
             ShowEffect(unit, new int[]{ret,0,0,0,0});
             while(ShowAnimating) { yield return null; }
           } else {
@@ -401,7 +401,7 @@ namespace MonoNS
       if (Cons.FiftyFifty()) {
         int ret = unit.plainSickness.Occur();
         if (ret != 0) {
-          unit.rf.morale += ret;
+          unit.morale += ret;
           if (unit.IsShowingAnimation()) {
             popAniController.Show(hexMap.GetUnitView(unit), textLib.get("pop_plainSickness"), Color.yellow);
             while (popAniController.Animating) { yield return null; }
@@ -411,7 +411,7 @@ namespace MonoNS
 
       int moraleDrop = unit.inCampComplain.Occur();
       if (moraleDrop != 0) {
-        unit.rf.morale += moraleDrop;
+        unit.morale += moraleDrop;
         hexMap.dialogue.ShowInCampComplain(unit.rf.province.region);
         while(hexMap.dialogue.Animating) { yield return null; }
         ShowEffect(unit, new int[]{moraleDrop, 0, 0, 0, 0}, settlementMgr.GetView(unit.tile.settlement));
@@ -420,7 +420,7 @@ namespace MonoNS
 
       moraleDrop = unit.onFieldComplain.Occur();
       if (moraleDrop != 0) {
-        unit.rf.morale += moraleDrop;
+        unit.morale += moraleDrop;
         hexMap.dialogue.ShowOnFieldComplain(unit.rf.province.region);
         while(hexMap.dialogue.Animating) { yield return null; }
         ShowEffect(unit, new int[]{moraleDrop, 0, 0, 0, 0});
@@ -461,9 +461,9 @@ namespace MonoNS
     }
 
     IEnumerator CoBury(Unit unit) {
-      if (!unit.ApplyDiscipline(Cons.FiftyFifty())) {
-        int moraleDrop = -1;
-        unit.rf.morale += moraleDrop;
+      if (!unit.ApplyDiscipline()) {
+        int moraleDrop = -20;
+        unit.morale += moraleDrop;
         ShowEffect(unit, new int[]{moraleDrop,0,0,0,0});
         while(ShowAnimating) { yield return null; }
       }
@@ -474,13 +474,13 @@ namespace MonoNS
     }
 
     public bool ScatterAnimating = false;
-    public void Scatter(List<Unit> units, List<Unit> failedToMove, int moraleDrop) {
+    public void Scatter(List<Unit> units, List<Unit> failedToMove, bool feint = false) {
       ScatterAnimating = true;
       hexMap.cameraKeyboardController.DisableCamera();
-      StartCoroutine(CoScatter(units, failedToMove, moraleDrop));
+      StartCoroutine(CoScatter(units, failedToMove, feint));
     }
 
-    IEnumerator CoScatter(List<Unit> units, List<Unit> failedToMove, int moraleDrop) {
+    IEnumerator CoScatter(List<Unit> units, List<Unit> failedToMove, bool feint) {
       Dictionary<Tile, bool> tiles = new Dictionary<Tile, bool>();
       Dictionary<Unit, List<Tile>> plan = new Dictionary<Unit, List<Tile>>();
       Unit loser = units[0];
@@ -571,15 +571,15 @@ namespace MonoNS
       foreach(Unit unit in failedToMove) {
         foreach(Tile t in unit.tile.neighbours) {
           Unit u = t.GetUnit();
-          if (u != null && u.IsAI() == unit.IsAI()&& !units.Contains(u) && moraleDrop != 0) {
-            hexMap.unitAniController.CrashByAlly(u, -3);
+          if (u != null && u.IsAI() == unit.IsAI()&& !units.Contains(u) && !feint) {
+            hexMap.unitAniController.CrashByAlly(u, -15);
             while (hexMap.unitAniController.CrashAnimating) { yield return null; }
             continue;
           }
         }
       }
 
-      if (moraleDrop == 0) {
+      if (feint) {
         loser.movementRemaining = (int)(loser.GetFullMovement() / 2);
       }
       
@@ -620,31 +620,27 @@ namespace MonoNS
       ShowEffect(from, new int[]{0,0,from.Killed(Util.Rand(2, 15)),0,0}, view);
       while (ShowAnimating) { yield return null; }
       if (scared) {
-        if (!to.IsGone()) {
-          List<Unit> affectedAllies = new List<Unit>();
-          affectedAllies.Add(to);
-          if (from.rf.general.Has(Cons.breaker)) {
-            foreach(Tile t in to.tile.neighbours) {
-              Unit u = t.GetUnit();
-              if (u != null && u.IsAI() == to.IsAI() && !u.StickAsNailWhenDefeat() && Cons.FiftyFifty()) {
-                if (u.rf.general.Has(Cons.holdTheGround) && Cons.FiftyFifty()) {
-                  affectedAllies.Add(u);
-                }
-              }
+        List<Unit> affectedAllies = new List<Unit>();
+        affectedAllies.Add(to);
+        if (from.rf.general.Has(Cons.breaker)) {
+          foreach(Tile t in to.tile.neighbours) {
+            Unit u = t.GetUnit();
+            if (u != null && u.IsAI() == to.IsAI() && !u.StandStill()) {
+              affectedAllies.Add(u);
             }
           }
+        }
 
-          Tile toTile = to.tile;
-          List<Unit> notMoved = new List<Unit>();
-          Scatter(affectedAllies, notMoved, -4);
-          while(ScatterAnimating) { yield return null; }
-          if (toTile.Deployable(from)) {
-            if (from.IsCamping()) {
-              from.tile.settlement.Decamp(from, toTile);
-            } else {
-              MoveUnit(from, toTile);
-              while (MoveAnimating) { yield return null; }
-            }
+        Tile toTile = to.tile;
+        List<Unit> notMoved = new List<Unit>();
+        Scatter(affectedAllies, notMoved);
+        while(ScatterAnimating) { yield return null; }
+        if (toTile.Deployable(from)) {
+          if (from.IsCamping()) {
+            from.tile.settlement.Decamp(from, toTile);
+          } else {
+            MoveUnit(from, toTile);
+            while (MoveAnimating) { yield return null; }
           }
         }
       } else {
@@ -690,35 +686,7 @@ namespace MonoNS
         while (hexMap.unitAniController.DestroyAnimating) { yield return null; }
       }
       to.tile.deadZone.Occur(dead);
-
-      if (!to.IsGone()) {
-        List<Unit> affectedAllies = new List<Unit>();
-        affectedAllies.Add(to);
-        if (from.rf.general.Has(Cons.breaker)) {
-          foreach(Tile t in to.tile.neighbours) {
-            Unit u = t.GetUnit();
-            if (u != null && u.IsAI() == to.IsAI() && !u.StickAsNailWhenDefeat() && Cons.FiftyFifty()) {
-              if (u.rf.general.Has(Cons.holdTheGround) && Cons.FiftyFifty()) {
-                affectedAllies.Add(u);
-              }
-            }
-          }
-        }
-
-        Tile toTile = to.tile;
-        List<Unit> notMoved = new List<Unit>();
-        Scatter(affectedAllies, notMoved, -4);
-        while(ScatterAnimating) { yield return null; }
-        if (toTile.Deployable(from)) {
-          if (from.IsCamping()) {
-            from.tile.settlement.Decamp(from, toTile);
-          } else {
-            MoveUnit(from, toTile);
-            while (MoveAnimating) { yield return null; }
-          }
-        }
-      }
-      ShowEffect(from, new int[]{from.Victory(2), 0, 0, 0, 0});
+      ShowEffect(from, new int[]{from.Victory(5), 0, 0, 0, 0});
       while( ShowAnimating ) { yield return null; }
       hexMap.cameraKeyboardController.EnableCamera();
       PursueAnimating = false;
@@ -739,14 +707,20 @@ namespace MonoNS
       View view = from.IsCamping() ?
         settlementMgr.GetView(from.tile.settlement) : hexMap.GetUnitView(from);
 
-      bool defeatingUnit = to.IsVulnerable();
+      int chance = from.morale - to.morale;
+      if (Cons.IsGale(hexMap.windGenerator.current)) {
+        WindAdvantage advantage = from.tile.GetGaleAdvantage(to.tile);
+        if (advantage == WindAdvantage.Advantage) {
+          chance += 55;
+        }
+        if (advantage == WindAdvantage.Disadvantage) {
+          chance -= 55;
+        }
+      }
+      chance += from.rf.general.Has(Cons.formidable) ? 50 : 0;
+      bool scared = to.IsVulnerable() || chance >= Util.Rand(1, 100);
       popAniController.Show(view, textLib.get("pop_toBreakThrough"), Color.green);
       while (popAniController.Animating) { yield return null; }
-      bool scared = to.CanBeShaked(from) >= Util.Rand(1, 100);
-      scared = defeatingUnit ? true : scared;
-      if (!scared && from.rf.general.Has(Cons.formidable)) {
-        scared = Cons.FiftyFifty();
-      }
       // morale, movement, killed, attack, def
       ShowEffect(from, new int[]{0,0,from.Killed(Util.Rand(20, 50)),0,0}, view);
       while (ShowAnimating) { yield return null; }
@@ -781,9 +755,9 @@ namespace MonoNS
           textLib.get("pop_failedToBreakthrough"),
           Color.white);
         while (popAniController.Animating) { yield return null; }
-        int morale1 = -5;
-        from.rf.morale += morale1;
-        ShowEffect(from, new int[]{morale1,0,0,0,0}, view, true);
+        int morale = -10;
+        from.morale += morale;
+        ShowEffect(from, new int[]{morale,0,0,0,0}, view, true);
         while(ShowAnimating) { yield return null; }
       }
       hexMap.cameraKeyboardController.EnableCamera();
@@ -807,7 +781,7 @@ namespace MonoNS
       // morale, movement, killed, attack, def
       ShowEffect(unit, new int[]{morale,0,unit.Killed(Util.Rand(40, 100)),0,0});
       while (ShowAnimating) { yield return null; }
-      unit.rf.morale += morale;
+      unit.morale += morale;
       if (unit.rf.soldiers <= Unit.DisbandUnitUnder) {
         // unit disbanded
         hexMap.unitAniController.DestroyUnit(unit, DestroyType.ByDisband);
@@ -850,11 +824,11 @@ namespace MonoNS
       } else {
         Region region = unit.rf.province.region;
         if ((Cons.IsQidan(region) || Cons.IsDangxiang(region)) && 
-          !unit.ApplyDiscipline(Cons.FiftyFifty())) {
+          !unit.ApplyDiscipline()) {
           hexMap.dialogue.ShowSiegeComplain(region);
           while(hexMap.dialogue.Animating) { yield return null; }
-          int moraleDrop = -5;
-          unit.rf.morale += moraleDrop;
+          int moraleDrop = -20;
+          unit.morale += moraleDrop;
           ShowEffect(unit, new int[]{moraleDrop,0,0,0,0});
           while(ShowAnimating) { yield return null; }
         }
@@ -1019,11 +993,6 @@ namespace MonoNS
         hexMap.dialogue.ShowRefuseToRetreat(unit);
         while(hexMap.dialogue.Animating) { yield return null; }
       } else {
-        if (breakThrough && !unit.rf.IsSpecial()) {
-          unit.mentality = Mental.Chaotic;
-        } else {
-          unit.mentality = Mental.Defeating;
-        }
         hexMap.dialogue.ShowRetreat(unit);
         while(hexMap.dialogue.Animating) { yield return null; }
         unit.movementRemaining = movement;
@@ -1041,8 +1010,8 @@ namespace MonoNS
           while(MoveAnimating) { yield return null; }
         }
         unit.movementRemaining = 0;
-        int moraleDrop = breakThrough ? -10 : -5;
-        unit.rf.morale += moraleDrop;
+        int moraleDrop = breakThrough ? -20 : -10;
+        unit.morale += moraleDrop;
         ShowEffect(unit, new int[]{moraleDrop,0,0,0,0});
         while(ShowAnimating) { yield return null; }
       }
