@@ -126,3 +126,6 @@ Find gameobject by name:
 
 use "System.Linq" to let Array has Contains method
 delete meta and .DS_Store file to avoid project syntax error in IDE
+
+战场提案系统
+一年4个战略回合，每个回合一个季度，每个战略回合15个战斗回合
