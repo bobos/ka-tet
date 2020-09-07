@@ -129,3 +129,4 @@ delete meta and .DS_Store file to avoid project syntax error in IDE
 
 战场提案系统
 一年4个战略回合，每个回合一个季度，每个战略回合15个战斗回合
+战斗回合开始前的战前会议 将领提案 非顶级将领只能选择一个提案 顶级将领可以选择两个提案
