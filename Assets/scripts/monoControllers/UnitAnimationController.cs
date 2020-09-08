@@ -1046,13 +1046,11 @@ namespace MonoNS
         popAniController.Show(hexMap.GetUnitView(to), textLib.get("pop_surpriseAttackFailed"), Color.white);
         while(popAniController.Animating) { yield return null; }
         int killed = from.type == Type.Infantry ? Util.Rand(40, 100) : Util.Rand(20, 50);
-        int moraleDrop = -3; 
-        from.rf.morale += moraleDrop;
+        int moraleDrop = -15;
+        from.morale += moraleDrop;
         ShowEffect(from, new int[]{moraleDrop,0,from.Killed(killed),0,0});
         while (ShowAnimating) { yield return null; }
-        to.mentality = Mental.Supercharged;
       } else {
-        to.wavingPoint += 80;
         hexMap.combatController.StartOperation(from, to, null, true);
         hexMap.combatController.CommenceOperation();
         while (hexMap.combatController.commenceOpAnimating) { yield return null; }

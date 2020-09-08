@@ -75,7 +75,7 @@ namespace UnitNS
         + "\n"
         + unit.rf.province.Name() + NumIcons(unit.rf.soldiers, unit.type != Type.Infantry) + "\n"
         + "攻: " + Shorten(unit.unitCombatPoint) + "\n防: " + Shorten(totalDefendPoint) + "\n"
-        + unit.rf.morale + "/" + unit.rf.province.region.MoralePunishLine() + "/" + unit.rf.province.region.RetreatThreshold();
+        + "战损比: " + unit.warWeary.Casualty() + "/" + unit.rf.org;
       textMesh.fontSize = 45;
       textMesh.color = color;
     }

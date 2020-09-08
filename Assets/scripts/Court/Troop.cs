@@ -32,8 +32,8 @@ namespace CourtNS
       name = province.region.Name();
       combatPoint = province.region.CombatPoint(type);
       movementPoint = 100;
-      org = province.region.DefaultOrganizationPoint();
       this.province = province;
+      org = province.region.DefaultOrganizationPoint();
       state = TroopState.Idle;
     }
 

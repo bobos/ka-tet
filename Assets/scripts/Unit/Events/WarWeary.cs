@@ -13,8 +13,12 @@
     }
 
     public bool IsWarWeary() {
+      return Casualty() > unit.rf.org;
+    }
+
+    public int Casualty() {
       int total = unit.kia + unit.rf.soldiers;
-      return total * unit.rf.org < unit.kia; 
+      return (int)((unit.kia / total) * 100);
     }
 
     public int GetWarWearyDissertNum()

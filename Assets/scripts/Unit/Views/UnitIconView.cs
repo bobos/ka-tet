@@ -18,7 +18,6 @@ namespace UnitNS
       + (unit.IsVulnerable() ? "∇": "")
       + (unit.IsWarWeary() ? "☹": "")
       + (unit.fooled ? "⊜" : "")
-      + (unit.inCommanderRange ? "㊬" : "")
       + (unit.rf.general.Has(Cons.ambusher) ? "☸": "")
       + (unit.rf.general.Has(Cons.tactic) ? "≜" : "")
       + (unit.rf.general.Has(Cons.fireBug) ? "♨" : "")

@@ -1,6 +1,7 @@
 *.meta
 /Library/
 /Temp/
+/obj/
 *.log
 *.asset
 obj/Debug/Assembly-CSharp.csprojAssemblyReference.cache

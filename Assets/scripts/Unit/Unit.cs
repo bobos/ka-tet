@@ -199,7 +199,16 @@ namespace UnitNS
       if (!IsOnField() || IsVulnerable() || tile.vantagePoint || rf.general.Has(Cons.ambusher)) {
         return 0;
       }
-      return rf.general.Is(Cons.conservative) || rf.general.Is(Cons.cunning) ? 20 : 95;
+      if (rf.general.Is(Cons.conservative)) {
+        return 10;
+      }
+      if (rf.general.Is(Cons.cunning)) {
+        return 25;
+      }
+      if (rf.general.Is(Cons.reckless)) {
+        return 95;
+      }
+      return 50;
     }
 
     public bool CanBeCrashed() {

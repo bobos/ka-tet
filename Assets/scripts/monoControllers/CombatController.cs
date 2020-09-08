@@ -454,7 +454,7 @@ namespace MonoNS
       if (type == ResultType.Great) {
         return -35;
       }
-      return -90;
+      return -80;
     }
 
     public bool commenceOpAnimating = false;
