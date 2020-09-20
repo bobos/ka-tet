@@ -16,13 +16,12 @@
         return unit.tile.settlement.wall.defensePoint * 0.04f;
       }
 
+      if (unit.tile.terrian == MapTileNS.TerrianType.Plain && unit.IsCavalry()) {
+        return 0.1f;
+      }
+
       if (unit.tile.terrian == MapTileNS.TerrianType.Hill) {
-        if (unit.type != Type.Infantry) {
-          // cavary debuf on hill
-          return -0.15f;
-        }
-        if (IsAtVantagePoint()) return 0.4f;
-        return 0f;
+        if (IsAtVantagePoint()) return 0.5f;
       }
 
       return 0f;
