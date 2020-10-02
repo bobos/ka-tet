@@ -205,7 +205,6 @@ public class Cons {
   public static Faction GF = new Ghost();
 
   // abilities
-  public static Ability forecaster = new Forecaster();
   public static Ability discipline = new Discipline();
   public static Ability hammer = new Hammer();
   public static Ability mechanician = new Mechanician();

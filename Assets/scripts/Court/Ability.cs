@@ -2,283 +2,192 @@
 using System.Collections.Generic;
 
 namespace CourtNS {
+  public enum AbilityType {
+    Common,
+    Infantry,
+    Cavalry,
+    Advanced
+  }
 
   public abstract class Ability {
-    public abstract string Name();
-    public abstract string Description();
-    public static Ability LuckyDraw() {
-      Ability[] candidates = new Ability[]{Cons.forecaster, Cons.discipline,
-        Cons.hammer, Cons.mechanician, Cons.diminisher, Cons.staminaManager,
-        Cons.formidable, Cons.generous, Cons.runner, Cons.fireBug,
-        Cons.holdTheGround, Cons.breaker, Cons.improvisor, Cons.tactic,
-        Cons.outlooker, Cons.ambusher, Cons.doctor, Cons.conspirator, Cons.vanguard};
-      int total = candidates.Length;
-      int luckNum = Util.Rand(0, total * 2);
-      if (luckNum < total) {
-        return candidates[luckNum];
+    public string Name() {
+      return Cons.GetTextLib().get(name);
+    }
+
+    public string Description() {
+      return Cons.GetTextLib().get(description);
+    }
+
+    public readonly AbilityType type;
+    public readonly bool isPassive;
+    public readonly int attempts = 0;
+    public readonly string name;
+    public readonly string description;
+    int remaining = 0;
+
+    protected Ability(string name, string description,
+      AbilityType type, int attempts = 0) {
+      this.type = type;
+      this.isPassive = attempts == 0;
+      this.remaining = this.attempts = attempts;
+      this.name = name;
+      this.description = description;
+    }
+
+    public bool Consume() {
+      if (isPassive) {
+        return true;
       }
-      return null;
-    }
 
-    public static List<Ability> RandomAcquiredAbilities() {
-      List<Ability> abilities = new List<Ability>();
-      int num = Util.Rand(1, 4);
-      for (int i = 0; i < num; i++)
-      {
-        Ability ability = LuckyDraw();
-        if (ability != null && !abilities.Contains(ability)) {
-          abilities.Add(ability);
-        }
+      if (remaining == 0) {
+        return false;
       }
-      return abilities;
+
+      remaining--;
+      return true;
+    }
+
+    public void Init() {
+      this.remaining = this.attempts;
+    }
+
+    protected static bool Find(string name, General general) {
+      foreach(Ability ability in general.acquiredAbilities) {
+        if(ability.name == name) {
+          return true;
+        } 
+      }
+      return false;
+    }
+
+    protected static bool Aval(AbilityType type, General general) {
+      if (type == AbilityType.Cavalry && !general.commandUnit.onFieldUnit.IsCavalry() ||
+      type == AbilityType.Infantry && general.commandUnit.onFieldUnit.IsCavalry()) {
+        return false;
+      }
+      return true;
     }
   }
 
-  public class Forecaster: Ability {
-    public Forecaster() {
+  class AbilityControl {
+    Dictionary<Faction, int> quotaMap = new Dictionary<Faction, int>();
+    readonly int quota;
+    readonly int requiredPoints;
+    public AbilityControl(int quota, int requiredPoints) {
+      this.quota = quota;
+      this.requiredPoints = requiredPoints;
     }
 
-    public override string Name() {
-      return Cons.GetTextLib().get("ability_forecaster");
+    public void Unlock(Faction faction) {
+      quotaMap[faction] = quota;
     }
 
-    public override string Description() {
-      return Cons.GetTextLib().get("ability_forecaster_description");
-    }
-  } 
+    public bool Acquire(General general) {
+      Faction faction = general.faction;
+      if (!Find(faction) || quotaMap[faction] == 0 || general.militatyPoints < requiredPoints) {
+        return false;
+      }
 
-  public class Improvisor: Ability {
-    public Improvisor() {
+      if (quotaMap[faction] > 0) {
+        quotaMap[faction]--;
+      }
+      general.militatyPoints -= requiredPoints;
+      return true;
     }
 
-    public override string Name() {
-      return Cons.GetTextLib().get("ability_improvisor");
+    public bool Find(Faction faction) {
+      return quotaMap.ContainsKey(faction);
     }
 
-    public override string Description() {
-      return Cons.GetTextLib().get("ability_improvisor_description");
-    }
   }
 
-  public class Discipline: Ability {
-    public Discipline() {
-    }
-
-    public override string Name() {
-      return Cons.GetTextLib().get("ability_discipline");
-    }
-
-    public override string Description() {
-      return Cons.GetTextLib().get("ability_discipline_description");
-    }
-  }
-
-  public class Hammer: Ability {
-    public Hammer() {
-    }
-
-    public override string Name() {
-      return Cons.GetTextLib().get("ability_hammer");
-    }
-
-    public override string Description() {
-      return Cons.GetTextLib().get("ability_hammer_description");
-    }
-  }
-
-  public class HoldTheGround: Ability {
-    public HoldTheGround() {
-    }
-
-    public override string Name() {
-      return Cons.GetTextLib().get("ability_holdTheGround");
-    }
-
-    public override string Description() {
-      return Cons.GetTextLib().get("ability_holdTheGround_description");
-    }
-  }
-
-  public class Breaker: Ability {
-    public Breaker() {
-    }
-
-    public override string Name() {
-      return Cons.GetTextLib().get("ability_breaker");
-    }
-
-    public override string Description() {
-      return Cons.GetTextLib().get("ability_breaker_description");
-    }
-  }
-
-  public class Formidable: Ability {
-    public Formidable() {
-    }
-
-    public override string Name() {
-      return Cons.GetTextLib().get("ability_formidable");
-    }
-
-    public override string Description() {
-      return Cons.GetTextLib().get("ability_formidable_description");
-    }
-  }
-
-  public class Tactic: Ability {
-    public Tactic() {
-    }
-
-    public override string Name() {
-      return Cons.GetTextLib().get("ability_tactic");
-    }
-
-    public override string Description() {
-      return Cons.GetTextLib().get("ability_tactic_description");
-    }
-  }
-
-  public class Mechanician: Ability {
-    public Mechanician() {
-    }
-
-    public override string Name() {
-      return Cons.GetTextLib().get("ability_mechanician");
-    }
-
-    public override string Description() {
-      return Cons.GetTextLib().get("ability_mechanician_description");
-    }
-  }
-
-  public class Diminisher: Ability {
-    public Diminisher() {
-    }
-
-    public override string Name() {
-      return Cons.GetTextLib().get("ability_diminisher");
-    }
-
-    public override string Description() {
-      return Cons.GetTextLib().get("ability_diminisher_description");
-    }
-  }
-
-  public class StaminaManager: Ability {
-    public StaminaManager() {
-    }
-
-    public override string Name() {
-      return Cons.GetTextLib().get("ability_staminaManager");
-    }
-
-    public override string Description() {
-      return Cons.GetTextLib().get("ability_staminaManager_description");
-    }
-  }
-
-  public class Generous: Ability {
-    public Generous() {
-    }
-
-    public override string Name() {
-      return Cons.GetTextLib().get("ability_generous");
-    }
-
-    public override string Description() {
-      return Cons.GetTextLib().get("ability_generous_description");
-    }
-  }
-
-  public class Runner: Ability {
-    public Runner() {
-    }
-
-    public override string Name() {
-      return Cons.GetTextLib().get("ability_runner");
-    }
-
-    public override string Description() {
-      return Cons.GetTextLib().get("ability_runner_description");
-    }
+  public class DrillMaster: Ability {
+    public const int requiredPoint = 2;
+    static AbilityControl ac = new AbilityControl(-1, requiredPoint);
+    const string N = "ability_drillMaster";
+    const string D = "ability_drillMaster_description";
+    public DrillMaster(): base(N, D, AbilityType.Common) {}
+    public static void Unlock(Faction faction) { ac.Unlock(faction); }
+    public static bool Acquire(General general) { return ac.Acquire(general); }
+    public static bool Find(General general) { return Ability.Find(N, general); }
+    public static bool Find(Faction faction) { return ac.Find(faction); }
   }
 
   public class FireBug: Ability {
-    public FireBug() {
-    }
-
-    public override string Name() {
-      return Cons.GetTextLib().get("ability_fireBug");
-    }
-
-    public override string Description() {
-      return Cons.GetTextLib().get("ability_fireBug_description");
-    }
-  }
-
-  public class Outlooker: Ability {
-    public Outlooker() {
-    }
-
-    public override string Name() {
-      return Cons.GetTextLib().get("ability_outlooker");
-    }
-
-    public override string Description() {
-      return Cons.GetTextLib().get("ability_outlooker_description");
-    }
+    public const int requiredPoint = 5;
+    static AbilityControl ac = new AbilityControl(-1, requiredPoint);
+    const string N = "ability_fireBug";
+    const string D = "ability_fireBug_description";
+    const AbilityType T = AbilityType.Common;
+    public FireBug(): base(N, D, T, 3) {}
+    public static void Unlock(Faction faction) { ac.Unlock(faction); }
+    public static bool Acquire(General general) { return ac.Acquire(general); }
+    public static bool Find(General general) { return Ability.Find(N, general); }
+    public static bool Find(Faction faction) { return ac.Find(faction); }
+    public static bool Aval(General general) { return Find(general) && Ability.Aval(T, general); }
   }
 
   public class Ambusher: Ability {
-    public Ambusher() {
-    }
-
-    public override string Name() {
-      return Cons.GetTextLib().get("ability_ambusher");
-    }
-
-    public override string Description() {
-      return Cons.GetTextLib().get("ability_ambusher_description");
-    }
+    public const int requiredPoint = 6;
+    static AbilityControl ac = new AbilityControl(-1, requiredPoint);
+    const string N = "ability_ambusher";
+    const string D = "ability_ambusher_description";
+    const AbilityType T = AbilityType.Common;
+    public Ambusher(): base(N, D, T) {}
+    public static void Unlock(Faction faction) { ac.Unlock(faction); }
+    public static bool Acquire(General general) { return ac.Acquire(general); }
+    public static bool Find(General general) { return Ability.Find(N, general); }
+    public static bool Find(Faction faction) { return ac.Find(faction); }
+    public static bool Aval(General general) { return Find(general) && Ability.Aval(T, general); }
+    public static int AmbushRange = 4;
+    public static int SupplyPunishment = 8;
+    public static int ExtraChanceForMistAmbush = 20;
   }
 
-  public class Doctor: Ability {
-    public Doctor() {
-    }
-
-    public override string Name() {
-      return Cons.GetTextLib().get("ability_doctor");
-    }
-
-    public override string Description() {
-      return Cons.GetTextLib().get("ability_doctor_description");
-    }
+  public class Striker: Ability {
+    public const int requiredPoint = 7;
+    static AbilityControl ac = new AbilityControl(2, requiredPoint);
+    const string N = "ability_striker";
+    const string D = "ability_striker_description";
+    const AbilityType T = AbilityType.Common;
+    public Striker(): base(N, D, T, 1) {}
+    public static void Unlock(Faction faction) { ac.Unlock(faction); }
+    public static bool Acquire(General general) { return ac.Acquire(general); }
+    public static bool Find(General general) { return Ability.Find(N, general); }
+    public static bool Find(Faction faction) { return ac.Find(faction); }
+    public static bool Aval(General general) { return Find(general) && Ability.Aval(T, general); }
+    public static float AtkBuf = 1f;
   }
 
-  public class Conspirator: Ability {
-    public Conspirator() {
-    }
-
-    public override string Name() {
-      return Cons.GetTextLib().get("ability_conspirator");
-    }
-
-    public override string Description() {
-      return Cons.GetTextLib().get("ability_conspirator_description");
-    }
+  public class Outlooker: Ability {
+    public const int requiredPoint = 7;
+    static AbilityControl ac = new AbilityControl(-1, requiredPoint);
+    const string N = "ability_outlooker";
+    const string D = "ability_outlooker_description";
+    const AbilityType T = AbilityType.Common;
+    public Outlooker(): base(N, D, T) {}
+    public static void Unlock(Faction faction) { ac.Unlock(faction); }
+    public static bool Acquire(General general) { return ac.Acquire(general); }
+    public static bool Find(General general) { return Ability.Find(N, general); }
+    public static bool Find(Faction faction) { return ac.Find(faction); }
+    public static bool Aval(General general) { return Find(general) && Ability.Aval(T, general); }
   }
 
-  public class Vanguard: Ability {
-    public Vanguard() {
-    }
-
-    public override string Name() {
-      return Cons.GetTextLib().get("ability_vanguard");
-    }
-
-    public override string Description() {
-      return Cons.GetTextLib().get("ability_vanguard_description");
-    }
+  public class Generous: Ability {
+    public const int requiredPoint = 9;
+    static AbilityControl ac = new AbilityControl(2, requiredPoint);
+    const string N = "ability_generous";
+    const string D = "ability_generous_description";
+    const AbilityType T = AbilityType.Common;
+    public Generous(): base(N, D, T, 1) {}
+    public static void Unlock(Faction faction) { ac.Unlock(faction); }
+    public static bool Acquire(General general) { return ac.Acquire(general); }
+    public static bool Find(General general) { return Ability.Find(N, general); }
+    public static bool Find(Faction faction) { return ac.Find(faction); }
+    public static bool Aval(General general) { return Find(general) && Ability.Aval(T, general); }
+    public static int Range = 2;
+    public static int MoraleBuf = 50;
+    public static int MoveBuf = 40;
   }
 
 }

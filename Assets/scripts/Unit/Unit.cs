@@ -61,13 +61,14 @@ namespace UnitNS
     WeatherGenerator weatherGenerator;
     TurnController turnController;
     public int surroundCnt = 0;
-    private int _morale = 85;
+    const int MaxMorale = 100;
+    private int _morale = MaxMorale;
     public int morale {
       get {
         return _morale;
       }
       set {
-        _morale = value < 0 ? 0 : (value > MaxMorale() ? MaxMorale() : value);
+        _morale = value < 0 ? 0 : (value > MaxMorale ? MaxMorale : value);
       }
     }
     public Unit(bool clone, Troop troop, Tile tile, State state,
@@ -127,10 +128,6 @@ namespace UnitNS
         tile.settlement.Encamp(this);
       }
       movementRemaining = GetFullMovement();
-    }
-
-    public int MaxMorale() {
-      return rf.general.Has(Cons.generous) ? 100 : 85;
     }
 
     State[] visibleStates = {State.Stand};

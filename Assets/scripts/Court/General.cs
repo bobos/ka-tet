@@ -55,6 +55,7 @@ namespace CourtNS {
     public LinkedList<General> nemesis = new LinkedList<General>();
     public GeneralStat stat = GeneralStat.Idle;
     public CommandSkill commandSkill;
+    public int militatyPoints;
 
     HexMap hexMap;
     string name;
