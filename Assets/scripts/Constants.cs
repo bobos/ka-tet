@@ -204,26 +204,6 @@ public class Cons {
   public static Faction Xia = new Xia(true, 2000000);
   public static Faction GF = new Ghost();
 
-  // abilities
-  public static Ability discipline = new Discipline();
-  public static Ability hammer = new Hammer();
-  public static Ability mechanician = new Mechanician();
-  public static Ability diminisher = new Diminisher();
-  public static Ability staminaManager = new StaminaManager();
-  public static Ability generous = new Generous();
-  public static Ability runner = new Runner();
-  public static Ability fireBug = new FireBug();
-  public static Ability holdTheGround = new HoldTheGround();
-  public static Ability breaker = new Breaker();
-  public static Ability tactic = new Tactic();
-  public static Ability outlooker = new Outlooker();
-  public static Ability ambusher = new Ambusher();
-  public static Ability improvisor = new Improvisor();
-  public static Ability formidable = new Formidable();
-  public static Ability doctor = new Doctor();
-  public static Ability conspirator = new Conspirator();
-  public static Ability vanguard = new Vanguard();
-
   // trait
   public static Trait reckless = new Reckless();
   public static Trait brave = new Brave();

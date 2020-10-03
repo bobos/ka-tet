@@ -63,17 +63,13 @@ namespace CourtNS {
     TextLib txtLib = Cons.GetTextLib();
 
     public General(string name, string biography, Province province, CommandSkill commandSkill,
-      List<Trait> traits = null, List<Ability> acquired = null) {
+      int militaryPoints, List<Trait> traits = null) {
       this.name = name;
       this.biography = biography;
       this.province = province;
       this.trait = Trait.Random();
-      acquiredAbilities = acquired == null ? Ability.RandomAcquiredAbilities() : acquired;
+      this.militatyPoints = militaryPoints;
       this.commandSkill = commandSkill;
-    }
-
-    public bool Has(Ability ability) {
-      return acquiredAbilities.Contains(ability);
     }
 
     public bool Is(Trait trait) {
