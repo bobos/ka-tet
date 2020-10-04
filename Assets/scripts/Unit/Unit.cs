@@ -610,6 +610,7 @@ namespace UnitNS
     // Before new turn starts
     public int[] RefreshUnit()
     {
+      rf.general.commandSkill.Reset();
       morale += IsCamping() ? 10 : 5;
       crashed = retreated = false;
       InitForecast();

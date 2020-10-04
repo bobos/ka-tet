@@ -139,6 +139,7 @@ namespace CourtNS {
       if (!ready) return ready;
       stat = GeneralStat.OnField;
       hexMap.GetWarParty(faction).JoinCampaign(this);
+      commandSkill.Reset();
       return true;
     }
 

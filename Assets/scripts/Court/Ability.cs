@@ -10,6 +10,55 @@ namespace CourtNS {
   }
 
   public abstract class Ability {
+    public static void Acquire4Test(General general) {
+      List<Ability> all = new List<Ability>(){
+        new DrillMaster(),
+        new FireBug(),
+        new Ambusher(),
+        new Striker(),
+        new Outlooker(),
+        new Rally(),
+        new Holder(),
+        new Builder(),
+        new Fortifier(),
+        new Herbist(),
+        new Breacher(),
+        new Runner(),
+        new StaminaManager(),
+        new Hammer(),
+        new Finisher(),
+        new Sentinel(),
+        new Conspirator(),
+        new Deciever(),
+        new Agitator(),
+        new MindReader(),
+        new GameChanger(),
+        new ShadowWarrior(),
+        new Disruptor()
+      };
+
+      List<Ability> remaining = new List<Ability>();
+      foreach(Ability ability in all) {
+        if (ability.RequiredPoints() <= general.militatyPoints) {
+          remaining.Add(ability);
+        }
+      }
+      while (remaining.Count > 0) {
+        Ability ability = remaining[Util.Rand(0, remaining.Count-1)];
+        general.acquiredAbilities.Add(ability.Clone());
+        general.militatyPoints -= ability.RequiredPoints();
+        remaining.Remove(ability);
+        all = new List<Ability>();
+        foreach(Ability a in remaining) {
+          if (a.RequiredPoints() <= general.militatyPoints) {
+            all.Add(ability);
+          }
+        }
+        remaining = all;
+      }
+    }
+
+    public abstract int RequiredPoints();
     public string Name() {
       return Cons.GetTextLib().get(name);
     }
@@ -18,6 +67,7 @@ namespace CourtNS {
       return Cons.GetTextLib().get(description);
     }
 
+    public abstract Ability Clone();
     public readonly AbilityType type;
     public readonly int attempts = 0;
     public readonly string name;
@@ -105,6 +155,9 @@ namespace CourtNS {
   }
 
   public class DrillMaster: Ability {
+    public override Ability Clone() { return new DrillMaster(); }
+    public override int RequiredPoints() { return requiredPoint; }
+    
     public const bool Passive = true;
     public const int requiredPoint = 2;
     static AbilityControl ac = new AbilityControl(-1, requiredPoint);
@@ -120,6 +173,9 @@ namespace CourtNS {
   }
 
   public class FireBug: Ability {
+    public override Ability Clone() { return new FireBug(); }
+    public override int RequiredPoints() { return requiredPoint; }
+    
     public const bool Passive = false;
     public const int requiredPoint = 5;
     static AbilityControl ac = new AbilityControl(-1, requiredPoint);
@@ -135,6 +191,9 @@ namespace CourtNS {
   }
 
   public class Ambusher: Ability {
+    public override Ability Clone() { return new Ambusher(); }
+    public override int RequiredPoints() { return requiredPoint; }
+    
     public const bool Passive = true;
     public const int requiredPoint = 6;
     static AbilityControl ac = new AbilityControl(4, requiredPoint);
@@ -153,6 +212,9 @@ namespace CourtNS {
   }
 
   public class Striker: Ability {
+    public override Ability Clone() { return new Striker(); }
+    public override int RequiredPoints() { return requiredPoint; }
+    
     public const bool Passive = false;
     public const int requiredPoint = 7;
     static AbilityControl ac = new AbilityControl(2, requiredPoint);
@@ -169,6 +231,9 @@ namespace CourtNS {
   }
 
   public class Outlooker: Ability {
+    public override Ability Clone() { return new Outlooker(); }
+    public override int RequiredPoints() { return requiredPoint; }
+    
     public const bool Passive = true;
     public const int requiredPoint = 7;
     static AbilityControl ac = new AbilityControl(-1, requiredPoint);
@@ -184,6 +249,9 @@ namespace CourtNS {
   }
 
   public class Rally: Ability {
+    public override Ability Clone() { return new Rally(); }
+    public override int RequiredPoints() { return requiredPoint; }
+    
     public const bool Passive = false;
     public const int requiredPoint = 8;
     static AbilityControl ac = new AbilityControl(2, requiredPoint);
@@ -201,7 +269,28 @@ namespace CourtNS {
     public static int MoveBuf = 40;
   }
 
+  public class ShadowWarrior: Ability {
+    public override Ability Clone() { return new ShadowWarrior(); }
+    public override int RequiredPoints() { return requiredPoint; }
+    
+    public const bool Passive = true;
+    public const int requiredPoint = 3;
+    static AbilityControl ac = new AbilityControl(-1, requiredPoint);
+    const string N = "ability_shadowWarrior";
+    const string D = "ability_shadowWarrior_description";
+    const AbilityType T = AbilityType.Common;
+    public ShadowWarrior(): base(N, D, T) {}
+    public static void Unlock(Faction faction) { ac.Unlock(faction); }
+    public static bool Acquire(General general) { return ac.Acquire(general); }
+    public static bool Find(General general) { return Ability.Find(N, general); }
+    public static bool Find(Faction faction) { return ac.Find(faction); }
+    public static bool Aval(General general) { return Find(general) && Ability.Aval(T, general); }
+  }
+
   public class Holder: Ability {
+    public override Ability Clone() { return new Holder(); }
+    public override int RequiredPoints() { return requiredPoint; }
+    
     public const bool Passive = true;
     public const int requiredPoint = 3;
     static AbilityControl ac = new AbilityControl(-1, requiredPoint);
@@ -218,6 +307,10 @@ namespace CourtNS {
   }
 
   public class Builder: Ability {
+    public override Ability Clone() { return new Builder();
+    }
+    public override int RequiredPoints() { return requiredPoint; }
+    
     public const bool Passive = true;
     public const int requiredPoint = 5;
     static AbilityControl ac = new AbilityControl(5, requiredPoint);
@@ -234,6 +327,9 @@ namespace CourtNS {
   }
 
   public class Fortifier: Ability {
+    public override Ability Clone() { return new Fortifier(); }
+    public override int RequiredPoints() { return requiredPoint; }
+    
     public const bool Passive = true;
     public const int requiredPoint = 4;
     static AbilityControl ac = new AbilityControl(-1, requiredPoint);
@@ -250,6 +346,9 @@ namespace CourtNS {
   }
 
   public class Herbist: Ability {
+    public override Ability Clone() { return new Herbist(); }
+    public override int RequiredPoints() { return requiredPoint; }
+    
     public const bool Passive = false;
     public const int requiredPoint = 5;
     static AbilityControl ac = new AbilityControl(-1, requiredPoint);
@@ -266,6 +365,9 @@ namespace CourtNS {
   }
 
   public class Breacher: Ability {
+    public override Ability Clone() { return new Breacher(); }
+    public override int RequiredPoints() { return requiredPoint; }
+    
     public const bool Passive = true;
     public const int requiredPoint = 6;
     static AbilityControl ac = new AbilityControl(4, requiredPoint);
@@ -282,6 +384,9 @@ namespace CourtNS {
   }
 
   public class Runner: Ability {
+    public override Ability Clone() { return new Runner(); }
+    public override int RequiredPoints() { return requiredPoint; }
+    
     public const bool Passive = false;
     public const int requiredPoint = 5;
     static AbilityControl ac = new AbilityControl(4, requiredPoint);
@@ -298,6 +403,9 @@ namespace CourtNS {
   }
 
   public class StaminaManager: Ability {
+    public override Ability Clone() { return new StaminaManager(); }
+    public override int RequiredPoints() { return requiredPoint; }
+    
     public const bool Passive = true;
     public const int requiredPoint = 6;
     static AbilityControl ac = new AbilityControl(3, requiredPoint);
@@ -313,6 +421,9 @@ namespace CourtNS {
   }
 
   public class Hammer: Ability {
+    public override Ability Clone() { return new Hammer(); }
+    public override int RequiredPoints() { return requiredPoint; }
+    
     public const bool Passive = true;
     public const int requiredPoint = 7;
     static AbilityControl ac = new AbilityControl(2, requiredPoint);
@@ -328,6 +439,9 @@ namespace CourtNS {
   }
 
   public class Finisher: Ability {
+    public override Ability Clone() { return new Finisher(); }
+    public override int RequiredPoints() { return requiredPoint; }
+    
     public const bool Passive = true;
     public const int requiredPoint = 8;
     static AbilityControl ac = new AbilityControl(3, requiredPoint);
@@ -343,14 +457,17 @@ namespace CourtNS {
     public static float KillBuf = 1f;
   }
 
-  public class Trapper: Ability {
+  public class Sentinel: Ability {
+    public override Ability Clone() { return new Sentinel(); }
+    public override int RequiredPoints() { return requiredPoint; }
+    
     public const bool Passive = true;
     public const int requiredPoint = 6;
     static AbilityControl ac = new AbilityControl(4, requiredPoint);
-    const string N = "ability_trapper";
-    const string D = "ability_trapper_description";
+    const string N = "ability_sentinel";
+    const string D = "ability_sentinel_description";
     const AbilityType T = AbilityType.Advanced;
-    public Trapper(): base(N, D, T) {}
+    public Sentinel(): base(N, D, T) {}
     public static void Unlock(Faction faction) { ac.Unlock(faction); }
     public static bool Acquire(General general) { return ac.Acquire(general); }
     public static bool Find(General general) { return Ability.Find(N, general); }
@@ -359,14 +476,17 @@ namespace CourtNS {
     public static int RedzoneRange = 2;
   }
 
-  public class Consiprator: Ability {
+  public class Agitator: Ability {
+    public override Ability Clone() { return new Agitator(); }
+    public override int RequiredPoints() { return requiredPoint; }
+    
     public const bool Passive = false;
     public const int requiredPoint = 6;
     static AbilityControl ac = new AbilityControl(3, requiredPoint);
-    const string N = "ability_consiprator";
-    const string D = "ability_consiprator_description";
+    const string N = "ability_agitator";
+    const string D = "ability_agitator_description";
     const AbilityType T = AbilityType.Advanced;
-    public Consiprator(): base(N, D, T, 2) {}
+    public Agitator(): base(N, D, T, 2) {}
     public static void Unlock(Faction faction) { ac.Unlock(faction); }
     public static bool Acquire(General general) { return ac.Acquire(general); }
     public static bool Find(General general) { return Ability.Find(N, general); }
@@ -378,9 +498,30 @@ namespace CourtNS {
     public const int MoraleDropForDiffRaceMax = 40;
   }
 
-  public class Deciever: Ability {
+  public class Conspirator: Ability {
+    public override Ability Clone() { return new Conspirator(); }
+    public override int RequiredPoints() { return requiredPoint; }
+    
     public const bool Passive = false;
     public const int requiredPoint = 7;
+    static AbilityControl ac = new AbilityControl(2, requiredPoint);
+    const string N = "ability_conspirator";
+    const string D = "ability_conspirator_description";
+    const AbilityType T = AbilityType.Advanced;
+    public Conspirator(): base(N, D, T, 2) {}
+    public static void Unlock(Faction faction) { ac.Unlock(faction); }
+    public static bool Acquire(General general) { return ac.Acquire(general); }
+    public static bool Find(General general) { return Ability.Find(N, general); }
+    public static bool Find(Faction faction) { return ac.Find(faction); }
+    public static bool Aval(General general) { return Find(general) && Ability.Aval(T, general); }
+  }
+
+  public class Deciever: Ability {
+    public override Ability Clone() { return new Deciever(); }
+    public override int RequiredPoints() { return requiredPoint; }
+    
+    public const bool Passive = false;
+    public const int requiredPoint = 8;
     static AbilityControl ac = new AbilityControl(2, requiredPoint);
     const string N = "ability_deciever";
     const string D = "ability_deciever_description";
@@ -393,22 +534,10 @@ namespace CourtNS {
     public static bool Aval(General general) { return Find(general) && Ability.Aval(T, general); }
   }
 
-  public class Tactician: Ability {
-    public const bool Passive = false;
-    public const int requiredPoint = 8;
-    static AbilityControl ac = new AbilityControl(2, requiredPoint);
-    const string N = "ability_tactician";
-    const string D = "ability_tactician_description";
-    const AbilityType T = AbilityType.Advanced;
-    public Tactician(): base(N, D, T, 2) {}
-    public static void Unlock(Faction faction) { ac.Unlock(faction); }
-    public static bool Acquire(General general) { return ac.Acquire(general); }
-    public static bool Find(General general) { return Ability.Find(N, general); }
-    public static bool Find(Faction faction) { return ac.Find(faction); }
-    public static bool Aval(General general) { return Find(general) && Ability.Aval(T, general); }
-  }
-
   public class MindReader: Ability {
+    public override Ability Clone() { return new MindReader(); }
+    public override int RequiredPoints() { return requiredPoint; }
+    
     public const bool Passive = false;
     public const int requiredPoint = 9;
     static AbilityControl ac = new AbilityControl(1, requiredPoint);
@@ -426,7 +555,28 @@ namespace CourtNS {
     public const int AffectRange = 2;
   }
 
+  public class Disruptor: Ability {
+    public override Ability Clone() { return new Disruptor(); }
+    public override int RequiredPoints() { return requiredPoint; }
+    
+    public const bool Passive = false;
+    public const int requiredPoint = 7;
+    static AbilityControl ac = new AbilityControl(3, requiredPoint);
+    const string N = "ability_disruptor";
+    const string D = "ability_disruptor_description";
+    const AbilityType T = AbilityType.Advanced;
+    public Disruptor(): base(N, D, T, 1) {}
+    public static void Unlock(Faction faction) { ac.Unlock(faction); }
+    public static bool Acquire(General general) { return ac.Acquire(general); }
+    public static bool Find(General general) { return Ability.Find(N, general); }
+    public static bool Find(Faction faction) { return ac.Find(faction); }
+    public static bool Aval(General general) { return Find(general) && Ability.Aval(T, general); }
+  }
+
   public class GameChanger: Ability {
+    public override Ability Clone() { return new GameChanger(); }
+    public override int RequiredPoints() { return requiredPoint; }
+    
     public const bool Passive = false;
     public const int requiredPoint = 10;
     static AbilityControl ac = new AbilityControl(1, requiredPoint);
