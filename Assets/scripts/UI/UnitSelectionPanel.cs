@@ -27,7 +27,7 @@ namespace MonoNS
                            RetreatButton, DecampButton, ReposButton,
                            BuryButton, ChargeButton, TroopButton, GeneralButton,
                            BreakThroughButton, SurpriseAttackButton, FeintDefeatButton,
-                           ForecastButton, FalseOrderButton, AlienateButton
+                           FalseOrderButton, AlienateButton
                            };
       buttons = btns;
       mouseController.onUnitSelect += OnUnitSelect;
@@ -64,7 +64,6 @@ namespace MonoNS
     public GameObject GeneralButton;
     public GameObject SurpriseAttackButton;
     public GameObject FeintDefeatButton;
-    public GameObject ForecastButton;
     public GameObject FalseOrderButton;
     public GameObject AlienateButton;
     GameObject[] buttons;
@@ -159,16 +158,15 @@ namespace MonoNS
       }
 
       if (mouseController.nearFireTiles.Count > 0 && hexMap.deployDone && !hexMap.wargameController.start) {
-        FireButton.SetActive(unit.CanFire());
+        FireButton.SetActive(true);
       }
 
       if (mouseController.nearWater && hexMap.deployDone && !hexMap.wargameController.start) {
-        DefendButton.SetActive(unit.CanPoision());
+        DefendButton.SetActive(true);
       }
 
       if (!hexMap.wargameController.start && hexMap.deployDone) {
         ChargeButton.SetActive(unit.CanCharge());
-        ForecastButton.SetActive(unit.CanForecast());
       }
 
       if (!hexMap.wargameController.start && unit.CanDecieve() && hexMap.deployDone) {
@@ -206,7 +204,7 @@ namespace MonoNS
       }
       
       if (!hexMap.combatController.start && hexMap.deployDone && unit.CanAttack()) {
-        FeintDefeatButton.SetActive(unit.rf.general.Has(Cons.tactic) && mouseController.nearEnemy);
+        FeintDefeatButton.SetActive(Deciever.Aval(unit.rf.general) && mouseController.nearEnemy);
         SurpriseAttackButton.SetActive(mouseController.surpriseTargets.Length > 0 && unit.CanSurpriseAttack());
       }
 
@@ -321,8 +319,8 @@ namespace MonoNS
     void ShowAbilityInfo(Unit unit) {
       title.fontSize = 18;
       title.text = "";
-      foreach(Ability ability in unit.rf.general.acquiredAbilities) {
-        title.text += "{" + ability.Name() + "}: " + ability.Description() + "\n";
+      foreach(Ability ability in unit.rf.general.acquiredAbilities.Values) {
+        title.text += "{" + ability.Name() + ability.Icon(unit.rf.general) + "}: " + ability.Description() + "\n";
       }
     }
 
@@ -331,11 +329,8 @@ namespace MonoNS
       title.text = "";
       if (unit.IsCommander()) {
         title.text += "统帅能力:\n";
-        if (unit.rf.general.commandSkill.ObeyMyOrder()) {
+        if (unit.rf.general.commandSkill.Obey()) {
           title.text += "指挥范围内友军强制服从主帅指挥\n";
-        }
-        if (unit.rf.general.commandSkill.TurningTide()) {
-          title.text += "指挥范围内友军战败溃败几率降低\n";
         }
       }
       title.text += "\n**性格**: " + unit.rf.general.trait.Name() + "\n  " + unit.rf.general.trait.Description();

@@ -88,7 +88,6 @@ namespace CourtNS
         return false;
       }
       state = TroopState.OnField;
-      movementPoint = general.Has(Cons.runner) ? 150 : 100;
       if (type == Type.Infantry) {
         onFieldUnit = Infantry.Create(false, this, deploymentTile);
       } else {

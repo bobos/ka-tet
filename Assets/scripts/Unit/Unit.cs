@@ -271,7 +271,7 @@ namespace UnitNS
       List<Tile> tiles = new List<Tile>();
       Weather weather = weatherGenerator.currentWeather;
       if(Cons.IsHeavyRain(weather) || Cons.IsRain(weather)
-        || Cons.IsSnow(weather) || Cons.IsBlizard(weather) || !CanFire()) {
+        || Cons.IsSnow(weather) || Cons.IsBlizard(weather)) {
         return tiles;
       }
 
@@ -280,26 +280,13 @@ namespace UnitNS
           continue;
         }
         if (t.burnable ||
-            rf.general.Has(Cons.fireBug) ||
+            FireBug.Aval(rf.general) ||
             tile.GetGaleAdvantage(t) == WindAdvantage.Advantage) {
             tiles.Add(t);
           }
       }
 
       return tiles;
-    }
-
-    public bool CanFire() {
-      return !fireDone;
-    }
-
-    public bool CanPoision() {
-      return !poisionDone;
-    }
-
-    public bool canForecast = false;
-    public bool CanForecast() {
-      return canForecast;
     }
 
     public bool fooled = false;
@@ -325,19 +312,8 @@ namespace UnitNS
       return target.unitConflict.Occur();
     }
 
-    public bool Forecast() {
-      canForecast = false;
-      return Cons.MostLikely();
-    }
-
-    void InitForecast() {
-      canForecast = rf.general.Has(Cons.forecaster);
-    }
-
     public bool retreated = false;
     public bool crashed = false;
-    public bool poisionDone = false;
-    public bool fireDone = false;
     public bool CanAttack() {
       return allowedAtmpt > 0;
     }
@@ -541,11 +517,7 @@ namespace UnitNS
     }
 
     public bool FollowOrder() {
-      return MyCommander().commandSkill.ObeyMyOrder() || rf.general.Is(Cons.loyal);
-    }
-
-    public bool TurningTide() {
-      return MyCommander().commandSkill.TurningTide() && Cons.FiftyFifty();
+      return MyCommander().commandSkill.Obey() || rf.general.Is(Cons.loyal);
     }
 
     public bool StandStill() {

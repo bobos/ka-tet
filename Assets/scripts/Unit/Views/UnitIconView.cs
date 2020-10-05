@@ -1,5 +1,4 @@
 ﻿using CourtNS;
-using MapTileNS;
 using UnityEngine;
 
 namespace UnitNS
@@ -9,7 +8,7 @@ namespace UnitNS
     // Use this for initialization
     void Start () {
     }
-  
+
     public void SetName(Unit unit) {
       TextMesh textMesh = this.transform.GetComponent<TextMesh>();
       Color color = Color.white;
@@ -18,24 +17,27 @@ namespace UnitNS
       + (unit.IsVulnerable() ? "∇": "")
       + (unit.IsWarWeary() ? "☹": "")
       + (unit.fooled ? "⊜" : "")
-      + (FireBug.Aval(unit.rf.general) ? "♨" : "")
-      + (Ambusher.Aval(unit.rf.general) ? "☸": "")
-      + (Outlooker.Aval(unit.rf.general) ? "⦿" : "")
-      + (Rally.Aval(unit.rf.general) ? "❥" : "")
-      + (Holder.Aval(unit.rf.general) ? "☍" : "")
-      + (Builder.Aval(unit.rf.general) ? "♜" : "")
-      + (Fortifier.Aval(unit.rf.general) ? "㊎" : "")
-      + (Herbist.Aval(unit.rf.general) ? "✚" : "")
-      + (Striker.Aval(unit.rf.general) ? "➹" : "")
-      + (Runner.Aval(unit.rf.general) ? "↹" : "")
-      + (StaminaManager.Aval(unit.rf.general) ? "♋" : "")
-      + (Hammer.Aval(unit.rf.general) ? "✪" : "")
-      + (Finisher.Aval(unit.rf.general) ? "➲" : "")
-      + (Sentinel.Aval(unit.rf.general) ? "▣" : "")
-      + (Disruptor.Aval(unit.rf.general) || Agitator.Aval(unit.rf.general) ? "✴" : "")
-      + (Conspirator.Aval(unit.rf.general) || MindReader.Aval(unit.rf.general)
-        || Deciever.Aval(unit.rf.general) || GameChanger.Aval(unit.rf.general) ? "☯" : "")
-      + (Breacher.Aval(unit.rf.general) ? "≜" : "");
+      + FireBug.Icon(unit.rf.general)
+      + Ambusher.Icon(unit.rf.general)
+      + Outlooker.Icon(unit.rf.general)
+      + Rally.Icon(unit.rf.general)
+      + Holder.Icon(unit.rf.general)
+      + Builder.Icon(unit.rf.general)
+      + Fortifier.Icon(unit.rf.general)
+      + Herbist.Icon(unit.rf.general)
+      + Striker.Icon(unit.rf.general)
+      + Runner.Icon(unit.rf.general)
+      + StaminaManager.Icon(unit.rf.general)
+      + Hammer.Icon(unit.rf.general)
+      + Finisher.Icon(unit.rf.general)
+      + Sentinel.Icon(unit.rf.general)
+      + Disruptor.Icon(unit.rf.general)
+      + Agitator.Icon(unit.rf.general)
+      + Conspirator.Icon(unit.rf.general)
+      + MindReader.Icon(unit.rf.general)
+      + Deciever.Icon(unit.rf.general)
+      + GameChanger.Icon(unit.rf.general)
+      + Breacher.Icon(unit.rf.general);
       textMesh.fontSize = 65;
       textMesh.color = color;
     }

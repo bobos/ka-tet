@@ -5,6 +5,7 @@ using System.Linq;
 using UnitNS;
 using MapTileNS;
 using TextNS;
+using CourtNS;
 
 namespace MonoNS
 {
@@ -132,7 +133,7 @@ namespace MonoNS
         if (tile.burnable ||
           selectedSettlement == null &&
           selectedUnit != null &&
-          selectedUnit.rf.general.Has(Cons.fireBug) &&
+          FireBug.Aval(selectedUnit.rf.general) &&
           tile.field == FieldType.Forest) {
           nearFireTiles.Add(tile);
         }

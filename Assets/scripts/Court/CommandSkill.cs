@@ -28,6 +28,10 @@
       remainingOrder--;
       return true;
     }
+
+    public bool Obey() {
+      return commandSkill > 3;
+    }
   }
 
 }

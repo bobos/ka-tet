@@ -100,10 +100,10 @@ namespace MonoNS
     public bool Burn(Unit unit, Tile tile, HashSet<Tile> tiles = null)
     {
       if (unit != null) {
-        if (!unit.CanFire() || !unit.GetBurnableTiles().Contains(tile)) {
+        if (!unit.GetBurnableTiles().Contains(tile)) return false;
+        if (!FireBug.Get(unit.rf.general).Consume()) {
           return false;
         }
-        unit.fireDone = true;
       }
       hexMap.cameraKeyboardController.DisableCamera();
       tiles = tiles == null ? tile.SetFire() : tiles;

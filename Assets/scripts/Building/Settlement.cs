@@ -4,6 +4,7 @@ using UnitNS;
 using MapTileNS;
 using MonoNS;
 using FieldNS;
+using CourtNS;
 
 public abstract class Settlement: Building
 {
@@ -180,13 +181,8 @@ public abstract class Settlement: Building
     }
 
     foreach(Unit unit in garrison) {
-      int point = (int)(unit.unitCombatPoint * (
-        unit.rf.general.Has(Cons.mechanician) ? 1.5f : 1f
-      ));
-      if (IsUnderSiege() && unit.rf.general.Has(Cons.formidable)) {
-        point = (int)(point * 1.5f);
-      }
-      force += point;
+      force += (int)(unit.unitCombatPoint * (1f + 
+        (Fortifier.Aval(unit.rf.general) ? Fortifier.DefenceIncr : 0)));
     }
 
     return force;
