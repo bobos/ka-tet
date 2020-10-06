@@ -834,41 +834,16 @@ namespace MonoNS
           }
         }
 
-        // affected all allies
-        if (loser.IsCommander() && !feint) {
-          int drop = 0;
-          if (resultLevel == ResultType.Small) {
-            drop = -10;
-          }
-          if (resultLevel == ResultType.Great) {
-            drop = -20;
-          }
-          if (resultLevel == ResultType.Crushing) {
-            drop = -30;
-          }
-          if (drop != 0) {
-            hexMap.unitAniController.ShakeNearbyAllies(loser, drop);
-            while (hexMap.unitAniController.ShakeAnimating) { yield return null; }
-          }
-        }
-
         HashSet<Unit> geese = new HashSet<Unit>();
         List<Unit> gonnaMove = new List<Unit>();
         List<Unit> failedToMove = new List<Unit>();
         if (resultLevel != ResultType.Small || Cons.SlimChance()) {
           if (!loser.IsCommander() && !feint) {
-            hexMap.unitAniController.ShakeNearbyAllies(loser, 0);
+            hexMap.unitAniController.ShakeNearbyAllies(loser);
             while (hexMap.unitAniController.ShakeAnimating) { yield return null; }
           }
           if (feint) {
             gonnaMove.Add(loser);
-          } else {
-            foreach(Unit unit in supporters) {
-              bool notMoving = unit.StickAsNailWhenDefeat();
-              if (!notMoving || feint) {
-                gonnaMove.Add(unit);
-              }
-            }
           }
           if (gonnaMove.Count > 2 && !feint) {
             if (resultLevel == ResultType.Crushing) {

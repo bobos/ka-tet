@@ -21,7 +21,7 @@
     }
 
     public bool Poision() {
-      if (poisioned || unit.rf.general.Has(Cons.doctor)) {
+      if (poisioned) {
         return false;
       }
       poisioned = true;

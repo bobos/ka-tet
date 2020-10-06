@@ -106,7 +106,6 @@ namespace UnitNS
       inCampComplain = new InCampComplain(this);
       onFieldComplain = new OnFieldComplain(this);
       InitAllowedAtmpt();
-      InitForecast();
       InitPlotAtmpt();
       InitChargeAtmpt();
     }
@@ -213,7 +212,7 @@ namespace UnitNS
     public int allowedAtmpt = 1;
     void InitAllowedAtmpt() {
       allowedAtmpt = 1;
-      if (rf.general.Has(Cons.staminaManager)) {
+      if (StaminaManager.Aval(this) && StaminaManager.Get(rf.general).Consume()) {
         allowedAtmpt++;
       }
     }
@@ -245,15 +244,14 @@ namespace UnitNS
     }
 
     void InitChargeAtmpt() {
-      chargeAtmpt = IsCavalry() ? 3 : 0;
+      chargeAtmpt = IsCavalry() ? 2 : 0;
     }
 
     public bool CanCharge() {
-      return IsCavalry() && CanAttack() && !IsSurrounded() && !IsVulnerable() && chargeAtmpt > 0;
+      return !IsSurrounded() && !IsVulnerable() && chargeAtmpt > 0;
     }
 
     public void Charge() {
-      UseAtmpt();
       chargeAtmpt--;
     }
 
@@ -274,7 +272,7 @@ namespace UnitNS
           continue;
         }
         if (t.burnable ||
-            FireBug.Aval(rf.general) ||
+            FireBug.Aval(this) ||
             tile.GetGaleAdvantage(t) == WindAdvantage.Advantage) {
             tiles.Add(t);
           }
@@ -293,7 +291,7 @@ namespace UnitNS
     }
 
     void InitPlotAtmpt() {
-      plotAtmpt = rf.general.Has(Cons.conspirator) ? 3 : 0;
+      plotAtmpt = Agitator.Aval(this) ? 3 : 0;
     }
 
     public void Decieve(Unit target) {
@@ -495,12 +493,12 @@ namespace UnitNS
     public Tile[] GetSurpriseAttackTiles() {
       int range = GetVisibleRange();
       return tile.GetNeighboursWithinRange(
-        rf.general.Has(Cons.ambusher) && range != L0Visibility ? 4 : range, (Tile t) => FindAttackPath(t).Length > 0);
+        Ambusher.Aval(this) && range != L0Visibility ? Ambusher.AmbushRange : range, (Tile t) => FindAttackPath(t).Length > 0);
     }
 
     public int GetVisibleRange() {
       int v;
-      if (Cons.IsMist(weatherGenerator.currentWeather) && !rf.general.Has(Cons.outlooker)) {
+      if (Cons.IsMist(weatherGenerator.currentWeather) && !Outlooker.Aval(this)) {
         v = L0Visibility;
       } else {
         v = vantage.IsAtVantagePoint() ? VantageVisibility : L1Visibility;
@@ -510,11 +508,11 @@ namespace UnitNS
 
     public Tile[] GetVisibleArea() {
       Tile[] detectRange =
-        !rf.general.Has(Cons.outlooker) ?
+        !Outlooker.Aval(this) ?
           tile.GetNeighboursWithinRange<Tile>(L0Visibility, (Tile _t) => true) : new Tile[]{}; 
 
       return tile.GetNeighboursWithinRange<Tile>(GetVisibleRange(), (Tile tile) => {
-        if (tile.field == FieldType.Forest && !rf.general.Has(Cons.outlooker) && !detectRange.Contains(tile)) {
+        if (tile.field == FieldType.Forest && !Outlooker.Aval(this) && !detectRange.Contains(tile)) {
           return false;
         }
         return true;
@@ -525,27 +523,11 @@ namespace UnitNS
       return MyCommander().commandSkill.Obey();
     }
 
-    public bool StandStill() {
-      return StickAsNailWhenDefeat() || rf.general.Has(Cons.holdTheGround) || Cons.FiftyFifty();
-    }
-
     public int ImproviseOnSupply() {
-      if (rf.general.Has(Cons.improvisor)) {
-        return -5; 
-      }
-      if(Util.eq<Region>(rf.province.region, Cons.tubo)) {
-        return -10;
+      if (Ambusher.Aval(this) && Ambusher.Get(rf.general).Consume()) {
+        return Ambusher.SupplyPunishment; 
       }
       return -25;
-    }
-
-    public bool StickAsNailWhenDefeat() {
-      if (IsVulnerable()) {
-        return false;
-      }
-      return TurningTide() ||
-        (rf.general.Has(Cons.holdTheGround) && Cons.MostLikely()) ||
-        (rf.IsSpecial() && Cons.MostLikely()) || Cons.FiftyFifty();
     }
 
     public bool RetreatOnDefeat() {
@@ -563,7 +545,7 @@ namespace UnitNS
     }
 
     public bool ApplyDiscipline() {
-      return rf.IsSpecial() || rf.general.Has(Cons.discipline);
+      return rf.IsSpecial();
     }
 
     public General MyCommander() {
@@ -730,16 +712,12 @@ namespace UnitNS
 
     float GetCampingAttackBuff()
     {
-      return GetGeneralBuf() + GetMentalBuf() - plainSickness.debuf - disarmorDefDebuf;
+      return GetMentalBuf() - plainSickness.debuf - disarmorDefDebuf;
     }
 
     public float GetBuff()
     {
       return GetCampingAttackBuff() + vantage.Buf();
-    }
-
-    public float GetGeneralBuf() {
-      return rf.general.Has(Cons.formidable) ? 0.5f : 0f;
     }
 
     public float GetMentalBuf() {

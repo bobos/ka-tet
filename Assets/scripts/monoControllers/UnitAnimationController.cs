@@ -74,7 +74,7 @@ namespace MonoNS
         while(popAniController.Animating) { yield return null; }
       }
 
-      ShakeNearbyAllies(unit, 0);
+      ShakeNearbyAllies(unit);
       while (ShakeAnimating) { yield return null; }
       int drop = unit.IsCommander() ? -50 : -30;
       foreach(Unit u in hexMap.GetWarParty(unit).GetUnits()) {
@@ -88,23 +88,16 @@ namespace MonoNS
     }
 
     public bool ShakeAnimating = false;
-    public void ShakeNearbyAllies(Unit unit, int moraleDrop) {
+    public void ShakeNearbyAllies(Unit unit) {
       ShakeAnimating = true;
-      StartCoroutine(CoShakeNearbyAllies(unit, moraleDrop));
+      StartCoroutine(CoShakeNearbyAllies(unit));
     }
 
-    IEnumerator CoShakeNearbyAllies(Unit unit, int moraleDrop) {
+    IEnumerator CoShakeNearbyAllies(Unit unit) {
       foreach(Tile t in unit.tile.GetNeighboursWithinRange<Tile>(4, (Tile tt) => true)) {
         Unit u = t.GetUnit();
         if (u != null && u.IsAI() == unit.IsAI() && !Util.eq<Unit>(unit, u)) {
-          int[] stats = new int[]{moraleDrop,0,0,0,0};
-          u.morale += moraleDrop;
-          if (u.IsShowingAnimation()) {
-            hexMap.unitAniController.ShowEffect(u, stats, null, true);
-          }
-          if (!u.StickAsNailWhenDefeat()
-            && u.RetreatOnDefeat()
-            && u.SetRetreatPath()) {
+          if (u.RetreatOnDefeat() && u.SetRetreatPath()) {
             ForceRetreat(u, 60);
             while(ForceRetreatAnimating) { yield return null; }
           }

@@ -105,31 +105,31 @@ namespace CourtNS {
       this.remaining = this.attempts;
     }
 
-    public string Icon(General general) {
+    public string Icon(Unit unit) {
       return icon + (
-        Aval(name, type, general) ?
+        !Aval(name, type, unit) ?
         "[x]" : (remaining == -1 ? "" :
         "[" + remaining + "/" + attempts + "]"));
     }
 
     // find out if the ability is available for given general, cavalry abililties are not availabe 
     // if general is commanding an infantry unit, vice-versa
-    protected static bool Aval(string name, AbilityType type, General general) {
-      if (type == AbilityType.Cavalry && !general.commandUnit.onFieldUnit.IsCavalry() ||
-      type == AbilityType.Infantry && general.commandUnit.onFieldUnit.IsCavalry()) {
+    protected static bool Aval(string name, AbilityType type, Unit unit) {
+      if (type == AbilityType.Cavalry && !unit.IsCavalry() ||
+      type == AbilityType.Infantry && unit.IsCavalry()) {
         return false;
       }
-      Ability ability = Get(name, general);
+      Ability ability = Get(name, unit.rf.general);
       return ability != null && (ability.remaining == -1 || ability.remaining > 0);
     }
 
     protected static Ability Get(string name, General general) {
-      return general.acquiredAbilities[name];
+      return general.acquiredAbilities.ContainsKey(name) ? general.acquiredAbilities[name] : null;
     }
 
-    protected static string Icon(string name, General general) {
-      Ability ability = Get(name, general);
-      return ability == null ? "" : ability.Icon(general);
+    protected static string Icon(string name, Unit unit) {
+      Ability ability = Get(name, unit.rf.general);
+      return ability == null ? "" : ability.Icon(unit);
     }
   }
 
@@ -181,9 +181,9 @@ namespace CourtNS {
     public static void Unlock(Faction faction) { ac.Unlock(faction); }
     public static bool Acquire(General general) { return ac.Acquire(general); }
     public static bool Find(Faction faction) { return ac.Find(faction); }
-    public static bool Aval(Unit unit) { return Ability.Aval(N, T, unit.rf.general); }
+    public static bool Aval(Unit unit) { return Ability.Aval(N, T, unit); }
     public static Ability Get(General general) { return Ability.Get(N, general); }
-    public static new string Icon(General general) { return ""; }
+    public static new string Icon(Unit _unit) { return ""; }
   }
 
   public class FireBug: Ability {
@@ -201,9 +201,9 @@ namespace CourtNS {
     public static void Unlock(Faction faction) { ac.Unlock(faction); }
     public static bool Acquire(General general) { return ac.Acquire(general); }
     public static bool Find(Faction faction) { return ac.Find(faction); }
-    public static bool Aval(Unit unit) { return Ability.Aval(N, T, unit.rf.general); }
+    public static bool Aval(Unit unit) { return Ability.Aval(N, T, unit); }
     public static Ability Get(General general) { return Ability.Get(N, general); }
-    public new static string Icon(General general) { return Ability.Icon(N, general); }
+    public new static string Icon(Unit unit) { return Ability.Icon(N, unit); }
   }
 
   public class Ambusher: Ability {
@@ -217,15 +217,15 @@ namespace CourtNS {
     const string I = "☸";
     const string D = "ability_ambusher_description";
     const AbilityType T = AbilityType.Common;
-    public Ambusher(): base(N, I, D, T) {}
+    public Ambusher(): base(N, I, D, T, 6) {}
     public static void Unlock(Faction faction) { ac.Unlock(faction); }
     public static bool Acquire(General general) { return ac.Acquire(general); }
     public static bool Find(Faction faction) { return ac.Find(faction); }
-    public static bool Aval(Unit unit) { return Ability.Aval(N, T, unit.rf.general); }
+    public static bool Aval(Unit unit) { return Ability.Aval(N, T, unit); }
     public static Ability Get(General general) { return Ability.Get(N, general); }
-    public new static string Icon(General general) { return Ability.Icon(N, general); }
+    public new static string Icon(Unit unit) { return Ability.Icon(N, unit); }
     public static int AmbushRange = 4;
-    public static int SupplyPunishment = 8;
+    public static int SupplyPunishment = -8;
     public static int ExtraChanceForMistAmbush = 20;
   }
 
@@ -244,9 +244,9 @@ namespace CourtNS {
     public static void Unlock(Faction faction) { ac.Unlock(faction); }
     public static bool Acquire(General general) { return ac.Acquire(general); }
     public static bool Find(Faction faction) { return ac.Find(faction); }
-    public static bool Aval(Unit unit) { return Ability.Aval(N, T, unit.rf.general); }
+    public static bool Aval(Unit unit) { return Ability.Aval(N, T, unit); }
     public static Ability Get(General general) { return Ability.Get(N, general); }
-    public new static string Icon(General general) { return Ability.Icon(N, general); }
+    public new static string Icon(Unit unit) { return Ability.Icon(N, unit); }
     public static float AtkBuf = 1f;
   }
 
@@ -265,9 +265,9 @@ namespace CourtNS {
     public static void Unlock(Faction faction) { ac.Unlock(faction); }
     public static bool Acquire(General general) { return ac.Acquire(general); }
     public static bool Find(Faction faction) { return ac.Find(faction); }
-    public static bool Aval(Unit unit) { return Ability.Aval(N, T, unit.rf.general); }
+    public static bool Aval(Unit unit) { return Ability.Aval(N, T, unit); }
     public static Ability Get(General general) { return Ability.Get(N, general); }
-    public new static string Icon(General general) { return Ability.Icon(N, general); }
+    public new static string Icon(Unit unit) { return Ability.Icon(N, unit); }
   }
 
   public class Evader: Ability {
@@ -285,9 +285,9 @@ namespace CourtNS {
     public static void Unlock(Faction faction) { ac.Unlock(faction); }
     public static bool Acquire(General general) { return ac.Acquire(general); }
     public static bool Find(Faction faction) { return ac.Find(faction); }
-    public static bool Aval(Unit unit) { return Ability.Aval(N, T, unit.rf.general); }
+    public static bool Aval(Unit unit) { return Ability.Aval(N, T, unit); }
     public static Ability Get(General general) { return Ability.Get(N, general); }
-    public new static string Icon(General general) { return Ability.Icon(N, general); }
+    public new static string Icon(Unit unit) { return Ability.Icon(N, unit); }
     public const float DeathDropBy = 0.25f;
   }
 
@@ -306,9 +306,9 @@ namespace CourtNS {
     public static void Unlock(Faction faction) { ac.Unlock(faction); }
     public static bool Acquire(General general) { return ac.Acquire(general); }
     public static bool Find(Faction faction) { return ac.Find(faction); }
-    public static bool Aval(Unit unit) { return Ability.Aval(N, T, unit.rf.general); }
+    public static bool Aval(Unit unit) { return Ability.Aval(N, T, unit); }
     public static Ability Get(General general) { return Ability.Get(N, general); }
-    public new static string Icon(General general) { return Ability.Icon(N, general); }
+    public new static string Icon(Unit unit) { return Ability.Icon(N, unit); }
     public static int Range = 2;
     public static int MoraleBuf = 50;
     public static int MoveBuf = 40;
@@ -329,9 +329,9 @@ namespace CourtNS {
     public static void Unlock(Faction faction) { ac.Unlock(faction); }
     public static bool Acquire(General general) { return ac.Acquire(general); }
     public static bool Find(Faction faction) { return ac.Find(faction); }
-    public static bool Aval(Unit unit) { return Ability.Aval(N, T, unit.rf.general); }
+    public static bool Aval(Unit unit) { return Ability.Aval(N, T, unit); }
     public static Ability Get(General general) { return Ability.Get(N, general); }
-    public new static string Icon(General general) { return ""; }
+    public new static string Icon(Unit _unit) { return ""; }
   }
 
   public class Holder: Ability {
@@ -349,9 +349,9 @@ namespace CourtNS {
     public static void Unlock(Faction faction) { ac.Unlock(faction); }
     public static bool Acquire(General general) { return ac.Acquire(general); }
     public static bool Find(Faction faction) { return ac.Find(faction); }
-    public static bool Aval(Unit unit) { return Ability.Aval(N, T, unit.rf.general); }
+    public static bool Aval(Unit unit) { return Ability.Aval(N, T, unit); }
     public static Ability Get(General general) { return Ability.Get(N, general); }
-    public new static string Icon(General general) { return Ability.Icon(N, general); }
+    public new static string Icon(Unit unit) { return Ability.Icon(N, unit); }
     public static int ChanceToHold = 50;
   }
 
@@ -371,9 +371,9 @@ namespace CourtNS {
     public static void Unlock(Faction faction) { ac.Unlock(faction); }
     public static bool Acquire(General general) { return ac.Acquire(general); }
     public static bool Find(Faction faction) { return ac.Find(faction); }
-    public static bool Aval(Unit unit) { return Ability.Aval(N, T, unit.rf.general); }
+    public static bool Aval(Unit unit) { return Ability.Aval(N, T, unit); }
     public static Ability Get(General general) { return Ability.Get(N, general); }
-    public new static string Icon(General general) { return Ability.Icon(N, general); }
+    public new static string Icon(Unit unit) { return Ability.Icon(N, unit); }
     public static float BuildEfficiencyIncr = 1f;
   }
 
@@ -392,9 +392,9 @@ namespace CourtNS {
     public static void Unlock(Faction faction) { ac.Unlock(faction); }
     public static bool Acquire(General general) { return ac.Acquire(general); }
     public static bool Find(Faction faction) { return ac.Find(faction); }
-    public static bool Aval(Unit unit) { return unit.IsCamping() && Ability.Aval(N, T, unit.rf.general); }
+    public static bool Aval(Unit unit) { return unit.IsCamping() && Ability.Aval(N, T, unit); }
     public static Ability Get(General general) { return Ability.Get(N, general); }
-    public new static string Icon(General general) { return Ability.Icon(N, general); }
+    public new static string Icon(Unit unit) { return Ability.Icon(N, unit); }
     public static float DefenceIncr = 0.5f;
   }
 
@@ -413,9 +413,9 @@ namespace CourtNS {
     public static void Unlock(Faction faction) { ac.Unlock(faction); }
     public static bool Acquire(General general) { return ac.Acquire(general); }
     public static bool Find(Faction faction) { return ac.Find(faction); }
-    public static bool Aval(Unit unit) { return Ability.Aval(N, T, unit.rf.general); }
+    public static bool Aval(Unit unit) { return Ability.Aval(N, T, unit); }
     public static Ability Get(General general) { return Ability.Get(N, general); }
-    public new static string Icon(General general) { return Ability.Icon(N, general); }
+    public new static string Icon(Unit unit) { return Ability.Icon(N, unit); }
     public static int CureRange = 1;
   }
 
@@ -434,9 +434,9 @@ namespace CourtNS {
     public static void Unlock(Faction faction) { ac.Unlock(faction); }
     public static bool Acquire(General general) { return ac.Acquire(general); }
     public static bool Find(Faction faction) { return ac.Find(faction); }
-    public static bool Aval(Unit unit) { return unit.IsOnField() && Ability.Aval(N, T, unit.rf.general); }
+    public static bool Aval(Unit unit) { return unit.IsOnField() && Ability.Aval(N, T, unit); }
     public static Ability Get(General general) { return Ability.Get(N, general); }
-    public new static string Icon(General general) { return Ability.Icon(N, general); }
+    public new static string Icon(Unit unit) { return Ability.Icon(N, unit); }
     public static float AtkBuf = 0.8f;
   }
 
@@ -455,9 +455,9 @@ namespace CourtNS {
     public static void Unlock(Faction faction) { ac.Unlock(faction); }
     public static bool Acquire(General general) { return ac.Acquire(general); }
     public static bool Find(Faction faction) { return ac.Find(faction); }
-    public static bool Aval(Unit unit) { return Ability.Aval(N, T, unit.rf.general); }
+    public static bool Aval(Unit unit) { return Ability.Aval(N, T, unit); }
     public static Ability Get(General general) { return Ability.Get(N, general); }
-    public new static string Icon(General general) { return Ability.Icon(N, general); }
+    public new static string Icon(Unit unit) { return Ability.Icon(N, unit); }
     public static float MoveBuf = 0.8f;
   }
 
@@ -476,9 +476,9 @@ namespace CourtNS {
     public static void Unlock(Faction faction) { ac.Unlock(faction); }
     public static bool Acquire(General general) { return ac.Acquire(general); }
     public static bool Find(Faction faction) { return ac.Find(faction); }
-    public static bool Aval(Unit unit) { return Ability.Aval(N, T, unit.rf.general); }
+    public static bool Aval(Unit unit) { return Ability.Aval(N, T, unit); }
     public static Ability Get(General general) { return Ability.Get(N, general); }
-    public new static string Icon(General general) { return Ability.Icon(N, general); }
+    public new static string Icon(Unit unit) { return Ability.Icon(N, unit); }
   }
 
   public class Pusher: Ability {
@@ -496,9 +496,9 @@ namespace CourtNS {
     public static void Unlock(Faction faction) { ac.Unlock(faction); }
     public static bool Acquire(General general) { return ac.Acquire(general); }
     public static bool Find(Faction faction) { return ac.Find(faction); }
-    public static bool Aval(Unit unit) { return Ability.Aval(N, T, unit.rf.general); }
+    public static bool Aval(Unit unit) { return Ability.Aval(N, T, unit); }
     public static Ability Get(General general) { return Ability.Get(N, general); }
-    public new static string Icon(General general) { return Ability.Icon(N, general); }
+    public new static string Icon(Unit unit) { return Ability.Icon(N, unit); }
   }
 
   public class Finisher: Ability {
@@ -516,9 +516,9 @@ namespace CourtNS {
     public static void Unlock(Faction faction) { ac.Unlock(faction); }
     public static bool Acquire(General general) { return ac.Acquire(general); }
     public static bool Find(Faction faction) { return ac.Find(faction); }
-    public static bool Aval(Unit unit) { return Ability.Aval(N, T, unit.rf.general); }
+    public static bool Aval(Unit unit) { return Ability.Aval(N, T, unit); }
     public static Ability Get(General general) { return Ability.Get(N, general); }
-    public new static string Icon(General general) { return Ability.Icon(N, general); }
+    public new static string Icon(Unit unit) { return Ability.Icon(N, unit); }
     public static float KillBuf = 1f;
   }
 
@@ -537,9 +537,9 @@ namespace CourtNS {
     public static void Unlock(Faction faction) { ac.Unlock(faction); }
     public static bool Acquire(General general) { return ac.Acquire(general); }
     public static bool Find(Faction faction) { return ac.Find(faction); }
-    public static bool Aval(Unit unit) { return unit.IsOnField() && Ability.Aval(N, T, unit.rf.general); }
+    public static bool Aval(Unit unit) { return unit.IsOnField() && Ability.Aval(N, T, unit); }
     public static Ability Get(General general) { return Ability.Get(N, general); }
-    public new static string Icon(General general) { return Ability.Icon(N, general); }
+    public new static string Icon(Unit unit) { return Ability.Icon(N, unit); }
     public static int RedzoneRange = 2;
   }
 
@@ -558,9 +558,9 @@ namespace CourtNS {
     public static void Unlock(Faction faction) { ac.Unlock(faction); }
     public static bool Acquire(General general) { return ac.Acquire(general); }
     public static bool Find(Faction faction) { return ac.Find(faction); }
-    public static bool Aval(Unit unit) { return Ability.Aval(N, T, unit.rf.general); }
+    public static bool Aval(Unit unit) { return Ability.Aval(N, T, unit); }
     public static Ability Get(General general) { return Ability.Get(N, general); }
-    public new static string Icon(General general) { return Ability.Icon(N, general); }
+    public new static string Icon(Unit unit) { return Ability.Icon(N, unit); }
     public const int MoraleDropForDiffProvinceMin = 20;
     public const int MoraleDropForDiffProvinceMax = 30;
     public const int MoraleDropForDiffRaceMin = 30;
@@ -582,9 +582,9 @@ namespace CourtNS {
     public static void Unlock(Faction faction) { ac.Unlock(faction); }
     public static bool Acquire(General general) { return ac.Acquire(general); }
     public static bool Find(Faction faction) { return ac.Find(faction); }
-    public static bool Aval(Unit unit) { return Ability.Aval(N, T, unit.rf.general); }
+    public static bool Aval(Unit unit) { return Ability.Aval(N, T, unit); }
     public static Ability Get(General general) { return Ability.Get(N, general); }
-    public new static string Icon(General general) { return Ability.Icon(N, general); }
+    public new static string Icon(Unit unit) { return Ability.Icon(N, unit); }
   }
 
   public class Deciever: Ability {
@@ -602,9 +602,9 @@ namespace CourtNS {
     public static void Unlock(Faction faction) { ac.Unlock(faction); }
     public static bool Acquire(General general) { return ac.Acquire(general); }
     public static bool Find(Faction faction) { return ac.Find(faction); }
-    public static bool Aval(Unit unit) { return Ability.Aval(N, T, unit.rf.general); }
+    public static bool Aval(Unit unit) { return Ability.Aval(N, T, unit); }
     public static Ability Get(General general) { return Ability.Get(N, general); }
-    public new static string Icon(General general) { return Ability.Icon(N, general); }
+    public new static string Icon(Unit unit) { return Ability.Icon(N, unit); }
   }
 
   public class FearMonger: Ability {
@@ -622,9 +622,9 @@ namespace CourtNS {
     public static void Unlock(Faction faction) { ac.Unlock(faction); }
     public static bool Acquire(General general) { return ac.Acquire(general); }
     public static bool Find(Faction faction) { return ac.Find(faction); }
-    public static bool Aval(Unit unit) { return Ability.Aval(N, T, unit.rf.general); }
+    public static bool Aval(Unit unit) { return Ability.Aval(N, T, unit); }
     public static Ability Get(General general) { return Ability.Get(N, general); }
-    public new static string Icon(General general) { return Ability.Icon(N, general); }
+    public new static string Icon(Unit unit) { return Ability.Icon(N, unit); }
     public const int MoraleDropMin = 30;
     public const int MoraleDropMax = 60;
     public const int AffectRange = 2;
@@ -645,9 +645,9 @@ namespace CourtNS {
     public static void Unlock(Faction faction) { ac.Unlock(faction); }
     public static bool Acquire(General general) { return ac.Acquire(general); }
     public static bool Find(Faction faction) { return ac.Find(faction); }
-    public static bool Aval(Unit unit) { return Ability.Aval(N, T, unit.rf.general); }
+    public static bool Aval(Unit unit) { return Ability.Aval(N, T, unit); }
     public static Ability Get(General general) { return Ability.Get(N, general); }
-    public new static string Icon(General general) { return Ability.Icon(N, general); }
+    public new static string Icon(Unit unit) { return Ability.Icon(N, unit); }
   }
 
   public class GameChanger: Ability {
@@ -665,9 +665,9 @@ namespace CourtNS {
     public static void Unlock(Faction faction) { ac.Unlock(faction); }
     public static bool Acquire(General general) { return ac.Acquire(general); }
     public static bool Find(Faction faction) { return ac.Find(faction); }
-    public static bool Aval(Unit unit) { return Ability.Aval(N, T, unit.rf.general); }
+    public static bool Aval(Unit unit) { return Ability.Aval(N, T, unit); }
     public static Ability Get(General general) { return Ability.Get(N, general); }
-    public new static string Icon(General general) { return Ability.Icon(N, general); }
+    public new static string Icon(Unit unit) { return Ability.Icon(N, unit); }
   }
 
 }

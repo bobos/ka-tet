@@ -23,7 +23,7 @@ namespace UnitNS
     }
 
     public bool Occur() {
-      if (!unit.IsHeatSicknessAffected() && !unit.rf.general.Has(Cons.doctor)) {
+      if (!unit.IsHeatSicknessAffected()) {
         lastTurns += GetLastTurns();
         return true;
       }

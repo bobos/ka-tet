@@ -68,8 +68,8 @@ namespace MonoNS
       supplyRange,
       PoisionRange
     }
-    public int numRows = 40;
-    public int numCols = 40;
+    public int numRows;
+    public int numCols;
     public Material MatOcean;
     public Material MatPlain;
     public Material MatLessPlain;
@@ -1180,9 +1180,9 @@ namespace MonoNS
         }
       }
 
-      float noiseResolution = 0.3f;
-      float noiseScale = 1.1f; //larger value, more islands
-      Random.InitState(1);
+      float noiseResolution = 0.18f; // lower, more mountains
+      float noiseScale = 1.3f; //larger value, more islands
+      Random.InitState(3);
       Vector2 noiseRandom = new Vector2(Random.Range(0f, 1f), Random.Range(0f, 1f));
       for (float col = 0; col < numCols; col++)
       {

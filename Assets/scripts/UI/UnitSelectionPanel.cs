@@ -283,7 +283,6 @@ namespace MonoNS
       + "%\n平原反应:" + unit.plainSickness.debuf * 100
       + "%\n加成:\n"
       + "%\n地形加成:" + unit.vantage.Buf() * 100
-      + "%\n将领加成:" + unit.GetGeneralBuf() * 100
       + "%\n总计加成:" + (unit.GetBuff() *100) + "%\n\n";
       hexMap.hoverInfo.Show(details);
 
@@ -320,7 +319,7 @@ namespace MonoNS
       title.fontSize = 18;
       title.text = "";
       foreach(Ability ability in unit.rf.general.acquiredAbilities.Values) {
-        title.text += "{" + ability.Name() + ability.Icon(unit.rf.general) + "}: " + ability.Description() + "\n";
+        title.text += "{" + ability.Name() + ability.Icon(unit) + "}: " + ability.Description() + "\n";
       }
     }
 

@@ -45,7 +45,7 @@ namespace CourtNS {
     }
     public Party party;
     public Trait trait;
-    public Dictionary<string, Ability> acquiredAbilities;
+    public Dictionary<string, Ability> acquiredAbilities = new Dictionary<string, Ability>();
     public int age;
     public Province province;
     public Troop commandUnit;

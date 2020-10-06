@@ -5158,8 +5158,8 @@ MonoBehaviour:
   popAniController: {fileID: 0}
   imgLibrary: {fileID: 0}
   eventStasher: {fileID: 0}
-  numRows: 40
-  numCols: 40
+  numRows: 30
+  numCols: 30
   MatOcean: {fileID: 2100000, guid: 75df011dacb6d464a9e0ee5173c7135b, type: 2}
   MatPlain: {fileID: 2100000, guid: 69259e7d8008543b39c4aafcbcc7b64b, type: 2}
   MatLessPlain: {fileID: 2100000, guid: bd3ea563e20fc49c7b5e4c4fa273045d, type: 2}
@@ -9564,10 +9564,8 @@ MonoBehaviour:
   GeneralButton: {fileID: 431876873}
   SurpriseAttackButton: {fileID: 1613612389}
   FeintDefeatButton: {fileID: 1605873869}
-  ForecastButton: {fileID: 1444959738}
   FalseOrderButton: {fileID: 593314586}
   AlienateButton: {fileID: 1988379851}
-  SkirmishButton: {fileID: 2041293890}
   title: {fileID: 1702976408}
   generalPortrait: {fileID: 1284838565}
   tileSelecting: 0
@@ -11668,15 +11666,13 @@ MonoBehaviour:
   BuryAnimating: 0
   ScatterAnimating: 0
   ChargeAnimating: 0
-  SkirmishAnimating: 0
-  PursueAnimating: 0
+  BreakAnimating: 0
   BreakthroughAnimating: 0
   CrashAnimating: 0
   SiegeAnimating: 0
   RetreatAnimating: 0
-  ForecastAnimating: 0
-  FalseOrderAnimating: 0
-  AlienateAnimating: 0
+  DecieveAnimating: 0
+  PlotAnimating: 0
   ForceRetreatAnimating: 0
   SurpriseAnimating: 0
   ShowAnimating: 0
