@@ -82,7 +82,7 @@ namespace MonoNS
 
     int AttackerPoint(Unit unit) {
       int point = unit.unitCombatPoint;
-      if (attackSettlement && Breacher.Aval(unit.rf.general)) {
+      if (attackSettlement && Breacher.Aval(unit)) {
         point = (int)(point * (1f + Breacher.AtkBuf));
       }
 
@@ -303,8 +303,8 @@ namespace MonoNS
       Unit target = attacker ? this.attacker : this.defender;
       if ((unit.rf.province.GetConflictProvinces().Contains(target.rf.province) ||
         !Util.eq<Region>(unit.rf.province.region, target.rf.province.region))
-        && !unit.FollowOrder()) {
-        ret = ret < 85 ? ret : 85;
+        && !unit.Obedient()) {
+        ret = ret < 95 ? ret : 95;
       }
 
       if (!attacker && Cons.IsMist(hexMap.weatherGenerator.currentWeather)) {
@@ -319,16 +319,13 @@ namespace MonoNS
     }
 
     int JoinPossibilityBaseOnOdds(Unit unit, ResultType result) {
-      if (unit.FollowOrder()) {
+      if (unit.Obedient()) {
         return 100;
       }
 
       int chance = 100;
-      if (result == ResultType.Small) {
-        chance = 95;
-      }
-      else if (result == ResultType.Great) {
-        chance = 80;
+      if (result == ResultType.Great) {
+        chance = 85;
       }
       else if (result == ResultType.Crushing) {
         chance = 70;
@@ -484,10 +481,9 @@ namespace MonoNS
         List<Unit> giveupAttackers = new List<Unit>();
         List<Unit> giveupDefenders = new List<Unit>();
 
-
         foreach (UnitPredict u in predict.attackers) {
           if (u.joinPossibility >= Util.Rand(0, 100)) {
-            if (attackSettlement && Breacher.Aval(u.unit.rf.general)) {
+            if (attackSettlement && Breacher.Aval(u.unit)) {
               Breacher.Get(u.unit.rf.general).Consume();
             }
             newAttackers.Add(u);
@@ -500,6 +496,9 @@ namespace MonoNS
         foreach (UnitPredict u in predict.defenders) {
           if (u.joinPossibility >= Util.Rand(0, 100)) {
             newDefenders.Add(u);
+            if (Fortifier.Aval(u.unit)) {
+              Fortifier.Get(u.unit.rf.general).Consume();
+            }
           } else {
             giveupDefenders.Add(u.unit);
           }
@@ -825,10 +824,10 @@ namespace MonoNS
         }
 
         Unit un = atkWin ? attacker : defender;
-        if (feint && !un.FollowOrder()) {
+        if (feint && !un.Obedient()) {
           if (un.IsCamping() && un.tile.settlement.garrison.Count == 1) {}
           else {
-            if (un.rf.general.Is(Cons.conservative) || Deciever.Get(un.rf.general) != null) {
+            if (Deciever.Get(un.rf.general) != null) {
             } else if (Cons.MostLikely()) {
               chasers.Add(un);
             }
@@ -889,7 +888,7 @@ namespace MonoNS
             while(hexMap.dialogue.Animating) { yield return null; }
           }
           if (gonnaMove.Count > 0) {
-            hexMap.unitAniController.Scatter(gonnaMove, failedToMove, feint);
+            hexMap.unitAniController.Scatter(gonnaMove);
             while(hexMap.unitAniController.ScatterAnimating) { yield return null; }
           }
 

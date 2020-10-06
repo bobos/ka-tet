@@ -9,11 +9,10 @@ namespace CourtNS {
     public static Trait Random() {
       Trait[] traits = new Trait[]{
         Cons.reckless,
-        Cons.brave, Cons.brave,
-        Cons.loyal, Cons.loyal,
-        Cons.conservative, Cons.conservative,
-        Cons.cunning, Cons.cunning,
-        Cons.calm, Cons.calm, Cons.calm};
+        Cons.brave,
+        Cons.loyal,
+        Cons.conservative,
+        Cons.cunning};
       return traits[Util.Rand(0, traits.Length-1)];
     }
   }

@@ -151,7 +151,7 @@ public abstract class Settlement: Building
     return false;
   }
   
-  protected override int HowMuchBuildWorkToFinish() {
+  protected override int HowMuchBuildWorkToFinish(bool _actualBuild = false) {
     int laborForce = 0;
     foreach(Unit unit in garrison) {
       laborForce += unit.rf.soldiers;
@@ -182,7 +182,7 @@ public abstract class Settlement: Building
 
     foreach(Unit unit in garrison) {
       force += (int)(unit.unitCombatPoint * (1f + 
-        (Fortifier.Aval(unit.rf.general) ? Fortifier.DefenceIncr : 0)));
+        (Fortifier.Aval(unit) ? Fortifier.DefenceIncr : 0)));
     }
 
     return force;

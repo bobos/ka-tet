@@ -16,12 +16,13 @@ namespace CourtNS
       return 30;
     }
     public virtual int DefaultOrganizationPoint() {
-      return 35;
+      return RookieOrg;
     }
     public virtual int MaxOrganizationPoint() {
       return 65;
     }
     public static int VeteranOrg = 50;
+    public static int RookieOrg = 30;
   }
 
   public class QidanRegion : Region

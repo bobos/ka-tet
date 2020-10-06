@@ -210,6 +210,4 @@ public class Cons {
   public static Trait loyal = new Loyal();
   public static Trait conservative = new Conservative();
   public static Trait cunning = new Cunning();
-  public static Trait calm = new Calm();
-
 }

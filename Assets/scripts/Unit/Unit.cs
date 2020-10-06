@@ -193,19 +193,13 @@ namespace UnitNS
     }
 
     public int CanBeSurprised() {
-      if (!IsOnField() || IsVulnerable() || tile.vantagePoint || rf.general.Has(Cons.ambusher)) {
+      if (!IsOnField() || IsVulnerable() || tile.vantagePoint || Ambusher.Get(rf.general) != null) {
         return 0;
-      }
-      if (rf.general.Is(Cons.conservative)) {
-        return 10;
-      }
-      if (rf.general.Is(Cons.cunning)) {
-        return 25;
       }
       if (rf.general.Is(Cons.reckless)) {
         return 95;
       }
-      return 50;
+      return 60;
     }
 
     public bool CanBeCrashed() {
@@ -327,6 +321,17 @@ namespace UnitNS
       return ret;
     }
 
+    public List<Unit> OnFieldAllies() {
+      List<Unit> allies = new List<Unit>(){this};
+      foreach(Tile t in tile.neighbours) {
+        Unit u = t.GetUnit();
+        if (u != null && u.IsOnField() && u.IsAI() == IsAI()) {
+          allies.Add(u);
+        }
+      }
+      return allies;
+    }
+
     public string GetStateName()
     {
       if (state == State.Camping)
@@ -446,7 +451,7 @@ namespace UnitNS
       foreach(Tile t in tile.GetNeighboursWithinRange<Tile>(GetVisibleRange(), (Tile _tile) => true)) {
         Unit unit = t.GetUnit();
         if (unit != null && unit.IsAI() != IsAI() && !unit.fooled && !unit.IsCommander()
-          && (unit.rf.general.Is(Cons.calm) || unit.rf.general.Is(Cons.conservative))) {
+          && unit.rf.general.Is(Cons.conservative)) {
           units.Add(unit);
         }
       }
@@ -516,8 +521,8 @@ namespace UnitNS
       });
     }
 
-    public bool FollowOrder() {
-      return MyCommander().commandSkill.Obey() || rf.general.Is(Cons.loyal);
+    public bool Obedient() {
+      return MyCommander().commandSkill.Obey();
     }
 
     public bool StandStill() {
@@ -553,7 +558,7 @@ namespace UnitNS
       if (rf.general.Is(Cons.conservative)) {
         return Cons.EvenChance();
       } else {
-        return Cons.SlimChance();
+        return false;
       }
     }
 
@@ -585,7 +590,6 @@ namespace UnitNS
       rf.general.commandSkill.Reset();
       morale += IsCamping() ? 10 : 5;
       crashed = retreated = false;
-      InitForecast();
       InitAllowedAtmpt();
       turnDone = false;
       movementRemaining = GetFullMovement();
@@ -625,8 +629,8 @@ namespace UnitNS
 
     public int Killed(int killed, bool all = false) {
       int num = killed;
-      if (!all && rf.general.Has(Cons.doctor)) {
-        num = (int)(killed * 0.5f);
+      if (!all && Evader.Aval(this) && Evader.Get(rf.general).Consume()) {
+        num = (int)(killed * (1 - Evader.DeathDropBy));
       }
       rf.soldiers -= num;
       kia += num;

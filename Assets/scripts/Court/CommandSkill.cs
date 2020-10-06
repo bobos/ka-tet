@@ -17,7 +17,7 @@
         case 1: return 2;
         case 2: return 3;    
         case 3: return 4;    
-        default: return 6;
+        default: return 8;
       }
     }
 

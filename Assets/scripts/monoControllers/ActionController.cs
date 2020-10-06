@@ -267,12 +267,6 @@ namespace MonoNS
       }
     }
 
-    public void OnForecastClick() {
-      if (onBtnClick != null) {
-        onBtnClick(actionName.Forecast);
-      }
-    }
-
     public void OnFalseOrderClick() {
       if (onBtnClick != null) {
         onBtnClick(actionName.Decieve);
@@ -326,8 +320,7 @@ namespace MonoNS
       AbilityInfo,
       SurpriseAttack,
       FeintDefeat,
-      Pursue,
-      Forecast,
+      Break,
       Decieve,
       Plot
     }
@@ -389,12 +382,8 @@ namespace MonoNS
       return DoAction(from, to, null, actionName.SurpriseAttack);
     }
 
-    public bool Pursue(Unit from, Unit to) {
-      return DoAction(from, to, null, actionName.Pursue);
-    }
-
-    public bool Forecast(Unit unit) {
-      return DoAction(unit, null, null, actionName.Forecast);
+    public bool Break(Unit from, Unit to) {
+      return DoAction(from, to, null, actionName.Break);
     }
 
     public bool Decieve(Unit unit, Unit unit1) {
@@ -465,13 +454,9 @@ namespace MonoNS
       {
         StartCoroutine(DoSurpriseAttack(unit, unit1));
       }
-      if (name == actionName.Pursue)
+      if (name == actionName.Break)
       {
-        StartCoroutine(DoPursue(unit, unit1));
-      }
-      if (name == actionName.Forecast)
-      {
-        StartCoroutine(DoForecast(unit));
+        StartCoroutine(DoBreak(unit, unit1));
       }
       if (name == actionName.Decieve)
       {
@@ -624,18 +609,9 @@ namespace MonoNS
       ActionOngoing = false;
     }
 
-    IEnumerator DoPursue(Unit unit, Unit unit1) {
-      unitAniController.Pursue(unit, unit1);
-      while (unitAniController.PursueAnimating)
-      {
-        yield return null;
-      }
-      ActionOngoing = false;
-    }
-
-    IEnumerator DoForecast(Unit unit) {
-      unitAniController.Forecast(unit);
-      while (unitAniController.ForecastAnimating)
+    IEnumerator DoBreak(Unit unit, Unit unit1) {
+      unitAniController.Break(unit, unit1);
+      while (unitAniController.BreakAnimating)
       {
         yield return null;
       }

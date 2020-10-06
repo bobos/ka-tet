@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-using MapTileNS;
+﻿using MapTileNS;
 using UnityEngine;
 using MonoNS;
-using System.Collections;
-using BuildingNS;
 using UnitNS;
 using FieldNS;
+using CourtNS;
 
 public class SiegeWall: Building
 {
@@ -21,11 +19,17 @@ public class SiegeWall: Building
     settlementMgr = hexMap.settlementMgr;
   }
 
-  protected override int HowMuchBuildWorkToFinish() {
+  protected override int HowMuchBuildWorkToFinish(bool actualBuild = false) {
     Unit unit = baseTile.GetUnit();
     int labor = 0;
     if (unit != null && unit.IsAI() == owner.isAI) {
       labor = unit.rf.soldiers;
+    }
+    if (Builder.Aval(unit)) {
+      labor = (int)(labor * (1f + Builder.BuildEfficiencyIncr));
+      if (actualBuild) {
+        Builder.Get(unit.rf.general).Consume();
+      }
     }
     return (int)(labor / 500);
   }

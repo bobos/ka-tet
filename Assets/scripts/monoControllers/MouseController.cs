@@ -133,7 +133,7 @@ namespace MonoNS
         if (tile.burnable ||
           selectedSettlement == null &&
           selectedUnit != null &&
-          FireBug.Aval(selectedUnit.rf.general) &&
+          FireBug.Aval(selectedUnit) &&
           tile.field == FieldType.Forest) {
           nearFireTiles.Add(tile);
         }
@@ -348,12 +348,6 @@ namespace MonoNS
         foreach(Unit u in nearbyAlly) {
           hexMap.TargetUnit(u);
         }
-      }
-
-      if (action == ActionController.actionName.Forecast)
-      {
-        hexMap.actionController.Forecast(selectedUnit);
-        Escape();
       }
 
       if (action == ActionController.actionName.INPUTCONFIRM)
@@ -654,7 +648,7 @@ namespace MonoNS
         }
 
         if (targetUnit != null && targetUnit.IsVulnerable()) {
-          actionController.Pursue(selectedUnit, targetUnit);
+          actionController.Break(selectedUnit, targetUnit);
           Escape();
         } else if (targetUnit != null || targetSettlement != null) {
           msgBox.Show("");

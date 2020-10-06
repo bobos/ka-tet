@@ -37,12 +37,12 @@ public abstract class Building: DataModel {
     }
   }
 
-  protected abstract int HowMuchBuildWorkToFinish();
+  protected abstract int HowMuchBuildWorkToFinish(bool actualBuild = false);
   public bool TurnEnd()
   {
-    bool ret = false;;
+    bool ret = false;
     if (state == State.constructing) {
-      buildWork -= HowMuchBuildWorkToFinish();
+      buildWork -= HowMuchBuildWorkToFinish(true);
     }
 
     if (buildWork < 1)
