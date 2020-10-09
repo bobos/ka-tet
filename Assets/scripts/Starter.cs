@@ -184,11 +184,11 @@ public class Starter : MonoBehaviour {
     StartButton.SetActive(false);
     
     // TODO build dam
-    Tile dam = hexMap.GetTile(12, 7);
+    Tile dam = hexMap.GetTile(3, 10);
     dam.BuildDam();
-    dam = hexMap.GetTile(7, 33);
+    dam = hexMap.GetTile(12, 8);
     dam.BuildDam();
-    dam = hexMap.GetTile(30, 15);
+    dam = hexMap.GetTile(23, 23);
     dam.BuildDam();
     
     // first one is always the commander
@@ -197,35 +197,32 @@ public class Starter : MonoBehaviour {
 
     // create settlements
     // * tactical phase starts *
-    Tile strategyBase = hexMap.GetTile(1, 6);
-    Tile camp1 = hexMap.GetTile(8, 26);
-    Tile camp2 = hexMap.GetTile(17, 9);
-    Tile camp3 = hexMap.GetTile(16, 33);
-    Tile city = hexMap.GetTile(29, 13);
-    Tile mainCity = hexMap.GetTile(38, 30);
+    Tile strategyBase = hexMap.GetTile(4, 5);
+    Tile camp1 = hexMap.GetTile(10, 8);
+    Tile camp2 = hexMap.GetTile(18, 9);
+    Tile camp3 = hexMap.GetTile(9, 21);
+    Tile city = hexMap.GetTile(23, 28);
+    Tile mainCity = hexMap.GetTile(10, 27);
     // Set Route
     strategyBase.linkedTilesForCamp.Add(camp1);
-    strategyBase.linkedTilesForCamp.Add(camp2);
     camp1.linkedTilesForCamp.Add(strategyBase);
-    camp1.linkedTilesForCamp.Add(camp3);
+    camp1.linkedTilesForCamp.Add(camp2);
 
-    camp2.linkedTilesForCamp.Add(strategyBase);
+    camp2.linkedTilesForCamp.Add(camp3);
     camp2.linkedTilesForCamp.Add(city);
 
-    camp3.linkedTilesForCamp.Add(camp1);
-    camp3.linkedTilesForCamp.Add(city);
+    camp3.linkedTilesForCamp.Add(camp2);
+    camp3.linkedTilesForCamp.Add(mainCity);
 
     city.linkedTilesForCamp.Add(camp2);
-    city.linkedTilesForCamp.Add(camp3);
-    city.linkedTilesForCamp.Add(mainCity);
 
-    mainCity.linkedTilesForCamp.Add(city);
+    mainCity.linkedTilesForCamp.Add(camp3);
 
-    hexMap.frontier = new Tile[]{camp1, camp2};
-    hexMap.middleField = new Tile[]{camp3, city};
-    hexMap.keyPos = new Tile[]{hexMap.GetTile(13, 30)};
+    hexMap.frontier = new Tile[]{camp1};
+    hexMap.middleField = new Tile[]{camp2};
+    hexMap.keyPos = new Tile[]{hexMap.GetTile(17, 5)};
     hexMap.theBox = mainCity;
-    hexMap.attackerReserveTile = hexMap.GetTile(5, 9);
+    hexMap.attackerReserveTile = hexMap.GetTile(3, 8);
 
     Settlement s = settlementMgr.BuildStrategyBase(strategyBase, hexMap.GetWarParty(Cons.Liao));
     if (s == null) {

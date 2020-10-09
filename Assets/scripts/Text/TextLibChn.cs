@@ -362,7 +362,7 @@ namespace TextNS
       {"ability_sentinel_description", "部队红区范围增加为周围2格"},
       {"ability_agitator", "煽风点火"},
       {"ability_agitator_description", "让来自不同地域或者不同人种的相邻敌军部队相互攻击"},
-      {"ability_freezer", "按兵不动"},
+      {"ability_freezer", "虚张声势"},
       {"ability_freezer_description", "让敌军部队在协同作战中无法行动"},
       {"ability_deciever", "佯败"},
       {"ability_deciever_description", "佯装败走，让敌军突前"},

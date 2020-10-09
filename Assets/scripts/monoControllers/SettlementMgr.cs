@@ -18,11 +18,6 @@ namespace MonoNS
     public Settlement defenderRoot;
     public List<Settlement> allNodes = new List<Settlement>(); 
 
-    public enum QueueJobType {
-      DistSupply,
-      DistLabor
-    }
-
     // Use this for initialization
     public override void PreGameInit(HexMap hexMap, BaseController me)
     {
