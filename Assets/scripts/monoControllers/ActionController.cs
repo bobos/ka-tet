@@ -284,6 +284,9 @@ namespace MonoNS
       }
     }
 
+    public void OnShowZone() {
+    }
+
     public enum actionName
     {
       MOVE,

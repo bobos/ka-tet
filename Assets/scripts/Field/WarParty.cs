@@ -203,11 +203,54 @@ namespace FieldNS
     }
 
     public void DiscoverTile(Tile tile) {
+      // TODO: update the tile color map
       discoveredTiles.Add(tile);
     }
 
     public void ResetDiscoveredTiles() {
       discoveredTiles = new HashSet<Tile>();
+    }
+
+    public List<Tile> MyRedZone(HashSet<Tile> enemyVisibleArea) {
+      List<Tile> tiles = new List<Tile>();
+      foreach(Unit u in GetUnits()) {
+        if (u.IsHidden(enemyVisibleArea)) {
+          // we dont want to show hidden unit's red zone
+          continue;
+        }
+        Tile tile = u.tile;
+        foreach (Tile t in
+         (Sentinel.Aval(u) && Sentinel.Get(u.rf.general).Consume()
+          ? tile.GetNeighboursWithinRange<Tile>(Sentinel.RedzoneRange, (Tile t) => true) :
+          tile.neighbours)
+         ) {
+          if (t.Deployable(u) && !tiles.Contains(t)) {
+            tiles.Add(t);
+          }
+        }
+      }
+      return tiles;
+    }
+
+    public Dictionary<Tile, int> discoveredTileColorMap; // 1: green, 2: yellow 3: red
+    public void UpdateTileColorMap(List<Tile> redzones, List<Tile> controlledTiles) {
+      discoveredTileColorMap = new Dictionary<Tile, int>();
+      foreach(Tile tile in discoveredTiles) {
+        if (redzones.Contains(tile)) {
+          // red tiles
+          discoveredTileColorMap[tile] = 3;
+          continue;
+        }
+
+        if (controlledTiles.Contains(tile)) {
+          // green tiles
+          discoveredTileColorMap[tile] = 1;
+          continue;
+        }
+
+        // yellow tiles
+        discoveredTileColorMap[tile] = 2;
+      }
     }
 
     public int GetTotalPoint() {

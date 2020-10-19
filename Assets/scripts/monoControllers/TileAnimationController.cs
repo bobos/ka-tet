@@ -101,7 +101,7 @@ namespace MonoNS
     {
       if (unit != null) {
         if (!unit.GetBurnableTiles().Contains(tile)) return false;
-        if (!FireBug.Get(unit.rf.general).Consume()) {
+        if (!tile.burnable && (!FireBug.Aval(unit) || !FireBug.Get(unit.rf.general).Consume())) {
           return false;
         }
       }

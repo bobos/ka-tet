@@ -208,6 +208,7 @@ namespace MonoNS
       // TODO
       p.ResetDiscoveredTiles();
       FoW.Get().Fog(hexMap.allTiles);
+      (playerTurn ? hexMap.GetPlayerParty() : hexMap.GetAIParty()).UpdateTileColorMap();
       foreach(Unit u in playerParty.GetUnits()) {
         if (!u.IsCamping()) {
           u.SetState(u.state);

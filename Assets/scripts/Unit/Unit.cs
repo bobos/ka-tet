@@ -310,13 +310,14 @@ namespace UnitNS
       return allowedAtmpt > 0;
     }
 
-    public bool CanSurpriseAttack(HashSet<Tile> tiles = null) {
-      bool ret = CanAttack() && tile.field == FieldType.Forest;
-      if (ret) {
-        tiles = tiles == null ? hexMap.GetWarParty(this, true).GetVisibleArea() : tiles;
-        ret = !tiles.Contains(tile);
-      }
-      return ret;
+    public bool CanSurpriseAttack(HashSet<Tile> enemyVisibleTiles = null) {
+      return CanAttack() && IsHidden(
+        enemyVisibleTiles == null ? hexMap.GetWarParty(this, true).GetVisibleArea() : enemyVisibleTiles
+      );
+    }
+
+    public bool IsHidden(HashSet<Tile> enemyVisibleTiles) {
+      return tile.field == FieldType.Forest && !enemyVisibleTiles.Contains(tile);
     }
 
     public List<Unit> OnFieldAllies() {

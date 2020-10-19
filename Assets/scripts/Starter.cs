@@ -206,16 +206,17 @@ public class Starter : MonoBehaviour {
     // Set Route
     strategyBase.linkedTilesForCamp.Add(camp1);
     camp1.linkedTilesForCamp.Add(strategyBase);
+
     camp1.linkedTilesForCamp.Add(camp2);
+    camp2.linkedTilesForCamp.Add(camp1);
 
     camp2.linkedTilesForCamp.Add(camp3);
-    camp2.linkedTilesForCamp.Add(city);
-
     camp3.linkedTilesForCamp.Add(camp2);
-    camp3.linkedTilesForCamp.Add(mainCity);
 
+    camp2.linkedTilesForCamp.Add(city);
     city.linkedTilesForCamp.Add(camp2);
 
+    camp3.linkedTilesForCamp.Add(mainCity);
     mainCity.linkedTilesForCamp.Add(camp3);
 
     hexMap.frontier = new Tile[]{camp1};
