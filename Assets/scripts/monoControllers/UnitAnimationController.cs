@@ -109,15 +109,12 @@ namespace MonoNS
 
     public bool MoveAnimating = false;
     public bool MoveUnit(Unit unit, Tile tile = null, bool dontFixCamera = false, bool normalMove = true) {
-      MoveAnimating = true;
       Tile old = unit.tile;
-      bool continuing = unit.DoMove(tile);
-      int moraleDrop = 0;
-      if (Util.eq<Tile>(old, unit.tile)) {
-        MoveAnimating = false;
+      if(!unit.DoMove(tile)) {
         return false;
       }
-
+      MoveAnimating = true;
+      int moraleDrop = 0;
       if (tile == null) {
         moraleDrop = unit.marchOnHeat.Occur();
       }
@@ -126,7 +123,7 @@ namespace MonoNS
       }
       hexMap.cameraKeyboardController.DisableCamera();
       StartCoroutine(CoMoveUnit(unit, moraleDrop, normalMove));
-      return continuing;
+      return true;
     }
 
     IEnumerator CoMoveUnit(Unit unit, int moraleDrop, bool normalMove) {

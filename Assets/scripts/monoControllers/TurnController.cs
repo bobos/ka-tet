@@ -3,7 +3,6 @@ using UnityEngine;
 using UnitNS;
 using FieldNS;
 using TextNS;
-using NatureNS;
 using MapTileNS;
 using System.Collections.Generic;
 
@@ -208,7 +207,7 @@ namespace MonoNS
       }
 
       // TODO
-      p.ResetDiscoveredTiles();
+      otherP.ResetDiscoveredTiles();
       FoW.Get().Fog(hexMap.allTiles);
       // for hidding the unit view
       foreach(Unit u in p.GetUnits()) {

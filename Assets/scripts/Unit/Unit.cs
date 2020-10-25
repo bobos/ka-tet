@@ -306,14 +306,12 @@ namespace UnitNS
       return allowedAtmpt > 0;
     }
 
-    public bool CanSurpriseAttack(HashSet<Tile> enemyVisibleTiles = null) {
-      return CanAttack() && IsHidden(
-        enemyVisibleTiles == null ? hexMap.GetWarParty(this, true).GetVisibleArea() : enemyVisibleTiles
-      );
+    public bool CanSurpriseAttack() {
+      return CanAttack() && IsHidden();
     }
 
-    public bool IsHidden(HashSet<Tile> enemyVisibleTiles) {
-      return tile.field == FieldType.Forest && !enemyVisibleTiles.Contains(tile);
+    public bool IsHidden() {
+      return tile.field == FieldType.Forest && !hexMap.GetWarParty(this).counterParty.discoveredTiles.Contains(tile);
     }
 
     public List<Unit> OnFieldAllies() {
@@ -820,8 +818,10 @@ namespace UnitNS
         next = path.Dequeue();
       }
 
-      if (!next.Deployable(this))
+      Unit u = next.GetUnit();
+      if (u != null && u.IsAI() != IsAI())
       {
+        // stumble upon a hidden enemy
         return false;
       }
       movementRemaining -= CostToEnterTile(next, PathFind.Mode.Normal);

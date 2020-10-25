@@ -419,7 +419,7 @@ namespace MonoNS
 
       if (action == ActionController.actionName.ShowZone) {
         toggled = true;
-        hexMap.HighlightArea(turnController.GetWarParty().GetVisibleArea(), RangeType.zoneIndication);
+        hexMap.HighlightArea(turnController.GetWarParty().discoveredTiles, RangeType.zoneIndication);
       }
       // disable other buttons than move
       ToggleButtons(false, mouseController.selectedUnit);

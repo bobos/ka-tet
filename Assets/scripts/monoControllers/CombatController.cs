@@ -131,7 +131,7 @@ namespace MonoNS
       supportDefenders = new List<Unit>();
       hiddenDefenders = new List<Unit>();
 
-      HashSet<Tile> attackerVision = hexMap.GetWarParty(attacker).GetVisibleArea();
+      HashSet<Tile> attackerVision = hexMap.GetWarParty(attacker).discoveredTiles;
       if (!surprised) {
         foreach (Tile tile in targetUnit.tile.neighbours) {
           Unit u = tile.GetUnit();

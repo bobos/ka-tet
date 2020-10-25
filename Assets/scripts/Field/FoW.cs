@@ -20,8 +20,7 @@ namespace FieldNS
       if (!hexMap.deployDone) {
         return new HashSet<Tile>(hexMap.InitPlayerDeploymentZone());
       }
-      WarParty party = hexMap.turnController.playerTurn ? hexMap.GetPlayerParty() : hexMap.GetAIParty();
-      return party.GetVisibleArea();
+      return hexMap.turnController.GetWarParty().discoveredTiles;
     }
 
     public void Fog(IEnumerable<Tile> all) {
@@ -46,6 +45,7 @@ namespace FieldNS
 
     public static void Init(HexMap hexMap) {
       if (instance == null) {
+        hexMap.GetWarParty().ResetDiscoveredTiles();
         instance = new FoW(hexMap);
       }
     }

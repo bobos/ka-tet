@@ -175,20 +175,6 @@ namespace FieldNS
       return info;
     }
 
-    HashSet<Tile> discoveredTiles = new HashSet<Tile>();
-    public HashSet<Tile> GetVisibleArea() {
-      HashSet<Tile> tiles = new HashSet<Tile>();
-      foreach (Unit u in GetUnits())
-      {
-        foreach(Tile tile in u.GetVisibleArea()) {
-          tiles.Add(tile);
-        }
-      }
-
-      tiles.UnionWith(discoveredTiles);
-      return tiles;
-    }
-
     public HashSet<Tile> GetAiIndicationArea(HashSet<Tile> playerVision) {
       HashSet<Tile> tiles = new HashSet<Tile>();
       foreach (Unit u in GetUnits())
@@ -204,13 +190,19 @@ namespace FieldNS
       return tiles;
     }
 
+    public HashSet<Tile> discoveredTiles = new HashSet<Tile>();
     public void DiscoverTile(Tile tile) {
-      // TODO: update the tile color map
       discoveredTiles.Add(tile);
     }
 
     public void ResetDiscoveredTiles() {
       discoveredTiles = new HashSet<Tile>();
+      foreach (Unit u in GetUnits())
+      {
+        foreach(Tile tile in u.GetVisibleArea()) {
+          discoveredTiles.Add(tile);
+        }
+      }
     }
 
     public HashSet<Tile> MyRedZone() {
@@ -252,7 +244,7 @@ namespace FieldNS
         greenTiles.UnionWith(s.myTiles);
       }
       ret[0] = greenTiles;
-      ret[1] = counterParty.MyRedZone(GetVisibleArea()); // red
+      ret[1] = counterParty.MyRedZone(); // red
       return ret;
     }
 
@@ -265,9 +257,8 @@ namespace FieldNS
     }
 
     public Unit GetAmbusher(Unit target) {
-      HashSet<Tile> area = target.hexMap.GetWarParty(target).GetVisibleArea();
       foreach(Unit unit in GetUnits()) {
-        if (unit.CanSurpriseAttack(area) && unit.GetSurpriseTargets().Contains(target)) {
+        if (unit.CanSurpriseAttack() && unit.GetSurpriseTargets().Contains(target)) {
           return unit;
         }
       }

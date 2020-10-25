@@ -44,12 +44,12 @@ namespace MapTileNS
 
       if (unit.IsCavalry()) {
         if (Green()) {
-          return 20;
+          return 15;
         }
         return 30;
       } else {
         if (Green()) {
-          return 25;
+          return 20;
         }
         return 40;
       }
