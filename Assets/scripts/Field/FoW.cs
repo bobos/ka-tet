@@ -24,7 +24,7 @@ namespace FieldNS
       return party.GetVisibleArea();
     }
 
-    public void Fog(Tile[] all) {
+    public void Fog(IEnumerable<Tile> all) {
       HashSet<Tile> tiles = GetVisibleArea();
       HashSet<Tile> enemyTiles = new HashSet<Tile>();
       if(hexMap.turnController.playerTurn) {

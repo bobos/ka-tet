@@ -56,6 +56,10 @@ namespace MonoNS
       StartCoroutine(KeepShowingTitle());
     }
 
+    public WarParty GetWarParty() {
+      return player ? hexMap.GetPlayerParty() : hexMap.GetAIParty();
+    }
+
     public void ShowTitle(string txt, Color color) {
       showingTitle = true;
       title.Set(txt, color, "", Color.white);
@@ -148,10 +152,8 @@ namespace MonoNS
     IEnumerator endTurn()
     {
       hexMap.cameraKeyboardController.DisableCamera();
-      WarParty playerParty = hexMap.GetPlayerParty();
-      WarParty aiParty = hexMap.GetAIParty();
-      WarParty p = player ? playerParty : aiParty;
-      WarParty otherP = !player ? playerParty : aiParty;
+      WarParty p = GetWarParty();
+      WarParty otherP = p.counterParty;
 
       foreach (Unit unit in p.GetUnits())
       {
@@ -191,8 +193,8 @@ namespace MonoNS
           }
 
           int moraleDrop = 5;
-          WarParty atkParty = playerParty.attackside ? playerParty : aiParty;
-          WarParty defParty = playerParty.attackside ? aiParty : playerParty;
+          WarParty atkParty = p.attackside ? p : otherP;
+          WarParty defParty = atkParty.counterParty;
           foreach (Unit unit in atkParty.GetUnits()) {
             unit.morale -= moraleDrop;
           }
@@ -208,13 +210,13 @@ namespace MonoNS
       // TODO
       p.ResetDiscoveredTiles();
       FoW.Get().Fog(hexMap.allTiles);
-      (playerTurn ? hexMap.GetPlayerParty() : hexMap.GetAIParty()).UpdateTileColorMap();
-      foreach(Unit u in playerParty.GetUnits()) {
+      // for hidding the unit view
+      foreach(Unit u in p.GetUnits()) {
         if (!u.IsCamping()) {
           u.SetState(u.state);
         }
       }
-      foreach(Unit u in aiParty.GetUnits()) {
+      foreach(Unit u in otherP.GetUnits()) {
         if (!u.IsCamping()) {
           u.SetState(u.state);
         }

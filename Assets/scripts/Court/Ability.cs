@@ -532,7 +532,7 @@ namespace CourtNS {
     const string I = "▣";
     const string N = "ability_sentinel";
     const string D = "ability_sentinel_description";
-    const AbilityType T = AbilityType.Advanced;
+    const AbilityType T = AbilityType.Infantry;
     public Sentinel(): base(N, I, D, T) {}
     public static void Unlock(Faction faction) { ac.Unlock(faction); }
     public static bool Acquire(General general) { return ac.Acquire(general); }

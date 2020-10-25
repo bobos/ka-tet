@@ -66,7 +66,8 @@ namespace MonoNS
       attack,
       camp,
       supplyRange,
-      PoisionRange
+      PoisionRange,
+      zoneIndication
     }
     public int numRows;
     public int numCols;
@@ -126,7 +127,7 @@ namespace MonoNS
     }
 
     //bool updateReady = false;
-    Tile[] highlightedArea;
+    IEnumerable<Tile> highlightedArea;
     LineRenderer lineRenderer;
     Dictionary<Tile, GameObject> tile2GO;
     Dictionary<Unit, GameObject> unit2GO = new Dictionary<Unit, GameObject>();
@@ -640,6 +641,8 @@ namespace MonoNS
     public void SetWarParties(WarParty p1, WarParty p2) {
       warParties[0] = p1.isAI ? p2 : p1;
       warParties[1] = p1.isAI ? p1 : p2;
+      p1.counterParty = p2;
+      p2.counterParty = p1;
     }
 
     public WarParty GetPlayerParty() {
@@ -1059,13 +1062,28 @@ namespace MonoNS
       highlightedArea = null;
     }
 
-    public void HighlightArea(Tile[] tiles, RangeType type, Unit unit = null)
+    public void HighlightArea(IEnumerable<Tile> tiles, RangeType type)
     {
       DehighlightArea();
-      Tile[] visible = unit != null ? unit.GetVisibleArea() : null;
+      HashSet<Tile>[] zones = null;
+      if (type == RangeType.zoneIndication) {
+        zones = turnController.GetWarParty().GetTileColorMap();
+      }
       foreach (Tile tile in tiles)
       {
         Material mat = null;
+        if (type == RangeType.zoneIndication && tile.Accessible()) {
+          Zone zone = Zone.Get(tile, zones);
+          if (zone.Red()) {
+            mat = MovementRange;
+          }
+          if (zone.Green()) {
+            mat = PlayerSkin;
+          }
+          if (zone.Yellow()) {
+            mat = CampRange;
+          }
+        }
         if (type == RangeType.attack) mat = AttackRange;
         if (type == RangeType.movement) {
           mat = MovementRange;
@@ -1073,7 +1091,9 @@ namespace MonoNS
         if (type == RangeType.camp) mat = CampRange;
         if (type == RangeType.supplyRange) mat = SupplyRange;
         if (type == RangeType.PoisionRange) mat = PoisionRange;
-        Overlay(tile, mat);
+        if (mat != null) {
+          Overlay(tile, mat);
+        }
       }
       highlightedArea = tiles;
     }

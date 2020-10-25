@@ -183,27 +183,19 @@ namespace MapTileNS
     public FieldType field;
     public bool isDam = false;
 
-    int movementCost;
     public void SetFieldType(FieldType type)
     {
       field = type;
       if (type == FieldType.Burning) {
         burnable = false;
       }
-      if (type == FieldType.Settlement || type == FieldType.Burning || type == FieldType.Flooding)
-      {
-        movementCost = Unit.MovementCostOnUnaccesible;
-      }
-      else
-      {
-        UpdateMovementcost();
-      }
       // TODO remove this
       hexMap.GetTileView(this).RefreshVisual();
     }
 
     public bool Accessible() {
-      return movementCost != Unit.MovementCostOnUnaccesible;
+      return terrian != TerrianType.Mountain && terrian != TerrianType.Water && 
+      field != FieldType.Settlement && field != FieldType.Burning && field != FieldType.Flooding;
     }
 
     public bool Passable(bool isAI, bool forDeploy = false) {
@@ -222,27 +214,6 @@ namespace MapTileNS
     public void SetTerrianType(TerrianType type)
     {
       terrian = type;
-      UpdateMovementcost();
-    }
-
-    private void UpdateMovementcost()
-    {
-      if (terrian == TerrianType.Hill)
-      {
-        movementCost = Unit.MovementcostOnHill;
-      }
-      else if (terrian == TerrianType.Plain)
-      {
-        movementCost = Unit.MovementcostOnPlain;
-      }
-      else
-      {
-        movementCost = Unit.MovementCostOnUnaccesible;
-      }
-
-      if (field == FieldType.Flooded && movementCost != Unit.MovementCostOnUnaccesible) {
-        movementCost = movementCost * 4;
-      }
     }
 
     public bool ignoreUnit = false;
@@ -254,41 +225,15 @@ namespace MapTileNS
       //  // settlement is passible
       //  return Unit.MovementcostOnPlain;
       //}
+      int mov = Zone.Get(this, hexMap.GetWarParty(unit).cachedColorMap).Cost(unit);
       Unit u = GetUnit();
-      int mov = movementCost;
       if (u != null)
       {
         if (u.IsAI() != unit.IsAI() && !ignoreUnit) {
           return Unit.MovementCostOnUnaccesible;
         }
       }
-
-      // apply movement modifier
-      int ret = (int)(mov * (
-          (terrian == TerrianType.Plain) ?
-          unit.MovementCostModifierOnPlainOrRoad() : unit.MovementCostModifierOnHill()));
-
-      if (vantagePoint) {
-        ret = (int)(ret * 1.2f);
-      }
-
-      if (ret > 0 && mode == Mode.Normal && !hexMap.unitAniController.ForceRetreatAnimating) {
-        int cnt = 0;
-        foreach (Tile t in neighbours) {
-          Unit u1 = t.GetUnit();
-          Settlement s = t.settlement;
-          if (u1 != null && u1.IsAI() != unit.IsAI() && !u1.IsVulnerable()) {
-            cnt++;
-          }
-
-          if (u1 == null && s != null && !s.IsEmpty() && s.owner.isAI != unit.IsAI()) {
-            cnt++;
-          }
-        }
-        ret = ret + (int)(ret * cnt * 0.8f);
-      }
-
-      return ret > 0 ? ret : Unit.MovementCostOnUnaccesible;
+      return mov;
     }
 
     public bool Deployable(Unit unit)
@@ -297,7 +242,7 @@ namespace MapTileNS
     }
 
     public bool DeployableForPathFind(Unit unit) {
-      return GetUnit() == null && movementCost != Unit.MovementCostOnUnaccesible;
+      return GetUnit() == null && Accessible();
     }
 
     public WindAdvantage GetGaleAdvantage(Tile target) {
@@ -396,7 +341,7 @@ namespace MapTileNS
       SetFieldType(FieldType.Wild);
       isDam = true;
     }
-    
+
     // ==============================================================
     // ================= Units ======================================
     // ==============================================================

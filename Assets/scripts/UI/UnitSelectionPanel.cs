@@ -345,6 +345,12 @@ namespace MonoNS
     bool toggled = false;
     public void OnBtnClick(ActionController.actionName action)
     {
+      if (toggled) {
+        toggled = false;
+        hexMap.DehighlightArea();
+        return;
+      }
+
       if (action == ActionController.actionName.TroopInfo) {
         OnUnitSelect(currentUnit, isCurrentGarrison);
       } else if (action == ActionController.actionName.AbilityInfo) {
@@ -364,11 +370,6 @@ namespace MonoNS
 
       if (action == ActionController.actionName.SHOWMINE || action == ActionController.actionName.SHOWENEMY) {
         hexMap.CleanSupplyLines();
-        if (toggled) {
-          toggled = false;
-          hexMap.DehighlightArea();
-          return;
-        }
         toggled = true;
         Settlement root;
         if (action == ActionController.actionName.SHOWENEMY) {
@@ -416,6 +417,10 @@ namespace MonoNS
         return;
       }
 
+      if (action == ActionController.actionName.ShowZone) {
+        toggled = true;
+        hexMap.HighlightArea(turnController.GetWarParty().GetVisibleArea(), RangeType.zoneIndication);
+      }
       // disable other buttons than move
       ToggleButtons(false, mouseController.selectedUnit);
     }

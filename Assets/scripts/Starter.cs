@@ -167,8 +167,8 @@ public class Starter : MonoBehaviour {
     //initialization all controllers
     hexMap.PreGameInit();
     hexMap.SetWarParties(
-      new WarParty(false, Cons.Song, liubei, supply),
-      new WarParty(true, Cons.Liao, caocao, supply)
+      new WarParty(false, Cons.Song, liubei, supply, hexMap),
+      new WarParty(true, Cons.Liao, caocao, supply, hexMap)
     );
     hexMap.deployDone = hexMap.GetWarParty(Cons.Song).commanderGeneral.commandSkill.commandSkill != 4;
 

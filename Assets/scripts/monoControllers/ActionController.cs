@@ -285,6 +285,9 @@ namespace MonoNS
     }
 
     public void OnShowZone() {
+      if (onBtnClick != null) {
+        onBtnClick(actionName.ShowZone);
+      }
     }
 
     public enum actionName
@@ -325,7 +328,8 @@ namespace MonoNS
       FeintDefeat,
       Break,
       Decieve,
-      Plot
+      Plot,
+      ShowZone
     }
 
     // Make sure this is sequential

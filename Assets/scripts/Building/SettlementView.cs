@@ -59,7 +59,7 @@ public class SettlementView : View
       && Util.eq<Settlement>(settlement, this.settlement)
       && !settlement.IsUnderSiege())
     {
-      hexMap.HighlightArea(settlement.myTiles.ToArray(), HexMap.RangeType.supplyRange);
+      hexMap.HighlightArea(settlement.myTiles, HexMap.RangeType.supplyRange);
     }
   }
 

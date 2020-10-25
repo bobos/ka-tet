@@ -5,17 +5,7 @@ namespace  UnitNS
 {
   public class Cavalry : Unit
   {
-    public const float ModifierOnHill = 1f; // 4 blocks
-    public const float ModifierOnPlainOrRoad = 0.8f; // 5 blocks
     public const int MaxTroopNum = 3000;
-
-    public override float MovementCostModifierOnHill() {
-      return ModifierOnHill;
-    }
-
-    public override float MovementCostModifierOnPlainOrRoad() {
-      return ModifierOnPlainOrRoad;
-    }
 
     public override bool IsCavalry() {
       return true;

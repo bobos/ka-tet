@@ -124,7 +124,7 @@ namespace UnitNS
         if (hexMap.wargameController.start && hexMap.wargameController.IsWargameUnit(unit)) {
         } else {
           Tile[] range = unit.GetAccessibleTiles(unit.IsAI() == hexMap.turnController.playerTurn);
-          hexMap.HighlightArea(range, HexMap.RangeType.movement, this.unit);
+          hexMap.HighlightArea(range, HexMap.RangeType.movement);
           hexMap.HighlightPath(unit.GetPath());
         }
       }
@@ -146,7 +146,7 @@ namespace UnitNS
       {
         if (name == ActionController.actionName.MOVE)
         {
-          hexMap.HighlightArea(unit.GetAccessibleTiles(), HexMap.RangeType.movement, this.unit);
+          hexMap.HighlightArea(unit.GetAccessibleTiles(), HexMap.RangeType.movement);
         }
         if (name == ActionController.actionName.ATTACK)
         {

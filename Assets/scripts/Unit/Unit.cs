@@ -13,15 +13,7 @@ namespace UnitNS
   public abstract class Unit : PFUnit, DataModel
   {
     protected abstract Unit Clone();
-    public const int MovementcostOnHill = 25;
-    public const int MovementcostOnPlain = 25;
     public const int MovementCostOnUnaccesible = -1;
-    public virtual float MovementCostModifierOnHill() {
-      return 1f;
-    }
-    public virtual float MovementCostModifierOnPlainOrRoad() {
-      return 1f;
-    }
     public virtual bool IsCavalry() {
       return false;
     }
@@ -207,6 +199,10 @@ namespace UnitNS
 
     public bool IsVulnerable() {
       return morale == 0;
+    }
+
+    public bool NoRedZone() {
+      return IsHidden() || IsVulnerable() || IsWarWeary();
     }
 
     public int allowedAtmpt = 1;
@@ -906,7 +902,13 @@ namespace UnitNS
     // ==============================================================
     // ================= path finding ===============================
     // ==============================================================
-    public Tile[] GetPureAccessibleTiles(bool fullMovement = false) {
+    void InitCache() {
+      WarParty wp = hexMap.GetWarParty(this);
+      wp.cachedColorMap = wp.GetTileColorMap();
+    }
+
+    Tile[] GetPureAccessibleTiles(bool fullMovement = false) {
+      InitCache();
       return PFTile2Tile(PathFinder.FindAccessibleTiles(tile, this,
         fullMovement ? GetFullMovement() : movementRemaining));
     }
@@ -936,6 +938,7 @@ namespace UnitNS
     {
       List<Tile> tiles = new List<Tile>();
       target.ignoreUnit = true;
+      InitCache();
       foreach(Tile t in PFTile2Tile(PathFinder.FindPath(tile, target, this))) {
         if (!Util.eq<Tile>(t, target)) {
           tiles.Add(t);
@@ -948,6 +951,7 @@ namespace UnitNS
     // only for Ghost unit to pathfind settlement path
     public Tile[] FindPath(Tile source, Tile target)
     {
+      hexMap.GetWarParty(this).cachedColorMap = null;
       return PFTile2Tile(PathFinder.FindPath(source, target, this, PathFind.Mode.Supply));
     }
 
@@ -957,6 +961,7 @@ namespace UnitNS
       if (target.GetUnit() != null) {
         return new Tile[]{};
       }
+      InitCache();
       return PFTile2Tile(PathFinder.FindPath(tile, target, this));
     }
 

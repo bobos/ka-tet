@@ -18,7 +18,8 @@ namespace FieldNS
 
   public class WarParty
   {
-    public WarParty(bool attackside, Faction faction, General commander, int supply)
+    public WarParty(bool attackside, Faction faction, General commander,
+      int supply, MonoNS.HexMap hexmap)
     {
       this.isAI = faction.IsAI();
       this.attackside = attackside;
@@ -29,6 +30,7 @@ namespace FieldNS
       }
       this.supply = supply;
       commanderGeneral = commander;
+      this.hexmap = hexmap;
     }
 
     public bool ConsumeSupply(int amount) {
@@ -49,6 +51,8 @@ namespace FieldNS
     public bool attackside { get; private set; }
     HashSet<Unit> units = new HashSet<Unit>();
     public int capturedHorse = 0;
+    public WarParty counterParty = null;
+    MonoNS.HexMap hexmap = null;
 
     // TODO: phase ends, add horses to faction and reset the horse to 0
     public void CaptureHorse(int num) {
@@ -181,9 +185,7 @@ namespace FieldNS
         }
       }
 
-      foreach (Tile tile in discoveredTiles) {
-        tiles.Add(tile);
-      }
+      tiles.UnionWith(discoveredTiles);
       return tiles;
     }
 
@@ -211,14 +213,14 @@ namespace FieldNS
       discoveredTiles = new HashSet<Tile>();
     }
 
-    public List<Tile> MyRedZone(HashSet<Tile> enemyVisibleArea) {
-      List<Tile> tiles = new List<Tile>();
+    public HashSet<Tile> MyRedZone() {
+      HashSet<Tile> tiles = new HashSet<Tile>();
       foreach(Unit u in GetUnits()) {
-        if (u.IsHidden(enemyVisibleArea)) {
-          // we dont want to show hidden unit's red zone
+        if (u.NoRedZone()) {
           continue;
         }
         Tile tile = u.tile;
+        tiles.Add(tile);
         foreach (Tile t in
          (Sentinel.Aval(u) && Sentinel.Get(u.rf.general).Consume()
           ? tile.GetNeighboursWithinRange<Tile>(Sentinel.RedzoneRange, (Tile t) => true) :
@@ -232,25 +234,26 @@ namespace FieldNS
       return tiles;
     }
 
-    public Dictionary<Tile, int> discoveredTileColorMap; // 1: green, 2: yellow 3: red
-    public void UpdateTileColorMap(List<Tile> redzones, List<Tile> controlledTiles) {
-      discoveredTileColorMap = new Dictionary<Tile, int>();
-      foreach(Tile tile in discoveredTiles) {
-        if (redzones.Contains(tile)) {
-          // red tiles
-          discoveredTileColorMap[tile] = 3;
-          continue;
+    public List<Settlement> MySettlements() {
+      List<Settlement> settlements = new List<Settlement>();
+      foreach(Settlement s in hexmap.settlementMgr.allNodes) {
+        if (Util.eq<WarParty>(s.owner, this)) {
+          settlements.Add(s);
         }
-
-        if (controlledTiles.Contains(tile)) {
-          // green tiles
-          discoveredTileColorMap[tile] = 1;
-          continue;
-        }
-
-        // yellow tiles
-        discoveredTileColorMap[tile] = 2;
       }
+      return settlements;
+    }
+
+    public HashSet<Tile>[] cachedColorMap;
+    public HashSet<Tile>[] GetTileColorMap() {
+      HashSet<Tile>[] ret = new HashSet<Tile>[2]; 
+      HashSet<Tile> greenTiles = new HashSet<Tile>();
+      foreach(Settlement s in MySettlements()) {
+        greenTiles.UnionWith(s.myTiles);
+      }
+      ret[0] = greenTiles;
+      ret[1] = counterParty.MyRedZone(GetVisibleArea()); // red
+      return ret;
     }
 
     public int GetTotalPoint() {

@@ -47,7 +47,7 @@ public abstract class Settlement: Building
 
   public Type type;
   public string name = "default";
-  public List<Tile> myTiles = new List<Tile>();
+  public HashSet<Tile> myTiles = new HashSet<Tile>();
   BuildingNS.Supply supply;
 
   public Tile[] GetVisibleArea() {
