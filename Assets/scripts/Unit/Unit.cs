@@ -502,11 +502,13 @@ namespace UnitNS
     }
 
     public Tile[] GetVisibleArea() {
+      int range = GetVisibleRange();
       Tile[] detectRange =
         !Outlooker.Aval(this) ?
-          tile.GetNeighboursWithinRange<Tile>(L0Visibility, (Tile _t) => true) : new Tile[]{}; 
+          tile.GetNeighboursWithinRange<Tile>(vantage.IsAtVantagePoint() ? range : L0Visibility,
+            (Tile _t) => true) : new Tile[]{}; 
 
-      return tile.GetNeighboursWithinRange<Tile>(GetVisibleRange(), (Tile tile) => {
+      return tile.GetNeighboursWithinRange<Tile>(range, (Tile tile) => {
         if (tile.field == FieldType.Forest && !Outlooker.Aval(this) && !detectRange.Contains(tile)) {
           return false;
         }

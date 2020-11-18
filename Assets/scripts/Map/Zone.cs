@@ -49,7 +49,7 @@ namespace MapTileNS
         return 30;
       } else {
         if (Green()) {
-          return 20;
+          return 25;
         }
         return 40;
       }
