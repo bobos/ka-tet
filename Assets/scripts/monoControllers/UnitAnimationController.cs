@@ -647,7 +647,7 @@ namespace MonoNS
       List<Unit> allies = to.OnFieldAllies();
       bool breaking = allies.Count > 1;
       int orgBuf = from.rf.org > Region.RookieOrg ? (from.rf.org - Region.RookieOrg) : 0;
-      int dead = (int)(from.rf.soldiers * (from.IsCavalry() ? 0.5f : 0.1f) * (1f + orgBuf / 100));
+      int dead = (int)(from.rf.soldiers * (from.IsCavalry() ? 0.75f : 0.2f) * (1f + orgBuf / 100));
       dead = to.IsCavalry() ? (int)(dead / 4) : dead;
       if (doubleTheKill && Finisher.Aval(from) && Finisher.Get(from.rf.general).Consume()) {
         dead = (int)(dead * (1f + Finisher.KillBuf));

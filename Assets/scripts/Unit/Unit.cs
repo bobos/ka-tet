@@ -666,10 +666,9 @@ namespace UnitNS
     public int GetFullMovement()
     {
       int full = (int)( rf.mov * (IsSick() ? 0.4f : 1));
-      if (Cons.IsHeavyRain(hexMap.weatherGenerator.currentWeather) ||
-        Cons.IsSnow(hexMap.weatherGenerator.currentWeather)) {
+      if ( Cons.IsSnow(hexMap.weatherGenerator.currentWeather)) {
         full = (int)(full / 2);
-      } else if (Cons.IsBlizard(hexMap.weatherGenerator.currentWeather)) {
+      } else if (Cons.IsHeavyRain(hexMap.weatherGenerator.currentWeather) || Cons.IsBlizard(hexMap.weatherGenerator.currentWeather)) {
         full = (int)(full / 4);
       }
       return full;
