@@ -76,7 +76,7 @@ namespace MonoNS
 
       ShakeNearbyAllies(unit);
       while (ShakeAnimating) { yield return null; }
-      int drop = unit.IsCommander() ? -50 : -30;
+      int drop = unit.IsCommander() ? -90 : -60;
       foreach(Unit u in hexMap.GetWarParty(unit).GetUnits()) {
         u.morale += drop;
         ShowEffect(u, new int[]{drop, 0, 0, 0, 0}, null, true);
@@ -458,13 +458,13 @@ namespace MonoNS
     }
 
     public bool ScatterAnimating = false;
-    public void Scatter(List<Unit> units) {
+    public void Scatter(List<Unit> units, bool oneStep = false) {
       ScatterAnimating = true;
       hexMap.cameraKeyboardController.DisableCamera();
-      StartCoroutine(CoScatter(units));
+      StartCoroutine(CoScatter(units, oneStep));
     }
 
-    IEnumerator CoScatter(List<Unit> units) {
+    IEnumerator CoScatter(List<Unit> units, bool oneStep) {
       Dictionary<Tile, bool> tiles = new Dictionary<Tile, bool>();
       Dictionary<Unit, List<Tile>> plan = new Dictionary<Unit, List<Tile>>();
       Unit loser = units[0];
@@ -494,6 +494,11 @@ namespace MonoNS
           }
           step1 = t;
           break;
+        }
+
+        if (oneStep) {
+          plan[unit] = step1 == null ? null : new List<Tile>{step1};
+          continue;
         }
 
         if (step1 == null) {
@@ -585,18 +590,18 @@ namespace MonoNS
 
       popAniController.Show(view, textLib.get("pop_charging"), Color.green);
       while (popAniController.Animating) { yield return null; }
-      int chance = to.IsCavalry() ? 0 : 25 + (from.morale - to.morale);
+      int chance = to.IsCavalry() ? 0 : 40 + (from.morale - to.morale);
       if (Cons.IsGale(hexMap.windGenerator.current)) {
         WindAdvantage advantage = from.tile.GetGaleAdvantage(to.tile);
         if (advantage == WindAdvantage.Advantage) {
-          chance += 55;
+          chance += 50;
         }
         if (advantage == WindAdvantage.Disadvantage) {
-          chance -= 55;
+          chance -= 50;
         }
       }
       if (Holder.Aval(to)) {
-        chance += Holder.ChanceToHold;
+        chance -= Holder.ChanceToHold;
         Holder.Get(to.rf.general).Consume();
       }
       bool scared = chance >= Util.Rand(1, 100);
@@ -605,6 +610,8 @@ namespace MonoNS
       while (ShowAnimating) { yield return null; }
       if (scared) {
         Tile toTile = to.tile;
+        Scatter(new List<Unit>{to}, true);
+        while(ScatterAnimating) { yield return null; }
         if (toTile.Deployable(from)) {
           if (from.IsCamping()) {
             from.tile.settlement.Decamp(from, toTile);

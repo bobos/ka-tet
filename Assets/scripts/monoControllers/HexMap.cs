@@ -1200,9 +1200,9 @@ namespace MonoNS
         }
       }
 
-      float noiseResolution = 0.18f; // lower, more mountains
-      float noiseScale = 1.3f; //larger value, more islands
-      Random.InitState(3);
+      float noiseResolution = 0.3f; // lower, more mountains
+      float noiseScale = 1f; //larger value, more islands
+      Random.InitState(30);
       Vector2 noiseRandom = new Vector2(Random.Range(0f, 1f), Random.Range(0f, 1f));
       for (float col = 0; col < numCols; col++)
       {

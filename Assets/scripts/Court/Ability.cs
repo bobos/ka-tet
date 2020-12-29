@@ -16,7 +16,7 @@ namespace CourtNS {
         new DrillMaster(),
         new FireBug(),
         new Ambusher(),
-        new Boxer(),
+        //new Boxer(),
         new Outlooker(),
         new Rally(),
         new Holder(),
@@ -32,10 +32,10 @@ namespace CourtNS {
         new Freezer(),
         new Deciever(),
         new Agitator(),
-        new FearMonger(),
+        //new FearMonger(),
         new GameChanger(),
-        new ShadowWarrior(),
-        new Disruptor(),
+        //new ShadowWarrior(),
+        //new Disruptor(),
         new Evader(),
       };
 
