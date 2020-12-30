@@ -290,6 +290,10 @@ namespace MonoNS
       }
     }
 
+    public void OnRally() {
+      rally(hexMap.mouseController.selectedUnit);
+    }
+
     public enum actionName
     {
       MOVE,
@@ -302,6 +306,7 @@ namespace MonoNS
       FIRE,
       SIEGE,
       BURY,
+      RALLY,
       CHARGE,
       Breakthrough,
       ENCAMP,
@@ -363,6 +368,10 @@ namespace MonoNS
 
     public bool buryBody(Unit unit) {
       return DoAction(unit, null, null, actionName.BURY);
+    }
+
+    public bool rally(Unit unit) {
+      return DoAction(unit, null, null, actionName.RALLY);
     }
 
     public bool commenceOperation() {
@@ -472,6 +481,10 @@ namespace MonoNS
       if (name == actionName.Plot)
       {
         StartCoroutine(DoPlot(unit, unit1));
+      }
+      if (name == actionName.RALLY)
+      {
+        StartCoroutine(DoRally(unit));
       }
       return true;
     }
@@ -637,6 +650,15 @@ namespace MonoNS
     IEnumerator DoPlot(Unit unit, Unit unit1) {
       unitAniController.Plot(unit, unit1);
       while (unitAniController.PlotAnimating)
+      {
+        yield return null;
+      }
+      ActionOngoing = false;
+    }
+
+    IEnumerator DoRally(Unit unit) {
+      unitAniController.Rally(unit);
+      while (unitAniController.RallyAnimating)
       {
         yield return null;
       }

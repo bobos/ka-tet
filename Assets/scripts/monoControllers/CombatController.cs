@@ -132,7 +132,7 @@ namespace MonoNS
       hiddenDefenders = new List<Unit>();
 
       HashSet<Tile> attackerVision = hexMap.GetWarParty(attacker).discoveredTiles;
-      if (!surprised) {
+      if (!surprised && !Cons.IsMist(hexMap.weatherGenerator.currentWeather)) {
         foreach (Tile tile in targetUnit.tile.neighbours) {
           Unit u = tile.GetUnit();
           if (u == null) {

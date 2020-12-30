@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using CourtNS;
 using UnitNS;
 
 namespace MapTileNS
@@ -16,7 +17,7 @@ namespace MapTileNS
         return Unit.MovementCostOnUnaccesible;
       }
 
-      if (tile.field == FieldType.Flooded) {
+      if (tile.field == FieldType.Flooded && !Ambusher.Aval(unit)) {
         return 100;
       }
 
@@ -31,7 +32,7 @@ namespace MapTileNS
       }
 
       if (Red()) {
-        int cost = 60;
+        int cost = 50;
         foreach(Tile t in tile.neighbours) {
           Unit u = t.GetUnit();
           if (u != null && u.IsAI() != unit.IsAI() && u.IsOnField() && u.IsCavalry() && !u.NoRedZone()) {

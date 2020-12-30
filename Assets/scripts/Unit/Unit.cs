@@ -98,7 +98,6 @@ namespace UnitNS
       inCampComplain = new InCampComplain(this);
       onFieldComplain = new OnFieldComplain(this);
       InitAllowedAtmpt();
-      InitPlotAtmpt();
       InitChargeAtmpt();
     }
 
@@ -219,16 +218,6 @@ namespace UnitNS
       movementRemaining = movementRemaining > p ? movementRemaining : p;
     }
 
-    int _plotAtmpt = 0;
-    public int plotAtmpt {
-      get {
-        return _plotAtmpt;
-      }
-      set {
-        _plotAtmpt = value < 0 ? 0 : value;
-      }
-    }
-
     int _chargeAtmpt = 0;
     public int chargeAtmpt {
       get {
@@ -279,25 +268,30 @@ namespace UnitNS
 
     public bool fooled = false;
     public bool CanDecieve() {
-      return plotAtmpt > 0;
+      return Deciever.Aval(this);
     }
 
     public bool CanPlot() {
-      return plotAtmpt > 0;
+      return Agitator.Aval(this);
     }
 
-    void InitPlotAtmpt() {
-      plotAtmpt = Agitator.Aval(this) ? 3 : 0;
+    public bool CanRally() {
+      return Rally.Aval(this) && IsOnField();
     }
 
     public void Decieve(Unit target) {
-      plotAtmpt--;
+      Deciever.Get(rf.general).Consume();
       target.fooled = true;
     }
 
     public ConflictResult Plot(Unit target) {
-      plotAtmpt--;
+      Agitator.Get(rf.general).Consume();
       return target.unitConflict.Occur();
+    }
+
+    public int RallyAlly() {
+      Rally.Get(rf.general).Consume();
+      return Rally.MoraleBuf;
     }
 
     public bool retreated = false;
@@ -668,7 +662,7 @@ namespace UnitNS
       int full = (int)( rf.mov * (IsSick() ? 0.4f : 1));
       if ( Cons.IsSnow(hexMap.weatherGenerator.currentWeather)) {
         full = (int)(full / 2);
-      } else if (Cons.IsHeavyRain(hexMap.weatherGenerator.currentWeather) || Cons.IsBlizard(hexMap.weatherGenerator.currentWeather)) {
+      } else if (Cons.IsHeavyRain(hexMap.weatherGenerator.currentWeather) && !Ambusher.Aval(this) || Cons.IsBlizard(hexMap.weatherGenerator.currentWeather)) {
         full = (int)(full / 4);
       }
       return full;

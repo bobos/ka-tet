@@ -124,7 +124,7 @@ public class Starter : MonoBehaviour {
     xuchu.CreateTroop(hexMap, 3000, Cons.shangJing, Type.Cavalry);
     abc.CreateTroop(hexMap, 10000, Cons.zhongJing, Type.Infantry);
     x1.CreateTroop(hexMap, 3000, Cons.xiJing, Type.Cavalry);
-    x2.CreateTroop(hexMap, 10000, Cons.xiJing, Type.Infantry);
+    x2.CreateTroop(hexMap, 10000, Cons.shangJing, Type.Infantry);
     x3.CreateTroop(hexMap, 10000, Cons.xiJing, Type.Infantry);
     x4.CreateTroop(hexMap, 2000, Cons.zhongJing, Type.Cavalry);
 
@@ -210,6 +210,8 @@ public class Starter : MonoBehaviour {
     } else {
       view = hexMap.GetUnitView(commander);
     }
+    hexMap.AttackerZone.Add(hexMap.GetTile(0,0));
+    hexMap.DefenderZone.Add(hexMap.GetTile(14,10));
     cameraKeyboardController.FixCameraAt(view.transform.position);
   }
 }

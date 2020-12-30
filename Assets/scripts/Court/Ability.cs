@@ -302,7 +302,7 @@ namespace CourtNS {
     const string N = "ability_rally";
     const string D = "ability_rally_description";
     const AbilityType T = AbilityType.Common;
-    public Rally(): base(N, I, D, T, 1) {}
+    public Rally(): base(N, I, D, T, 2) {}
     public static void Unlock(Faction faction) { ac.Unlock(faction); }
     public static bool Acquire(General general) { return ac.Acquire(general); }
     public static bool Find(Faction faction) { return ac.Find(faction); }
@@ -310,7 +310,7 @@ namespace CourtNS {
     public static Ability Get(General general) { return Ability.Get(N, general); }
     public new static string Icon(Unit unit) { return Ability.Icon(N, unit); }
     public static int Range = 2;
-    public static int MoraleBuf = 50;
+    public static int MoraleBuf = 60;
     public static int MoveBuf = 40;
   }
 

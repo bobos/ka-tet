@@ -243,6 +243,7 @@ namespace TextNS
 
       // pop out msg
       {"pop_builded", "建造完成!"},
+      {"pop_rally", "重整旗鼓!"},
       {"pop_starving", "后勤不济!"},
       {"pop_damBroken", "决堤!"},
       {"pop_morale", "士气"},
@@ -333,7 +334,7 @@ namespace TextNS
       {"ability_fireBug", "火烧连营"},
       {"ability_fireBug_description", "任意密林都可以放火"},
       {"ability_ambusher", "神出鬼没"},
-      {"ability_ambusher_description", "可发动奇袭范围增加为4格, 后勤不济时士气惩罚降为8点，暴雨不影响移动力，大雾天提升奇袭成功率20%"},
+      {"ability_ambusher_description", "可发动奇袭范围增加为4格, 后勤不济时士气惩罚降为8点，暴雨不影响移动力，提升奇袭成功率20%"},
       {"ability_boxer", "一鼓作气"},
       {"ability_boxer_description", "战斗力增加100%"},
       {"ability_outlooker", "一目千里"},

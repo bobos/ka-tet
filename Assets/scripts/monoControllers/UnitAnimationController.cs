@@ -573,6 +573,40 @@ namespace MonoNS
       ScatterAnimating = false;
     }
 
+    public bool RallyAnimating = false;
+    public void Rally(Unit from) {
+      if (!from.CanRally()) {
+        return;
+      }
+      RallyAnimating = true;
+      hexMap.cameraKeyboardController.DisableCamera();
+      StartCoroutine(CoRally(from));
+    }
+
+    IEnumerator CoRally(Unit from) {
+      int incr = from.RallyAlly();
+      View view = hexMap.GetUnitView(from);
+      List<Unit> all = new List<Unit>{from};
+      popAniController.Show(view, textLib.get("pop_rally"), Color.green);
+      while (popAniController.Animating) { yield return null; }
+      foreach(Tile tile in from.tile.neighbours) {
+        Unit unit = tile.GetUnit();
+        if (unit != null && unit.IsAI() == from.IsAI()) {
+          all.Add(unit);
+        }
+      }
+
+      foreach(Unit u in all) {
+        u.morale += incr;
+        ShowEffect(u, new int[]{incr,0,0,0,0}, null, true);
+      }
+      hexMap.turnController.Sleep(1);
+      while(hexMap.turnController.sleeping) { yield return null; }
+
+      hexMap.cameraKeyboardController.EnableCamera();
+      RallyAnimating = false;
+    }
+
     public bool ChargeAnimating = false;
     public void Charge(Unit from, Unit to) {
       if (!from.CanCharge() || !to.CanBeShaked(from)) {
@@ -1002,7 +1036,7 @@ namespace MonoNS
     }
 
     IEnumerator CoSurpriseAttack(Unit from, Unit to, bool hitNrun) {
-      bool surprised = to.CanBeSurprised() >= Util.Rand(1, 100);
+      bool surprised = to.CanBeSurprised() + (Ambusher.Aval(from) ? Ambusher.ExtraChanceForMistAmbush : 0) >= Util.Rand(1, 100);
       Tile originPos = from.tile;
       from.SetPath(from.FindAttackPath(to.tile));
       while (from.GetPath().Length > 0) {
