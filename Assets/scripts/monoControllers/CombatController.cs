@@ -421,10 +421,10 @@ namespace MonoNS
         return 0;
       }
       if (type == ResultType.Small) {
-        return -20;
+        return -15;
       }
       if (type == ResultType.Great) {
-        return -50;
+        return -40;
       }
       return -90;
     }

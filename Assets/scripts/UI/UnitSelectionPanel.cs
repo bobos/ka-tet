@@ -147,10 +147,10 @@ namespace MonoNS
     public void ToggleButtons(bool state, Unit unit, bool isGarrison = false)
     {
       if (unit == null) return;
-      if (!Freezer.Aval(unit)) { FreezeButton.SetActive(false); }
-      if (!Deciever.Aval(unit)) { FeintDefeatButton.SetActive(false); }
-      if (!Agitator.Aval(unit)) { AgitateButton.SetActive(false); }
-      if (!Rally.Aval(unit)) { RallyButton.SetActive(false); }
+      FreezeButton.SetActive(Freezer.Aval(unit));
+      FeintDefeatButton.SetActive(Deciever.Aval(unit));
+      AgitateButton.SetActive(Agitator.Aval(unit));
+      RallyButton.SetActive(Rally.Aval(unit));
 
       foreach (GameObject button in buttons)
       {

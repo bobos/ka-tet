@@ -561,7 +561,7 @@ namespace MonoNS
       foreach(Unit unit in failedToMove) {
         foreach(Unit u in unit.OnFieldAllies()) {
           if (!units.Contains(u)) {
-            hexMap.unitAniController.CrashByAlly(u, -40);
+            hexMap.unitAniController.CrashByAlly(u, -25);
             while (hexMap.unitAniController.CrashAnimating) { yield return null; }
             continue;
           }
@@ -642,29 +642,19 @@ namespace MonoNS
       ShowEffect(from, new int[]{0,0,from.Killed(Util.Rand(2, 15)),0,0}, view);
       while (ShowAnimating) { yield return null; }
       if (scared) {
-        Tile toTile = to.tile;
         Scatter(new List<Unit>{to}, !Pusher.Aval(from));
         while(ScatterAnimating) { yield return null; }
-        if (toTile.Deployable(from)) {
-          if (from.IsCamping()) {
-            from.tile.settlement.Decamp(from, toTile);
-          } else {
-            MoveUnit(from, toTile);
-            while (MoveAnimating) { yield return null; }
-          }
-        }
       } else {
         popAniController.Show(hexMap.GetUnitView(to), textLib.get("pop_holding"), Color.green);
         while (popAniController.Animating) { yield return null; }
         int morale = -5;
         from.morale += morale;
-        int toDrop = Pusher.Aval(from) ? (morale - Pusher.ExtMoraleDrop) : morale;
-        to.morale += toDrop;
         ShowEffect(from, new int[]{morale,0,0,0,0}, view, true);
-        ShowEffect(to, new int[]{toDrop,0,0,0,0}, null, true);
-        hexMap.turnController.Sleep(1);
-        while(hexMap.turnController.sleeping) { yield return null; }
       }
+      int toDrop = -5;
+      toDrop = Pusher.Aval(from) ? (toDrop - Pusher.ExtMoraleDrop) : toDrop;
+      to.morale += toDrop;
+      ShowEffect(to, new int[]{toDrop,0,0,0,0}, null, true);
       hexMap.cameraKeyboardController.EnableCamera();
       ChargeAnimating = false;
     }
@@ -686,7 +676,7 @@ namespace MonoNS
       popAniController.Show(view, textLib.get("pop_chasing"), Color.green);
       while (popAniController.Animating) { yield return null; }
       List<Unit> allies = to.OnFieldAllies();
-      bool breaking = allies.Count > 1;
+      allies.Add(to);
       int orgBuf = from.rf.org > Region.RookieOrg ? (from.rf.org - Region.RookieOrg) : 0;
       int dead = (int)(from.rf.soldiers * (from.IsCavalry() ? 0.75f : 0.2f) * (1f + orgBuf / 100));
       dead = to.IsCavalry() ? (int)(dead / 4) : dead;
@@ -703,16 +693,14 @@ namespace MonoNS
         allies.Remove(to);
       }
       to.tile.deadZone.Occur(dead);
-      if (!to.Obedient() && breaking) {
-        hexMap.turnController.ShowTitle(Cons.GetTextLib().get("title_formationBreaking"), Color.red);
-        while(hexMap.turnController.showingTitle) { yield return null; }
-        hexMap.dialogue.ShowFormationBreaking(from);
-        while(hexMap.dialogue.Animating) { yield return null; }
-        hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetUnitView(to).transform.position);
-        while(hexMap.cameraKeyboardController.fixingCamera) { yield return null; }
-        hexMap.unitAniController.Scatter(allies);
-        while(hexMap.unitAniController.ScatterAnimating) { yield return null; }
-      }
+      hexMap.turnController.ShowTitle(Cons.GetTextLib().get("title_formationBreaking"), Color.red);
+      while(hexMap.turnController.showingTitle) { yield return null; }
+      hexMap.dialogue.ShowFormationBreaking(from);
+      while(hexMap.dialogue.Animating) { yield return null; }
+      hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetUnitView(to).transform.position);
+      while(hexMap.cameraKeyboardController.fixingCamera) { yield return null; }
+      hexMap.unitAniController.Scatter(allies);
+      while(hexMap.unitAniController.ScatterAnimating) { yield return null; }
       ShowEffect(from, new int[]{from.Victory(5), 0, 0, 0, 0});
       while( ShowAnimating ) { yield return null; }
       hexMap.cameraKeyboardController.EnableCamera();
@@ -1048,7 +1036,7 @@ namespace MonoNS
           while(MoveAnimating) { yield return null; }
         }
         unit.movementRemaining = 0;
-        int moraleDrop = breakThrough ? -20 : -10;
+        int moraleDrop = breakThrough ? -60 : -40;
         unit.morale += moraleDrop;
         ShowEffect(unit, new int[]{moraleDrop,0,0,0,0});
         hexMap.UnsetPath(unit);

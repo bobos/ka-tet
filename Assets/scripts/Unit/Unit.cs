@@ -566,7 +566,7 @@ namespace UnitNS
     public int[] RefreshUnit()
     {
       rf.general.commandSkill.Reset();
-      morale += IsCamping() ? 10 : 5;
+      morale += IsCamping() ? 20 : 5;
       crashed = retreated = false;
       InitAllowedAtmpt();
       turnDone = false;
