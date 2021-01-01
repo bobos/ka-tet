@@ -2274,7 +2274,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.854902, g: 0.79215693, b: 0.5411765, a: 1}
+  m_Color: {r: 0, g: 0.6362872, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_OnCullStateChanged:
@@ -2654,7 +2654,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 0.62641835, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_OnCullStateChanged:
@@ -3153,7 +3153,7 @@ GameObject:
   - component: {fileID: 593314589}
   - component: {fileID: 593314588}
   m_Layer: 5
-  m_Name: FalseOrder
+  m_Name: Freeze
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3224,7 +3224,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 769809669}
         m_TargetAssemblyTypeName: MonoNS.ActionController, Assembly-CSharp
-        m_MethodName: OnFalseOrderClick
+        m_MethodName: OnFreezeClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3247,7 +3247,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.829278, g: 0.5411765, b: 0.85490197, a: 1}
+  m_Color: {r: 0, g: 0.61860776, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_OnCullStateChanged:
@@ -3872,7 +3872,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0, g: 0.75025225, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_OnCullStateChanged:
@@ -4081,7 +4081,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.854902, g: 0.79215693, b: 0.5411765, a: 1}
+  m_Color: {r: 0, g: 0.65542626, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_OnCullStateChanged:
@@ -5521,7 +5521,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.854902, g: 0.79215693, b: 0.5411765, a: 1}
+  m_Color: {r: 0, g: 0.6751158, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_OnCullStateChanged:
@@ -5861,7 +5861,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.6603774, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 0.7246518, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_OnCullStateChanged:
@@ -6070,7 +6070,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.8352942, g: 0.54901963, b: 0.5568628, a: 1}
+  m_Color: {r: 0, g: 0.7190268, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_OnCullStateChanged:
@@ -6259,8 +6259,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -0.000022888184, y: -0.024974823}
+  m_SizeDelta: {x: -0.000061035, y: -0.050011}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1115518828
 MonoBehaviour:
@@ -6294,7 +6294,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u5F00\u59CB"
+  m_Text: "\u70B9\u6211\u5F00\u59CB\u5DE6\u53F3\u4E92\u640F"
 --- !u!222 &1115518829
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -6484,7 +6484,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_OnCullStateChanged:
@@ -7106,7 +7106,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.745283, g: 0.10194911, b: 0.11957463, a: 1}
+  m_Color: {r: 0, g: 0.67567825, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_OnCullStateChanged:
@@ -7646,7 +7646,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0, g: 0.6520896, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_OnCullStateChanged:
@@ -8290,7 +8290,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_OnCullStateChanged:
@@ -8309,7 +8309,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u63A9\u57CB\u5C38\u4F53"
+  m_Text: "\u63A9\u57CB"
 --- !u!222 &1360221908
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -8747,8 +8747,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -3.075, y: 519.44}
-  m_SizeDelta: {x: 93.85, y: 41.2}
+  m_AnchoredPosition: {x: 73.8, y: 502.8}
+  m_SizeDelta: {x: 247.5, y: 74.5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1442251466
 GameObject:
@@ -8935,7 +8935,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.829278, g: 0.5411765, b: 0.85490197, a: 1}
+  m_Color: {r: 0, g: 0.67243624, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_OnCullStateChanged:
@@ -9599,7 +9599,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MoveButton: {fileID: 1016301001}
   AttackButton: {fileID: 1067531533}
-  DefendButton: {fileID: 1607737173}
+  PoisonButton: {fileID: 1607737173}
   SabotageButton: {fileID: 1005648229}
   NextTurnButton: {fileID: 1544490800}
   DeploymentDoneButton: {fileID: 1278230523}
@@ -9616,8 +9616,8 @@ MonoBehaviour:
   GeneralButton: {fileID: 431876873}
   SurpriseAttackButton: {fileID: 1613612389}
   FeintDefeatButton: {fileID: 1605873869}
-  FalseOrderButton: {fileID: 593314586}
-  AlienateButton: {fileID: 1988379851}
+  FreezeButton: {fileID: 593314586}
+  AgitateButton: {fileID: 1988379851}
   RallyButton: {fileID: 1444959738}
   title: {fileID: 1702976408}
   generalPortrait: {fileID: 1284838565}
@@ -9918,7 +9918,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.829278, g: 0.5411765, b: 0.85490197, a: 1}
+  m_Color: {r: 0, g: 0.6049979, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_OnCullStateChanged:
@@ -10049,7 +10049,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.8962264, g: 0.8280404, b: 0.5453453, a: 1}
+  m_Color: {r: 0, g: 0.7061653, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_OnCullStateChanged:
@@ -10180,7 +10180,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.4438857, g: 0.8105213, b: 0.8962264, a: 1}
+  m_Color: {r: 0, g: 0.7002113, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_OnCullStateChanged:
@@ -10311,7 +10311,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.86274517, g: 0.7960785, b: 0.52156866, a: 1}
+  m_Color: {r: 0, g: 0.61476326, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_OnCullStateChanged:
@@ -10459,7 +10459,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_OnCullStateChanged:
@@ -11449,7 +11449,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.427451, g: 0.7803922, b: 0.86274517, a: 1}
+  m_Color: {r: 0, g: 0.5893867, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_OnCullStateChanged:
@@ -11726,6 +11726,7 @@ MonoBehaviour:
   SiegeAnimating: 0
   RetreatAnimating: 0
   DecieveAnimating: 0
+  FreezeAnimating: 0
   PlotAnimating: 0
   ForceRetreatAnimating: 0
   SurpriseAnimating: 0
@@ -12930,7 +12931,7 @@ GameObject:
   - component: {fileID: 1988379854}
   - component: {fileID: 1988379853}
   m_Layer: 5
-  m_Name: Alienate
+  m_Name: Agitate
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13001,7 +13002,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 769809669}
         m_TargetAssemblyTypeName: MonoNS.ActionController, Assembly-CSharp
-        m_MethodName: OnAlienate
+        m_MethodName: OnAgitate
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -13024,7 +13025,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.829278, g: 0.5411765, b: 0.85490197, a: 1}
+  m_Color: {r: 0, g: 0.6071863, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_OnCullStateChanged:
@@ -13358,7 +13359,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.48627454, g: 0.5058824, b: 0.72156864, a: 1}
+  m_Color: {r: 0, g: 0.6447847, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_OnCullStateChanged:

@@ -56,11 +56,8 @@ namespace UnitNS
 
     public void SetName(Unit unit) {
       int totalDefendPoint = unit.unitCombatPoint;
-      foreach(Tile tile in unit.tile.neighbours) {
-        Unit u = tile.GetUnit();
-        if (u != null && u.IsAI() == unit.IsAI()) {
-          totalDefendPoint += u.unitCombatPoint;
-        }
+      foreach(Unit u in unit.OnFieldAllies()) {
+        totalDefendPoint += u.unitCombatPoint;
       }
 
       TextMesh textMesh = this.transform.GetComponent<TextMesh>();

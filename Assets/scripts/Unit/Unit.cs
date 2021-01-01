@@ -267,6 +267,10 @@ namespace UnitNS
     }
 
     public bool fooled = false;
+    public bool CanFreeze() {
+      return Freezer.Aval(this);
+    }
+
     public bool CanDecieve() {
       return Deciever.Aval(this);
     }
@@ -279,9 +283,21 @@ namespace UnitNS
       return Rally.Aval(this) && IsOnField();
     }
 
-    public void Decieve(Unit target) {
+    public bool Freeze(Unit target) {
+      Freezer.Get(rf.general).Consume();
+      if (target.rf.general.Is(Cons.conservative) || Cons.FiftyFifty()) {
+        target.fooled = true;
+        return true;
+      }
+      return false;
+    }
+
+    public bool Decieve(Unit target) {
       Deciever.Get(rf.general).Consume();
-      target.fooled = true;
+      if (target.rf.general.Is(Cons.reckless) || Cons.FiftyFifty()) {
+        return true;
+      }
+      return false;
     }
 
     public ConflictResult Plot(Unit target) {
@@ -433,12 +449,11 @@ namespace UnitNS
       return true;
     }
 
-    public List<Unit> GetDeceptionTargets() {
+    public List<Unit> GetFreezeTargets() {
       List<Unit> units = new List<Unit>();
       foreach(Tile t in tile.GetNeighboursWithinRange<Tile>(GetVisibleRange(), (Tile _tile) => true)) {
         Unit unit = t.GetUnit();
-        if (unit != null && unit.IsAI() != IsAI() && !unit.fooled && !unit.IsCommander()
-          && unit.rf.general.Is(Cons.conservative)) {
+        if (unit != null && unit.IsAI() != IsAI() && !unit.fooled && !unit.IsCommander()) {
           units.Add(unit);
         }
       }
@@ -451,13 +466,10 @@ namespace UnitNS
         Unit unit = t.GetUnit();
         if (unit != null && unit.IsAI() != IsAI() && !unit.unitConflict.conflicted && !unit.ApplyDiscipline()) {
           List<Province> conflictProvinces = unit.rf.province.GetConflictProvinces();
-          foreach(Tile tile in unit.tile.neighbours) {
-            Unit u = tile.GetUnit();
-            if (u != null && u.IsAI() == unit.IsAI()) {
-              if(conflictProvinces.Contains(u.rf.province) ||
-                !Util.eq<Region>(u.rf.province.region, unit.rf.province.region)) {
-                units.Add(unit);
-              }
+          foreach(Unit u in unit.OnFieldAllies()) {
+            if(conflictProvinces.Contains(u.rf.province) ||
+              !Util.eq<Region>(u.rf.province.region, unit.rf.province.region)) {
+              units.Add(unit);
             }
           }
         }
@@ -481,8 +493,8 @@ namespace UnitNS
 
     public Tile[] GetSurpriseAttackTiles() {
       int range = GetVisibleRange();
-      return tile.GetNeighboursWithinRange(
-        Ambusher.Aval(this) && range != L0Visibility ? Ambusher.AmbushRange : range, (Tile t) => FindAttackPath(t).Length > 0);
+      return tile.GetNeighboursWithinRange(range > L1Visibility ? L1Visibility : range,
+        (Tile t) => FindAttackPath(t).Length > 0);
     }
 
     public int GetVisibleRange() {
@@ -525,14 +537,7 @@ namespace UnitNS
       if (IsVulnerable()) {
         return true;
       }
-      if (IsCamping()) {
-        return false;
-      }
-      if (rf.general.Is(Cons.conservative)) {
-        return Cons.EvenChance();
-      } else {
-        return false;
-      }
+      return false;
     }
 
     public bool ApplyDiscipline() {
@@ -586,11 +591,9 @@ namespace UnitNS
     public bool SetRetreatPath() {
       Tile[] path = new Tile[0];
       foreach (Tile t in hexMap.IsAttackSide(IsAI()) ? hexMap.AttackerZone : hexMap.DefenderZone) {
-        if (t.Deployable(this)) {
-          path = FindPath(this.tile, t);
-          if (path.Length > 0) {
-            break;
-          }
+        path = FindPath(this.tile, t);
+        if (path.Length > 0) {
+          break;
         }
       }
       if (path.Length == 0) {
@@ -778,6 +781,7 @@ namespace UnitNS
     public void Decamp(Tile tile)
     {
       SetTile(tile);
+      UpdateVisibleTiles();
       path = null;
       SetState(State.Stand);
     }
@@ -785,9 +789,11 @@ namespace UnitNS
     public bool DoMove(Tile toTile = null)
     {
       Tile next = null;
+      int takenMovement;
       if (toTile != null) {
         path = null;
         next = toTile;
+        takenMovement = CostToEnterTile(next, PathFind.Mode.Normal);
       } else {
         if (path != null && path.Count > 0) {
           next = path.Peek();
@@ -799,7 +805,7 @@ namespace UnitNS
           return false;
         }
 
-        int takenMovement = CostToEnterTile(next, PathFind.Mode.Normal);
+        takenMovement = CostToEnterTile(next, PathFind.Mode.Normal);
         if (takenMovement < 0)
         {
           // path blocked, empty path and set idle
@@ -817,14 +823,19 @@ namespace UnitNS
       if (u != null && u.IsAI() != IsAI())
       {
         // stumble upon a hidden enemy
+        path = null;
         return false;
       }
-      movementRemaining -= CostToEnterTile(next, PathFind.Mode.Normal);
+      movementRemaining -= takenMovement;
       SetTile(next);
+      UpdateVisibleTiles();
+      return true;
+    }
+
+    void UpdateVisibleTiles() {
       foreach(Tile t in GetVisibleArea()) {
         hexMap.GetWarParty(this).DiscoverTile(t);
       }
-      return true;
     }
 
     public void SetWargameTile(Tile h) {
@@ -852,6 +863,15 @@ namespace UnitNS
         h.AddUnit(this);
       }
       tile = h;
+    }
+
+    public bool IsAtRetreatZone() {
+      foreach (Tile t in hexMap.IsAttackSide(IsAI()) ? hexMap.AttackerZone : hexMap.DefenderZone) {
+        if (Util.eq<Tile>(t, tile)) {
+          return true;
+        }
+      }
+      return false;
     }
 
     public Tile FindBreakThroughPoint() {
@@ -978,9 +998,7 @@ namespace UnitNS
 
     public Tile[] GetPath()
     {
-      Tile[] p = new Tile[0];
-      if (path != null) p = path.ToArray();
-      return p;
+      return path != null ? path.ToArray() : new Tile[]{};
     }
 
     public int MovementCostToEnterTile(Tile tile, PathFind.Mode mode)

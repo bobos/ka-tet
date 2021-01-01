@@ -54,40 +54,45 @@ namespace MonoNS
       }
       FloodAnimating = true;
       hexMap.cameraKeyboardController.DisableCamera();
-      StartCoroutine(CoFlood(unit, tile, tiles == null ? tile.CreateFlood() : tiles));
+      StartCoroutine(CoFlood(unit, tile, tiles == null && Cons.IsRainy(hexMap.weatherGenerator.currentWeather) ? tile.CreateFlood() : tiles));
       return true;
     }
 
     IEnumerator CoFlood(Unit u, Tile t, HashSet<Tile> tiles)
     {
-      popAniController.Show(hexMap.GetTileView(t), textLib.get("pop_damBroken"), Color.white);
-      while (popAniController.Animating) { yield return null; }
-      foreach(Tile tile in tiles) {
-        hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(tile).transform.position);
-        Unit unit = tile.GetUnit();
-        tile.Flood();
-        TileView view = hexMap.GetTileView(tile);
-        view.FloodAnimation();
-        while (view.Animating) { yield return null; }
-        if (tile.siegeWall != null) {
-          DestroySiegeWall(null, tile);
-          while (DestroySiegeAnimating) { yield return null; }
-        }
+      if (tiles == null) {
+        popAniController.Show(hexMap.GetTileView(t), textLib.get("pop_damBrokenFail"), Color.red);
+        while (popAniController.Animating) { yield return null; }
+      } else {
+        popAniController.Show(hexMap.GetTileView(t), textLib.get("pop_damBroken"), Color.white);
+        while (popAniController.Animating) { yield return null; }
+        foreach(Tile tile in tiles) {
+          hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(tile).transform.position);
+          Unit unit = tile.GetUnit();
+          tile.Flood();
+          TileView view = hexMap.GetTileView(tile);
+          view.FloodAnimation();
+          while (view.Animating) { yield return null; }
+          if (tile.siegeWall != null) {
+            DestroySiegeWall(null, tile);
+            while (DestroySiegeAnimating) { yield return null; }
+          }
 
-        if (unit != null) {
-          Tile newTile = tile.Escape();
-          if (newTile == null) {
-            unitAniController.DestroyUnit(unit, DestroyType.ByFlood);
-            while (unitAniController.DestroyAnimating) { yield return null; }
-          } else {
-            unitAniController.ShowEffect(unit, DisasterEffect.Apply(DisasterType.Flood, unit));
-            while(unitAniController.ShowAnimating) { yield return null; }
-            unitAniController.MoveUnit(unit, newTile);
-            while (unitAniController.MoveAnimating) { yield return null; }
-            if (!Util.eq<Tile>(newTile, unit.tile)) {
-              // Failed to move, destroy unit
+          if (unit != null) {
+            Tile newTile = tile.Escape();
+            if (newTile == null) {
               unitAniController.DestroyUnit(unit, DestroyType.ByFlood);
               while (unitAniController.DestroyAnimating) { yield return null; }
+            } else {
+              unitAniController.ShowEffect(unit, DisasterEffect.Apply(DisasterType.Flood, unit));
+              while(unitAniController.ShowAnimating) { yield return null; }
+              unitAniController.MoveUnit(unit, newTile);
+              while (unitAniController.MoveAnimating) { yield return null; }
+              if (!Util.eq<Tile>(newTile, unit.tile)) {
+                // Failed to move, destroy unit
+                unitAniController.DestroyUnit(unit, DestroyType.ByFlood);
+                while (unitAniController.DestroyAnimating) { yield return null; }
+              }
             }
           }
         }

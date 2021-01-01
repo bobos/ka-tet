@@ -485,7 +485,7 @@ namespace MonoNS
         List<Unit> ally = new List<Unit>();
         foreach (Tile t in unit.tile.neighbours) {
           // already taken
-          if (tiles[t]) { 
+          if (tiles[t]) {
             Unit u = t.GetUnit();
             if (u != null && u.IsAI() == unit.IsAI()) {
               ally.Add(u);
@@ -559,9 +559,8 @@ namespace MonoNS
       while(hexMap.turnController.sleeping) { yield return null; }
 
       foreach(Unit unit in failedToMove) {
-        foreach(Tile t in unit.tile.neighbours) {
-          Unit u = t.GetUnit();
-          if (u != null && u.IsAI() == unit.IsAI() && !units.Contains(u)) {
+        foreach(Unit u in unit.OnFieldAllies()) {
+          if (!units.Contains(u)) {
             hexMap.unitAniController.CrashByAlly(u, -40);
             while (hexMap.unitAniController.CrashAnimating) { yield return null; }
             continue;
@@ -589,11 +588,8 @@ namespace MonoNS
       List<Unit> all = new List<Unit>{from};
       popAniController.Show(view, textLib.get("pop_rally"), Color.green);
       while (popAniController.Animating) { yield return null; }
-      foreach(Tile tile in from.tile.neighbours) {
-        Unit unit = tile.GetUnit();
-        if (unit != null && unit.IsAI() == from.IsAI()) {
-          all.Add(unit);
-        }
+      foreach(Unit unit in from.OnFieldAllies()) {
+        all.Add(unit);
       }
 
       foreach(Unit u in all) {
@@ -624,7 +620,7 @@ namespace MonoNS
 
       popAniController.Show(view, textLib.get("pop_charging"), Color.green);
       while (popAniController.Animating) { yield return null; }
-      int chance = to.IsCavalry() ? 0 : 40 + (from.morale - to.morale);
+      int chance = from.morale - to.morale;
       if (Cons.IsGale(hexMap.windGenerator.current)) {
         WindAdvantage advantage = from.tile.GetGaleAdvantage(to.tile);
         if (advantage == WindAdvantage.Advantage) {
@@ -638,13 +634,16 @@ namespace MonoNS
         chance -= Holder.ChanceToHold;
         Holder.Get(to.rf.general).Consume();
       }
+      if (to.rf.general.Is(Cons.cunning)) {
+        chance += 30;
+      }
       bool scared = chance >= Util.Rand(1, 100);
       // morale, movement, killed, attack, def
       ShowEffect(from, new int[]{0,0,from.Killed(Util.Rand(2, 15)),0,0}, view);
       while (ShowAnimating) { yield return null; }
       if (scared) {
         Tile toTile = to.tile;
-        Scatter(new List<Unit>{to}, true);
+        Scatter(new List<Unit>{to}, !Pusher.Aval(from));
         while(ScatterAnimating) { yield return null; }
         if (toTile.Deployable(from)) {
           if (from.IsCamping()) {
@@ -657,11 +656,12 @@ namespace MonoNS
       } else {
         popAniController.Show(hexMap.GetUnitView(to), textLib.get("pop_holding"), Color.green);
         while (popAniController.Animating) { yield return null; }
-        int morale = -10;
+        int morale = -5;
         from.morale += morale;
-        to.morale += morale;
+        int toDrop = Pusher.Aval(from) ? (morale - Pusher.ExtMoraleDrop) : morale;
+        to.morale += toDrop;
         ShowEffect(from, new int[]{morale,0,0,0,0}, view, true);
-        ShowEffect(to, new int[]{morale,0,0,0,0}, null, true);
+        ShowEffect(to, new int[]{toDrop,0,0,0,0}, null, true);
         hexMap.turnController.Sleep(1);
         while(hexMap.turnController.sleeping) { yield return null; }
       }
@@ -899,22 +899,52 @@ namespace MonoNS
 
     public bool DecieveAnimating = false;
     public void Decieve(Unit unit, Unit target) {
-      if (!unit.CanDecieve() || !unit.GetDeceptionTargets().Contains(target)) {
+      if (!unit.CanDecieve() || !hexMap.mouseController.nearEnemy) {
         return;
       }
-      unit.Decieve(target);
       DecieveAnimating = true;
       hexMap.cameraKeyboardController.DisableCamera();
       StartCoroutine(CoDecieve(unit, target));
     }
 
-    IEnumerator CoDecieve(Unit _unit, Unit target) {
+    IEnumerator CoDecieve(Unit unit, Unit target) {
       hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(target.tile).transform.position);
       while(hexMap.cameraKeyboardController.fixingCamera) { yield return null; }
-      popAniController.Show(hexMap.GetUnitView(target), textLib.get("pop_decieved"), Color.green);
-      while(popAniController.Animating) { yield return null; }
+      if (unit.Decieve(target)) {
+        popAniController.Show(hexMap.GetUnitView(target), textLib.get("pop_decieved"), Color.green);
+        while(popAniController.Animating) { yield return null; }
+        hexMap.combatController.StartOperation(unit, target, null, false, true);
+        hexMap.combatController.CommenceOperation();
+        while (hexMap.combatController.commenceOpAnimating) { yield return null; }
+      } else {
+        popAniController.Show(hexMap.GetUnitView(target), textLib.get("pop_failed"), Color.red);
+        while(popAniController.Animating) { yield return null; }
+      }
       hexMap.cameraKeyboardController.EnableCamera();
       DecieveAnimating = false;
+    }
+
+    public bool FreezeAnimating = false;
+    public void Freeze(Unit unit, Unit target) {
+      if (!unit.CanFreeze() || !hexMap.mouseController.freezeTargets.Contains(target)) {
+        return;
+      }
+      FreezeAnimating = true;
+      hexMap.cameraKeyboardController.DisableCamera();
+      StartCoroutine(CoFreeze(unit, target));
+    }
+
+    IEnumerator CoFreeze(Unit unit, Unit target) {
+      hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetTileView(target.tile).transform.position);
+      while(hexMap.cameraKeyboardController.fixingCamera) { yield return null; }
+      if (unit.Freeze(target)) {
+        popAniController.Show(hexMap.GetUnitView(target), textLib.get("pop_decieved"), Color.green);
+      } else {
+        popAniController.Show(hexMap.GetUnitView(target), textLib.get("pop_failed"), Color.red);
+      }
+      while(popAniController.Animating) { yield return null; }
+      hexMap.cameraKeyboardController.EnableCamera();
+      FreezeAnimating = false;
     }
 
     public bool PlotAnimating = false;
@@ -997,15 +1027,18 @@ namespace MonoNS
       if (!breakThrough && unit.rf.general.Is(Cons.loyal) && Cons.MostLikely()) {
         hexMap.dialogue.ShowRefuseToRetreat(unit);
         while(hexMap.dialogue.Animating) { yield return null; }
+        hexMap.UnsetPath(unit);
       } else {
         hexMap.dialogue.ShowRetreat(unit);
         while(hexMap.dialogue.Animating) { yield return null; }
         unit.movementRemaining = movement;
-        while (unit.movementRemaining > 0 && unit.GetPath().Length > 0) {
-          MoveUnit(unit);
-          while(MoveAnimating) { yield return null; }
+        while (unit.GetPath().Length > 0) {
+          if (MoveUnit(unit)) {
+            while(MoveAnimating) { yield return null; }
+          } else {
+            break;
+          }
         }
-        while(MoveAnimating) { yield return null; }
         if (unit.tile.UnitCount() > 1) {
           Tile tile = unit.tile.FindDeployableTile(unit);
           if (tile == null) {
@@ -1018,9 +1051,13 @@ namespace MonoNS
         int moraleDrop = breakThrough ? -20 : -10;
         unit.morale += moraleDrop;
         ShowEffect(unit, new int[]{moraleDrop,0,0,0,0});
+        hexMap.UnsetPath(unit);
         while(ShowAnimating) { yield return null; }
+        if (unit.IsAtRetreatZone()) {
+          Retreat(unit);
+          while(RetreatAnimating) { yield return null; }
+        }
       }
-      hexMap.UnsetPath(unit);
       hexMap.cameraKeyboardController.EnableCamera();
       ForceRetreatAnimating = false;
     }
@@ -1040,10 +1077,12 @@ namespace MonoNS
       Tile originPos = from.tile;
       from.SetPath(from.FindAttackPath(to.tile));
       while (from.GetPath().Length > 0) {
-        MoveUnit(from, null, false, false);
-        while(MoveAnimating) { yield return null; }
+        if (MoveUnit(from, null, false, false)) {
+          while(MoveAnimating) { yield return null; }
+        } else {
+          break;
+        }
       }
-      while(MoveAnimating) { yield return null; }
       popAniController.Show(hexMap.GetUnitView(from), textLib.get("pop_surpriseAttack"), Color.green);
       while(popAniController.Animating) { yield return null; }
       if (!surprised) {

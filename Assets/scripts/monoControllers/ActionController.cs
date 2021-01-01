@@ -267,20 +267,15 @@ namespace MonoNS
       }
     }
 
-    public void OnFalseOrderClick() {
+    public void OnFreezeClick() {
       if (onBtnClick != null) {
-        onBtnClick(actionName.Decieve);
+        onBtnClick(actionName.Freeze);
       }
     }
 
-    public void OnAlienate() {
+    public void OnAgitate() {
       if (onBtnClick != null) {
         onBtnClick(actionName.Plot);
-      }
-    }
-
-    public void OnSkirmish() {
-      if (onBtnClick != null) {
       }
     }
 
@@ -332,9 +327,9 @@ namespace MonoNS
       SurpriseAttack,
       FeintDefeat,
       Break,
-      Decieve,
       Plot,
-      ShowZone
+      ShowZone,
+      Freeze
     }
 
     // Make sure this is sequential
@@ -403,7 +398,11 @@ namespace MonoNS
     }
 
     public bool Decieve(Unit unit, Unit unit1) {
-      return DoAction(unit, unit1, null, actionName.Decieve);
+      return DoAction(unit, unit1, null, actionName.FeintDefeat);
+    }
+    
+    public bool Freeze(Unit unit, Unit unit1) {
+      return DoAction(unit, unit1, null, actionName.Freeze);
     }
 
     public bool Plot(Unit unit, Unit unit1) {
@@ -474,9 +473,13 @@ namespace MonoNS
       {
         StartCoroutine(DoBreak(unit, unit1));
       }
-      if (name == actionName.Decieve)
+      if (name == actionName.FeintDefeat)
       {
         StartCoroutine(DoDecieve(unit, unit1));
+      }
+      if (name == actionName.Freeze)
+      {
+        StartCoroutine(DoFreeze(unit, unit1));
       }
       if (name == actionName.Plot)
       {
@@ -641,6 +644,15 @@ namespace MonoNS
     IEnumerator DoDecieve(Unit unit, Unit unit1) {
       unitAniController.Decieve(unit, unit1);
       while (unitAniController.DecieveAnimating)
+      {
+        yield return null;
+      }
+      ActionOngoing = false;
+    }
+
+    IEnumerator DoFreeze(Unit unit, Unit unit1) {
+      unitAniController.Freeze(unit, unit1);
+      while (unitAniController.FreezeAnimating)
       {
         yield return null;
       }

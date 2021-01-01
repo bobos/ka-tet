@@ -25,13 +25,10 @@ namespace UnitNS
       conflicted = true;
       Unit target = null;
       List<Province> conflictProvinces = unit.rf.province.GetConflictProvinces();
-      foreach(Tile tile in unit.tile.neighbours) {
-        Unit u = tile.GetUnit();
-        if (u != null && u.IsAI() == unit.IsAI()) {
-          if(conflictProvinces.Contains(u.rf.province) || !Util.eq<Region>(u.rf.province.region, unit.rf.province.region)) {
-            target = u;
-            break;
-          }
+      foreach(Unit u in unit.OnFieldAllies()) {
+        if(conflictProvinces.Contains(u.rf.province) || !Util.eq<Region>(u.rf.province.region, unit.rf.province.region)) {
+          target = u;
+          break;
         }
       }
 

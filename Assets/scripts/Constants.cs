@@ -58,6 +58,9 @@ public class Cons {
     return Util.eq<Weather>(weather, cloudy);
   }
   public static Weather rain = new Rain();
+  public static bool IsRainy(Weather weather) {
+    return IsRain(weather) || IsHeavyRain(weather);
+  }
   public static bool IsRain(Weather weather) {
     return Util.eq<Weather>(weather, rain);
   }

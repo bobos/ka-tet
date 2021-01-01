@@ -211,7 +211,7 @@ public class Starter : MonoBehaviour {
       view = hexMap.GetUnitView(commander);
     }
     hexMap.AttackerZone.Add(hexMap.GetTile(0,0));
-    hexMap.DefenderZone.Add(hexMap.GetTile(14,10));
+    hexMap.DefenderZone.Add(hexMap.GetTile(14,14));
     cameraKeyboardController.FixCameraAt(view.transform.position);
   }
 }

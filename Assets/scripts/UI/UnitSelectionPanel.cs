@@ -22,12 +22,12 @@ namespace MonoNS
       actionController.onBtnClick += OnBtnClick;
       turnController.onEndTurnClicked += OnEndTurnClicked;
       turnController.onNewTurn += OnNewTurn;
-      GameObject[] btns = {MoveButton, AttackButton, DefendButton,
+      GameObject[] btns = {MoveButton, AttackButton, PoisonButton,
                            SabotageButton, FireButton, SiegeButton, EncampButton,
                            RetreatButton, DecampButton, ReposButton,
                            BuryButton, ChargeButton, TroopButton, GeneralButton,
                            BreakThroughButton, SurpriseAttackButton, FeintDefeatButton,
-                           FalseOrderButton, AlienateButton, RallyButton
+                           FreezeButton, AgitateButton, RallyButton
                            };
       buttons = btns;
       mouseController.onUnitSelect += OnUnitSelect;
@@ -47,7 +47,7 @@ namespace MonoNS
     GameObject self;
     public GameObject MoveButton;
     public GameObject AttackButton;
-    public GameObject DefendButton; // Poison
+    public GameObject PoisonButton; // Poison
     public GameObject SabotageButton;
     public GameObject NextTurnButton;
     public GameObject DeploymentDoneButton;
@@ -64,23 +64,30 @@ namespace MonoNS
     public GameObject GeneralButton;
     public GameObject SurpriseAttackButton;
     public GameObject FeintDefeatButton;
-    public GameObject FalseOrderButton;
-    public GameObject AlienateButton;
+    public GameObject FreezeButton;
+    public GameObject AgitateButton;
     public GameObject RallyButton;
     GameObject[] buttons;
+
+    void Disable(GameObject btn) {
+      btn.GetComponent<Button>().interactable = false;
+    }
+    void Enable(GameObject btn) {
+      btn.GetComponent<Button>().interactable = true;
+    }
 
     public Text title;
     public Image generalPortrait; 
 
     public void OnEndTurnClicked()
     {
-      NextTurnButton.SetActive(false);
+      Disable(NextTurnButton);
     }
 
     public void OnNewTurn()
     {
       if (hexMap.deployDone) {
-        NextTurnButton.SetActive(true);
+        Enable(NextTurnButton);
       }
     }
 
@@ -96,14 +103,14 @@ namespace MonoNS
       }
     }
 
-    public void ActionDone(Unit unit, Unit[] units, ActionController.actionName name)
-    {
-      if ((unit != null && !unit.IsAI() && name == ActionController.actionName.MOVE)
-        || (unit != null && unit.IsAI() && name == ActionController.actionName.ATTACK))
-      {
-        RefreshButtons(unit, false);
-      }
-    }
+    //public void ActionDone(Unit unit, Unit[] units, ActionController.actionName name)
+    //{
+    //  if ((unit != null && !unit.IsAI() && name == ActionController.actionName.MOVE)
+    //    || (unit != null && unit.IsAI() && name == ActionController.actionName.ATTACK))
+    //  {
+    //    RefreshButtons(unit, false);
+    //  }
+    //}
 
     void RefreshButtons(Unit unit, bool isGarrison)
     {
@@ -139,47 +146,55 @@ namespace MonoNS
     List<Tile> deployableTiles;
     public void ToggleButtons(bool state, Unit unit, bool isGarrison = false)
     {
+      if (unit == null) return;
+      if (!Freezer.Aval(unit)) { FreezeButton.SetActive(false); }
+      if (!Deciever.Aval(unit)) { FeintDefeatButton.SetActive(false); }
+      if (!Agitator.Aval(unit)) { AgitateButton.SetActive(false); }
+      if (!Rally.Aval(unit)) { RallyButton.SetActive(false); }
+
       foreach (GameObject button in buttons)
       {
-        button.SetActive(false);
+        Disable(button);
       }
-      TroopButton.SetActive(true);
-      GeneralButton.SetActive(true);
+      Enable(TroopButton);
+      Enable(GeneralButton);
 
       // TODO: uncomment
       //if (!state || hexMap.combatController.start || unit.IsAI()) return;
       if (!state || hexMap.combatController.start) return;
 
-      if (!hexMap.wargameController.start && hexMap.deployDone) {
-        BreakThroughButton.SetActive(unit.CanBreakThrough());
+      if (!hexMap.wargameController.start && hexMap.deployDone && unit.CanBreakThrough()) {
+        Enable(BreakThroughButton);
       }
 
-      if (hexMap.deployDone) {
-        AttackButton.SetActive(unit.CanAttack());
+      if (hexMap.deployDone && unit.CanAttack()) {
+        Enable(AttackButton);
       }
 
       if (mouseController.nearFireTiles.Count > 0 && hexMap.deployDone && !hexMap.wargameController.start) {
-        FireButton.SetActive(true);
+        Enable(FireButton);
       }
 
       if (mouseController.nearWater && hexMap.deployDone && !hexMap.wargameController.start) {
-        DefendButton.SetActive(true);
+        Enable(PoisonButton);
       }
 
-      if (!hexMap.wargameController.start && hexMap.deployDone) {
-        ChargeButton.SetActive(unit.CanCharge());
+      if (!hexMap.wargameController.start && hexMap.deployDone && unit.CanCharge()) {
+        Enable(ChargeButton);
       }
 
-      if (!hexMap.wargameController.start && unit.CanDecieve() && hexMap.deployDone) {
-        FalseOrderButton.SetActive(mouseController.deceptionTargets.Count > 0);
+      if (!hexMap.wargameController.start && unit.CanFreeze() && hexMap.deployDone
+        && mouseController.freezeTargets.Count > 0) {
+        Enable(FreezeButton);
       }
 
-      if (!hexMap.wargameController.start && unit.CanPlot() && hexMap.deployDone) {
-        AlienateButton.SetActive(mouseController.plotTargets.Count > 0);
+      if (!hexMap.wargameController.start && unit.CanPlot() && hexMap.deployDone
+        && mouseController.plotTargets.Count > 0) {
+        Enable(AgitateButton);
       }
 
       if (!hexMap.wargameController.start && unit.CanRally() && hexMap.deployDone) {
-        RallyButton.SetActive(true);
+        Enable(RallyButton);
       }
 
       if (isGarrison) {
@@ -191,7 +206,7 @@ namespace MonoNS
           }
         }
         if (deployableTiles.Count > 0) {
-          DecampButton.SetActive(true);
+          Enable(DecampButton);
         }
 
         return;
@@ -200,37 +215,41 @@ namespace MonoNS
       if (hexMap.wargameController.start && hexMap.wargameController.IsWargameUnit(unit)
         || !hexMap.deployDone) {
       } else {
-        MoveButton.SetActive(true);
+        Enable(MoveButton);
       }
 
       if (!hexMap.wargameController.start && hexMap.deployDone && !unit.retreated) {
-        NextTurnButton.SetActive(true);
-        RetreatButton.SetActive(true);
+        Enable(NextTurnButton);
+        Enable(RetreatButton);
       }
       
       if (!hexMap.combatController.start && hexMap.deployDone && unit.CanAttack()) {
-        FeintDefeatButton.SetActive(Deciever.Aval(unit) && mouseController.nearEnemy);
-        SurpriseAttackButton.SetActive(mouseController.surpriseTargets.Length > 0 && unit.CanSurpriseAttack());
+        if (unit.CanDecieve() && mouseController.nearEnemy) {
+          Enable(FeintDefeatButton);
+        }
+        if (mouseController.surpriseTargets.Length > 0 && unit.CanSurpriseAttack()) {
+          Enable(SurpriseAttackButton);
+        }
       }
 
       if (mouseController.nearAlly && hexMap.deployDone && !hexMap.wargameController.IsWargameUnit(unit)) {
-        ReposButton.SetActive(true);
+        Enable(ReposButton);
       }
 
       if (!hexMap.wargameController.start && unit.type == Type.Infantry && unit.tile.deadZone.DecompositionCntDown > 0) {
-        BuryButton.SetActive(true);
+        Enable(BuryButton);
       }
 
       if (mouseController.nearMySettlement != null && mouseController.nearMySettlement.HasRoom()
         && !mouseController.nearMySettlement.IsUnderSiege()) {
         if (!hexMap.wargameController.start) {
-          EncampButton.SetActive(true);
+          Enable(EncampButton);
         }
       }
 
       if (unit.type == Type.Infantry && hexMap.deployDone && !hexMap.wargameController.start) {
         if (mouseController.nearDam != null || (unit.tile.siegeWall != null && unit.tile.siegeWall.owner.isAI != unit.IsAI())) {
-          SabotageButton.SetActive(true);
+          Enable(SabotageButton);
         }
       }
 
@@ -238,7 +257,7 @@ namespace MonoNS
         if (hexMap.deployDone &&
           mouseController.nearEnemySettlement != null && !mouseController.nearEnemySettlement.IsEmpty()
           && !hexMap.wargameController.start) {
-          SiegeButton.SetActive(true);
+          Enable(SiegeButton);
         }
       }
     }
@@ -367,9 +386,9 @@ namespace MonoNS
       if (action == ActionController.actionName.DEPLOYMENTDONE) {
         hexMap.turnController.DeploymentDone();
         hexMap.deployDone = true;
-        DeploymentDoneButton.SetActive(false);
-        hexMap.wargameController.WargameBtn.SetActive(true);
-        NextTurnButton.SetActive(true);
+        Disable(DeploymentDoneButton);
+        Enable(hexMap.wargameController.WargameBtn);
+        Enable(NextTurnButton);
         FoW.Get().Fog(hexMap.allTiles);
       }
 
@@ -426,8 +445,10 @@ namespace MonoNS
         toggled = true;
         hexMap.HighlightArea(turnController.GetWarParty().discoveredTiles, RangeType.zoneIndication);
       }
-      // disable other buttons than move
-      ToggleButtons(false, mouseController.selectedUnit);
+      if (mouseController.selectedUnit != null) {
+        // disable other buttons than move
+        ToggleButtons(false, mouseController.selectedUnit);
+      }
     }
 
     public override void UpdateChild() { }

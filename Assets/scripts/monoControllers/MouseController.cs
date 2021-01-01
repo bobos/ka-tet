@@ -98,7 +98,7 @@ namespace MonoNS
     public bool nearWater = false;
     public List<Unit> nearbyEnemey = null;
     public Unit[] surpriseTargets = null;
-    public List<Unit> deceptionTargets = null;
+    public List<Unit> freezeTargets = null;
     public List<Unit> plotTargets = null;
     public Tile[] accessibleTiles = null;
     public HashSet<Unit> nearbyAlly = null;
@@ -115,7 +115,7 @@ namespace MonoNS
       nearFireTiles = new List<Tile>();
       surpriseTargets = new Unit[]{};
       accessibleTiles = new Tile[]{};
-      deceptionTargets = new List<Unit>();
+      freezeTargets = new List<Unit>();
       plotTargets = new List<Unit>();
     }
 
@@ -173,7 +173,7 @@ namespace MonoNS
         surpriseTargets = selectedUnit.GetSurpriseTargets();
         accessibleTiles = selectedUnit.GetAccessibleTiles();
         Unit u = selectedUnit != null ? selectedUnit : hexMap.settlementViewPanel.selectedUnit;
-        deceptionTargets = u.GetDeceptionTargets();
+        freezeTargets = u.GetFreezeTargets();
         plotTargets = u.GetPlotTargets();
         nearFireTiles = selectedUnit.GetBurnableTiles();
       }
@@ -286,16 +286,16 @@ namespace MonoNS
         }
       }
 
-      if (action == ActionController.actionName.Decieve)
+      if (action == ActionController.actionName.Freeze)
       {
-        if (deceptionTargets.Count == 0) {
+        if (freezeTargets.Count == 0) {
           msgBox.Show("无可疑兵目标!");
           Escape();
         } else {
-          mouseMode = mode.decieve;
-          Update_CurrentFunc = UpdateUnitDecieve;
+          mouseMode = mode.freeze;
+          Update_CurrentFunc = UpdateUnitFreeze;
           msgBox.Show("选择目标!");
-          foreach(Unit u in deceptionTargets) {
+          foreach(Unit u in freezeTargets) {
             hexMap.TargetUnit(u);
           }
         }
@@ -375,7 +375,7 @@ namespace MonoNS
       attack,
       feint,
       surpriseAttack,
-      decieve,
+      freeze,
       plot,
       repos,
       sabotage,
@@ -429,8 +429,8 @@ namespace MonoNS
         }
       }
 
-      if (mouseMode == mode.decieve) {
-        foreach(Unit u in deceptionTargets) {
+      if (mouseMode == mode.freeze) {
+        foreach(Unit u in freezeTargets) {
           hexMap.SetUnitSkin(u);
         }
       }
@@ -582,8 +582,8 @@ namespace MonoNS
         }
       }
 
-      if (mouseMode == mode.decieve) {
-        if(u != null && u.IsAI() != selectedUnit.IsAI() && deceptionTargets.Contains(u)) {
+      if (mouseMode == mode.freeze) {
+        if(u != null && u.IsAI() != selectedUnit.IsAI() && freezeTargets.Contains(u)) {
           targetUnit = u;
           return;
         }
@@ -673,10 +673,10 @@ namespace MonoNS
       if (Input.GetMouseButtonUp(0))
       {
         ClickOnTile();
-        if (targetUnit != null || targetSettlement != null) {
+        if (targetUnit != null) {
           msgBox.Show("");
-          hexMap.combatController.StartOperation(selectedUnit, targetUnit, targetSettlement, false, true);
-          hexMap.actionController.commenceOperation();
+          hexMap.actionController.Decieve(selectedUnit, targetUnit);
+          Escape();
         }
       } else if (!Util.eq<Tile>(tileUnderMouse, selectedUnit.tile))
       {
@@ -722,6 +722,29 @@ namespace MonoNS
         if (targetUnit != null) {
           msgBox.Show("");
           hexMap.actionController.Decieve(selectedUnit, targetUnit);
+          Escape();
+        }
+      } else if (!Util.eq<Tile>(tileUnderMouse, selectedUnit.tile))
+      {
+        Unit u = tileUnderMouse.GetUnit();
+        if (u != null)
+        {
+          hover.Show(u.Name());
+        }
+      }
+    }
+
+    void UpdateUnitFreeze()
+    {
+      if (tileUnderMouse == null) {
+        return;
+      }
+      if (Input.GetMouseButtonUp(0))
+      {
+        ClickOnTile();
+        if (targetUnit != null) {
+          msgBox.Show("");
+          hexMap.actionController.Freeze(selectedUnit, targetUnit);
           Escape();
         }
       } else if (!Util.eq<Tile>(tileUnderMouse, selectedUnit.tile))
