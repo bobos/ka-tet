@@ -229,19 +229,38 @@ namespace UnitNS
     }
 
     void InitChargeAtmpt() {
-      chargeAtmpt = IsCavalry() ? 2 : 0;
+      chargeAtmpt = IsCavalry() ? 10000 : 0;
     }
 
-    public bool CanCharge() {
-      return !IsSurrounded() && !IsVulnerable() && chargeAtmpt > 0;
+    bool charged = false;
+    public List<Unit> CanCharge() {
+      List<Unit> targets = new List<Unit>();
+      if (charged || IsSurrounded() || IsVulnerable() || chargeAtmpt == 0) {
+        return targets;
+      }
+      return GetChargeTargets();
+    }
+
+    public List<Tile> CanFire() {
+      List<Tile> tiles = new List<Tile>();
+      foreach (Tile t in tile.neighbours) {
+        if (t.burnable || FireBug.Aval(this) && t.field == FieldType.Forest) {
+          tiles.Add(t);
+        }
+      }
+      return tiles;
     }
 
     public void Charge() {
+      charged = true;
       chargeAtmpt--;
     }
 
-    public bool CanBreakThrough() {
-      return IsSurrounded() && CanAttack() && !IsVulnerable();
+    public List<Unit> CanBreakThrough() {
+      if (!IsSurrounded() || CanAttack().Count == 0 && IsVulnerable()) {
+        return new List<Unit>();
+      }
+      return OnFieldEnemy();
     }
 
     public List<Tile> GetBurnableTiles() {
@@ -266,25 +285,168 @@ namespace UnitNS
       return tiles;
     }
 
+    public List<Tile> CanAttack() {
+      List<Tile> tiles = new List<Tile>();
+      if (allowedAtmpt == 0) {
+        return tiles;
+      }
+
+      foreach(Tile t in tile.neighbours) {
+        if (t.settlement != null && t.settlement.owner.isAI != IsAI()) {
+          tiles.Add(t);
+          continue;
+        }
+        Unit u = t.GetUnit();
+        if (u != null && u.IsAI() != IsAI()) {
+          tiles.Add(t);
+        }
+      }
+      return tiles;
+    }
+
+    public List<Tile> CanPoison() {
+      List<Tile> tiles = new List<Tile>();
+      foreach(Tile t in tile.neighbours) {
+        if (t.poision != null) {
+          tiles.Add(t);
+        }
+      }
+      return tiles;
+    }
+
     public bool fooled = false;
-    public bool CanFreeze() {
-      return Freezer.Aval(this);
+    bool freezed = false;
+    public List<Unit> CanFreeze() {
+      if (freezed || !Freezer.Aval(this)) {
+        return new List<Unit>();
+      }
+      return GetFreezeTargets();
     }
 
-    public bool CanDecieve() {
-      return Deciever.Aval(this);
+    bool decieved = false;
+    public List<Unit> CanDecieve() {
+      if (decieved || !Deciever.Aval(this) || FindDeployableTile() == null) {
+        return new List<Unit>();
+      }
+      return OnFieldEnemy();
     }
 
-    public bool CanPlot() {
-      return Agitator.Aval(this);
+    bool ploted = false;
+    public List<Unit> CanPlot() {
+      if (ploted || !Agitator.Aval(this)) {
+        return new List<Unit>();
+      }
+      return GetPlotTargets();
     }
 
-    public bool CanRally() {
-      return Rally.Aval(this) && IsOnField();
+    bool surprised = false;
+    public List<Unit> CanSurpriseAttack() {
+      if (!surprised && Ambusher.Aval(this) && IsHidden()) {
+        return GetSurpriseTargets();
+      }
+      return new List<Unit>();
+    }
+
+    bool rallyed = false;
+    public List<Unit> CanRally() {
+      if (!rallyed && Rally.Aval(this) && IsOnField()) {
+        return OnFieldAllies(true);
+      }
+      return new List<Unit>();
+    }
+
+    public List<Tile> CanDecamp(Settlement s) {
+      List<Tile> deployableTiles = new List<Tile>();
+      if (IsOnField()) {
+        return deployableTiles;
+      }
+
+      foreach(Tile tile in s.baseTile.neighbours) {
+        Unit u = tile.GetUnit();
+        if (tile.Deployable(this)) {
+          deployableTiles.Add(tile);
+        }
+      }
+      return deployableTiles;
+    }
+
+    public bool CanTriggerRetreat() {
+      return !retreated;
+    }
+
+    public bool CanBury() {
+      return !IsCavalry() && tile.deadZone.DecompositionCntDown > 0;
+    }
+
+    public Settlement CanEncamp() {
+      Settlement s = AllySettment();
+      if (s == null || s.IsUnderSiege() || !s.HasRoom()) {
+        return null;
+      }
+      return s;
+    }
+
+    public Tile CanSabotage() {
+      Tile t = null;
+      if (IsCavalry()) {
+        return t;
+      }
+
+      if (tile.siegeWall != null && tile.siegeWall.owner.isAI != IsAI()) {
+        return tile;
+      }
+
+      foreach(Tile t1 in tile.neighbours) {
+        if (t1.isDam) {
+          t = t1;
+          break;
+        }
+      }
+      return t;
+    }
+
+    public bool CanSiege() {
+      Settlement s = EnemySettment(); 
+      return !IsCavalry() && s != null && !s.IsEmpty();
+    }
+
+    public Settlement AllySettment() {
+      Settlement s = null;
+      if (IsCamping()) {
+        return s;
+      }
+
+      foreach (Tile t in tile.neighbours) {
+        Settlement s1 = t.settlement;
+        if (s1 != null && s1.owner.isAI == IsAI()) {
+          s = s1;
+        }
+      }
+      return s;
+    }
+
+    public Settlement EnemySettment() {
+      Settlement s = null;
+      if (IsCamping()) {
+        return s;
+      }
+
+      foreach (Tile t in tile.neighbours) {
+        Settlement s1 = t.settlement;
+        if (s1 != null && s1.owner.isAI != IsAI()) {
+          s = s1;
+        }
+      }
+      return s;
+    }
+
+    public void Surprise() {
+      surprised = true;
     }
 
     public bool Freeze(Unit target) {
       Freezer.Get(rf.general).Consume();
+      freezed = true;
       if (target.rf.general.Is(Cons.conservative) || Cons.FiftyFifty()) {
         target.fooled = true;
         return true;
@@ -293,6 +455,7 @@ namespace UnitNS
     }
 
     public bool Decieve(Unit target) {
+      decieved = true;
       Deciever.Get(rf.general).Consume();
       if (target.rf.general.Is(Cons.reckless) || Cons.FiftyFifty()) {
         return true;
@@ -301,31 +464,28 @@ namespace UnitNS
     }
 
     public ConflictResult Plot(Unit target) {
+      ploted = true;
       Agitator.Get(rf.general).Consume();
       return target.unitConflict.Occur();
     }
 
     public int RallyAlly() {
+      rallyed = true;
       Rally.Get(rf.general).Consume();
       return Rally.MoraleBuf;
     }
 
     public bool retreated = false;
     public bool crashed = false;
-    public bool CanAttack() {
-      return allowedAtmpt > 0;
-    }
-
-    public bool CanSurpriseAttack() {
-      return CanAttack() && IsHidden();
-    }
-
     public bool IsHidden() {
       return tile.field == FieldType.Forest && !hexMap.GetWarParty(this).counterParty.discoveredTiles.Contains(tile);
     }
 
-    public List<Unit> OnFieldAllies() {
-      List<Unit> allies = new List<Unit>(){this};
+    public List<Unit> OnFieldAllies(bool selfIncluded = false) {
+      List<Unit> allies = new List<Unit>();
+      if (selfIncluded) {
+        allies.Add(this);
+      }
       foreach(Tile t in tile.neighbours) {
         Unit u = t.GetUnit();
         if (u != null && u.IsOnField() && u.IsAI() == IsAI()) {
@@ -333,6 +493,17 @@ namespace UnitNS
         }
       }
       return allies;
+    }
+
+    public List<Unit> OnFieldEnemy() {
+      List<Unit> enemy = new List<Unit>();
+      foreach(Tile t in tile.neighbours) {
+        Unit u = t.GetUnit();
+        if (u != null && u.IsOnField() && u.IsAI() != IsAI()) {
+          enemy.Add(u);
+        }
+      }
+      return enemy;
     }
 
     public string GetStateName()
@@ -477,9 +648,9 @@ namespace UnitNS
       return units;
     }
 
-    public Unit[] GetSurpriseTargets() {
+    public List<Unit> GetSurpriseTargets() {
       Tile[] tiles = GetSurpriseAttackTiles();
-      if (tiles.Length == 0) { return new Unit[]{}; }
+      if (tiles.Length == 0) { return new List<Unit>(); }
 
       List<Unit> targets = new List<Unit>();
       foreach(Tile t in tiles) {
@@ -488,7 +659,17 @@ namespace UnitNS
           targets.Add(unit);
         }
       }
-      return targets.ToArray();
+      return targets;
+    }
+
+    public List<Unit> GetChargeTargets() {
+      List<Unit> targets = new List<Unit>();
+      foreach (Unit u in OnFieldEnemy()) {
+        if (u.CanBeShaked(this)) {
+          targets.Add(u);
+        }
+      }
+      return targets;
     }
 
     public Tile[] GetSurpriseAttackTiles() {
@@ -541,7 +722,7 @@ namespace UnitNS
     }
 
     public bool ApplyDiscipline() {
-      return rf.IsSpecial();
+      return rf.IsSpecial() || Cons.FiftyFifty();
     }
 
     public General MyCommander() {
@@ -567,7 +748,7 @@ namespace UnitNS
     {
       rf.general.commandSkill.Reset();
       morale += IsCamping() ? 20 : 5;
-      crashed = retreated = false;
+      crashed = retreated = ploted = decieved = freezed = rallyed = charged = surprised = false;
       InitAllowedAtmpt();
       turnDone = false;
       movementRemaining = GetFullMovement();
@@ -584,8 +765,23 @@ namespace UnitNS
       return turnDone;
     }
 
+    public Tile FindDeployableTile() {
+      List<Tile> tiles = new List<Tile>();
+      foreach(Tile t in tile.neighbours) {
+        if (t.Deployable(this)) {
+          tiles.Add(t);
+        }
+      }
+      int len = tiles.Count;
+      if (len == 0) {
+        return null;
+      }
+      Tile[] array = tiles.ToArray();
+      return array[Util.Rand(0, len - 1)];
+    }
+
     public bool CanRetreat() {
-      return !retreated && (hexMap.IsAttackSide(IsAI()) ? hexMap.AttackerZone : hexMap.DefenderZone).Contains(tile);
+      return CanTriggerRetreat() && (hexMap.IsAttackSide(IsAI()) ? hexMap.AttackerZone : hexMap.DefenderZone).Contains(tile);
     }
 
     public bool SetRetreatPath() {

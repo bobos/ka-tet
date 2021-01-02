@@ -36,8 +36,7 @@ Game Tips:
 44. 地域冲突换成挑拨技能，任何来自不同行省军队都能挑拨，来自不同民族军队挑拨几率极高，成功两军发生冲突后撤
 45. 高地上发现视力范围内埋伏敌军
 
-没有破阵被追击也应该后撤
-
+去掉骑兵
 新技能实现:
 Fortifier
 Breacher
@@ -94,4 +93,3 @@ delete meta and .DS_Store file to avoid project syntax error in IDE
 忠义：不撤退，破城易战死
 保守: 容易被疑兵
 机智：30%几率被冲阵
-

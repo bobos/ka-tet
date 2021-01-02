@@ -26,13 +26,13 @@ namespace MapTileNS
           return 100;
         }
         if (Yellow()) {
-          return 80;
+          return 60;
         }
-        return 50;
+        return 40;
       }
 
       if (Red()) {
-        int cost = 50;
+        int cost = 35;
         foreach(Tile t in tile.neighbours) {
           Unit u = t.GetUnit();
           if (u != null && u.IsAI() != unit.IsAI() && u.IsOnField() && u.IsCavalry() && !u.NoRedZone()) {
@@ -52,7 +52,7 @@ namespace MapTileNS
         if (Green()) {
           return 25;
         }
-        return 40;
+        return 30;
       }
     }
 

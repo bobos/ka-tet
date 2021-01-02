@@ -109,7 +109,6 @@ namespace MonoNS
 
     public bool MoveAnimating = false;
     public bool MoveUnit(Unit unit, Tile tile = null, bool dontFixCamera = false, bool normalMove = true) {
-      Tile old = unit.tile;
       if(!unit.DoMove(tile)) {
         return false;
       }
@@ -153,9 +152,6 @@ namespace MonoNS
           if (!unit.IsAI()) {
             hexMap.mouseController.Escape();
           }
-          // TODO: for player ask attack confirmation
-          SurpriseAttack(ambusher, unit, true);
-          while (SurpriseAnimating) { yield return null; }
         }
       }
       // stash event
@@ -248,7 +244,7 @@ namespace MonoNS
         } else {
           settlement.Decamp(g, tile);
           if(g.SetRetreatPath()) {
-            ForceRetreat(g, 200, true);
+            ForceRetreat(g, 150, true);
             while (ForceRetreatAnimating) { yield return null; }
           }
         }
@@ -446,7 +442,7 @@ namespace MonoNS
 
     IEnumerator CoBury(Unit unit) {
       if (!unit.ApplyDiscipline()) {
-        int moraleDrop = -20;
+        int moraleDrop = -10;
         unit.morale += moraleDrop;
         ShowEffect(unit, new int[]{moraleDrop,0,0,0,0});
         while(ShowAnimating) { yield return null; }
@@ -482,18 +478,13 @@ namespace MonoNS
       foreach(Unit unit in units) {
         // first step
         Tile step1 = null;
-        List<Unit> ally = new List<Unit>();
+        List<Unit> ally = unit.OnFieldAllies();
         foreach (Tile t in unit.tile.neighbours) {
-          // already taken
-          if (tiles[t]) {
-            Unit u = t.GetUnit();
-            if (u != null && u.IsAI() == unit.IsAI()) {
-              ally.Add(u);
-            }
-            continue;
+          if (!tiles[t]) {
+            // the tile is not taken
+            step1 = t;
+            break;
           }
-          step1 = t;
-          break;
         }
 
         if (oneStep) {
@@ -574,25 +565,18 @@ namespace MonoNS
 
     public bool RallyAnimating = false;
     public void Rally(Unit from) {
-      if (!from.CanRally()) {
-        return;
-      }
       RallyAnimating = true;
       hexMap.cameraKeyboardController.DisableCamera();
       StartCoroutine(CoRally(from));
     }
 
     IEnumerator CoRally(Unit from) {
+      List<Unit> units = from.CanRally();
       int incr = from.RallyAlly();
       View view = hexMap.GetUnitView(from);
-      List<Unit> all = new List<Unit>{from};
       popAniController.Show(view, textLib.get("pop_rally"), Color.green);
       while (popAniController.Animating) { yield return null; }
-      foreach(Unit unit in from.OnFieldAllies()) {
-        all.Add(unit);
-      }
-
-      foreach(Unit u in all) {
+      foreach(Unit u in units) {
         u.morale += incr;
         ShowEffect(u, new int[]{incr,0,0,0,0}, null, true);
       }
@@ -605,9 +589,6 @@ namespace MonoNS
 
     public bool ChargeAnimating = false;
     public void Charge(Unit from, Unit to) {
-      if (!from.CanCharge() || !to.CanBeShaked(from)) {
-        return;
-      }
       ChargeAnimating = true;
       hexMap.cameraKeyboardController.DisableCamera();
       StartCoroutine(CoCharge(from, to));
@@ -661,9 +642,6 @@ namespace MonoNS
 
     public bool BreakAnimating = false;
     public void Break(Unit from, Unit to, bool doubleTheKill = false) {
-      if (!to.IsVulnerable()) {
-        return;
-      }
       BreakAnimating = true;
       hexMap.cameraKeyboardController.DisableCamera();
       StartCoroutine(CoBreak(from, to, doubleTheKill));
@@ -675,8 +653,7 @@ namespace MonoNS
         settlementMgr.GetView(from.tile.settlement) : hexMap.GetUnitView(from);
       popAniController.Show(view, textLib.get("pop_chasing"), Color.green);
       while (popAniController.Animating) { yield return null; }
-      List<Unit> allies = to.OnFieldAllies();
-      allies.Add(to);
+      List<Unit> allies = to.OnFieldAllies(true);
       int orgBuf = from.rf.org > Region.RookieOrg ? (from.rf.org - Region.RookieOrg) : 0;
       int dead = (int)(from.rf.soldiers * (from.IsCavalry() ? 0.75f : 0.2f) * (1f + orgBuf / 100));
       dead = to.IsCavalry() ? (int)(dead / 4) : dead;
@@ -697,7 +674,7 @@ namespace MonoNS
       while(hexMap.turnController.showingTitle) { yield return null; }
       hexMap.dialogue.ShowFormationBreaking(from);
       while(hexMap.dialogue.Animating) { yield return null; }
-      hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetUnitView(to).transform.position);
+      hexMap.cameraKeyboardController.FixCameraAt(hexMap.GetUnitView(from).transform.position);
       while(hexMap.cameraKeyboardController.fixingCamera) { yield return null; }
       hexMap.unitAniController.Scatter(allies);
       while(hexMap.unitAniController.ScatterAnimating) { yield return null; }
@@ -709,9 +686,6 @@ namespace MonoNS
 
     public bool BreakthroughAnimating = false;
     public void BreakThrough(Unit from, Unit to) {
-      if (!from.CanBreakThrough()) {
-        return;
-      }
       BreakthroughAnimating = true;
       hexMap.cameraKeyboardController.DisableCamera();
       StartCoroutine(CoBreakThrough(from, to));
@@ -887,9 +861,6 @@ namespace MonoNS
 
     public bool DecieveAnimating = false;
     public void Decieve(Unit unit, Unit target) {
-      if (!unit.CanDecieve() || !hexMap.mouseController.nearEnemy) {
-        return;
-      }
       DecieveAnimating = true;
       hexMap.cameraKeyboardController.DisableCamera();
       StartCoroutine(CoDecieve(unit, target));
@@ -914,9 +885,6 @@ namespace MonoNS
 
     public bool FreezeAnimating = false;
     public void Freeze(Unit unit, Unit target) {
-      if (!unit.CanFreeze() || !hexMap.mouseController.freezeTargets.Contains(target)) {
-        return;
-      }
       FreezeAnimating = true;
       hexMap.cameraKeyboardController.DisableCamera();
       StartCoroutine(CoFreeze(unit, target));
@@ -937,9 +905,6 @@ namespace MonoNS
 
     public bool PlotAnimating = false;
     public void Plot(Unit unit, Unit target) {
-      if (!unit.CanPlot()) {
-        return;
-      }
       PlotAnimating = true;
       hexMap.cameraKeyboardController.DisableCamera();
       StartCoroutine(CoPlot(unit, target));
@@ -999,9 +964,6 @@ namespace MonoNS
 
     public bool ForceRetreatAnimating = false;
     public void ForceRetreat(Unit unit, int movement, bool breakThrough = false) {
-      if (unit.retreated) {
-        return;
-      }
       ForceRetreatAnimating = true;
       unit.retreated = true;
       hexMap.cameraKeyboardController.DisableCamera();
@@ -1052,11 +1014,9 @@ namespace MonoNS
 
     public bool SurpriseAnimating = false;
     public void SurpriseAttack(Unit from, Unit to, bool hitNrun = false) {
-      if (!from.CanSurpriseAttack()) {
-        return;
-      }
       SurpriseAnimating = true;
       hexMap.cameraKeyboardController.DisableCamera();
+      from.Surprise();
       StartCoroutine(CoSurpriseAttack(from, to, hitNrun));
     }
 
@@ -1074,7 +1034,6 @@ namespace MonoNS
       popAniController.Show(hexMap.GetUnitView(from), textLib.get("pop_surpriseAttack"), Color.green);
       while(popAniController.Animating) { yield return null; }
       if (!surprised) {
-        from.UseAtmpt();
         popAniController.Show(hexMap.GetUnitView(to), textLib.get("pop_surpriseAttackFailed"), Color.white);
         while(popAniController.Animating) { yield return null; }
         int killed = from.type == Type.Infantry ? Util.Rand(40, 100) : Util.Rand(20, 50);

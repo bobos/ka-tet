@@ -89,93 +89,20 @@ namespace MonoNS
       }
     }
 
-    public Settlement nearEnemySettlement = null;
-    public Settlement nearMySettlement = null;
-    public Tile nearDam = null;
-    public List<Tile> nearFireTiles = null;
-    public bool nearAlly = false;
-    public bool nearEnemy = false;
-    public bool nearWater = false;
-    public List<Unit> nearbyEnemey = null;
-    public Unit[] surpriseTargets = null;
-    public List<Unit> freezeTargets = null;
-    public List<Unit> plotTargets = null;
     public Tile[] accessibleTiles = null;
-    public HashSet<Unit> nearbyAlly = null;
 
     void ResetUnitSelection() {
-      nearEnemySettlement = null;
-      nearMySettlement = null;
-      nearDam = null;
-      nearAlly = false;
-      nearEnemy = false;
-      nearWater = false;
-      nearbyEnemey = new List<Unit>();
-      nearbyAlly = new HashSet<Unit>();
-      nearFireTiles = new List<Tile>();
-      surpriseTargets = new Unit[]{};
       accessibleTiles = new Tile[]{};
-      freezeTargets = new List<Unit>();
-      plotTargets = new List<Unit>();
+    }
+
+    public Unit UnitSelected() {
+      return selectedUnit != null ? selectedUnit : hexMap.settlementViewPanel.selectedUnit;
     }
 
     public void PrepareUnitSelection() {
       ResetUnitSelection();
-      Settlement s = null;
-      Tile t = selectedUnit != null ? selectedUnit.tile : selectedSettlement.baseTile;
-      bool isAI = selectedUnit != null ? selectedUnit.IsAI() : selectedSettlement.owner.isAI;
-
-      foreach(Tile tile in t.neighbours) {
-        if (tile.settlement != null) {
-          s = tile.settlement;
-        }
-
-        if (tile.burnable ||
-          selectedSettlement == null &&
-          selectedUnit != null &&
-          FireBug.Aval(selectedUnit) &&
-          tile.field == FieldType.Forest) {
-          nearFireTiles.Add(tile);
-        }
-
-        if (tile.isDam) {
-          nearDam = tile;
-        }
-
-        if (tile.terrian == TerrianType.Water) {
-          nearWater = true;
-        }
-
-        Unit u = tile.GetUnit();
-        if (u != null && u.IsAI() == isAI) {
-          nearAlly = true;
-          nearbyAlly.Add(u);
-        }
-
-        if (u != null && u.IsAI() != isAI) {
-          nearEnemy = true;
-          nearbyEnemey.Add(u);
-        }
-
-        if (tile.settlement != null && tile.settlement.owner.isAI != selectedUnit.IsAI()) {
-          nearEnemy = true;
-        }
-      }
-
-      if (s != null && isAI == s.owner.isAI) {
-        nearMySettlement = s;
-      }
-      if (s != null && isAI != s.owner.isAI) {
-        nearEnemySettlement = s;
-      }
-      
       if (selectedUnit != null) {
-        surpriseTargets = selectedUnit.GetSurpriseTargets();
         accessibleTiles = selectedUnit.GetAccessibleTiles();
-        Unit u = selectedUnit != null ? selectedUnit : hexMap.settlementViewPanel.selectedUnit;
-        freezeTargets = u.GetFreezeTargets();
-        plotTargets = u.GetPlotTargets();
-        nearFireTiles = selectedUnit.GetBurnableTiles();
       }
     }
 
@@ -203,7 +130,7 @@ namespace MonoNS
 
       if (action == ActionController.actionName.ENCAMP)
       {
-        nearMySettlement.Encamp(selectedUnit);
+        selectedUnit.CanEncamp().Encamp(selectedUnit);
         Escape();
         return;
       }
@@ -221,8 +148,8 @@ namespace MonoNS
 
       if (action == ActionController.actionName.SABOTAGE)
       {
-        Tile tile = nearDam;
-        if (selectedUnit.tile.siegeWall != null && selectedUnit.tile.siegeWall.owner.isAI != selectedUnit.IsAI()) {
+        Tile tile = selectedUnit.CanSabotage();
+        if (tile.siegeWall != null) {
           tile = null;
         }
         if(!actionController.sabotage(selectedUnit, tile)){
@@ -237,7 +164,7 @@ namespace MonoNS
         mouseMode = mode.fire;
         Update_CurrentFunc = UpdateUnitSetFire;
         msgBox.Show("选择放火地点");
-        hexMap.HighlightArea(nearFireTiles.ToArray(), HexMap.RangeType.camp);
+        hexMap.HighlightArea(UnitSelected().CanFire().ToArray(), HexMap.RangeType.camp);
       }
 
       if (action == ActionController.actionName.WARGAME)
@@ -256,7 +183,7 @@ namespace MonoNS
         mouseMode = mode.attack;
         Update_CurrentFunc = UpdateUnitAttack;
         msgBox.Show("选择目标!");
-        foreach(Unit u in nearbyEnemey) {
+        foreach(Unit u in UnitSelected().OnFieldEnemy()) {
           hexMap.TargetUnit(u);
         }
       }
@@ -266,21 +193,22 @@ namespace MonoNS
         mouseMode = mode.feint;
         Update_CurrentFunc = UpdateUnitFeintDefeat;
         msgBox.Show("选择目标!");
-        foreach(Unit u in nearbyEnemey) {
+        foreach(Unit u in UnitSelected().CanDecieve()) {
           hexMap.TargetUnit(u);
         }
       }
 
       if (action == ActionController.actionName.SurpriseAttack)
       {
-        if (surpriseTargets.Length == 0) {
+        List<Unit> units = UnitSelected().CanSurpriseAttack();
+        if (units.Count == 0) {
           msgBox.Show("无可奇袭目标!");
           Escape();
         } else {
           mouseMode = mode.surpriseAttack;
           Update_CurrentFunc = UpdateUnitSurpriseAttack;
           msgBox.Show("选择目标!");
-          foreach(Unit u in surpriseTargets) {
+          foreach(Unit u in units) {
             hexMap.TargetUnit(u);
           }
         }
@@ -288,14 +216,15 @@ namespace MonoNS
 
       if (action == ActionController.actionName.Freeze)
       {
-        if (freezeTargets.Count == 0) {
+        List<Unit> units = UnitSelected().CanFreeze();
+        if (units.Count == 0) {
           msgBox.Show("无可疑兵目标!");
           Escape();
         } else {
           mouseMode = mode.freeze;
           Update_CurrentFunc = UpdateUnitFreeze;
           msgBox.Show("选择目标!");
-          foreach(Unit u in freezeTargets) {
+          foreach(Unit u in units) {
             hexMap.TargetUnit(u);
           }
         }
@@ -303,14 +232,15 @@ namespace MonoNS
 
       if (action == ActionController.actionName.Plot)
       {
-        if (plotTargets.Count == 0) {
+        List<Unit> units = UnitSelected().CanPlot();
+        if (units.Count == 0) {
           msgBox.Show("无可离间目标!");
           Escape();
         } else {
           mouseMode = mode.plot;
           Update_CurrentFunc = UpdateUnitPlot;
           msgBox.Show("选择目标!");
-          foreach(Unit u in plotTargets) {
+          foreach(Unit u in units) {
             hexMap.TargetUnit(u);
           }
         }
@@ -318,25 +248,23 @@ namespace MonoNS
 
       if (action == ActionController.actionName.CHARGE)
       {
+        List<Unit> units = UnitSelected().CanCharge();
         mouseMode = mode.attack;
         Update_CurrentFunc = UpdateUnitCharge;
         msgBox.Show("选择目标!");
-        foreach(Unit u in nearbyEnemey) {
-          if (u.CanBeShaked(selectedUnit)) {
-            hexMap.TargetUnit(u);
-          }
+        foreach(Unit u in units) {
+          hexMap.TargetUnit(u);
         }
       }
 
       if (action == ActionController.actionName.Breakthrough)
       {
+        List<Unit> units = UnitSelected().CanBreakThrough();
         mouseMode = mode.attack;
         Update_CurrentFunc = UpdateUnitBreakThrough;
         msgBox.Show("选择突破目标!");
-        foreach(Unit u in nearbyEnemey) {
-          if (u.IsOnField()) {
-            hexMap.TargetUnit(u);
-          }
+        foreach(Unit u in units) {
+          hexMap.TargetUnit(u);
         }
       }
 
@@ -345,7 +273,7 @@ namespace MonoNS
         mouseMode = mode.repos;
         Update_CurrentFunc = UpdateUnitRepos;
         msgBox.Show("选择目标!");
-        foreach(Unit u in nearbyAlly) {
+        foreach(Unit u in selectedUnit.OnFieldAllies()) {
           hexMap.TargetUnit(u);
         }
       }
@@ -410,35 +338,17 @@ namespace MonoNS
         return;
       }
 
+      HashSet<Unit> all = new HashSet<Unit>();
+      all.UnionWith(hexMap.GetAIParty().GetUnits());
+      all.UnionWith(hexMap.GetPlayerParty().GetUnits());
+      foreach(Unit unit in all) {
+        if (unit.IsShowingAnimation()) {
+          hexMap.SetUnitSkin(unit);
+        }
+      }
+
       if (mouseMode == mode.repos) {
-        foreach(Unit u in nearbyAlly) {
-          hexMap.SetUnitSkin(u);
-          targetUnit = null;
-        }
-      }
-
-      if (mouseMode == mode.attack || mouseMode == mode.feint) {
-        foreach(Unit u in nearbyEnemey) {
-          hexMap.SetUnitSkin(u);
-        }
-      }
-
-      if (mouseMode == mode.surpriseAttack) {
-        foreach(Unit u in surpriseTargets) {
-          hexMap.SetUnitSkin(u);
-        }
-      }
-
-      if (mouseMode == mode.freeze) {
-        foreach(Unit u in freezeTargets) {
-          hexMap.SetUnitSkin(u);
-        }
-      }
-
-      if (mouseMode == mode.plot) {
-        foreach(Unit u in plotTargets) {
-          hexMap.SetUnitSkin(u);
-        }
+        targetUnit = null;
       }
 
       if (mouseMode == mode.fire) {
@@ -469,7 +379,7 @@ namespace MonoNS
     public void EscapeOnOperationCommence()
     {
       msgBox.Show("");
-      foreach(Unit u in nearbyEnemey) {
+      foreach(Unit u in UnitSelected().OnFieldEnemy()) {
         if (u != null) {
           hexMap.SetUnitSkin(u);
         }
@@ -483,7 +393,7 @@ namespace MonoNS
     public void EscapeOnOperationCancel()
     {
       msgBox.Show("");
-      foreach(Unit u in nearbyEnemey) {
+      foreach(Unit u in UnitSelected().OnFieldEnemy()) {
         hexMap.SetUnitSkin(u);
       }
       hexMap.combatController.CancelOperation();
@@ -563,40 +473,40 @@ namespace MonoNS
       }
 
       if (mouseMode == mode.attack || mouseMode == mode.feint) {
-        if(u != null && u.IsAI() != selectedUnit.IsAI() && nearbyEnemey.Contains(u)) {
+        if(u != null && UnitSelected().OnFieldEnemy().Contains(u)) {
           targetUnit = u;
           return;
         }
 
         if (hexMap.settlementViewPanel.selectedUnit == null && s != null && s.owner.isAI != selectedUnit.IsAI()
-          && Util.eq<Settlement>(nearEnemySettlement, s)) {
+          && Util.eq<Settlement>(selectedUnit.EnemySettment(), s)) {
           targetSettlement = s;
           return;
         }
       }
 
       if (mouseMode == mode.surpriseAttack) {
-        if(u != null && u.IsAI() != selectedUnit.IsAI() && surpriseTargets.Contains(u)) {
+        if(u != null && u.IsAI() != selectedUnit.IsAI() && selectedUnit.GetSurpriseTargets().Contains(u)) {
           targetUnit = u;
           return;
         }
       }
 
       if (mouseMode == mode.freeze) {
-        if(u != null && u.IsAI() != selectedUnit.IsAI() && freezeTargets.Contains(u)) {
+        if(u != null && u.IsAI() != selectedUnit.IsAI() && UnitSelected().GetFreezeTargets().Contains(u)) {
           targetUnit = u;
           return;
         }
       }
 
       if (mouseMode == mode.plot) {
-        if(u != null && u.IsAI() != selectedUnit.IsAI() && plotTargets.Contains(u)) {
+        if(u != null && u.IsAI() != selectedUnit.IsAI() && UnitSelected().GetPlotTargets().Contains(u)) {
           targetUnit = u;
           return;
         }
       }
 
-      if (mouseMode == mode.repos && nearbyAlly.Contains(u)) {
+      if (mouseMode == mode.repos && selectedUnit.OnFieldAllies().Contains(u)) {
         targetUnit = u;
         return;
       }
@@ -907,7 +817,7 @@ namespace MonoNS
 
     void UpdateUnitSetFire()
     {
-      if (tileUnderMouse != null && Input.GetMouseButtonUp(0) && nearFireTiles.Contains(tileUnderMouse))
+      if (tileUnderMouse != null && Input.GetMouseButtonUp(0) && UnitSelected().CanFire().Contains(tileUnderMouse))
       {
         if(!actionController.burn(selectedUnit, tileUnderMouse)) {
           // TODO

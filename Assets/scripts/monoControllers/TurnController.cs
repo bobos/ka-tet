@@ -31,6 +31,8 @@ namespace MonoNS
       TurnChange();
     }
 
+    public static int TargetTurns = 20;
+
     public override void UpdateChild() {}
 
     public bool playerTurn = false;
@@ -185,23 +187,17 @@ namespace MonoNS
       }
       TurnChange();
       if (cnt == 0) {
-        if (turnNum > 20) {
-          // starts to drop morale
-          if (turnNum == 21) {
-            WarWeary();
-          }
+        // starts to drop morale
+        if (turnNum == TargetTurns + 1) {
+          WarWeary();
+        }
 
-          int moraleDrop = 5;
+        if (turnNum > 20) {
+          int moraleDrop = 20;
           WarParty atkParty = p.attackside ? p : otherP;
           WarParty defParty = atkParty.counterParty;
           foreach (Unit unit in atkParty.GetUnits()) {
             unit.morale -= moraleDrop;
-          }
-
-          if ((turnNum % 2) != 0) {
-            foreach(Unit unit in defParty.GetUnits()) {
-              unit.morale -= moraleDrop;
-            }
           }
         }
       }

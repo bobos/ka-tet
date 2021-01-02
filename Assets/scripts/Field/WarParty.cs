@@ -258,7 +258,8 @@ namespace FieldNS
 
     public Unit GetAmbusher(Unit target) {
       foreach(Unit unit in GetUnits()) {
-        if (unit.CanSurpriseAttack() && unit.GetSurpriseTargets().Contains(target)) {
+        List<Unit> us = unit.CanSurpriseAttack();
+        if (us.Count > 0 && us.Contains(target)) {
           return unit;
         }
       }

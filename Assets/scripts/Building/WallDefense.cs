@@ -1,7 +1,7 @@
 ﻿using TextNS;
 
 public class WallDefense {
-  public const int DefenseDrop = 10;
+  public const int DefenseDrop = 20;
   TextLib textLib = Cons.GetTextLib();
   int level = 1;
   public int defensePoint = 0;

@@ -81,38 +81,38 @@ namespace MapTileNS
 
       if (windDirection == Cons.Direction.dueNorth)
       {
-        PickTile2Burn(affectedTiles1, tile.NorthTile<Tile>(), tile.NorthEastTile<Tile>(),
-                      tile.NorthWestTile<Tile>(), chance1, chance2, chance3);
-      }
-
-      if (windDirection == Cons.Direction.dueSouth)
-      {
         PickTile2Burn(affectedTiles1, tile.SouthTile<Tile>(), tile.SouthEastTile<Tile>(),
                       tile.SouthWestTile<Tile>(), chance1, chance2, chance3);
       }
 
+      if (windDirection == Cons.Direction.dueSouth)
+      {
+        PickTile2Burn(affectedTiles1, tile.NorthTile<Tile>(), tile.NorthEastTile<Tile>(),
+                      tile.NorthWestTile<Tile>(), chance1, chance2, chance3);
+      }
+
       if (windDirection == Cons.Direction.northEast)
-      {
-        PickTile2Burn(affectedTiles1, tile.NorthEastTile<Tile>(), tile.NorthTile<Tile>(),
-                      tile.SouthEastTile<Tile>(), chance1, chance2, chance3);
-      }
-
-      if (windDirection == Cons.Direction.northWest)
-      {
-        PickTile2Burn(affectedTiles1, tile.NorthWestTile<Tile>(), tile.NorthTile<Tile>(),
-                      tile.SouthWestTile<Tile>(), chance1, chance2, chance3);
-      }
-
-      if (windDirection == Cons.Direction.southWest)
       {
         PickTile2Burn(affectedTiles1, tile.SouthWestTile<Tile>(), tile.SouthTile<Tile>(),
                       tile.NorthWestTile<Tile>(), chance1, chance2, chance3);
       }
 
-      if (windDirection == Cons.Direction.southEast)
+      if (windDirection == Cons.Direction.northWest)
       {
         PickTile2Burn(affectedTiles1, tile.SouthEastTile<Tile>(), tile.SouthTile<Tile>(),
                       tile.NorthEastTile<Tile>(), chance1, chance2, chance3);
+      }
+
+      if (windDirection == Cons.Direction.southWest)
+      {
+        PickTile2Burn(affectedTiles1, tile.NorthEastTile<Tile>(), tile.NorthTile<Tile>(),
+                      tile.SouthEastTile<Tile>(), chance1, chance2, chance3);
+      }
+
+      if (windDirection == Cons.Direction.southEast)
+      {
+        PickTile2Burn(affectedTiles1, tile.NorthWestTile<Tile>(), tile.NorthTile<Tile>(),
+                      tile.SouthWestTile<Tile>(), chance1, chance2, chance3);
       }
 
       foreach (Tile tile in affectedTiles1)

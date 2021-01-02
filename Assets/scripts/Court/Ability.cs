@@ -208,13 +208,13 @@ namespace CourtNS {
     public override Ability Clone() { return new Ambusher(); }
     public override int RequiredPoints() { return requiredPoint; }
     
-    public const int requiredPoint = 5;
+    public const int requiredPoint = 6;
     static AbilityControl ac = new AbilityControl(4, requiredPoint);
     const string N = "ability_ambusher";
     const string I = "☸";
     const string D = "ability_ambusher_description";
     const AbilityType T = AbilityType.Common;
-    public Ambusher(): base(N, I, D, T) {}
+    public Ambusher(): base(N, I, D, T, 1) {}
     public static void Unlock(Faction faction) { ac.Unlock(faction); }
     public static bool Acquire(General general) { return ac.Acquire(general); }
     public static bool Find(Faction faction) { return ac.Find(faction); }

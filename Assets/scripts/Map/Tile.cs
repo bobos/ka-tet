@@ -10,12 +10,7 @@ namespace MapTileNS
 {
   public class Tile : Hex, PFTile, DataModel
   {
-    public const float PlainHeightStart = 0f;
-    public const float PlainHeightEnd = 0.75f;
-    public const float HillHeightStart = 0.5f;
-    public const float HillHeightEnd = 1.0f;
-    public const float HighgroundWatermark = 0.65f;
-    public const int Work2BuildCamp = 34;
+    public const int Work2BuildCamp = 20;
     public const float HighGround = 0.312f;
     public const float VantageGround = 0.8f;
     public Flood flood = null;
@@ -88,26 +83,6 @@ namespace MapTileNS
         return _neighbours;
       }
       private set {}
-    }
-
-    public string GetFieldType()
-    {
-      string prefix = "";
-      if (field == FieldType.Wild) prefix = "Wild";
-      if (field == FieldType.Forest) prefix = "Forest";
-      if (field == FieldType.Settlement) prefix = "Settelment On";
-      if (field == FieldType.Schorched) prefix = "Schorched";
-      if (field == FieldType.Burning) prefix = "Burning";
-      if (field == FieldType.Flooded) prefix = "Flooded";
-      if (field == FieldType.Flooding) prefix = "Flooding";
-
-      string suffix = "";
-      if (terrian == TerrianType.Hill) suffix = "Hills";
-      if (terrian == TerrianType.Mountain) suffix = "Mountain";
-      if (terrian == TerrianType.Plain) suffix = "Plain";
-      if (terrian == TerrianType.Water) suffix = "Water";
-
-      return prefix + " " + suffix;
     }
 
     // ==============================================================

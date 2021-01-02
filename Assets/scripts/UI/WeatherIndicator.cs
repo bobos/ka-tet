@@ -26,7 +26,8 @@ namespace MonoNS
 
     public void ShowInfo()
     {
-      indicator.text = "今日: " + weatherGenerator.currentWeather.Name() + "\n";
+      indicator.text = "目标回合数: " + TurnController.TargetTurns + "\n";
+      indicator.text += "今日: " + weatherGenerator.currentWeather.Name() + "\n";
       indicator.text += weatherGenerator.season.Name() + "\n";
       indicator.text += windGenerator.current.Name() + "\n";
       indicator.text += "风向: " + Cons.DirectionDisplay(windGenerator.direction) + "\n";

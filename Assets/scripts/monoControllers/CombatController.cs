@@ -105,13 +105,13 @@ namespace MonoNS
     }
 
     int DefenderPoint(Unit unit) {
-      return (int)(unit.unitCombatPoint * 1.1f);
+      return (int)(unit.unitCombatPoint * 1.05f);
     }
 
     OperationPredict predict;
     public OperationPredict StartOperation(Unit attacker, Unit targetUnit,
       Settlement targetSettlement, bool surprised = false, bool feintDefeat = false) {
-      if (!attacker.CanAttack()) {
+      if (!surprised && attacker.CanAttack().Count == 0) {
         // no enough attempt, can not start operation
         return null;
       }
@@ -140,7 +140,7 @@ namespace MonoNS
             continue;
           }
 
-          if (u.IsAI() == attacker.IsAI() && !Util.eq<Unit>(u, attacker) && u.CanAttack() && !feintDefeat) {
+          if (u.IsAI() == attacker.IsAI() && !Util.eq<Unit>(u, attacker) && u.CanAttack().Count > 0 && !feintDefeat) {
             supportAttackers.Add(u);
           }
         }
@@ -264,7 +264,7 @@ namespace MonoNS
       float odds = bigger / smaller;
       if (odds < 2f) {
         predict.suggestedResultType = ResultType.Small;
-      } else if (odds >= 2f && odds < 4f) {
+      } else if (odds >= 2f && odds < 3.5f) {
         predict.suggestedResultType = ResultType.Great;
       } else {
         predict.suggestedResultType = ResultType.Crushing;
@@ -284,7 +284,7 @@ namespace MonoNS
       float odds = bigger / smaller;
       if (odds < 2f) {
         predict.trueSuggestedResultType = ResultType.Small;
-      } else if (odds >= 2f && odds < 4f) {
+      } else if (odds >= 2f && odds < 3.5f) {
         predict.trueSuggestedResultType = ResultType.Great;
       } else {
         predict.trueSuggestedResultType = ResultType.Crushing;
@@ -306,7 +306,7 @@ namespace MonoNS
       if ((unit.rf.province.GetConflictProvinces().Contains(target.rf.province) ||
         !Util.eq<Region>(unit.rf.province.region, target.rf.province.region))
         && !unit.Obedient()) {
-        ret = ret < 95 ? ret : 95;
+        ret = ret < 99 ? ret : 99;
       }
 
       if (!attacker && Cons.IsMist(hexMap.weatherGenerator.currentWeather)) {
@@ -469,7 +469,9 @@ namespace MonoNS
               Breacher.Get(u.unit.rf.general).Consume();
             }
             newAttackers.Add(u);
-            u.unit.UseAtmpt(); 
+            if (!predict.feintDefeat) {
+              u.unit.UseAtmpt(); 
+            }
           } else {
             giveupAttackers.Add(u.unit);
           }
@@ -611,29 +613,29 @@ namespace MonoNS
           }
 
           if (resultLevel == ResultType.Small) {
-            int modifier = 4;
+            float modifier = 0.22f;
             if (atkWin) {
-              attackerCasualty = (int)(defenderCasualty * modifier * 0.15f);
+              attackerCasualty = (int)(defenderCasualty * modifier);
             } else {
-              defenderCasualty = (int)(attackerCasualty * modifier * 0.15f);
+              defenderCasualty = (int)(attackerCasualty * modifier);
             }
           }
 
           if (resultLevel == ResultType.Great) {
-            int modifier = 3;
+            float modifier = 0.16f;
             if (atkWin) {
-              attackerCasualty = (int)(defenderCasualty * modifier* 0.15f);
+              attackerCasualty = (int)(defenderCasualty * modifier);
             } else {
-              defenderCasualty = (int)(attackerCasualty * modifier * 0.15f);
+              defenderCasualty = (int)(attackerCasualty * modifier);
             }
           }
 
           if (resultLevel == ResultType.Crushing) {
-            int modifier = Util.Rand(1, 2);
+            float modifier = 0.1f;
             if (atkWin) {
-              attackerCasualty = (int)(defenderCasualty * modifier * 0.15f);
+              attackerCasualty = (int)(defenderCasualty * modifier);
             } else {
-              defenderCasualty = (int)(attackerCasualty * modifier * 0.15f);
+              defenderCasualty = (int)(attackerCasualty * modifier);
             }
           }
         }
@@ -810,83 +812,35 @@ namespace MonoNS
         }
 
         Unit loser = atkWin ? defender : attacker;
-        List<Unit> supporters = new List<Unit>{loser};
-        HashSet<Unit> chasers = new HashSet<Unit>();
-        foreach(Unit u in loser.OnFieldAllies()) {
-          supporters.Add(u);
-        }
-
-        foreach(UnitPredict up in atkWin ? predict.attackers : predict.defenders) {
-          if (up.unit.IsCamping() && up.unit.tile.settlement.garrison.Count == 1) {
-            continue;
-          }
-          if (!up.unit.IsGone() && up.unit.rf.general.Is(Cons.reckless) && Cons.MostLikely()) {
-            chasers.Add(up.unit);
-          }
-        }
-
-        Unit un = atkWin ? attacker : defender;
-        if (feint && !un.Obedient()) {
-          if (un.IsCamping() && un.tile.settlement.garrison.Count == 1) {}
+        Tile toTile = null;
+        if (feint && !defender.Obedient()) {
+          if (defender.IsCamping() && defender.tile.settlement.garrison.Count == 1) {}
           else {
-            if (Deciever.Get(un.rf.general) != null) {
+            if (Deciever.Get(defender.rf.general) != null) {
             } else if (Cons.MostLikely()) {
-              chasers.Add(un);
+              toTile = attacker.FindDeployableTile();
             }
           }
         }
 
-        HashSet<Unit> geese = new HashSet<Unit>();
-        if (feint) {
-          geese.Add(loser);
+        Tile origTile = attacker.tile;
+        if (feint && toTile != null) {
           hexMap.dialogue.ShowFeintDefeat(loser);
           while(hexMap.dialogue.Animating) { yield return null; }
+          hexMap.dialogue.ShowChaseDialogue(defender);
+          while (hexMap.dialogue.Animating) { yield return null; }
+
+          hexMap.unitAniController.MoveUnit(attacker, toTile, true);
+          hexMap.unitAniController.MoveUnit(defender, origTile, true);
+          hexMap.turnController.Sleep(1);
+          while(hexMap.turnController.sleeping) { yield return null; }
         }
+
         if (atkWin && loser.IsCamping() &&
           (resultLevel == ResultType.Crushing || resultLevel == ResultType.Great)) {
           // settlement loss
           hexMap.unitAniController.TakeSettlement(attacker, loser.tile.settlement);
           while (hexMap.unitAniController.TakeAnimating) { yield return null; }
-        }
-
-        // goose chase
-        HashSet<Unit> occupied = new HashSet<Unit>();
-        foreach(Unit u in chasers) {
-          if (u.IsCamping()) {
-            Tile targetTile = null;
-            foreach(Tile t in u.tile.neighbours) {
-              if (t.Deployable(u)) {
-                targetTile = t;
-                break;
-              }
-            }
-            if (targetTile == null) {
-              continue;
-            }
-            u.tile.settlement.Decamp(u, targetTile);
-          }
-          Tile[] path = new Tile[]{};
-          foreach(Unit goose in geese) {
-            foreach(Tile t in goose.tile.neighbours) {
-              if (!t.Deployable(u)) {
-                continue;
-              }
-
-              path = u.FindPath(t);
-              if (path.Length > 0) {
-                break;
-              }
-            }
-            if (path.Length > 0) {
-              break;
-            }
-          }
-          if (path.Length > 0) {
-            hexMap.dialogue.ShowChaseDialogue(u);
-            while (hexMap.dialogue.Animating) { yield return null; }
-            hexMap.unitAniController.MoveUnit(u, path[path.Length - 1]);
-            while (hexMap.unitAniController.MoveAnimating) { yield return null; }
-          }
         }
       } else {
       // TODO: uncomment

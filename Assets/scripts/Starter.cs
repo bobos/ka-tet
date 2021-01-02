@@ -150,9 +150,7 @@ public class Starter : MonoBehaviour {
     StartButton.SetActive(false);
     
     // TODO build dam
-    Tile dam = hexMap.GetTile(6, 3);
-    dam.BuildDam();
-    dam = hexMap.GetTile(8, 11);
+    Tile dam = hexMap.GetTile(8, 11);
     dam.BuildDam();
     
     // first one is always the commander
